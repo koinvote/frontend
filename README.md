@@ -1,1 +1,1 @@
-# frontend
+Coin Dev init
