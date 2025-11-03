@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --fw-regular: 400;
+  --fw-medium: 500;
+
+  /* letter-spacing tokens (px) */
+  --track-0: 0px;
+  --track--15: -0.15px;
+  --track--31: -0.31px;
+  --track--44: -0.44px;
+
+  /* breakpoints */
+  --breakpoint-md: 48rem; /* 768px */
+  --breakpoint-lg: 80rem; /* 1280px */
+}
+
+@layer base {
+  html { font-family: var(--font-inter, Inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  body { font-weight: var(--fw-regular); font-size: 14px; line-height: 24px; letter-spacing: var(--track--31); }
+}
+
+/* weights */
+@utility fw-r { font-weight: var(--fw-regular); }
+@utility fw-m { font-weight: var(--fw-medium); }
+
+/* font-size */
+@utility tx-12 { font-size: 12px; }
+@utility tx-16 { font-size: 16px; }
+@utility tx-18 { font-size: 18px; }
+@utility tx-20 { font-size: 20px; }
+@utility tx-22 { font-size: 22px; }
+
+/* line-height */
+@utility lh-16 { line-height: 16px; }
+@utility lh-18 { line-height: 18px; }
+@utility lh-20 { line-height: 20px; }
+@utility lh-22 { line-height: 22px; }
+@utility lh-24 { line-height: 24px; }
+@utility lh-26 { line-height: 26px; }
+@utility lh-27 { line-height: 27px; }
+@utility lh-30 { line-height: 30px; }
+@utility lh-32 { line-height: 32px; }
+
+/* letter-spacing (tracking) */
+@utility track-0   { letter-spacing: var(--track-0); }
+@utility track--15 { letter-spacing: var(--track--15); }
+@utility track--31 { letter-spacing: var(--track--31); }
+@utility track--44 { letter-spacing: var(--track--44); }
