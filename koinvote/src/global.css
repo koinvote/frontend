@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   /* color tokens */
@@ -34,6 +35,20 @@
   --breakpoint-lg: 80rem; /* 1280px */
 }
 
+:root {
+  /* primary */
+  --btn-primary-bg: #ffffff;
+  --btn-primary-fg: #0a0a0a;
+  --btn-primary-bg-hover: #f3f3f5;
+
+
+  /* outline */
+  --btn-outline-bg: transparent;
+  --btn-outline-fg: #ffffff;         
+  --btn-outline-border: #e6e6ea33;   
+  --btn-outline-bg-hover: #111214;   
+}
+
 /* light mode */
 :root:not(.dark) {
   --color-primary:           #0A0A0A;     
@@ -41,6 +56,14 @@
   --color-bg:           #FFFFFF;      
   --color-surface:      #F3F3F5;     
   --color-border:       #E6E6EA;     
+
+  --btn-primary-bg: #ff8904;
+  --btn-primary-fg: #ffffff;
+  --btn-primary-bg-hover: #ff9c2b;   
+
+  --btn-outline-fg: #0a0a0a;
+  --btn-outline-border: #dcdee2;
+  --btn-outline-bg-hover: #f3f3f5;
 }
 
 
