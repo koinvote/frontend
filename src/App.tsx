@@ -1,10 +1,17 @@
+import { Suspense } from 'react'
+
+import { RouterProvider } from 'react-router'
+import { router } from './router'
+import { PageLoading } from '@/components'
+
+
 function App() {
+  
   return (
     <>
-      <h1>KoinVote</h1>
-      <p className="read-the-docs text-mint-500 tx-14">
-        BTC
-      </p>
+      <Suspense fallback={<PageLoading />}>
+        <RouterProvider router={router} />
+      </Suspense>
     </>
   )
 }

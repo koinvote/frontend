@@ -1,93 +1,79 @@
+// components/base/Button.tsx
 import { cva, type VariantProps } from 'class-variance-authority'
-import type { ReactNode } from 'react'
-
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/utils/style'
 
-const buttonVariants = cva('rounded-[8px] text-primary', {
-  variants: {
-    type: {
-      default: '',
-      primary: 'bg-btn-primary text-primary-reverse hover:bg-btn-primary-hover',
-      secondary: 'bg-btn-secondary text-primary-reverse hover:bg-btn-secondary-hover',
-      tertiary: 'bg-btn-tertiary text-primary-reverse hover:bg-btn-tertiary-hover',
-      outline: 'bg-panel-white border-[1px] border-gray300',
-      danger: 'bg-error text-primary-reverse',
-      warning: 'bg-error/10 text-error',
-      link: '',
+export const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-[10px] px-4 select-none fw-m track--15 ' +
+    'transition-[transform,opacity,background-color,box-shadow] duration-150 ease-out ' +
+    'focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-orange-500)] ' +
+    'active:scale-[0.98]',
+  {
+    variants: {
+      variant: {
+        white:
+          'bg-[var(--color-white)] text-[var(--color-black)] ' +
+          'hover:opacity-95 dark:hover:opacity-95 ' +
+          'border border-[color:var(--color-border)]/40 dark:border-[color:var(--color-border)]/60',
+        black:
+          'bg-[var(--color-black)] text-[var(--color-white)] ' +
+          'hover:opacity-95 dark:hover:opacity-95',
+        orange:
+          'bg-[var(--color-orange-500)] text-[var(--color-white)] ' +
+          'hover:opacity-95 dark:hover:opacity-95 shadow-[0_0_0_1px_rgba(0,0,0,0.04)]',
+      },
+      size: {
+        sm: 'h-9 lh-18',
+        md: 'h-10 lh-20',
+        lg: 'h-12 lh-24',
+      },
+      text: {
+        xs: 'tx-12',
+        md: 'tx-16',
+        lg: 'tx-18',
+      },
+      block: {
+        true: 'w-full',
+      },
     },
-    size: {
-      md: 't-sb px-4 py-3',
-      sm: 't-xs px-3 py-2',
+    defaultVariants: {
+      variant: 'white',
+      size: 'md',
     },
-    block: {
-      true: 'w-full',
-    },
-    disabled: {
-      true: 'cursor-not-allowed',
-    },
-  },
-  compoundVariants: [
-    {
-      type: 'primary',
-      disabled: true,
-      class: 'bg-btn-primary/50 text-primary-reverse/50',
-    },
-    {
-      type: 'secondary',
-      disabled: true,
-      class: 'bg-btn-secondary/50 text-primary-reverse/50',
-    },
-    {
-      type: 'tertiary',
-      disabled: true,
-      class: 'bg-btn-tertiary/50 text-primary-reverse/50',
-    },
-    {
-      type: 'danger',
-      disabled: true,
-      class: 'bg-error/50 text-primary-reverse/50',
-    },
-    {
-      type: 'warning',
-      disabled: true,
-      class: 'bg-error/5 text-error/50',
-    },
-    {
-      type: 'outline',
-      disabled: true,
-      class: 'text-tertiary/50 border-gray300/50',
-    },
-    {
-      type: 'default',
-      disabled: true,
-      class: 'bg-panel-gray-100/50 text-primary/50',
-    },
-    {
-      type: 'link',
-      disabled: true,
-      class: 'opacity-40',
-    },
-  ],
-  defaultVariants: {
-    type: 'default',
-    size: 'md',
-    block: false,
-  },
-})
+  }
+)
 
-interface ButtonProps extends VariantProps<typeof buttonVariants> {
+export interface ButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'>,
+    VariantProps<typeof buttonVariants> {
   children?: ReactNode
-  disabled?: boolean
-  className?: string
-  onClick?: () => any
 }
 
-export function Button({ children, type, size, className, block, disabled, onClick }: ButtonProps) {
+/** example
+ * <Button variant="white">White</Button>
+ * <Button variant="black" size="lg" block>Black Full</Button>
+ * <Button variant="orange" className="rounded-2xl px-6">Orange Custom</Button>
+ */
+export function Button({
+  children,
+  className,
+  variant,
+  size,
+  block,
+  text,
+  disabled,
+  ...rest
+}: ButtonProps) {
   return (
     <button
-      className={cn(buttonVariants({ type, size, block, disabled }), className)}
+      type="button"
       disabled={disabled}
-      onClick={onClick}
+      className={cn(
+        buttonVariants({ variant, size, text, block }),
+        disabled && 'opacity-50 pointer-events-none',
+        className
+      )}
+      {...rest}
     >
       {children}
     </button>
