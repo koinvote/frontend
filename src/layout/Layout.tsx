@@ -75,8 +75,9 @@ export default function Layout() {
             </Button>
             <Button
               size="md"
+              text="sm"
               block={false}
-              className="w-auto md:w-[140px] lg:tx-16"
+              className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
             >
               {t('layout.createEvent')}
             </Button>
@@ -89,8 +90,7 @@ export default function Layout() {
           'hidden md:sticky md:top-16 md:block md:shrink-0 md:h-[calc(100dvh-4rem)]',
           'md:backdrop-blur',
           'transition-[width] duration-200 ease-out',
-          // 新增：邊框/背景使用 token
-          'border-r border-border bg-surface',
+          ' border-border bg-surface',
           collapsed ? 'md:w-[70px]' : 'md:w-[280px]'
         )}>
           <div className={cn('h-full overflow-y-auto py-2', collapsed ? 'px-0' : 'px-2')}>

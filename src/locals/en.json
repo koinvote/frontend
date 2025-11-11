@@ -3,15 +3,29 @@
     "title": "KoinVote",
     "createEvent": "Create Event"
   },
-    "menu": {
-      "about": "About Koinvote",
-      "support": "Support",
-      "verification": "Verification Tool",
-      "terms": "Terms",
-      "privacy": "Privacy",
-      "charges": "Charges and Refunds",
-      "subscribe": "Subscribe",
-      "help": "Help / FAQ"
-    }
+  "menu": {
+    "about": "About Koinvote",
+    "support": "Support",
+    "verification": "Verification Tool",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "charges": "Charges and Refunds",
+    "subscribe": "Subscribe",
+    "help": "Help / FAQ"
+  },
+  "about": {
+    "title": "About Koinvote",
+    "introBold": "Koinvote is a forum for Bitcoin holders, where opinions carry real and transparent influence according to their holdings.",
+    "intro": "Through Koinvote, Bitcoin will evolve from an asset into a right. We believe that as Bitcoin adoption grows, this power will make an unparalleled contribution to human peace.",
+    "featuresTitle": "Features",
+    "feature1Title": " No registration: ",
+    "feature1": "participate without creating an account",
+    "feature2Title": " Secure: ",
+    "feature2": "the Bitcoin related to your message signing never leaves your own address",
+    "feature3Title": " Transparent: ",
+    "feature3": "all replies and holding information are publicly verifiable",
+    "feature4Title": " Rewarding: ",
+    "feature4": "earn potential returns by participating in events",
+    "outro": "Through these features, we will provide a secure and effective platform to discover and deliver opinions from Bitcoin holders."
   }
-  
+}

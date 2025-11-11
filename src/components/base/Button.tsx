@@ -33,6 +33,7 @@ export const buttonVariants = cva(
       },
       text: {
         xs: 'tx-12',
+        sm: 'tx-14',
         md: 'tx-16',
         lg: 'tx-18',
       },
@@ -98,7 +99,7 @@ export const buttonVariants = cva(
       appearance: 'solid',
       tone: 'primary',
       size: 'md',
-      text: 'md',
+      text: 'sm',
     },
   }
 )

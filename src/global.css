@@ -79,6 +79,7 @@
 
 /* font-size */
 @utility tx-12 { font-size: 12px; }
+@utility tx-14 { font-size: 14px; }
 @utility tx-16 { font-size: 16px; }
 @utility tx-18 { font-size: 18px; }
 @utility tx-20 { font-size: 20px; }

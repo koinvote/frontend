@@ -1,16 +1,31 @@
 {
-    "layout": {
+  "layout": {
     "title": "KoinVote",
     "createEvent": "建立活動"
   },
-    "menu": {
-      "about": "關於 Koinvote",
-      "support": "支援",
-      "verification": "驗證工具",
-      "terms": "條款",
-      "privacy": "隱私",
-      "charges": "費用和退款",
-      "subscribe": "訂閱",
-      "help": "幫助 / 常見問題"
-    }
+  "menu": {
+    "about": "關於 Koinvote",
+    "support": "支援",
+    "verification": "驗證工具",
+    "terms": "條款",
+    "privacy": "隱私",
+    "charges": "費用和退款",
+    "subscribe": "訂閱",
+    "help": "幫助 / 常見問題"
+  },
+  "about": {
+    "title": "關於 Koinvote",
+    "introBold": "Koinvote 是一個讓比特幣持有者能根據其持有量發揮真實且透明影響力的論壇。",
+    "intro": "透過 Koinvote，比特幣將從一種資產演變為一項權利。我們相信，隨著比特幣的普及，這股力量將為人類和平帶來前所未有的貢獻。",
+    "featuresTitle": "特色",
+    "feature1Title": " 無需註冊：",
+    "feature1": "可在不建立帳號的情況下參與",
+    "feature2Title": " 安全：",
+    "feature2": "與您訊息簽名相關的比特幣永遠不會離開您的地址",
+    "feature3Title": " 透明：",
+    "feature3": "所有回覆與持有資訊皆可公開驗證",
+    "feature4Title": " 回饋：",
+    "feature4": "可透過參與活動獲得潛在報酬",
+    "outro": "透過這些特點，我們將提供一個安全且有效的平台，讓比特幣持有者發掘與傳遞意見。"
+  }
 }
