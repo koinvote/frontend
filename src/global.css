@@ -6,6 +6,7 @@
   /* color tokens */
   --color-gray-50:  #FAFAFA;
   --color-gray-100: #F3F3F5;
+  --color-gray-200: #DDDDDD;
   --color-gray-400: #A1A1A1;
   --color-gray-500: #717182;
   --color-gray-950: #0A0A0A;
@@ -16,6 +17,7 @@
 
   --color-primary:           var(--color-gray-50);
   --color-secondary:     var(--color-gray-400);
+  --color-tertiary:     var(--color-gray-200);
   --color-bg:           var(--color-gray-950);
   --color-surface:      #111214;
   --color-border:       #232428;

@@ -88,5 +88,28 @@
     "section8Title": "8. Disclaimer",
     "s8_1": "The platform executes payouts automatically as designed and is not liable for any losses caused by blockchain delays, fee fluctuations, user input errors, or system hacking.",
     "s8_2": "You use this platform at your own risk."
+  },
+  "charges": {
+    "title": "Charges and Refunds",
+    "section1Title": "Charges",
+    "s1_1_title": "Platform Service Fee",
+    "s1_1_text": "A platform service fee of 2% will be deducted from each event reward pool.",
+    "s1_2_title": "Transaction Fee",
+    "s1_2_text": "All reward distribution and refund transactions are subject to Bitcoin network fees, based on the recommended fee rate at the time of processing.",
+    "s1_3_title": "Sponsorship Threshold",
+    "s1_3_text": "The minimum reward amount is 0.0005 BTC. Payments below this amount will be treated as donations and will not be refunded.",
+    "s1_4_title": "Minimum Payout Threshold (Dust Rule)",
+    "s1_4_text": "10,000 sats. If a winner’s reward is below this amount, it will not be distributed directly but added to the redistribution pool.",
+    "s1_5_title": "Refund Processing Fee",
+    "s1_5_text": "A refund processing fee applies to each refund, currently set at 0%.",
+    "section2Title": "Refunds",
+    "s2_1_title": "Abnormal Payments",
+    "s2_1_text": "If a payment transaction generates multiple outputs within the same transaction, it may be treated as abnormal and will NOT trigger a refund.",
+    "s2_2_title": "Underpayments",
+    "s2_2_text": "If the payment is above 0.0005 BTC but insufficient for the event requirement, the system will automatically refund.",
+    "s2_3_title": "Overpayments",
+    "s2_3_text": "If the payment exceeds the required amount:\n- Any excess below 0.0005 BTC will be treated as a sponsorship to the platform.\n- Any excess of 0.0005 BTC or more will be refunded.",
+    "s2_4_title": "Refund Deductions",
+    "s2_4_text": "All refunds will be subject to:\n- Bitcoin network transaction fee\n- Platform refund processing fee\n\nIf the refundable amount is insufficient to cover these costs, no refund will be issued."
   }
 }
