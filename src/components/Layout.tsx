@@ -2,9 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, Outlet } from 'react-router'
 import Menu from './Menu'
 import { Button } from './base/Button'
+import { cn } from '@/utils/style'
 
 export default function Layout() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)            // mobile drawer
+  const [collapsed, setCollapsed] = useState(false)  // desktop sidebar
   const closeBtnRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
@@ -51,25 +53,46 @@ export default function Layout() {
       </header>
 
       <div className="flex w-full">
-        <aside
-          className="
-            hidden
-            md:block
-            md:shrink-0
-            md:border-r md:border-white/10
-            md:bg-black
-            md:backdrop-blur
-            md:sticky md:top-16
-            md:h-[calc(100dvh-4rem)]
-            lg:top-16
-            md:w-[230px]
-          "
-          // style={{ width: '230px' }} // 固定寬，避免 1/4 在超寬螢幕過大；需要 1/4 可改 md:w-1/4
-        >
-          <div className="h-full overflow-y-auto px-4 py-4">
-            <Menu onItemClick={() => setOpen(false)} />
-          </div>
-        </aside>
+      <aside
+  className={cn(
+    'hidden md:sticky md:top-16 md:block md:shrink-0 md:h-[calc(100dvh-4rem)]',
+    'md:bg-black md:backdrop-blur',
+    'transition-[width] duration-200 ease-out',
+    collapsed ? 'md:w-[76px]' : 'md:w-[280px]'
+  )}
+>
+  <div className={cn('h-full overflow-y-auto py-4', collapsed ? 'px-0' : 'px-2')}>
+    <Menu collapsed={collapsed} onItemClick={() => setOpen(false)} />
+  </div>
+</aside>
+
+<div className="relative hidden md:block md:sticky md:top-16 md:h-[calc(100dvh-4rem)] w-px bg-white/10">
+  <button
+    type="button"
+    onClick={() => setCollapsed(v => !v)}
+    aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
+    className={cn(
+      'absolute left-1/2 -translate-x-1/2',
+      'mt-3',
+      'inline-flex h-8 w-8 items-center justify-center rounded-2xl',
+      'border border-white/30 bg-black shadow hover:bg-white/10 transition-colors'
+    )}
+  >
+    {collapsed ? (
+      // →
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M10 7l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    ) : (
+      // ←
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M14 7l-5 5 5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    )}
+  </button>
+</div>
+
+
 
         {/* Content */}
         <main className="min-w-0 flex-1">
@@ -93,9 +116,8 @@ export default function Layout() {
 
         {/* Panel */}
         <div
-          className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] transform bg-neutral-900 p-3 shadow-2xl transition-transform ${
-            open ? 'translate-x-0' : '-translate-x-full'
-          }`}
+          className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] transform bg-neutral-900 p-3 shadow-2xl transition-transform ${open ? 'translate-x-0' : '-translate-x-full'
+            }`}
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
