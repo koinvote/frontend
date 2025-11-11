@@ -12,7 +12,7 @@ export default function ChargesnRefunds() {
       <section>
         <h2 className="fw-m mb-2">{t('charges.section1Title')}</h2>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div>
             <h3 className="fw-m">{t('charges.s1_1_title')}</h3>
             <p>{t('charges.s1_1_text')}</p>
@@ -37,18 +37,13 @@ export default function ChargesnRefunds() {
             <h3 className="fw-m">{t('charges.s1_5_title')}</h3>
             <p>{t('charges.s1_5_text')}</p>
           </div>
-
-          <div>
-            <h3 className="fw-m">{t('charges.s1_6_title')}</h3>
-            <p>{t('charges.s1_6_text')}</p>
-          </div>
         </div>
       </section>
 
       <section>
         <h2 className="fw-m mb-2">{t('charges.section2Title')}</h2>
 
-        <div className="text-secondary space-y-3">
+        <div className="space-y-4">
           <div>
             <h3 className="fw-m">{t('charges.s2_1_title')}</h3>
             <p>{t('charges.s2_1_text')}</p>
