@@ -1,3 +1,16 @@
 {
-    "hello": "你好"
+    "layout": {
+    "title": "KoinVote",
+    "createEvent": "建立活動"
+  },
+    "menu": {
+      "about": "關於 Koinvote",
+      "support": "支援",
+      "verification": "驗證工具",
+      "terms": "條款",
+      "privacy": "隱私",
+      "charges": "費用和退款",
+      "subscribe": "訂閱",
+      "help": "幫助 / 常見問題"
+    }
 }

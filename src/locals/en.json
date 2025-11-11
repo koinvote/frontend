@@ -1,4 +1,8 @@
 {
+  "layout": {
+    "title": "KoinVote",
+    "createEvent": "Create Event"
+  },
     "menu": {
       "about": "About Koinvote",
       "support": "Support",

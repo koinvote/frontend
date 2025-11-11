@@ -1,7 +1,7 @@
   import { createBrowserRouter } from 'react-router'
   import { Root } from './Root'
   import { ErrorPage } from '@/error/index'
-  import  Layout  from '@/components/Layout'
+  import  Layout  from '@/layout/Layout'
   import Home from '@/pages/home'
   import About from '@/pages/about'
   import Chargesnrefunds from "@/pages/chargesnrefunds";

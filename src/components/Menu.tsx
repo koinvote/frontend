@@ -34,10 +34,12 @@ const items: Item[] = [
 ]
 
 const baseLink =
-  'group flex items-center rounded-xl px-3 py-2 tx-16 lh-22 ' +
-  'text-[var(--color-secondary)] hover:bg-white/5 transition-colors'
+  'group flex items-center rounded-xl px-3 py-2 tx-16 lh-22 transition-colors ' +
+  'text-secondary hover:bg-surface/70'
 
-const activeLink = 'bg-white/10 text-[var(--color-primary)]'
+const activeLink =
+  'bg-surface text-primary'
+
 
 const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const { t } = useTranslation();
