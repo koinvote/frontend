@@ -11,6 +11,7 @@
   import Subscribe from "@/pages/subscribe";
   import Support from "@/pages/support";
   import VerificaionTool from "@/pages/verificaionTool";
+import TermsOfRewardDistribution from './pages/terms/TermsOfRewardDistribution'
 
 
   export const router = createBrowserRouter([
@@ -27,6 +28,7 @@
               { path: 'help-faq', element: <HelpnFaq /> },
               { path: 'privacy', element: <Privacy /> },
               { path: 'terms', element: <Terms /> },
+              { path: 'terms-reward-distribution', element: <TermsOfRewardDistribution /> },
               { path: 'subscribe', element: <Subscribe /> },
               { path: 'support', element: <Support /> },
               { path: 'verification-tool', element: <VerificaionTool /> },

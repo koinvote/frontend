@@ -90,7 +90,7 @@ export default function Layout() {
           'hidden md:sticky md:top-16 md:block md:shrink-0 md:h-[calc(100dvh-4rem)]',
           'md:backdrop-blur',
           'transition-[width] duration-200 ease-out',
-          ' border-border bg-surface',
+          ' border-border bg-(--color-bg)',
           collapsed ? 'md:w-[70px]' : 'md:w-[280px]'
         )}>
           <div className={cn('h-full overflow-y-auto py-2', collapsed ? 'px-0' : 'px-2')}>
