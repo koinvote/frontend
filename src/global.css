@@ -10,6 +10,7 @@
   --color-gray-400: #A1A1A1;
   --color-gray-500: #717182;
   --color-gray-950: #0A0A0A;
+  --color-gray-600: #C0C0C0;
 
   --color-white:    #FFFFFF;
   --color-black:    #000000;
@@ -22,6 +23,7 @@
   --color-surface:      #111214;
   --color-border:       #232428;
   --color-accent:       var(--color-orange-500);
+  --color-primary-lightModeGray: var(--color-gray-50);
 
   /* font weight */
   --fw-regular: 400;
@@ -59,6 +61,7 @@
   --color-bg:           #FFFFFF;      
   --color-surface:      #F3F3F5;     
   --color-border:       #E6E6EA;     
+  --color-primary-lightModeGray: var(--color-gray-600);
 
   --btn-primary-bg: #ff8904;
   --btn-primary-fg: #ffffff;

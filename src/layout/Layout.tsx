@@ -123,7 +123,7 @@ export default function Layout() {
 
         {/* Content */}
         <main className="min-w-0 flex-1">
-          <div className="px-4 py-4 md:px-6 md:py-6 lg:px-12">
+          <div className="px-4 py-4 md:px-6 md:py-6 lg:px-12 border-b border-border">
             <Outlet />
           </div>
         </main>
