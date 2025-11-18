@@ -14,6 +14,7 @@
     "@tanstack/react-query": "^5.90.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.19",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-i18next": "^16.2.4",
