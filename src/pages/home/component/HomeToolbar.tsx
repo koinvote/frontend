@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useHomeStore } from '@/stores/homeStore'
 import { type HomeSortField, type HomeSortOrder } from '@/pages/home/types/index'
 import { mockFetchPopularHashtags } from '@/pages/home/mockData'
@@ -41,11 +41,11 @@ export function HomeToolbar() {
 
   const isOngoing = status === 'ongoing'
 
-  const sortLabel = useMemo(
-    () =>
-      SORT_OPTIONS.find((opt) => opt.value === sortField)?.label ?? 'Time',
-    [sortField],
-  )
+  // const sortLabel = useMemo(
+  //   () =>
+  //     SORT_OPTIONS.find((opt) => opt.value === sortField)?.label ?? 'Time',
+  //   [sortField],
+  // )
 
   const toggleSortOrder = () => {
     const next: HomeSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'

@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { useHomeEvents } from '@/hooks/useHomeEvents'
 import { EventCard } from '@/pages/home/component/EventCard'
-import { useHomeStore } from '@/stores/homeStore'
+// import { useHomeStore } from '@/stores/homeStore'
 
 
 export function EventList() {
   const { events, isLoading, isError, hasMore, loadMore, reload } = useHomeEvents()
   const sentinelRef = useRef<HTMLDivElement | null>(null)
-  const { status } = useHomeStore()
+  // const { status } = useHomeStore()
 
   // infinite scroll
   useEffect(() => {
