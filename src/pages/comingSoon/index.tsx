@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 
 const ComingSoon = () => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [email, setEmail] = useState('')
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = () => {
     setStatus('submitting')
 
     setTimeout(() => {
