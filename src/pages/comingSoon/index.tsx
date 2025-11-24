@@ -50,7 +50,7 @@ const ComingSoon = () => {
                 name="fields[email]"
                 required
                 autoComplete="email"
-                placeholder="Enter your email address..."
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full flex-1 rounded-lg border border-neutral-700 bg-neutral-900 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400"
