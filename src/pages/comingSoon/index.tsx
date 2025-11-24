@@ -75,7 +75,7 @@ const ComingSoon = () => {
                 type="submit"
                 disabled={isSubmitting}
                 className="w-full rounded-lg bg-[#4A5565] px-6 py-3 text-base font-semibold 
-                text-[#171717] transition-colors hover:bg-amber-400 disabled:cursor-not-allowed disabled:opacity-70"
+                text-[#171717] transition-colors hover:bg-amber-50 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {isSubmitting ? 'Subscribing…' : 'Subscribe'}
               </button>
