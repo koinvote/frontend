@@ -1,6 +1,6 @@
 
 import { useEffect, useCallback } from 'react'
-import { mockFetchEvents } from '@/pages/home/mockData'
+import { mockFetchEventsForHome } from '@/pages/home/mockData'
 import { useHomeStore } from '@/stores/homeStore'
 
 export function useHomeEvents() {
@@ -26,13 +26,13 @@ export function useHomeEvents() {
     setLoading(true)
     setError(false)
     try {
-      const res = await mockFetchEvents({
+      const res = await mockFetchEventsForHome({
         status,
         search: debouncedSearch,
         sortField,
         sortOrder,
         hashtag: activeHashtag,
-        offset: 0,
+        page: 1,
         limit,
       })
       setEvents(res.items, res.total, res.hasMore, res.offset + res.items.length)
@@ -59,14 +59,14 @@ export function useHomeEvents() {
     setLoading(true)
     setError(false)
     try {
-      const res = await mockFetchEvents({
+      const res = await mockFetchEventsForHome({
         status,
         search: debouncedSearch,
         sortField,
         sortOrder,
         hashtag: activeHashtag,
-        offset,
-        limit,
+        page: offset,
+        limit: limit,
       })
       appendEvents(res.items, res.hasMore, res.offset + res.items.length)
     } catch (e) {

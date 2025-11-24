@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useHomeStore } from '@/stores/homeStore'
 import { type HomeSortField, type HomeSortOrder } from '@/pages/home/types/index'
-import { mockFetchPopularHashtags } from '@/pages/home/mockData'
 
 const SORT_OPTIONS: { value: HomeSortField; label: string }[] = [
   { value: 'time', label: 'Time' },
@@ -26,10 +25,7 @@ export function HomeToolbar() {
 
   const [popularHashtags, setPopularHashtags] = useState<string[]>([])
 
-  // 取得熱門 hashtag（mock）
-  useEffect(() => {
-    mockFetchPopularHashtags(10).then(setPopularHashtags).catch(console.error)
-  }, [])
+
 
   // debounce search 300ms
   useEffect(() => {

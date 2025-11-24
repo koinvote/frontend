@@ -1,9 +1,13 @@
+// src/pages/home/types.ts
+
+// ===== UI 用的型別 (保持不變) =====
+
 export type EventState = 'ACTIVE' | 'CLOSED'
 
 export interface ReplyPreview {
   reply_id: string
   body: string
-  weight_percent: number // 0–100
+  weight_percent: number
   amount_btc: string
 }
 
@@ -26,25 +30,52 @@ export interface EventSummary {
   top_replies: ReplyPreview[]
 }
 
+// Home 狀態、排序（UI）
 export type HomeStatusFilter = 'ongoing' | 'completed'
-
 export type HomeSortField = 'time' | 'bounty' | 'participation'
 export type HomeSortOrder = 'asc' | 'desc'
 
-export interface GetEventsParams {
-  status: HomeStatusFilter
-  search?: string
-  sortField?: HomeSortField
-  sortOrder?: HomeSortOrder
-  hashtag?: string | null
-  offset?: number
-  limit?: number
-}
-
+// front-end 自己用的分頁結果
 export interface PaginatedResult<T> {
   items: T[]
   total: number
   limit: number
   offset: number
   hasMore: boolean
+}
+
+// ===== 後端回傳型別 (新加) =====
+
+export type EventStateCode = 0 | 1 // 0=closed, 1=active
+
+export interface BackendTopReply {
+  id: number                       // reply id
+  body: string
+  weight_percent: number
+  amount_btc: number               // sats
+}
+
+export interface BackendEvent {
+  id: number                       // event internal id
+  event_id: string
+  title: string
+  description: string
+  state: EventStateCode
+  hashtags: string[]               // ["bitcoin", "mining"] no '#'
+  created_at: string
+  deadline_at: string
+  ended_at?: string
+
+  total_reward_btc: number         // sats
+  participants_count: number
+  total_stake_btc: number          // sats
+
+  top_replies: BackendTopReply[]
+}
+
+export interface BackendGetEventsResponse {
+  code: string
+  success: boolean
+  message: string | null
+  data: BackendEvent[]
 }

@@ -7,13 +7,13 @@ import { useHomeStore } from '@/stores/homeStore'
 export function HomePage() {
   const { scrollY, setScrollY } = useHomeStore()
 
-  // mount 時恢復捲動位置
+  // mount and restore the scroll position
   useEffect(() => {
     if (scrollY > 0) {
       window.scrollTo(0, scrollY)
     }
     return () => {
-      // 離開頁面時記錄當前 scroll
+      // remember the scroll position
       setScrollY(window.scrollY)
     }
   }, [scrollY, setScrollY])
