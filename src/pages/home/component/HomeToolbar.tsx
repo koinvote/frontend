@@ -23,7 +23,7 @@ export function HomeToolbar() {
     resetFilters,
   } = useHomeStore()
 
-  const [popularHashtags, setPopularHashtags] = useState<string[]>([])
+  const [popularHashtags] = useState<string[]>([])
 
 
 

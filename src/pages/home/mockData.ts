@@ -435,7 +435,7 @@ export const MOCK_BACKEND_EVENTS: BackendEvent[] = [
       return backend
     })
   
-    const total = list.length
+   
     const offset = (page - 1) * limit
     const sliced = list.slice(offset, offset + limit)
   
