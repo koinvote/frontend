@@ -1,93 +1,136 @@
+// components/base/Button.tsx
 import { cva, type VariantProps } from 'class-variance-authority'
-import type { ReactNode } from 'react'
-
+import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/utils/style'
 
-const buttonVariants = cva('rounded-[8px] text-primary', {
-  variants: {
-    type: {
-      default: '',
-      primary: 'bg-btn-primary text-primary-reverse hover:bg-btn-primary-hover',
-      secondary: 'bg-btn-secondary text-primary-reverse hover:bg-btn-secondary-hover',
-      tertiary: 'bg-btn-tertiary text-primary-reverse hover:bg-btn-tertiary-hover',
-      outline: 'bg-panel-white border-[1px] border-gray300',
-      danger: 'bg-error text-primary-reverse',
-      warning: 'bg-error/10 text-error',
-      link: '',
+/**
+ * appearance: solid / outline
+ * tone:
+ *  - primary  -> 使用 --btn-primary-* / --btn-outline-* 變數（主題感知）
+ *  - white/black/orange -> 指定固定色（不跟主題換）
+ */
+export const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-[10px] px-4 select-none fw-m track--15 ' +
+    'transition-[transform,opacity,background-color,box-shadow,border-color,color] duration-150 ease-out ' +
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 ' +
+    'active:scale-[0.98]',
+  {
+    variants: {
+      appearance: {
+        solid: '',
+        outline: 'bg-transparent border',
+      },
+      tone: {
+        primary: '', // 下面用 compoundVariants 決定最終樣式
+        white: '',
+        black: '',
+        orange: '',
+      },
+      size: {
+        sm: 'h-9 lh-18',
+        md: 'h-10 lh-20',
+        lg: 'h-12 lh-24',
+      },
+      text: {
+        xs: 'tx-12',
+        sm: 'tx-14',
+        md: 'tx-16',
+        lg: 'tx-18',
+      },
+      block: { true: 'w-full' },
     },
-    size: {
-      md: 't-sb px-4 py-3',
-      sm: 't-xs px-3 py-2',
-    },
-    block: {
-      true: 'w-full',
-    },
-    disabled: {
-      true: 'cursor-not-allowed',
-    },
-  },
-  compoundVariants: [
-    {
-      type: 'primary',
-      disabled: true,
-      class: 'bg-btn-primary/50 text-primary-reverse/50',
-    },
-    {
-      type: 'secondary',
-      disabled: true,
-      class: 'bg-btn-secondary/50 text-primary-reverse/50',
-    },
-    {
-      type: 'tertiary',
-      disabled: true,
-      class: 'bg-btn-tertiary/50 text-primary-reverse/50',
-    },
-    {
-      type: 'danger',
-      disabled: true,
-      class: 'bg-error/50 text-primary-reverse/50',
-    },
-    {
-      type: 'warning',
-      disabled: true,
-      class: 'bg-error/5 text-error/50',
-    },
-    {
-      type: 'outline',
-      disabled: true,
-      class: 'text-tertiary/50 border-gray300/50',
-    },
-    {
-      type: 'default',
-      disabled: true,
-      class: 'bg-panel-gray-100/50 text-primary/50',
-    },
-    {
-      type: 'link',
-      disabled: true,
-      class: 'opacity-40',
-    },
-  ],
-  defaultVariants: {
-    type: 'default',
-    size: 'md',
-    block: false,
-  },
-})
+    compoundVariants: [
+      /** solid */
+      {
+        appearance: 'solid',
+        tone: 'primary',
+        class:
+          // 主題感知（你的 global.css 內已定義）
+          'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-fg)] ' +
+          'hover:bg-[var(--btn-primary-bg-hover)]',
+      },
+      {
+        appearance: 'solid',
+        tone: 'white',
+        class:
+          'bg-[var(--color-white)] text-[var(--color-black)] ' +
+          'hover:opacity-95 border border-border/40 dark:border-border/60',
+      },
+      {
+        appearance: 'solid',
+        tone: 'black',
+        class: 'bg-[var(--color-black)] text-[var(--color-white)] hover:opacity-95',
+      },
+      {
+        appearance: 'solid',
+        tone: 'orange',
+        class:
+          'bg-[var(--color-orange-500)] text-[var(--color-white)] hover:opacity-95 ' +
+          'shadow-[0_0_0_1px_rgba(0,0,0,0.04)]',
+      },
 
-interface ButtonProps extends VariantProps<typeof buttonVariants> {
+      /** outline */
+      {
+        appearance: 'outline',
+        tone: 'primary',
+        class:
+          // 主題感知 outline（你在 global.css 已定義 dark/ light）
+          'text-[var(--btn-outline-fg)] border-[var(--btn-outline-border)] ' +
+          'hover:bg-[var(--btn-outline-bg-hover)]',
+      },
+      {
+        appearance: 'outline',
+        tone: 'white',
+        class: 'text-[var(--color-white)] border-[var(--color-white)]/90 hover:bg-white/5',
+      },
+      {
+        appearance: 'outline',
+        tone: 'black',
+        class: 'text-[var(--color-black)] border-[var(--color-black)]/90 hover:bg-black/5',
+      },
+      {
+        appearance: 'outline',
+        tone: 'orange',
+        class:
+          'text-[var(--color-orange-500)] border-[var(--color-orange-500)] hover:bg-[color-mix(in_oklab,var(--color-orange-500)_10%,transparent)]',
+      },
+    ],
+    defaultVariants: {
+      appearance: 'solid',
+      tone: 'primary',
+      size: 'md',
+      text: 'sm',
+    },
+  }
+)
+
+export interface ButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'>,
+    VariantProps<typeof buttonVariants> {
   children?: ReactNode
-  disabled?: boolean
-  className?: string
-  onClick?: () => any
 }
 
-export function Button({ children, type, size, className, block, disabled, onClick }: ButtonProps) {
+export function Button({
+  children,
+  className,
+  appearance,
+  tone,
+  size,
+  text,
+  block,
+  disabled,
+  ...rest
+}: ButtonProps) {
   return (
     <button
-      className={cn(buttonVariants({ type, size, block, disabled }), className)}
+      type="button"
       disabled={disabled}
-      onClick={onClick}
+      className={cn(
+        buttonVariants({ appearance, tone, size, text, block }),
+        disabled && 'opacity-50 pointer-events-none',
+        className
+      )}
+      {...rest}
     >
       {children}
     </button>
