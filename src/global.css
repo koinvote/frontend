@@ -89,6 +89,7 @@
 @utility tx-18 { font-size: 18px; }
 @utility tx-20 { font-size: 20px; }
 @utility tx-22 { font-size: 22px; }
+@utility tx-36 { font-size: 36px; }
 
 /* line-height */
 @utility lh-16 { line-height: 16px; }
