@@ -19,9 +19,11 @@ const ComingSoon = () => {
   const isSuccess = status === 'success'
 
   return (
+    <div className="h-screen bg-[#030303]">
     <main
-      className="relative flex min-h-[calc(100dvh-200px)] items-center justify-center px-4 bg-[#030303] text-white"
-    >
+  className="relative flex flex-col min-h-screen items-center justify-start px-4 pt-48 bg-[#030303] text-white"
+>
+
 
       <div className="absolute left-1/2 top-6 -translate-x-1/2 flex items-center gap-2">
         <Logo className="h-8 w-auto" />
@@ -38,9 +40,9 @@ const ComingSoon = () => {
           Coming Soon
         </h1>
         <p className="text-center tx-16 lg:tx-20 leading-relaxed text-neutral-300">
-          A forum powered by Bitcoin holders
+         <span className="whitespace-nowrap"> A forum powered by Bitcoin holders </span>
           <br />
-          Your Bitcoin balance amplifies your voice
+          <span className="whitespace-nowrap"> Your Bitcoin balance amplifies your voice </span>
         </p>
 
         {!isSuccess ? (
@@ -92,6 +94,7 @@ const ComingSoon = () => {
         )}
       </div>
     </main>
+    </div>
   )
 }
 
