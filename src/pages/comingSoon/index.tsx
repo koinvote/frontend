@@ -19,7 +19,10 @@ const ComingSoon = () => {
   const isSuccess = status === 'success'
 
   return (
-    <main className="relative flex min-h-[calc(100dvh-200px)] items-center justify-center px-4">
+    <main
+      className="relative flex min-h-[calc(100dvh-200px)] items-center justify-center px-4 bg-[#030303] text-white"
+    >
+
       <div className="absolute left-1/2 top-6 -translate-x-1/2 flex items-center gap-2">
         <Logo className="h-8 w-auto" />
         <span className="text-xl font-bold text-white">Koinvote</span>
@@ -30,11 +33,11 @@ const ComingSoon = () => {
         title="MailerLite subscribe"
       />
 
-      <div className="w-full max-w-md rounded-xl bg-neutral-950/80 px-6 py-8 shadow-lg">
-        <h1 className="mb-3 text-center text-2xl lg:tx-36 font-semibold text-white">
+      <div className="w-full max-w-md rounded-xl bg-black px-6 py-8">
+        <h1 className="mb-3 text-center text-3xl lg:tx-36 font-semibold text-white">
           Coming Soon
         </h1>
-        <p className="text-center text--base lg:tx-20 leading-relaxed text-neutral-300">
+        <p className="text-center tx-16 lg:tx-20 leading-relaxed text-neutral-300">
           A forum powered by Bitcoin holders
           <br />
           Your Bitcoin balance amplifies your voice
@@ -77,13 +80,13 @@ const ComingSoon = () => {
                 {isSubmitting ? 'Subscribing…' : 'Subscribe'}
               </button>
             </form>
-            
+
           </>
         ) : (
           <div className="mt-6 text-center">
-            <h2 className="text-xl font-semibold text-white">Thank you!</h2>
-            <p className="mt-2 text-sm text-neutral-300">
-              You have successfully joined our subscriber list.
+            <h2 className="tx-20 font-semibold text-[#BBBBBB]"> ✓ Thank you! </h2>
+            <p className="mt-2 tx-20 text-[#BBBBBB]">
+             We’ll let you know when Koinvote launches.
             </p>
           </div>
         )}
