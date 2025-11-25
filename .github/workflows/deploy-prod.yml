@@ -3,7 +3,7 @@ name: Deploy to GCE prod
 on:
   push:
     branches:
-      - main   
+      - main
 
 jobs:
   deploy:
@@ -27,3 +27,4 @@ jobs:
             git pull origin main
             npm install
             npm run build
+            sudo nginx -t && sudo systemctl reload nginx
