@@ -1,50 +1,50 @@
-# KoinVote 部署說明（dev / prod + SSL + CI/CD）
+# KoinVote Deployment Guide (dev / prod + SSL + CI/CD)
 
-本文件說明如何將這個 repo 部署到 GCP 上的 dev / prod 環境，並透過 GitHub Actions 自動部署，以及使用 Let's Encrypt 設定 SSL（HTTPS）。
+This document explains how to deploy this repository to Google Cloud Platform (GCP) for both **dev** and **prod** environments, set up **HTTPS with Let's Encrypt**, and configure **GitHub Actions** for automatic deployments.
 
 ---
 
-## 環境總覽
+## Overview
 
 - Repo: `https://github.com/koinvote/frontend`
-- Branch 約定：
-  - `dev`：部署到開發機（dev 環境）
-  - `main`：部署到正式機（prod 環境）
-- Domain：
-  - Prod：`koinvote.com` → 指向 prod VM
-  - Dev：`dev.koinvote.com` → 指向 dev VM（選用）
+- Branch convention:
+  - `dev`: deployed to the **dev** VM (staging environment)
+  - `main`: deployed to the **prod** VM (production environment)
+- Domains:
+  - Prod: `koinvote.com` → points to the prod VM
+  - Dev: `dev.koinvote.com` → points to the dev VM (optional)
 
 ---
 
-## 一、GCP VM 基本設定（dev / prod 都通用）
+## 1. GCP VM baseline setup (shared for dev / prod)
 
-### 1. 建立 VM
+### 1.1 Create VMs
 
-在 GCP 建立兩台 VM：
+Create two VMs in GCP:
 
-- `koinvote-dev`（dev）
-- `koinvote-prod`（prod）
+- `koinvote-dev` (dev)
+- `koinvote-prod` (prod)
 
-設定建議：
+Recommended settings:
 
-- OS：Debian 12 (bookworm)
-- Machine type：`e2-medium` 或依實際需求
-- 啟動磁碟：10–20GB 以上
-- 防火牆：
-  - ✅ Allow HTTP traffic
-  - ✅ Allow HTTPS traffic
+- OS: **Debian 12 (bookworm)**
+- Machine type: `e2-medium` (or adjust as needed)
+- Boot disk: at least **10–20GB**
+- Firewall:
+  - ✅ Allow HTTP traffic  
+  - ✅ Allow HTTPS traffic  
 
-建立完成後，記得把 External IP 設為 **靜態 IP**。
+After creation, change each VM’s **External IP** to **Static**.
 
-### 2. 安裝基本套件
+### 1.2 Install base packages
 
-SSH 進 VM 後：
+SSH into each VM, then:
 
 ```bash
 sudo apt update
 sudo apt install -y git nginx
 
-# 安裝 Node 20
+# Install Node 20
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 
