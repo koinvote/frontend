@@ -25,6 +25,7 @@ export const buttonVariants = cva(
         white: '',
         black: '',
         orange: '',
+        transparent: '',
       },
       size: {
         sm: 'h-9 lh-18',
@@ -66,6 +67,13 @@ export const buttonVariants = cva(
         tone: 'orange',
         class:
           'bg-[var(--color-orange-500)] text-[var(--color-white)] hover:opacity-95 ' +
+          'shadow-[0_0_0_1px_rgba(0,0,0,0.04)]',
+      },
+      {
+        appearance: 'solid',
+        tone: 'transparent',
+        class:
+          'border border-admin-accent text-[var(--color-orange-500)] hover:opacity-95 ' +
           'shadow-[0_0_0_1px_rgba(0,0,0,0.04)]',
       },
 
@@ -128,6 +136,7 @@ export function Button({
       className={cn(
         buttonVariants({ appearance, tone, size, text, block }),
         disabled && 'opacity-50 pointer-events-none',
+        !disabled && 'cursor-pointer',
         className
       )}
       {...rest}

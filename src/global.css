@@ -25,6 +25,15 @@
   --color-accent:       var(--color-orange-500);
   --color-primary-lightModeGray: var(--color-gray-50);
 
+  /* admin color tokens */
+  --color-admin-bg:        #f3f3f5;  /* 外層灰底 */
+  --color-admin-surface:   #fff5e6;  /* 內層淡橘底 */
+  --color-admin-card:      #ffffff;  /* 表單白卡 */
+  --color-admin-border:    #e0d4c5;  /* 邊框線 */
+  --color-admin-text-main: #333333;  /* 主文字 */
+  --color-admin-text-sub:  #777777;  /* 次文字 */
+  --color-admin-accent:    #f39b2b;  /* 主要按鈕 / 重點色 */
+
   /* font weight */
   --fw-regular: 400;
   --fw-medium: 500;
