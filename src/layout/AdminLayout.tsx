@@ -20,6 +20,7 @@ export default function AdminLayout() {
           <button
             type="button"
             className="flex items-center gap-1 text-admin-text-sub hover:text-admin-text-main transition-colors cursor-pointer"
+            onClick={() => window.location.href = '/'}
           >
             <ComputerIcon className="w-5 h-5" />
             切換至前台
