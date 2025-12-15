@@ -13,7 +13,8 @@ import Support from '@/pages/support'
 import VerificaionTool from '@/pages/verificaionTool'
 import TermsOfRewardDistribution from './pages/terms/TermsOfRewardDistribution'
 import ComingSoon from './pages/comingSoon'
-
+import CreateEvent from '@/pages/create-event/createEvent'
+import PreviewEvent from '@/pages/create-event/PreviewEvent'
 //admin
 import AdminLayout from '@/layout/AdminLayout'
 import AdminLogin from '@/admin/component/AdminLogin'
@@ -66,6 +67,8 @@ export const router = createBrowserRouter([
                 { path: 'subscribe', element: <Subscribe /> },
                 { path: 'support', element: <Support /> },
                 { path: 'verification-tool', element: <VerificaionTool /> },
+                { path: 'create-event', element: <CreateEvent /> },
+                { path: 'preview-event', element: <PreviewEvent /> },
               ],
             },
           ]),

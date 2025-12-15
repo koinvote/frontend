@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, Outlet } from 'react-router'
+import { Link, Outlet, useNavigate } from 'react-router'
 
 import Menu from '../components/Menu'
 import { Button } from '../components/base/Button'
@@ -24,6 +24,7 @@ export default function Layout() {
   const { theme, toggle } = useTheme()
   const { current, setLanguage } = useLanguagesStore()
   const toggleLang = () => setLanguage(current === 'en' ? 'zh' : 'en')
+  const navigate = useNavigate()
 
 
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function Layout() {
               text="sm"
               block={false}
               className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
+              onClick={() => navigate('/create-event')}
             >
               {t('layout.createEvent')}
             </Button>

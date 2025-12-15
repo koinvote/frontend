@@ -1,8 +1,5 @@
 // src/pages/home/types.ts
-
-// ===== UI 用的型別 (保持不變) =====
-
-export type EventState = 'ACTIVE' | 'CLOSED'
+import type { EventState } from '@/api/types'
 
 export interface ReplyPreview {
   reply_id: string
@@ -15,7 +12,7 @@ export interface EventSummary {
   event_id: string
   title: string
   description: string
-  state: EventState
+  state: (typeof EventState.ONGOING) | (typeof EventState.PREHEAT) | (typeof EventState.COMPLETED)
 
   hashtags: string[]
 
