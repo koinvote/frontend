@@ -14,6 +14,33 @@
     "subscribe": "訂閱",
     "help": "幫助 / 常見問題"
   },
+  "createEvent": {
+    "creatorAddressTooltip": "此地址也將用於退款。",
+    "formTitle": "建立活動",
+    "creatorAddress": "建立者地址",
+    "creatorAddressPlaceholder": "輸入你的比特幣地址",
+    "title": "標題",
+    "titlePlaceholder": "120 字元內",
+    "characterLeft": "字元內",
+    "description": "描述",
+    "descriptionPlaceholder": "500 字元內",
+    "hashtags": "標籤",
+    "hashtagsPlaceholder": "50 字元內",
+    "responseType": "回覆類型",
+    "responseTypeOptions": [
+      { "value": "open", "label": "開放式" },
+      { "value": "single_choice", "label": "單選題" }
+    ],
+    "options": "選項",
+    "optionsPlaceholder": "輸入選項",
+    "rewardType": "獎勵類型",
+    "rewarded": "有獎勵",
+    "nonRewarded": "無獎勵",
+    "rewardBtc": "獎勵 (BTC)",
+    "rewardBtcPlaceholder": "設定活動時長",
+    "numberOfRecipients": "獎勵分配人數",
+    "durationOfEvent": "活動時長"
+  },
   "verificationTool": {
     "title": "驗證指南",
     "description": "如何使用開源工具獨立驗證活動和收據",

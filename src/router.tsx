@@ -13,7 +13,17 @@ import Support from '@/pages/support'
 import VerificaionTool from '@/pages/verificaionTool'
 import TermsOfRewardDistribution from './pages/terms/TermsOfRewardDistribution'
 import ComingSoon from './pages/comingSoon'
-
+import CreateEvent from '@/pages/create-event/createEvent'
+import PreviewEvent from '@/pages/create-event/previewEvent'
+//admin
+import AdminLayout from '@/layout/AdminLayout'
+import AdminLogin from '@/admin/component/AdminLogin'
+import AdminRewardRulesPage from '@/admin/pages/rewardRules'
+import AdminFeesPage from '@/admin/pages/fee'
+import AdminRefundsPage from '@/admin/pages/refund'
+import AdminSystemSettingPage from '@/admin/pages/systemSetting'
+import AdminAnnouncementsPage from '@/admin/pages/announcement'
+import AdminSubscribersPage from '@/admin/pages/subscribe'
 const isComingSoonMode = import.meta.env.VITE_COMING_SOON === 'true'
 
 export const router = createBrowserRouter([
@@ -21,8 +31,22 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
-      { path: 'coming-soon-preview', element: <ComingSoon /> },
+      { path: 'admin/login', element: <AdminLogin /> },
+      {
+        path: 'admin',
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <AdminRewardRulesPage /> },
+          { path: 'reward-rules', element: <AdminRewardRulesPage /> },
+          { path: 'fees', element: <AdminFeesPage /> },
+          { path: 'refunds', element: <AdminRefundsPage /> },
+          { path: 'system-setting', element: <AdminSystemSettingPage /> },
+          { path: 'announcements', element: <AdminAnnouncementsPage /> },
+          { path: 'subscribers', element: <AdminSubscribersPage /> },
+        ],
+      },
 
+      { path: 'coming-soon-preview', element: <ComingSoon /> },
       ...(isComingSoonMode
         ? [
             { index: true, element: <ComingSoon /> },
@@ -43,6 +67,8 @@ export const router = createBrowserRouter([
                 { path: 'subscribe', element: <Subscribe /> },
                 { path: 'support', element: <Support /> },
                 { path: 'verification-tool', element: <VerificaionTool /> },
+                { path: 'create-event', element: <CreateEvent /> },
+                { path: 'preview-event', element: <PreviewEvent /> },
               ],
             },
           ]),

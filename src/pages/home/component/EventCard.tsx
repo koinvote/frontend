@@ -1,57 +1,58 @@
-import { type EventSummary } from '@/pages/home/types/index'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import { type EventSummary } from "@/pages/home/types/index";
+import { EventState } from "@/api/types";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-import BTCIcon from '@/assets/icons/btc.svg?react'
+import BTCIcon from "@/assets/icons/btc.svg?react";
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
 interface EventCardProps {
-  event: EventSummary
-  onClick?: () => void
+  event: EventSummary;
+  onClick?: () => void;
 }
 
 function formatCountdown(event: EventSummary) {
-  if (event.state === 'ACTIVE') {
-    const now = dayjs()
-    const deadline = dayjs(event.deadline_at)
-    if (deadline.isBefore(now)) return 'Closing soon'
-    const diffMs = deadline.diff(now)
-    const totalSeconds = Math.max(0, Math.floor(diffMs / 1000))
-    const days = Math.floor(totalSeconds / 86400)
-    const hours = Math.floor((totalSeconds % 86400) / 3600)
-    const minutes = Math.floor((totalSeconds % 3600) / 60)
+  if (event.state === EventState.ONGOING) {
+    const now = dayjs();
+    const deadline = dayjs(event.deadline_at);
+    if (deadline.isBefore(now)) return "Closing soon";
+    const diffMs = deadline.diff(now);
+    const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
 
     if (days > 0) {
-      return `${days}d ${hours}h`
+      return `${days}d ${hours}h`;
     }
-    return `${hours}h ${minutes}m`
+    return `${hours}h ${minutes}m`;
   }
 
   // CLOSED
   if (event.ended_at) {
-    const ended = dayjs(event.ended_at)
-    const now = dayjs()
-    const diffDays = now.diff(ended, 'day')
+    const ended = dayjs(event.ended_at);
+    const now = dayjs();
+    const diffDays = now.diff(ended, "day");
 
     if (diffDays < 1) {
-      const hours = now.diff(ended, 'hour')
-      return `${hours}h ago`
+      const hours = now.diff(ended, "hour");
+      return `${hours}h ago`;
     }
     if (diffDays < 7) {
-      return `${diffDays}d ago`
+      return `${diffDays}d ago`;
     }
-    const weeks = Math.floor(diffDays / 7)
-    return `${weeks}w ago`
+    const weeks = Math.floor(diffDays / 7);
+    return `${weeks}w ago`;
   }
 
-  return 'Ended'
+  return "Ended";
 }
 
 export function EventCard({ event, onClick }: EventCardProps) {
-  const countdown = formatCountdown(event)
-  const primaryReply = event.top_replies[0]
-  const secondaryReply = event.top_replies[1]
+  const countdown = formatCountdown(event);
+  const primaryReply = event.top_replies[0];
+  const secondaryReply = event.top_replies[1];
 
   return (
     <article
@@ -65,7 +66,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
         </h2>
         <div className="flex flex-row items-center gap-4 text-xs md:text-sm text-secondary">
           <span className="flex items-center gap-1">
-            <BTCIcon />{' '}
+            <BTCIcon />{" "}
             <span className="font-semibold text-accent">
               {event.total_reward_btc} BTC
             </span>
@@ -97,9 +98,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
 
           {primaryReply && (
             <div className="mb-1">
-              <p className="line-clamp-1 text-primary">
-                {primaryReply.body}
-              </p>
+              <p className="line-clamp-1 text-primary">{primaryReply.body}</p>
               <div className="mt-1 flex justify-between text-[11px] text-secondary">
                 <span>Weight: {primaryReply.weight_percent}%</span>
                 <span>Amount: {primaryReply.amount_btc} BTC</span>
@@ -109,9 +108,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
 
           {secondaryReply && (
             <div className="mt-2 border-t border-border pt-2">
-              <p className="line-clamp-1 text-primary">
-                {secondaryReply.body}
-              </p>
+              <p className="line-clamp-1 text-primary">{secondaryReply.body}</p>
               <div className="mt-1 flex justify-between text-[11px] text-secondary">
                 <span>Weight: {secondaryReply.weight_percent}%</span>
                 <span>Amount: {secondaryReply.amount_btc} BTC</span>
@@ -133,5 +130,5 @@ export function EventCard({ event, onClick }: EventCardProps) {
         </div>
       </div>
     </article>
-  )
+  );
 }

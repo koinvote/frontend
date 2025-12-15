@@ -4,17 +4,18 @@ import {
     type BackendEvent,
     type BackendTopReply,
     type EventSummary,
-    type EventState,
     type ReplyPreview,
   } from '@/pages/home/types/index'
+
+  import { EventState } from '@/api/types'
   
   const SATS_PER_BTC = 100_000_000
   
   const satsToBtcString = (sats: number): string =>
     (sats / SATS_PER_BTC).toFixed(8)
   
-  const mapStateCode = (code: 0 | 1): EventState =>
-    code === 1 ? 'ACTIVE' : 'CLOSED'
+  const mapStateCode = (code: 0 | 1): (typeof EventState.ONGOING) | (typeof EventState.PREHEAT) | (typeof EventState.COMPLETED) =>
+    code === 1 ? EventState.ONGOING : EventState.COMPLETED
   
   const mapHashtags = (tags: string[]): string[] =>
     tags.map((t) => (t.startsWith('#') ? t : `#${t}`))
