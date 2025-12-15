@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router'
 import { type FormEvent, useState, useEffect, type ChangeEvent } from 'react'
 import { Tooltip } from 'antd';
-import { useMutation } from '@tanstack/react-query'
+// import { useMutation } from '@tanstack/react-query'
 
 import { Button } from '@/components/base/Button'
 import CircleLeftIcon from '@/assets/icons/circle-left.svg?react'
@@ -9,8 +9,8 @@ import MinusIcon from '@/assets/icons/minus.svg?react'
 import PlusIcon from '@/assets/icons/plus.svg?react'
 import { cn } from '@/utils/style'
 
-import { API } from '@/api'
-import type { CreateEventReq } from '@/api/request'
+// import { API } from '@/api'
+// import type { CreateEventReq } from '@/api/request'
 import type { EventType } from '@/api/types'
 
 import { useTranslation } from 'react-i18next'
@@ -63,7 +63,7 @@ export default function CreateEvent() {
   const [hashtags, setHashtags] = useState('') // 目前 API 還沒用到，先存起來
 
   /** Minimum duration hours */
-  const [minimumDurationHours, setMinimumDurationHours] = useState<number>()
+  // const [minimumDurationHours, setMinimumDurationHours] = useState<number>()
 
   /** 回覆類型：open / single_choice */
   const [eventType, setEventType] = useState<EventType>('open')
@@ -130,11 +130,11 @@ export default function CreateEvent() {
   }
 
   /** BTC -> sats 小工具 */
-  const btcToSats = (value: string) => {
-    const num = Number(value)
-    if (!Number.isFinite(num) || num <= 0) return 0
-    return Math.round(num * 1e8)
-  }
+  // const btcToSats = (value: string) => {
+  //   const num = Number(value)
+  //   if (!Number.isFinite(num) || num <= 0) return 0
+  //   return Math.round(num * 1e8)
+  // }
 
   /** -------- React Query mutation：Create Event -------- */
   // const createEventMutation = useMutation({

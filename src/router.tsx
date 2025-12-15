@@ -14,7 +14,7 @@ import VerificaionTool from '@/pages/verificaionTool'
 import TermsOfRewardDistribution from './pages/terms/TermsOfRewardDistribution'
 import ComingSoon from './pages/comingSoon'
 import CreateEvent from '@/pages/create-event/createEvent'
-import PreviewEvent from '@/pages/create-event/PreviewEvent'
+import PreviewEvent from '@/pages/create-event/previewEvent'
 //admin
 import AdminLayout from '@/layout/AdminLayout'
 import AdminLogin from '@/admin/component/AdminLogin'
