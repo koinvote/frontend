@@ -20,17 +20,18 @@
     "creatorAddress": "建立者地址",
     "creatorAddressPlaceholder": "輸入你的比特幣地址",
     "title": "標題",
-    "titlePlaceholder": "120 字元內",
+    "titlePlaceholder": "",
     "characterLeft": "字元內",
     "description": "描述",
-    "descriptionPlaceholder": "500 字元內",
+    "descriptionPlaceholder": "",
     "hashtags": "標籤",
-    "hashtagsPlaceholder": "50 字元內",
+    "hashtagsPlaceholder": "",
     "responseType": "回覆類型",
     "responseTypeOptions": [
       { "value": "open", "label": "開放式" },
       { "value": "single_choice", "label": "單選題" }
     ],
+    "minimum": "最低獎勵",
     "options": "選項",
     "optionsPlaceholder": "輸入選項",
     "rewardType": "獎勵類型",
@@ -39,7 +40,10 @@
     "rewardBtc": "獎勵 (BTC)",
     "rewardBtcPlaceholder": "設定活動時長",
     "numberOfRecipients": "獎勵分配人數",
-    "durationOfEvent": "活動時長"
+    "enablePreheat": "開啟預熱",
+    "enablePreheatTooltip": "預熱允許在回覆開放前查看活動。在此期間，活動可見但回覆不可見。",
+    "durationOfEvent": "活動時長",
+    "rewardBtcPlaceholderEnabled": "輸入獎勵（最低 {{min}} "
   },
   "verificationTool": {
     "title": "驗證指南",
