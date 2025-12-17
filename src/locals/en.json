@@ -20,12 +20,12 @@
     "creatorAddress": "Creator Address",
     "creatorAddressPlaceholder": "Enter your Bitcoin address",
     "title": "Title",
-    "titlePlaceholder": "120 left",
+    "titlePlaceholder": "",
     "characterLeft": "characters left",
     "description": "Description",
-    "descriptionPlaceholder": "500 characters left",
+    "descriptionPlaceholder": "",
     "hashtags": "Hashtags",
-    "hashtagsPlaceholder": "50 characters left",
+    "hashtagsPlaceholder": "",
     "responseType": "Response Type",
     "responseTypeTooltip": "Choose the response type for the event.",
     "responseTypeOptions": [
@@ -43,8 +43,12 @@
       { "value": "rewarded", "label": "Rewarded" },
       { "value": "non_reward", "label": "Non-Rewarded" }
     ],
+    "minimum": "Minimum",
     "numberOfRecipients": "Number of Recipients",
-    "durationOfEvent": "Duration of this event"
+    "enablePreheat": "Enable Preheat",
+    "enablePreheatTooltip": "Preheat lets people see the event before replies open. During this time, the event is visible but replies are disabled.",
+    "durationOfEvent": "Duration of this event",
+    "rewardBtcPlaceholderEnabled": "Enter reward (Min {{min}})"
   },
   "verificationTool": {
     "title": "Verification Guide",

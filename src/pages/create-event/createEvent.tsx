@@ -14,6 +14,7 @@ import type { CreateEventReq } from '@/api/request'
 import type { EventType } from '@/api/types'
 
 import { useTranslation } from 'react-i18next'
+import { useSystemParametersStore } from '@/stores/systemParametersStore'
 
 type PreviewEventState = {
   creatorAddress: string
@@ -258,6 +259,17 @@ export default function CreateEvent() {
     agree,
   ])
 
+  const params = useSystemParametersStore(s => s.params)
+  const minRewardBtc =
+    params?.min_reward_amount_satoshi != null
+      ? params.min_reward_amount_satoshi / 1e8
+      : 0.000011
+
+  const rewardBtcPlaceholder =
+    Number(durationHours) > 0
+      ? t('createEvent.rewardBtcPlaceholderEnabled', { min: minRewardBtc.toFixed(6) })
+      : t('createEvent.rewardBtcPlaceholder')
+
   return (
     <div className="flex-col flex items-center justify-center w-full">
       <div className="h-[50px] w-full relative">
@@ -362,13 +374,13 @@ export default function CreateEvent() {
               className={`w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
                          focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-                         ${hashtags.length >= 50 ? 'border-red-500 focus:ring-red-500' : ''}
-                         ${hashtags.length >= 50 ? ' border-red-500' : ''}
+                         ${hashtags.length >= 20 ? 'border-red-500 focus:ring-red-500' : ''}
+                         ${hashtags.length >= 20 ? ' border-red-500' : ''}
                          `}
             />
             <span className={`tx-12 lh-18  block text-right 
-              ${hashtags.length >= 50 ? 'text-red-500' : 'text-secondary'}`}>
-              {50 - hashtags.length} {t('createEvent.characterLeft')}
+              ${hashtags.length >= 20 ? 'text-red-500' : 'text-secondary'}`}>
+              {20 - hashtags.length} {t('createEvent.characterLeft')}
             </span>
           </div>
 
@@ -491,25 +503,21 @@ export default function CreateEvent() {
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="tx-14 lh-20 fw-m text-primary">
-                {t('createEvent.durationOfEvent')} 
+                {t('createEvent.durationOfEvent')}
                 <span className="text-(--color-orange-500)">*</span>
               </label>
-              <button
-                type="button"
-                className="tx-12 lh-16 text-(--color-orange-500) fw-m"
-                onClick={() => {
-                  // TODO: 之後根據 FREE_HOURS 和 Max Active Hours 來決定
-                  // 目前先示意：把 duration 填一個預設值
-                  if (!durationHours) setDurationHours('24')
-                }}
-              >
-                123
-              </button>
             </div>
             <input
               type="number"
               value={durationHours}
-              onChange={e => setDurationHours(e.target.value)}
+              onChange={e => {
+                const v = e.target.value
+                setDurationHours(v)
+                const n = Number(v)
+                if (!Number.isFinite(n) || n <= 0) {
+                  setRewardBtc('')
+                }
+              }}
               placeholder="Enter hours"
               className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
@@ -523,17 +531,32 @@ export default function CreateEvent() {
               <label className="block tx-14 lh-20 fw-m text-primary mb-1">
                 {t('createEvent.rewardBtc')} <span className="text-(--color-orange-500)">*</span>
               </label>
-              <input
-                type="number"
-                step="0.00000001"
-                min="0"
-                value={rewardBtc}
-                onChange={e => setRewardBtc(e.target.value)}
-                placeholder={t('createEvent.rewardBtcPlaceholder')}
-                className="w-full rounded-xl border border-border bg-white px-3 py-2
+              <div className="flex items-center gap-2">
+                <input
+                  disabled={Number(durationHours) <= 0}
+                  type="number"
+                  step="0.00000001"
+                  min={minRewardBtc}
+                  value={rewardBtc}
+                  onChange={e => setRewardBtc(e.target.value)}
+                  //if enabled, the placeholder need to be change to Enter reward ( Min 0.000011 ), and the number Min xxxx need to have a state so I can update it dynamically
+                  placeholder={rewardBtcPlaceholder}
+                  className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
-                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
-              />
+                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500) disabled:opacity-60"
+                />
+                <Button
+                  disabled={Number(durationHours) <= 0}
+                  type="button"
+                  appearance="solid"
+                  tone="orange"
+                  text="sm"
+                  className="w-[100px]"
+                  onClick={() => setRewardBtc(minRewardBtc.toString())}
+                >
+                  {t('createEvent.minimum')}
+                </Button>
+              </div>
             </div>
           )}
 
@@ -547,7 +570,7 @@ export default function CreateEvent() {
             </div>
           )}
 
-          
+
 
           {/* Platform fee（只有 no reward 時顯示，之後接 FREE_HOURS 邏輯） */}
           {!isRewarded && (
@@ -559,24 +582,45 @@ export default function CreateEvent() {
 
           {/* Preheat */}
           <div className="space-y-2">
-            <label className="flex items-center gap-2 tx-14 lh-20 text-primary">
+            <div className="flex items-center gap-2 tx-14 lh-20 text-primary">
               <input
+                id="enable-preheat"
                 type="checkbox"
+                // check box color change to white
                 className="accent-(--color-orange-500)"
                 checked={enablePreheat}
                 onChange={e => setEnablePreheat(e.target.checked)}
               />
-              <span>
-                Enable Preheat
-                <span className="ml-1 tx-14 text-admin-text-main dark:text-white">ⓘ</span>
-              </span>
-            </label>
+              <label htmlFor="enable-preheat" className="tx-14 lh-20 text-primary cursor-pointer">
+                {t('createEvent.enablePreheat')}
+              </label>
+              <Tooltip
+                placement="topLeft"
+                title={t('createEvent.enablePreheatTooltip')}
+                color="white"
+                overlayInnerStyle={{
+                  // Clamp to viewport on mobile while capping at a comfortable max on desktop
+                  maxWidth: 'min(450px, calc(100vw - 32px))',
+                  whiteSpace: 'normal',
+                  wordBreak: 'break-word',
+                  overflowWrap: 'anywhere',
+                }}
+              >
+                <span
+                  className="tx-14 text-admin-text-main dark:text-white cursor-default"
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={e => e.stopPropagation()}
+                >
+                  ⓘ
+                </span>
+              </Tooltip>
+            </div>
             <input
               type="number"
               value={preheatHours}
               onChange={e => setPreheatHours(e.target.value)}
               placeholder="Enter hours (max 720)"
-              className="w-full rounded-xl border border-border bg-[color-mix(in_oklab,var(--color-white)_10%,transparent)]
+              className="w-full rounded-xl border border-border bg-white
                          px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary
                          focus:outline-none focus:ring-2 focus:ring-(--color-orange-500) disabled:opacity-60"
               disabled={!enablePreheat}

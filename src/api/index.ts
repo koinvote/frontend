@@ -7,6 +7,7 @@ import type {
 } from './request.ts'
 
 import type {
+  SystemConfigRes,
   EventDataRes,
   GetEventListRes,
   EventDetailDataRes
@@ -40,6 +41,7 @@ export interface ApiResponse<T> {
 }
 
 export const API = {
+  getSystemConfig: get<ApiResponse<SystemConfigRes>, void>`/system/parameters`,
   createEvent: post<ApiResponse<EventDataRes>, CreateEventReq>`/events`,
   getEventList: get<ApiResponse<GetEventListRes>, GetEventListReq>`/events`,
   getEventDetail: get<ApiResponse<EventDetailDataRes>, { event_id: string }>`/events/{event-id}`,
