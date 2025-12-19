@@ -2,6 +2,17 @@
 import type { ReplyPreview } from "@/pages/home/types"
 import type { EventType, EventRewardType, EventState } from "./types"
 
+export interface SystemConfigRes {
+    maintenance_mode: boolean
+    min_reward_amount_satoshi: number
+    satoshi_per_extra_winner: number
+    dust_threshold_satoshi: number
+    satoshi_per_duration_hour: number
+    free_hours: number
+    platform_fee_percentage: number
+    refund_service_fee_percentage: number
+}
+
 export interface EventDataRes {
     event_id: string
     title: string
