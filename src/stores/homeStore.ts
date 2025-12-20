@@ -1,57 +1,65 @@
-
-import { create } from 'zustand'
+import { create } from "zustand";
 import {
   type EventSummary,
   type HomeSortField,
   type HomeSortOrder,
   type HomeStatusFilter,
-} from '@/pages/home/types/index'
+} from "@/pages/create-event/types/index";
 
 interface HomeStoreState {
   // filters
-  status: HomeStatusFilter
-  search: string
-  debouncedSearch: string
-  sortField: HomeSortField
-  sortOrder: HomeSortOrder
-  activeHashtag: string | null
+  status: HomeStatusFilter;
+  search: string;
+  debouncedSearch: string;
+  sortField: HomeSortField;
+  sortOrder: HomeSortOrder;
+  activeHashtag: string | null;
 
   // data
-  events: EventSummary[]
-  hasMore: boolean
-  offset: number
-  limit: number
-  total: number
+  events: EventSummary[];
+  hasMore: boolean;
+  offset: number;
+  limit: number;
+  total: number;
 
   // ui
-  isLoading: boolean
-  isError: boolean
-  scrollY: number
+  isLoading: boolean;
+  isError: boolean;
+  scrollY: number;
 
   // actions
-  setStatus: (status: HomeStatusFilter) => void
-  setSearch: (value: string) => void
-  setDebouncedSearch: (value: string) => void
-  setSort: (field: HomeSortField, order: HomeSortOrder) => void
-  setActiveHashtag: (tag: string | null) => void
+  setStatus: (status: HomeStatusFilter) => void;
+  setSearch: (value: string) => void;
+  setDebouncedSearch: (value: string) => void;
+  setSort: (field: HomeSortField, order: HomeSortOrder) => void;
+  setActiveHashtag: (tag: string | null) => void;
 
-  setEvents: (events: EventSummary[], total: number, hasMore: boolean, offset: number) => void
-  appendEvents: (events: EventSummary[], hasMore: boolean, offset: number) => void
+  setEvents: (
+    events: EventSummary[],
+    total: number,
+    hasMore: boolean,
+    offset: number
+  ) => void;
+  appendEvents: (
+    events: EventSummary[],
+    hasMore: boolean,
+    offset: number
+  ) => void;
 
-  setLoading: (loading: boolean) => void
-  setError: (error: boolean) => void
+  setLoading: (loading: boolean) => void;
+  setError: (error: boolean) => void;
 
-  setScrollY: (y: number) => void
-  resetFilters: () => void
-  resetList: () => void
+  setScrollY: (y: number) => void;
+  resetFilters: () => void;
+  resetList: () => void;
 }
 
 export const useHomeStore = create<HomeStoreState>((set) => ({
-  status: 'ongoing',
-  search: '',
-  debouncedSearch: '',
-  sortField: 'time',
-  sortOrder: 'asc',
+  status: "ongoing",
+  search: "",
+  debouncedSearch: "",
+  sortField: "time",
+  sortOrder: "asc",
   activeHashtag: null,
 
   events: [],
@@ -109,11 +117,11 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
 
   resetFilters: () =>
     set((state) => ({
-      search: '',
-      debouncedSearch: '',
+      search: "",
+      debouncedSearch: "",
       activeHashtag: null,
-      sortField: 'time',
-      sortOrder: state.status === 'ongoing' ? 'asc' : 'desc',
+      sortField: "time",
+      sortOrder: state.status === "ongoing" ? "asc" : "desc",
       offset: 0,
     })),
 
@@ -124,4 +132,4 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
       offset: 0,
       total: 0,
     })),
-}))
+}));

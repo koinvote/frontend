@@ -25,7 +25,7 @@
     "description": "Description",
     "descriptionPlaceholder": "",
     "hashtags": "Hashtags",
-    "hashtagsPlaceholder": "",
+    "hashtagsPlaceholder": "#bitcoin #koinvote",
     "responseType": "Response Type",
     "responseTypeTooltip": "Choose the response type for the event.",
     "responseTypeOptions": [

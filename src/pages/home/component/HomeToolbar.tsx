@@ -1,12 +1,15 @@
-import { useEffect, useState } from 'react'
-import { useHomeStore } from '@/stores/homeStore'
-import { type HomeSortField, type HomeSortOrder } from '@/pages/home/types/index'
+import { useEffect, useState } from "react";
+import { useHomeStore } from "@/stores/homeStore";
+import {
+  type HomeSortField,
+  type HomeSortOrder,
+} from "@/pages/create-event/types/index";
 
 const SORT_OPTIONS: { value: HomeSortField; label: string }[] = [
-  { value: 'time', label: 'Time' },
-  { value: 'bounty', label: 'Bounty' },
-  { value: 'participation', label: 'Participation' },
-]
+  { value: "time", label: "Time" },
+  { value: "bounty", label: "Bounty" },
+  { value: "participation", label: "Participation" },
+];
 
 export function HomeToolbar() {
   const {
@@ -21,21 +24,19 @@ export function HomeToolbar() {
     setSort,
     setActiveHashtag,
     resetFilters,
-  } = useHomeStore()
+  } = useHomeStore();
 
-  const [popularHashtags] = useState<string[]>([])
-
-
+  const [popularHashtags] = useState<string[]>([]);
 
   // debounce search 300ms
   useEffect(() => {
     const id = setTimeout(() => {
-      setDebouncedSearch(search)
-    }, 300)
-    return () => clearTimeout(id)
-  }, [search, setDebouncedSearch])
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [search, setDebouncedSearch]);
 
-  const isOngoing = status === 'ongoing'
+  const isOngoing = status === "ongoing";
 
   // const sortLabel = useMemo(
   //   () =>
@@ -44,28 +45,24 @@ export function HomeToolbar() {
   // )
 
   const toggleSortOrder = () => {
-    const next: HomeSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-    setSort(sortField, next)
-  }
+    const next: HomeSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setSort(sortField, next);
+  };
 
   const handleSortChange = (field: HomeSortField) => {
     // 根據狀態給預設順序
     const defaultOrder: HomeSortOrder =
-      field === 'time'
-        ? isOngoing
-          ? 'asc'
-          : 'desc'
-        : 'desc'
-    setSort(field, defaultOrder)
-  }
+      field === "time" ? (isOngoing ? "asc" : "desc") : "desc";
+    setSort(field, defaultOrder);
+  };
 
   const handleHashtagClick = (tag: string) => {
     if (activeHashtag && activeHashtag.toLowerCase() === tag.toLowerCase()) {
-      setActiveHashtag(null)
+      setActiveHashtag(null);
     } else {
-      setActiveHashtag(tag)
+      setActiveHashtag(tag);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-3 md:gap-4">
@@ -75,18 +72,18 @@ export function HomeToolbar() {
           <button
             type="button"
             className={`px-4 py-1.5 rounded-full text-sm md:text-base ${
-              isOngoing ? 'bg-accent text-accent-foreground' : 'text-secondary'
+              isOngoing ? "bg-accent text-accent-foreground" : "text-secondary"
             }`}
-            onClick={() => setStatus('ongoing')}
+            onClick={() => setStatus("ongoing")}
           >
             Ongoing
           </button>
           <button
             type="button"
             className={`px-4 py-1.5 rounded-full text-sm md:text-base ${
-              !isOngoing ? 'bg-accent text-accent-foreground' : 'text-secondary'
+              !isOngoing ? "bg-accent text-accent-foreground" : "text-secondary"
             }`}
-            onClick={() => setStatus('completed')}
+            onClick={() => setStatus("completed")}
           >
             Completed
           </button>
@@ -99,7 +96,7 @@ export function HomeToolbar() {
             onClick={toggleSortOrder}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-xs"
           >
-            {sortOrder === 'asc' ? '↑' : '↓'}
+            {sortOrder === "asc" ? "↑" : "↓"}
           </button>
           <select
             className="h-9 rounded-full border border-border bg-surface px-3 text-sm md:text-base"
@@ -135,7 +132,7 @@ export function HomeToolbar() {
           {popularHashtags.map((tag) => {
             const isActive =
               activeHashtag &&
-              activeHashtag.toLowerCase() === tag.toLowerCase()
+              activeHashtag.toLowerCase() === tag.toLowerCase();
             return (
               <button
                 key={tag}
@@ -143,13 +140,13 @@ export function HomeToolbar() {
                 onClick={() => handleHashtagClick(tag)}
                 className={`rounded-full px-3 py-1 text-xs md:text-sm border ${
                   isActive
-                    ? 'bg-accent text-accent-foreground border-accent'
-                    : 'bg-surface border-border text-secondary'
+                    ? "bg-accent text-accent-foreground border-accent"
+                    : "bg-surface border-border text-secondary"
                 }`}
               >
                 {tag}
               </button>
-            )
+            );
           })}
 
           {/* 清除搜尋條件 */}
@@ -165,5 +162,5 @@ export function HomeToolbar() {
         </div>
       )}
     </div>
-  )
+  );
 }

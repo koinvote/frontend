@@ -1,77 +1,134 @@
 // api/response.ts
-import type { ReplyPreview } from "@/pages/home/types"
-import type { EventType, EventRewardType, EventState } from "./types"
+import type { ReplyPreview } from "@/pages/create-event/types";
+import type {
+  EventType,
+  EventRewardType,
+  EventState,
+  EventStatus,
+  DepositStatus,
+} from "./types";
 
 export interface SystemConfigRes {
-    maintenance_mode: boolean
-    min_reward_amount_satoshi: number
-    satoshi_per_extra_winner: number
-    dust_threshold_satoshi: number
-    satoshi_per_duration_hour: number
-    free_hours: number
-    platform_fee_percentage: number
-    refund_service_fee_percentage: number
+  maintenance_mode: boolean; //維護模式
+  min_reward_amount_satoshi: number; //最低發起金額
+  satoshi_per_extra_winner: number; //中獎地址數/獎金金額比例
+  dust_threshold_satoshi: number; //最低派獎門檻（Dust Rule）
+  satoshi_per_duration_hour: number; //活動最長存續時間/獎金金額比例
+  free_hours: number; //免費時長
+  platform_fee_percentage: number; //平台服務費比例
+  refund_service_fee_percentage: number; //退款處理費比例
 }
 
 export interface EventDataRes {
-    event_id: string
-    title: string
-    description: string
-    event_type: EventType
-    event_reward_type: EventRewardType
-    initial_reward_satoshi: number
-    total_reward_satoshi: number
-    winner_count: number
-    duration_hours: number
-    status: number
-    refund_address: string
-    deposit_address: string
-    deadline_at: string
-    created_at: string
-    preheat_hours: number
-    preheat_fee_satoshi: number
-    total_cost_satoshi: number
-  }
-  export interface EventListDataRes {
-    id: number
-    event_id: string
-    title: string
-    description: string
-    state: (typeof EventState.ONGOING) | (typeof EventState.PREHEAT) | (typeof EventState.COMPLETED)
-    hashtags: string[]
-    created_at: string
-    deadline_at: string
-    total_reward_satoshi: number
-    participants_count: number
-    total_stake_satoshi: number
-    top_replies: ReplyPreview[]
-  }
+  event_id: string;
+  title: string;
+  description: string;
+  event_type: EventType;
+  event_reward_type: EventRewardType;
+  initial_reward_satoshi: number;
+  total_reward_satoshi: number;
+  winner_count: number;
+  duration_hours: number;
+  status:
+    | typeof EventStatus.PENDING
+    | typeof EventStatus.PREHEAT
+    | typeof EventStatus.ACTIVE
+    | typeof EventStatus.ENDED
+    | typeof EventStatus.COMPLETED
+    | typeof EventStatus.CANCELLED
+    | typeof EventStatus.REFUNDED
+    | typeof EventStatus.EXPIRED;
+  creator_address: string;
+  deposit_address: string;
+  deadline_at: string;
+  created_at: string;
+  hashtags: string[];
+  preheat_hours: number;
+  preheat_fee_satoshi: number;
+  total_cost_satoshi: number;
+}
 
-  export interface GetEventListRes {
-    events: EventListDataRes[]
-    page: number
-    limit: number
-  }
+export interface EventListDataRes {
+  id: number;
+  event_id: string;
+  title: string;
+  description: string;
+  state:
+    | typeof EventState.ONGOING
+    | typeof EventState.PREHEAT
+    | typeof EventState.COMPLETED;
+  hashtags: string[];
+  created_at: string;
+  deadline_at: string;
+  total_reward_satoshi: number;
+  participants_count: number;
+  total_stake_satoshi: number;
+  top_replies: ReplyPreview[];
+}
 
-  export interface EventDetailDataRes {
-    id: number
-    event_id: string
-    title: string
-    description: string
-    event_type: EventType
-    event_reward_type: EventRewardType
-    status: (typeof EventState.ONGOING) | (typeof EventState.PREHEAT) | (typeof EventState.COMPLETED)
-    initial_reward_satoshi: number
-    total_reward_satoshi: number
-    winner_count: number
-    duration_hours: number
-    created_at: string
-    started_at: string
-    deadline_at: string
-    participants_count: number
-    total_stake_satoshi: number
-    options: string[]
-    top_replies: ReplyPreview[]
-    hashtags: string[]
-    preheat_hours: number
-  }
+export interface GetEventListRes {
+  events: EventListDataRes[];
+  page: number;
+  limit: number;
+}
+
+export interface EventDetailDataRes {
+  id: number;
+  event_id: string;
+  title: string;
+  description: string;
+  event_type: EventType;
+  event_reward_type: EventRewardType;
+  status:
+    | typeof EventState.ONGOING
+    | typeof EventState.PREHEAT
+    | typeof EventState.COMPLETED;
+  initial_reward_satoshi: number;
+  total_reward_satoshi: number;
+  winner_count: number;
+  duration_hours: number;
+  created_at: string;
+  started_at: string;
+  deadline_at: string;
+  participants_count: number;
+  total_stake_satoshi: number;
+  options: string[];
+  top_replies: ReplyPreview[];
+  hashtags: string[];
+  preheat_hours: number;
+}
+
+export interface GetSignaturePlainTextRes {
+  event_id: string;
+  plaintext: string;
+  timestamp: number;
+}
+
+export interface VerifySignatureRes {
+  event_id: string;
+  message: string;
+  status: number;
+}
+
+export interface DepositStatusRes {
+  event_id: string;
+  deposit_address: string;
+  expected_amount_satoshi: number;
+  received_amount_satoshi: number;
+  status:
+    | typeof DepositStatus.PENDING
+    | typeof DepositStatus.UNCONFIRMED
+    | typeof DepositStatus.COMPLETED
+    | typeof DepositStatus.DONATION
+    | typeof DepositStatus.WAIT_FOR_REFUND
+    | typeof DepositStatus.EXPIRED
+    | typeof DepositStatus.FROZEN;
+  confirmed_at: string;
+  received_txid: string;
+  confirmations: number;
+  initial_timeout_at: string;
+  extend_timeout_at: string;
+  first_seen_at: string;
+  block_height: number;
+  deposit_type: string;
+}

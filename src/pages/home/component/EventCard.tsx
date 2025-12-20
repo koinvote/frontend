@@ -1,4 +1,4 @@
-import { type EventSummary } from "@/pages/home/types/index";
+import { type EventSummary } from "@/pages/create-event/types/index";
 import { EventState } from "@/api/types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";

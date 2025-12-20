@@ -8,10 +8,10 @@ export interface CreateEventReq {
     event_reward_type: EventRewardType
     initial_reward_satoshi: number
     duration_hours: number
-    refund_address: string
-
+    creator_address: string
     options?: string[]
     preheat_hours?: number
+    hashtags?: string[]
   }
   
 export interface GetEventListReq {

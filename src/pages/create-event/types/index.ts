@@ -76,3 +76,5 @@ export interface BackendGetEventsResponse {
   message: string | null
   data: BackendEvent[]
 }
+
+export type AddressValidationStatus = "idle" | "checking" | "valid" | "invalid";
