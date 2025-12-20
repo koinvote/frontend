@@ -75,7 +75,10 @@ export const router = createBrowserRouter([
                 { path: "create-event", element: <CreateEvent /> },
                 { path: "preview-event", element: <PreviewEvent /> },
                 { path: "confirm-sign/:eventId", element: <ConfirmSign /> },
-                { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
+                {
+                  path: "confirm-pay/:eventId/payment",
+                  element: <ConfirmPay />,
+                },
               ],
             },
           ]),
