@@ -1,34 +1,48 @@
-import { useEffect, useRef } from 'react'
-import { useHomeEvents } from '@/hooks/useHomeEvents'
-import { EventCard } from '@/pages/home/component/EventCard'
-// import { useHomeStore } from '@/stores/homeStore'
-
+import { useEffect, useRef, useMemo } from "react";
+import { useHomeEvents } from "@/hooks/useHomeEvents";
+import { EventCard } from "@/pages/home/component/EventCard";
+import { useHomeStore } from "@/stores/homeStore";
+import { EventState } from "@/api/types";
 
 export function EventList() {
-  const { events, isLoading, isError, hasMore, loadMore, reload } = useHomeEvents()
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
-  // const { status } = useHomeStore()
+  const { events, isLoading, isError, hasMore, loadMore, reload } =
+    useHomeEvents();
+  const { status } = useHomeStore();
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Filter events by current status according to API doc:
+  // state: 1 (preheat), 2 (ongoing), 3 (completed)
+  const filteredEvents = useMemo(() => {
+    const expectedState =
+      status === "preheat"
+        ? EventState.PREHEAT
+        : status === "ongoing"
+        ? EventState.ONGOING
+        : EventState.COMPLETED;
+
+    return events.filter((event) => event.state === expectedState);
+  }, [events, status]);
 
   // infinite scroll
   useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel) return
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const entry = entries[0]
+        const entry = entries[0];
         if (entry.isIntersecting) {
-          loadMore()
+          loadMore();
         }
       },
       {
-        rootMargin: '200px',
-      },
-    )
+        rootMargin: "200px",
+      }
+    );
 
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [loadMore])
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   if (isError) {
     return (
@@ -42,10 +56,10 @@ export function EventList() {
           Retry
         </button>
       </div>
-    )
+    );
   }
 
-  const isEmpty = !isLoading && events.length === 0
+  const isEmpty = !isLoading && filteredEvents.length === 0;
 
   if (isEmpty) {
     return (
@@ -55,18 +69,18 @@ export function EventList() {
           Try clearing search or selecting a different status.
         </span>
       </div>
-    )
+    );
   }
 
   return (
     <div className="mt-4 flex flex-col gap-4 md:gap-6">
-      {events.map((event) => (
+      {filteredEvents.map((event) => (
         <EventCard
           key={event.event_id}
           event={event}
           onClick={() => {
             // TODO: 之後接到 /event/:id 詳情頁
-            console.log('click event', event.event_id)
+            console.log("click event", event.event_id);
           }}
         />
       ))}
@@ -78,12 +92,12 @@ export function EventList() {
             Loading...
           </div>
         )}
-        {!hasMore && !isLoading && events.length > 0 && (
+        {!hasMore && !isLoading && filteredEvents.length > 0 && (
           <div className="flex h-full items-center justify-center text-[11px] text-secondary">
             No more events
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

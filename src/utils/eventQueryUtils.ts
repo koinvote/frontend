@@ -51,7 +51,7 @@ export function applySort(
   const dir = order === "asc" ? 1 : -1;
 
   return [...events].sort((a, b) => {
-    if (field === "bounty") {
+    if (field === "reward") {
       const av = parseFloat(a.total_reward_btc);
       const bv = parseFloat(b.total_reward_btc);
       return (av - bv) * dir;

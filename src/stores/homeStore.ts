@@ -21,6 +21,7 @@ interface HomeStoreState {
   offset: number;
   limit: number;
   total: number;
+  popularHashtags: string[];
 
   // ui
   isLoading: boolean;
@@ -52,6 +53,7 @@ interface HomeStoreState {
   setScrollY: (y: number) => void;
   resetFilters: () => void;
   resetList: () => void;
+  setPopularHashtags: (hashtags: string[]) => void;
 }
 
 export const useHomeStore = create<HomeStoreState>((set) => ({
@@ -67,6 +69,7 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   offset: 0,
   limit: 20,
   total: 0,
+  popularHashtags: [],
 
   isLoading: false,
   isError: false,
@@ -75,8 +78,11 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   setStatus: (status) =>
     set(() => ({
       status,
-      // 狀態切換時重置分頁
+      // 狀態切換時重置分頁和清空事件列表
       offset: 0,
+      events: [],
+      hasMore: true,
+      total: 0,
     })),
   setSearch: (value) => set(() => ({ search: value })),
   setDebouncedSearch: (value) =>
@@ -121,7 +127,10 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
       debouncedSearch: "",
       activeHashtag: null,
       sortField: "time",
-      sortOrder: state.status === "ongoing" ? "asc" : "desc",
+      sortOrder:
+        state.status === "ongoing" || state.status === "preheat"
+          ? "asc"
+          : "desc",
       offset: 0,
     })),
 
@@ -131,5 +140,10 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
       hasMore: true,
       offset: 0,
       total: 0,
+    })),
+
+  setPopularHashtags: (hashtags) =>
+    set(() => ({
+      popularHashtags: hashtags,
     })),
 }));

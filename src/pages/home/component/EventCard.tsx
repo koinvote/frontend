@@ -29,21 +29,56 @@ function formatCountdown(event: EventSummary) {
     return `${hours}h ${minutes}m`;
   }
 
-  // CLOSED
-  if (event.ended_at) {
-    const ended = dayjs(event.ended_at);
+  // PREHEAT
+  if (event.state === EventState.PREHEAT) {
     const now = dayjs();
-    const diffDays = now.diff(ended, "day");
+    const deadline = dayjs(event.deadline_at);
+    if (deadline.isBefore(now)) return "Starting soon";
+    const diffMs = deadline.diff(now);
+    const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
 
-    if (diffDays < 1) {
-      const hours = now.diff(ended, "hour");
-      return `${hours}h ago`;
+    if (days > 0) {
+      return `Starts in ${days}d ${hours}h`;
     }
-    if (diffDays < 7) {
-      return `${diffDays}d ago`;
+    return `Starts in ${hours}h ${minutes}m`;
+  }
+
+  // COMPLETED
+  if (event.state === EventState.COMPLETED) {
+    if (event.ended_at) {
+      const ended = dayjs(event.ended_at);
+      const now = dayjs();
+      const diffDays = now.diff(ended, "day");
+
+      if (diffDays < 1) {
+        const hours = now.diff(ended, "hour");
+        return `${hours}h ago`;
+      }
+      if (diffDays < 7) {
+        return `${diffDays}d ago`;
+      }
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks}w ago`;
     }
-    const weeks = Math.floor(diffDays / 7);
-    return `${weeks}w ago`;
+    // If no ended_at, use deadline_at as fallback
+    const deadline = dayjs(event.deadline_at);
+    const now = dayjs();
+    if (deadline.isBefore(now)) {
+      const diffDays = now.diff(deadline, "day");
+      if (diffDays < 1) {
+        const hours = now.diff(deadline, "hour");
+        return `${hours}h ago`;
+      }
+      if (diffDays < 7) {
+        return `${diffDays}d ago`;
+      }
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks}w ago`;
+    }
+    return "Ended";
   }
 
   return "Ended";
@@ -59,7 +94,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       onClick={onClick}
       className="cursor-pointer rounded-2xl border border-border bg-surface px-4 py-3 md:px-6 md:py-4 transition md:hover:bg-surface/80"
     >
-      {/* header row: title + bounty + time */}
+      {/* header row: title + reward + time */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <h2 className="text-base md:text-lg font-semibold text-primary">
           {event.title}

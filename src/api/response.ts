@@ -48,22 +48,26 @@ export interface EventDataRes {
   total_cost_satoshi: number;
 }
 
+export interface TopReplyRes {
+  id: number;
+  body: string;
+  weight_percent: number;
+  amount_satoshi: number;
+}
+
 export interface EventListDataRes {
   id: number;
   event_id: string;
   title: string;
   description: string;
-  state:
-    | typeof EventState.ONGOING
-    | typeof EventState.PREHEAT
-    | typeof EventState.COMPLETED;
+  state: 1 | 2 | 3; // 1: preheat, 2: ongoing, 3: completed
   hashtags: string[];
   created_at: string;
   deadline_at: string;
   total_reward_satoshi: number;
   participants_count: number;
   total_stake_satoshi: number;
-  top_replies: ReplyPreview[];
+  top_replies: TopReplyRes[];
 }
 
 export interface GetEventListRes {
@@ -107,7 +111,7 @@ export interface GetSignaturePlainTextRes {
 export interface VerifySignatureRes {
   event_id: string;
   message: string;
-  status: number;
+  status: number | string; // Can be 1 (number) or "activated" (string)
 }
 
 export interface DepositStatusRes {

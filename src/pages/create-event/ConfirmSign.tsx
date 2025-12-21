@@ -9,9 +9,6 @@ import type { EventType } from "@/api/types";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 
-
-
-
 type PreviewEventState = {
   creatorAddress: string;
   title: string;
@@ -49,6 +46,7 @@ export default function ConfirmSign() {
   const [plaintext, setPlaintext] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
   const [signatureError, setSignatureError] = useState<string>("");
+  const [signatureSuccess, setSignatureSuccess] = useState<string>("");
   const [countdown, setCountdown] = useState<number>(COUNTDOWN_MINUTES * 60);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPlaintext, setIsLoadingPlaintext] = useState(false);
@@ -232,6 +230,7 @@ export default function ConfirmSign() {
         signature,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       })) as any;
+
       const verifyEnvelope =
         verifyRes?.success !== undefined ? verifyRes : verifyRes?.data;
 
@@ -246,19 +245,37 @@ export default function ConfirmSign() {
       const verifyData = verifyEnvelope.data;
 
       // Check if verification passed
-      // The message field will indicate if verification passed or failed
-      // Status 1 typically means success, but we also check the message
-      if (verifyData.status === 1) {
-        showToast(
-          "success",
-          verifyData.message || "Event submitted successfully!"
-        );
-        // TODO: Navigate to success page or event detail page
-        navigate("/");
-      } else {
+      // Status can be: 1 (number) or "activated" (string)
+      const isSuccess =
+        verifyData?.status === 1 || verifyData?.status === "activated";
+
+      if (isSuccess) {
+        // Clear any previous errors
+        setSignatureError("");
+
+        // Show success message in green
+        const successMessage =
+          verifyData.message || "Event successfully activated";
+
+        // Set success message (green)
+        setSignatureSuccess(successMessage);
+
+        // Show success toast
+        showToast("success", successMessage);
+
+        // Clear create event draft from sessionStorage
+        const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
+        sessionStorage.removeItem(CREATE_EVENT_DRAFT_KEY);
+
+        // Navigate to homepage after a delay to ensure toast is visible
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else {        // Not success - show error
         const errorMessage =
-          verifyData.message || "Signature verification failed";
+          verifyData?.message || "Signature verification failed";
         setSignatureError(errorMessage);
+        setSignatureSuccess(""); // Clear success message
         setIsLoading(false);
       }
     } catch (error) {
@@ -270,7 +287,6 @@ export default function ConfirmSign() {
         (error instanceof Error
           ? error.message
           : "Signature verification failed");
-
       setSignatureError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -412,9 +428,12 @@ export default function ConfirmSign() {
                 value={signature}
                 onChange={(e) => {
                   setSignature(e.target.value);
-                  // Clear error when user starts typing
+                  // Clear error and success when user starts typing
                   if (signatureError) {
                     setSignatureError("");
+                  }
+                  if (signatureSuccess) {
+                    setSignatureSuccess("");
                   }
                 }}
                 className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 lh-20 
@@ -424,6 +443,11 @@ export default function ConfirmSign() {
               />
               {signatureError && (
                 <div className="tx-12 lh-18 text-red-500">{signatureError}</div>
+              )}
+              {signatureSuccess && (
+                <div className="tx-12 lh-18 text-green-500">
+                  {signatureSuccess}
+                </div>
               )}
             </div>
           </div>

@@ -4,10 +4,12 @@ import {
   type HomeSortField,
   type HomeSortOrder,
 } from "@/pages/create-event/types/index";
+import SearchIcon from "@/assets/icons/search.svg?react";
+import ClearIcon from "@/assets/icons/clear.svg?react";
 
 const SORT_OPTIONS: { value: HomeSortField; label: string }[] = [
   { value: "time", label: "Time" },
-  { value: "bounty", label: "Bounty" },
+  { value: "reward", label: "Reward" },
   { value: "participation", label: "Participation" },
 ];
 
@@ -18,15 +20,16 @@ export function HomeToolbar() {
     sortField,
     sortOrder,
     activeHashtag,
+    popularHashtags,
     setStatus,
     setSearch,
     setDebouncedSearch,
     setSort,
     setActiveHashtag,
-    resetFilters,
+    // resetFilters,
   } = useHomeStore();
 
-  const [popularHashtags] = useState<string[]>([]);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // debounce search 300ms
   useEffect(() => {
@@ -36,7 +39,9 @@ export function HomeToolbar() {
     return () => clearTimeout(id);
   }, [search, setDebouncedSearch]);
 
+  const isPreheat = status === "preheat";
   const isOngoing = status === "ongoing";
+  const isCompleted = status === "completed";
 
   // const sortLabel = useMemo(
   //   () =>
@@ -52,7 +57,7 @@ export function HomeToolbar() {
   const handleSortChange = (field: HomeSortField) => {
     // 根據狀態給預設順序
     const defaultOrder: HomeSortOrder =
-      field === "time" ? (isOngoing ? "asc" : "desc") : "desc";
+      field === "time" ? (isOngoing || isPreheat ? "asc" : "desc") : "desc";
     setSort(field, defaultOrder);
   };
 
@@ -66,13 +71,21 @@ export function HomeToolbar() {
 
   return (
     <div className="flex flex-col gap-3 md:gap-4">
-      {/* status tabs + sort (desktop 可以橫排，mobile 堆疊) */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div className="inline-flex rounded-full bg-surface border border-border p-1 w-fit">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+        <div className="flex rounded-xl bg-surface border border-border p-1 w-full md:w-fit">
           <button
             type="button"
-            className={`px-4 py-1.5 rounded-full text-sm md:text-base ${
-              isOngoing ? "bg-accent text-accent-foreground" : "text-secondary"
+            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center ${
+              isPreheat ? "bg-white text-black" : "text-secondary"
+            }`}
+            onClick={() => setStatus("preheat")}
+          >
+            Preheat
+          </button>
+          <button
+            type="button"
+            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center ${
+              isOngoing ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("ongoing")}
           >
@@ -80,8 +93,8 @@ export function HomeToolbar() {
           </button>
           <button
             type="button"
-            className={`px-4 py-1.5 rounded-full text-sm md:text-base ${
-              !isOngoing ? "bg-accent text-accent-foreground" : "text-secondary"
+            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center ${
+              isCompleted ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("completed")}
           >
@@ -89,17 +102,46 @@ export function HomeToolbar() {
           </button>
         </div>
 
+        {/* search */}
+        <div className="relative flex flex-1 items-center">
+          <div className="absolute left-4 pointer-events-none">
+            <SearchIcon className="w-4 h-4 text-secondary" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            placeholder="Search by title, body, hashtag, Event ID, or BTC address..."
+            className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-sm md:text-base outline-none"
+          />
+          {(isSearchFocused || search) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setIsSearchFocused(false);
+              }}
+              className="absolute right-3 flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-hover text-secondary hover:text-primary transition-colors"
+              aria-label="Clear search"
+            >
+              <ClearIcon className="w-4 h-4 text-secondary" />
+            </button>
+          )}
+        </div>
+
         {/* sort */}
-        <div className="flex items-center gap-2 self-start md:self-auto">
+        <div className="flex items-center gap-2 w-full md:w-auto self-start md:self-auto">
           <button
             type="button"
             onClick={toggleSortOrder}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-xs"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-xs flex-shrink-0"
           >
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
           <select
-            className="h-9 rounded-full border border-border bg-surface px-3 text-sm md:text-base"
+            className="flex-1 md:flex-none h-9 rounded-xl border border-border bg-surface px-3 text-sm md:text-base"
             value={sortField}
             onChange={(e) => handleSortChange(e.target.value as HomeSortField)}
           >
@@ -112,53 +154,44 @@ export function HomeToolbar() {
         </div>
       </div>
 
-      {/* search */}
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by title, body, hashtag, Event ID, or BTC address..."
-          className="flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm md:text-base outline-none"
-        />
-      </div>
-
       {/* popular hashtags */}
       {popularHashtags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs md:text-sm text-secondary">
-            Popular hashtags
-          </span>
-          {popularHashtags.map((tag) => {
-            const isActive =
-              activeHashtag &&
-              activeHashtag.toLowerCase() === tag.toLowerCase();
-            return (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs md:text-sm text-secondary">
+              Popular hashtags
+            </span>
+            {/* {(search || activeHashtag) && (
               <button
-                key={tag}
                 type="button"
-                onClick={() => handleHashtagClick(tag)}
-                className={`rounded-full px-3 py-1 text-xs md:text-sm border ${
-                  isActive
-                    ? "bg-accent text-accent-foreground border-accent"
-                    : "bg-surface border-border text-secondary"
-                }`}
+                onClick={resetFilters}
+                className="text-xs md:text-sm text-accent underline"
               >
-                {tag}
+                Clear filters
               </button>
-            );
-          })}
-
-          {/* 清除搜尋條件 */}
-          {(search || activeHashtag) && (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="ml-auto text-xs md:text-sm text-accent underline"
-            >
-              Clear filters
-            </button>
-          )}
+            )} */}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {popularHashtags.map((tag) => {
+              const isActive =
+                activeHashtag &&
+                activeHashtag.toLowerCase() === tag.toLowerCase();
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleHashtagClick(tag)}
+                  className={`rounded-xl px-3 py-1 text-xs md:text-sm border ${
+                    isActive
+                      ? "bg-accent text-accent-foreground border-accent"
+                      : "bg-surface border-border text-secondary"
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

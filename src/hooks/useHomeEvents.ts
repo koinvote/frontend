@@ -1,7 +1,53 @@
+import { useEffect, useCallback, useMemo, useRef } from "react";
+import { useHomeStore } from "@/stores/homeStore";
+import { API, type ApiResponse } from "@/api/index";
+import { mapApiEventToEventSummary } from "@/utils/eventTransform";
+import type { GetEventListRes } from "@/api/response";
 
-import { useEffect, useCallback } from 'react'
-import { mockFetchEventsForHome } from '@/pages/home/mockData'
-import { useHomeStore } from '@/stores/homeStore'
+// Map frontend status filter to backend state code
+const mapStatusToState = (
+  status: "preheat" | "ongoing" | "completed"
+): "1" | "2" | "3" => {
+  if (status === "preheat") return "1";
+  if (status === "ongoing") return "2";
+  return "3";
+};
+
+// Map frontend sortField to backend sortBy
+const mapSortFieldToSortBy = (
+  sortField: "time" | "reward" | "participation"
+): "time" | "reward" | "participation" => {
+  if (sortField === "reward") return "reward";
+  return sortField;
+};
+
+// Calculate popular hashtags from events
+function calculatePopularHashtags(
+  events: Array<{ hashtags: string[] }>
+): string[] {
+  const hashtagCount = new Map<string, number>();
+
+  // Count hashtag occurrences (remove # prefix for counting)
+  events.forEach((event) => {
+    event.hashtags.forEach((tag) => {
+      const normalizedTag = tag.startsWith("#")
+        ? tag.slice(1).toLowerCase()
+        : tag.toLowerCase();
+      hashtagCount.set(
+        normalizedTag,
+        (hashtagCount.get(normalizedTag) || 0) + 1
+      );
+    });
+  });
+
+  // Sort by count (descending) and take top 8
+  const sortedHashtags = Array.from(hashtagCount.entries())
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8)
+    .map(([tag]) => `#${tag}`);
+
+  return sortedHashtags;
+}
 
 export function useHomeEvents() {
   const {
@@ -9,7 +55,6 @@ export function useHomeEvents() {
     debouncedSearch,
     sortField,
     sortOrder,
-    activeHashtag,
     events,
     hasMore,
     offset,
@@ -20,67 +65,139 @@ export function useHomeEvents() {
     appendEvents,
     setLoading,
     setError,
-  } = useHomeStore()
+    setPopularHashtags,
+  } = useHomeStore();
+
+  // Track the status when request was made to prevent race conditions
+  const requestStatusRef = useRef(status);
+
+  // Calculate popular hashtags from current events
+  const popularHashtags = useMemo(
+    () => calculatePopularHashtags(events),
+    [events]
+  );
+
+  // Update popular hashtags in store when events change
+  useEffect(() => {
+    setPopularHashtags(popularHashtags);
+  }, [popularHashtags, setPopularHashtags]);
+
+  // Update requestStatusRef when status changes
+  useEffect(() => {
+    requestStatusRef.current = status;
+  }, [status]);
 
   const loadFirstPage = useCallback(async () => {
-    setLoading(true)
-    setError(false)
+    // Capture the status at the time of request
+    const requestStatus = status;
+    requestStatusRef.current = requestStatus;
+    
+    setLoading(true);
+    setError(false);
     try {
-      const res = await mockFetchEventsForHome({
-        status,
-        search: debouncedSearch,
-        sortField,
-        sortOrder,
-        hashtag: activeHashtag,
-        page: 1,
-        limit,
-      })
-      setEvents(res.items, res.total, res.hasMore, res.offset + res.items.length)
+      const currentPage = 1;
+      const res = (await API.getEventList({
+        state: mapStatusToState(requestStatus),
+        q: debouncedSearch || "",
+        page: String(currentPage),
+        limit: String(limit),
+        sortBy: mapSortFieldToSortBy(sortField),
+        order: sortOrder,
+      })) as unknown as ApiResponse<GetEventListRes>;
+
+      // Only update events if status hasn't changed since the request was made
+      if (requestStatusRef.current !== requestStatus) {
+        return; // Status changed, ignore this response
+      }
+
+      if (res.success && res.data) {
+        const transformedEvents = res.data.events.map(
+          mapApiEventToEventSummary
+        );
+        const total = res.data.events.length; // Backend doesn't return total, use current page length
+        const hasMoreData = res.data.events.length === limit;
+        const newOffset = transformedEvents.length;
+
+        setEvents(transformedEvents, total, hasMoreData, newOffset);
+      } else {
+        setError(true);
+      }
     } catch (e) {
-      console.error('Failed to load events', e)
-      setError(true)
+      // Only set error if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        console.error("Failed to load events", e);
+        setError(true);
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        setLoading(false);
+      }
     }
   }, [
     status,
     debouncedSearch,
     sortField,
     sortOrder,
-    activeHashtag,
     limit,
     setEvents,
     setLoading,
     setError,
-  ])
+  ]);
 
   const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore) return
-    setLoading(true)
-    setError(false)
+    if (isLoading || !hasMore) return;
+    
+    // Capture the status at the time of request
+    const requestStatus = status;
+    
+    setLoading(true);
+    setError(false);
     try {
-      const res = await mockFetchEventsForHome({
-        status,
-        search: debouncedSearch,
-        sortField,
-        sortOrder,
-        hashtag: activeHashtag,
-        page: offset,
-        limit: limit,
-      })
-      appendEvents(res.items, res.hasMore, res.offset + res.items.length)
+      // Calculate page number from offset
+      const currentPage = Math.floor(offset / limit) + 1;
+      const res = (await API.getEventList({
+        state: mapStatusToState(requestStatus),
+        q: debouncedSearch || "",
+        page: String(currentPage),
+        limit: String(limit),
+        sortBy: mapSortFieldToSortBy(sortField),
+        order: sortOrder,
+      })) as unknown as ApiResponse<GetEventListRes>;
+
+      // Only update events if status hasn't changed since the request was made
+      if (requestStatusRef.current !== requestStatus) {
+        return; // Status changed, ignore this response
+      }
+
+      if (res.success && res.data) {
+        const transformedEvents = res.data.events.map(
+          mapApiEventToEventSummary
+        );
+        const hasMoreData = res.data.events.length === limit;
+        const newOffset = offset + transformedEvents.length;
+
+        appendEvents(transformedEvents, hasMoreData, newOffset);
+      } else {
+        setError(true);
+      }
     } catch (e) {
-      console.error('Failed to load more events', e)
-      setError(true)
+      // Only set error if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        console.error("Failed to load more events", e);
+        setError(true);
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        setLoading(false);
+      }
     }
   }, [
     status,
     debouncedSearch,
     sortField,
     sortOrder,
-    activeHashtag,
     offset,
     limit,
     isLoading,
@@ -88,12 +205,12 @@ export function useHomeEvents() {
     appendEvents,
     setLoading,
     setError,
-  ])
+  ]);
 
   // filters 改變時重新載入第一頁
   useEffect(() => {
-    loadFirstPage()
-  }, [loadFirstPage])
+    loadFirstPage();
+  }, [loadFirstPage]);
 
   return {
     events,
@@ -102,5 +219,5 @@ export function useHomeEvents() {
     hasMore,
     loadMore,
     reload: loadFirstPage,
-  }
+  };
 }
