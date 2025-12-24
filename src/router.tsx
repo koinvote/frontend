@@ -48,7 +48,7 @@ export const router = createBrowserRouter([
         ],
       },
 
-      { path: "coming-soon-preview", element: <ComingSoon /> },
+      // { path: "coming-soon-preview", element: <ComingSoon /> },
       ...(isComingSoonMode
         ? [
             { index: true, element: <ComingSoon /> },
