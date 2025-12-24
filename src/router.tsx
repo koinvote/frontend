@@ -26,7 +26,8 @@ import AdminRefundsPage from "@/admin/pages/refund";
 import AdminSystemSettingPage from "@/admin/pages/systemSetting";
 import AdminAnnouncementsPage from "@/admin/pages/announcement";
 import AdminSubscribersPage from "@/admin/pages/subscribe";
-const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
+// const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
+const isComingSoonMode = false; // 暂时禁用 Coming Soon 模式
 
 export const router = createBrowserRouter([
   {
