@@ -9,11 +9,11 @@ import {
 import type { EventListDataRes, TopReplyRes } from "@/api/response";
 
 import { EventState } from "@/api/types";
+import { satsToBtc } from "@/utils/formatter";
 
-const SATS_PER_BTC = 100_000_000;
-
+// Helper to convert satoshi to BTC string (without " BTC" suffix)
 const satsToBtcString = (sats: number): string =>
-  (sats / SATS_PER_BTC).toFixed(8);
+  satsToBtc(sats, { suffix: false });
 
 const mapStateCode = (
   code: 0 | 1
@@ -23,15 +23,17 @@ const mapStateCode = (
   | typeof EventState.COMPLETED =>
   code === 1 ? EventState.ONGOING : EventState.COMPLETED;
 
-// Map backend API state (1: preheat, 2: ongoing, 3: completed) to EventState
+// Map backend API state to EventState
+// 1: preheat, 2: ongoing, 3: completed, 4-8: other states (treated as completed)
 const mapApiStateToEventState = (
-  state: 1 | 2 | 3
+  state: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 ):
   | typeof EventState.ONGOING
   | typeof EventState.PREHEAT
   | typeof EventState.COMPLETED => {
   if (state === 1) return EventState.PREHEAT;
   if (state === 2) return EventState.ONGOING;
+  // 3-8 are all treated as completed states
   return EventState.COMPLETED;
 };
 

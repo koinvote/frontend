@@ -1,5 +1,12 @@
 import { Link, useNavigate } from "react-router";
-import { type FormEvent, useState, useEffect, type ChangeEvent } from "react";
+import {
+  type FormEvent,
+  useState,
+  useEffect,
+  type ChangeEvent,
+  useMemo,
+  useRef,
+} from "react";
 import { Tooltip } from "antd";
 // import { useMutation } from '@tanstack/react-query'
 
@@ -24,6 +31,7 @@ import type { AddressValidationStatus } from "./types/index";
 
 import { useTranslation } from "react-i18next";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { satsToBtc } from "@/utils/formatter";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -78,8 +86,6 @@ export default function CreateEvent() {
 
   const networkLabel =
     ACTIVE_BTC_NETWORK === Network.mainnet ? "mainnet" : "testnet";
-
-
 
   /** 同意條款 */
   const [agree, setAgree] = useState(false);
@@ -159,13 +165,15 @@ export default function CreateEvent() {
     return () => window.clearTimeout(timer);
   }, [creatorAddress, ACTIVE_BTC_NETWORK, networkLabel]);
 
-
   useEffect(() => {
     const saved = sessionStorage.getItem(CREATE_EVENT_DRAFT_KEY);
     if (!saved) return;
 
     try {
       const draft: CreateEventDraft = JSON.parse(saved);
+
+      // Set flag to prevent clearing preheatHours during restore
+      isRestoringRef.current = true;
 
       setCreatorAddress(draft.creatorAddress ?? "");
       setTitle(draft.title ?? "");
@@ -181,6 +189,7 @@ export default function CreateEvent() {
       setRewardBtc(draft.rewardBtc ?? "");
       setOptions(draft.options && draft.options.length ? draft.options : [""]);
       setDurationHours(draft.durationHours ?? "");
+      // Restore enablePreheat and preheatHours together to maintain consistency
       setEnablePreheat(draft.enablePreheat ?? false);
       setPreheatHours(draft.preheatHours ?? "");
       setAgree(draft.agree ?? false);
@@ -188,6 +197,23 @@ export default function CreateEvent() {
       console.error("Failed to parse create-event draft", e);
     }
   }, []);
+
+  // Clear preheat hours when preheat is disabled
+  // Use a ref to track if we're restoring from sessionStorage to avoid clearing during restore
+  const isRestoringRef = useRef(false);
+
+  useEffect(() => {
+    // Don't clear if we're restoring from sessionStorage
+    if (isRestoringRef.current) {
+      isRestoringRef.current = false;
+      return;
+    }
+
+    if (!enablePreheat) {
+      setPreheatHours("");
+    }
+  }, [enablePreheat]);
+
   // -------- Creator address handlers --------
   const handleCreatorAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
     //todo when user finish input, check if it is a valid btc address
@@ -206,6 +232,8 @@ export default function CreateEvent() {
   };
 
   const handleAddOption = () => {
+    // Maximum 5 options
+    if (options.length >= 5) return;
     setOptions((prev) => [...prev, ""]);
   };
 
@@ -237,13 +265,12 @@ export default function CreateEvent() {
   /** -------- Submit handler -------- */
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-
     e.preventDefault();
 
-     if (addrStatus !== "valid") {
-       alert(`Please enter a valid Bitcoin address (${networkLabel}).`);
-       return;
-     }
+    if (addrStatus !== "valid") {
+      alert(`Please enter a valid Bitcoin address (${networkLabel}).`);
+      return;
+    }
 
     if (!agree) return;
 
@@ -253,7 +280,15 @@ export default function CreateEvent() {
       return;
     }
 
-    const preheat = Number(preheatHours || 0);
+    // Validate preheat hours if enabled
+    let preheat = 0;
+    if (enablePreheat) {
+      preheat = Number(preheatHours || 0);
+      if (!preheat || preheat < 1 || preheat > 720) {
+        alert("Please enter a valid preheat hours (between 1 and 720 hours).");
+        return;
+      }
+    }
 
     // 單選題的 options，先過濾空白
     let cleanedOptions: string[] | undefined;
@@ -349,17 +384,234 @@ export default function CreateEvent() {
   ]);
 
   const params = useSystemParametersStore((s) => s.params);
-  const minRewardBtc =
-    params?.min_reward_amount_satoshi != null
-      ? params.min_reward_amount_satoshi / 1e8
-      : 0.000011;
+
+  // Calculate minimum reward based on duration and free hours
+  // Rule 1: If duration_hours ≤ free_hours, min = satoshi_per_duration_hour
+  // Rule 2: If duration_hours > free_hours, min = max(min_reward_amount_satoshi, duration_hours × satoshi_per_duration_hour)
+  const minRewardBtc = useMemo(() => {
+    if (!params) {
+      return 0.000011; // Default fallback
+    }
+
+    const durationHoursNum = Number(durationHours);
+    const freeHours = params.free_hours ?? 0;
+    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
+    const minRewardAmountSatoshi = params.min_reward_amount_satoshi ?? 0;
+
+    // If duration is not set or invalid, return default
+    if (!Number.isFinite(durationHoursNum) || durationHoursNum <= 0) {
+      return minRewardAmountSatoshi / 100_000_000;
+    }
+
+    let minRewardSatoshi: number;
+
+    if (durationHoursNum <= freeHours) {
+      // Rule 1: duration_hours ≤ free_hours, min = satoshi_per_duration_hour
+      minRewardSatoshi = satoshiPerDurationHour;
+    } else {
+      // Rule 2: duration_hours > free_hours, min = max(min_reward_amount_satoshi, duration_hours × satoshi_per_duration_hour)
+      const durationBasedMin = durationHoursNum * satoshiPerDurationHour;
+      minRewardSatoshi = Math.max(minRewardAmountSatoshi, durationBasedMin);
+    }
+
+    // Convert to BTC
+    return minRewardSatoshi / 100_000_000;
+  }, [params, durationHours]);
 
   const rewardBtcPlaceholder =
     Number(durationHours) > 0
       ? t("createEvent.rewardBtcPlaceholderEnabled", {
-          min: minRewardBtc.toFixed(6),
+          min: minRewardBtc.toFixed(8),
         })
       : t("createEvent.rewardBtcPlaceholder");
+
+  // Calculate max recipients for rewarded events
+  // Formula: [用户输入的奖金金额] / [satoshi_per_extra_winner], 无条件舍去取整数
+  const maxRecipients = useMemo(() => {
+    if (!isRewarded || !rewardBtc) return null;
+
+    const rewardAmountSatoshi = Math.round(parseFloat(rewardBtc) * 100_000_000);
+    if (!Number.isFinite(rewardAmountSatoshi) || rewardAmountSatoshi <= 0) {
+      return null;
+    }
+
+    const satoshiPerExtraWinner = params?.satoshi_per_extra_winner ?? 0;
+    if (!satoshiPerExtraWinner || satoshiPerExtraWinner <= 0) {
+      return null;
+    }
+
+    // 无条件舍去取整数
+    return Math.floor(rewardAmountSatoshi / satoshiPerExtraWinner);
+  }, [isRewarded, rewardBtc, params?.satoshi_per_extra_winner]);
+
+  // Validate reward amount
+  const rewardBtcValidation = useMemo(() => {
+    if (!isRewarded) {
+      return { isValid: true, error: null };
+    }
+
+    if (!rewardBtc || rewardBtc.trim() === "") {
+      return {
+        isValid: false,
+        error: "Please enter reward amount",
+      };
+    }
+
+    const rewardAmount = parseFloat(rewardBtc);
+    if (!Number.isFinite(rewardAmount) || rewardAmount <= 0) {
+      return {
+        isValid: false,
+        error: "Please enter a valid reward amount",
+      };
+    }
+
+    // Check if reward amount is less than minimum
+    if (rewardAmount < minRewardBtc) {
+      return {
+        isValid: false,
+        error: `Minimum ${minRewardBtc.toFixed(8)} BTC`,
+      };
+    }
+
+    return { isValid: true, error: null };
+  }, [isRewarded, rewardBtc, minRewardBtc]);
+
+  // Calculate platform fee for non-reward events
+  // Formula: [Duration - free_hours] × satoshi_per_duration_hour × platform_fee_percentage
+  const platformFeeSatoshi = useMemo(() => {
+    // Only calculate for non-reward events
+    if (isRewarded) return null;
+
+    // Check if system parameters are loaded
+    if (!params) return null;
+
+    const duration = Number(durationHours);
+    const freeHours = params.free_hours ?? 0;
+    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
+    const platformFeePercentage = params.platform_fee_percentage ?? 0;
+
+    // If duration is invalid or not provided, return null
+    if (!Number.isFinite(duration) || duration <= 0) return null;
+
+    // If free_hours is 0, it means no free hours, calculate for full duration
+    // If duration <= free_hours, platform fee is 0
+    const billableHours =
+      freeHours > 0 ? Math.max(0, duration - freeHours) : duration;
+
+    // If no billable hours, platform fee is 0
+    if (billableHours <= 0) return 0;
+
+    // Calculate: billableHours × satoshi_per_duration_hour × platform_fee_percentage
+    const fee =
+      billableHours * satoshiPerDurationHour * (platformFeePercentage / 100);
+
+    // Round to nearest satoshi
+    return Math.round(fee);
+  }, [isRewarded, params, durationHours]);
+
+  // Format platform fee for display
+  const platformFeeDisplay = useMemo(() => {
+    return satsToBtc(platformFeeSatoshi);
+  }, [platformFeeSatoshi]);
+
+  // Calculate preheat fee
+  // Formula: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
+  const preheatFeeSatoshi = useMemo(() => {
+    // Only calculate if preheat is enabled
+    if (!enablePreheat) return null;
+
+    // Check if system parameters are loaded
+    if (!params) return null;
+
+    const preheatHoursNum = Number(preheatHours);
+    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
+    const platformFeePercentage = params.platform_fee_percentage ?? 0;
+
+    // Validate preheat hours (must be between 1 and 720)
+    if (
+      !Number.isFinite(preheatHoursNum) ||
+      preheatHoursNum < 1 ||
+      preheatHoursNum > 720
+    ) {
+      return null;
+    }
+
+    // Calculate: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
+    const multiplier = 0.2 + 0.8 * (preheatHoursNum / 720);
+    const fee =
+      preheatHoursNum *
+      satoshiPerDurationHour *
+      (platformFeePercentage / 100) *
+      multiplier;
+
+    // Round to nearest satoshi
+    return Math.round(fee);
+  }, [enablePreheat, params, preheatHours]);
+
+  // Format preheat fee for display
+  const preheatFeeDisplay = useMemo(() => {
+    return satsToBtc(preheatFeeSatoshi);
+  }, [preheatFeeSatoshi]);
+
+  // Validate preheat hours
+  const preheatHoursValidation = useMemo(() => {
+    if (!enablePreheat) {
+      return { isValid: true, error: null };
+    }
+
+    const preheatHoursNum = Number(preheatHours);
+
+    // Check if preheat hours is empty
+    if (!preheatHours || preheatHours.trim() === "") {
+      return {
+        isValid: false,
+        error: "Please enter preheat hours",
+      };
+    }
+
+    // Check if preheat hours is a valid number
+    if (!Number.isFinite(preheatHoursNum)) {
+      return {
+        isValid: false,
+        error: "Please enter a valid number",
+      };
+    }
+
+    // Check if preheat hours is greater than 720
+    if (preheatHoursNum > 720) {
+      return {
+        isValid: false,
+        error: "Maximum preheat hours is 720",
+      };
+    }
+
+    // Check if preheat hours is less than 1
+    if (preheatHoursNum < 1) {
+      return {
+        isValid: false,
+        error: "Minimum preheat hours is 1",
+      };
+    }
+
+    return { isValid: true, error: null };
+  }, [enablePreheat, preheatHours]);
+
+  // Check if Preview button should be disabled
+  const isPreviewDisabled = useMemo(() => {
+    return (
+      !agree ||
+      isSubmitting ||
+      !preheatHoursValidation.isValid ||
+      !rewardBtcValidation.isValid ||
+      addrStatus !== "valid"
+    );
+  }, [
+    agree,
+    isSubmitting,
+    preheatHoursValidation.isValid,
+    rewardBtcValidation.isValid,
+    addrStatus,
+  ]);
 
   // -------- Hashtags handlers -------- *
   const addTag = (raw: string) => {
@@ -403,6 +655,24 @@ export default function CreateEvent() {
     }
     setHashtagInput(v);
   };
+
+  // Calculate total hashtag characters (only letters, excluding #)
+  // Count all tags in hashtagList + current input
+  const totalHashtagChars = useMemo(() => {
+    // Count characters in existing tags (already normalized, no #)
+    const existingChars = hashtagList.reduce((sum, tag) => sum + tag.length, 0);
+
+    // Count characters in current input (excluding #)
+    if (!hashtagInput) return existingChars;
+    const cleaned = hashtagInput.replace(/^#+/g, "").replace(/[^\w]/g, "");
+    return existingChars + cleaned.length;
+  }, [hashtagList, hashtagInput]);
+
+  // Maximum total characters for all hashtags
+  const MAX_TOTAL_HASHTAG_CHARS = 20;
+  const hashtagCharsLeft = useMemo(() => {
+    return Math.max(0, MAX_TOTAL_HASHTAG_CHARS - totalHashtagChars);
+  }, [totalHashtagChars]);
 
   return (
     <div className="flex-col flex items-center justify-center w-full">
@@ -524,7 +794,7 @@ export default function CreateEvent() {
             </span>
           </div>
 
-          {/* Hashtags（現在先只是 UI，之後可以接成陣列） */}
+          {/* Hashtags */}
           <div>
             <label className="block tx-14 lh-20 fw-m text-primary mb-1">
               {t("createEvent.hashtags")}
@@ -585,9 +855,15 @@ export default function CreateEvent() {
               />
             </div>
 
-            <span className="tx-12 lh-18 block text-right text-secondary">
-              {/* 這裡你要顯示規則：例如「單一 tag 最多 20 字」或「最多 N 個」都行 */}
-              {t("createEvent.characterLeft")}
+            <span
+              className={cn(
+                "tx-12 lh-18 block text-right",
+                totalHashtagChars >= MAX_TOTAL_HASHTAG_CHARS
+                  ? "text-red-500"
+                  : "text-secondary"
+              )}
+            >
+              {hashtagCharsLeft} {t("createEvent.characterLeft")}
             </span>
           </div>
 
@@ -660,8 +936,8 @@ export default function CreateEvent() {
                         </div>
                       )}
 
-                      {/* 加號：只在最後一列顯示 */}
-                      {isLast && (
+                      {/* 加號：只在最後一列顯示，且選項數量少於5個時才顯示 */}
+                      {isLast && options.length < 5 && (
                         <div
                           className={cn(
                             "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer"
@@ -752,9 +1028,12 @@ export default function CreateEvent() {
                   onChange={(e) => setRewardBtc(e.target.value)}
                   //if enabled, the placeholder need to be change to Enter reward ( Min 0.000011 ), and the number Min xxxx need to have a state so I can update it dynamically
                   placeholder={rewardBtcPlaceholder}
-                  className="w-full rounded-xl border border-border bg-white px-3 py-2
-                         tx-14 lh-20 text-black placeholder:text-secondary
-                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500) disabled:opacity-60"
+                  className={cn(
+                    "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                    rewardBtcValidation.error
+                      ? "border-red-500 focus:ring-red-500"
+                      : "border-border focus:ring-(--color-orange-500)"
+                  )}
                 />
                 <Button
                   disabled={Number(durationHours) <= 0}
@@ -768,28 +1047,37 @@ export default function CreateEvent() {
                   {t("createEvent.minimum")}
                 </Button>
               </div>
+              {isRewarded && rewardBtcValidation.error && (
+                <p className="tx-12 lh-18 text-red-500 mt-1">
+                  {rewardBtcValidation.error}
+                </p>
+              )}
             </div>
           )}
 
-          {/* Number of recipients（之後看後端計算，再來補） */}
+          {/* Number of recipients */}
           {isRewarded && (
             <div>
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
                 {t("createEvent.numberOfRecipients")}
               </p>
               <p className="tx-12 lh-18 text-secondary">
-                -- {/* TODO: calculate from reward/threshold */}
+                {maxRecipients !== null && maxRecipients > 0
+                  ? maxRecipients === 1
+                    ? "1 Address"
+                    : `${maxRecipients} Addresses`
+                  : "--"}
               </p>
             </div>
           )}
 
-          {/* Platform fee（只有 no reward 時顯示，之後接 FREE_HOURS 邏輯） */}
+          {/* Platform fee（只有 no reward 時顯示） */}
           {!isRewarded && (
             <div>
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
                 Platform fee:
               </p>
-              <p className="tx-12 lh-18 text-secondary">--</p>
+              <p className="tx-12 lh-18 text-secondary">{platformFeeDisplay}</p>
             </div>
           )}
 
@@ -836,17 +1124,27 @@ export default function CreateEvent() {
               value={preheatHours}
               onChange={(e) => setPreheatHours(e.target.value)}
               placeholder="Enter hours (max 720)"
-              className="w-full rounded-xl border border-border bg-white
-                         px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary
-                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500) disabled:opacity-60"
+              className={cn(
+                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                preheatHoursValidation.error
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-border focus:ring-(--color-orange-500)"
+              )}
               disabled={!enablePreheat}
+              min={1}
+              max={720}
             />
+            {enablePreheat && preheatHoursValidation.error && (
+              <p className="tx-12 lh-18 text-red-500 mt-1">
+                {preheatHoursValidation.error}
+              </p>
+            )}
           </div>
 
           {/* Preheat fee */}
           <div>
             <p className="tx-14 lh-20 fw-m text-primary mb-1">Preheat fee:</p>
-            <p className="tx-12 lh-18 text-secondary">--</p>
+            <p className="tx-12 lh-18 text-secondary">{preheatFeeDisplay}</p>
           </div>
 
           {/* Terms checkbox */}
@@ -865,6 +1163,13 @@ export default function CreateEvent() {
                   className="text-(--color-orange-500) underline"
                 >
                   Terms of Service
+                </Link>
+                ,{" "}
+                <Link
+                  to="/terms-reward-distribution"
+                  className="text-(--color-orange-500) underline"
+                >
+                  Reward Distribution
                 </Link>
                 ,{" "}
                 <Link
@@ -903,7 +1208,7 @@ export default function CreateEvent() {
               tone="primary"
               text="sm"
               className="sm:w-[160px]"
-              disabled={!agree || isSubmitting}
+              disabled={isPreviewDisabled}
             >
               {isSubmitting ? "Submitting…" : "Preview"}
             </Button>

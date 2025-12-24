@@ -1,27 +1,12 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { useHomeEvents } from "@/hooks/useHomeEvents";
 import { EventCard } from "@/pages/home/component/EventCard";
-import { useHomeStore } from "@/stores/homeStore";
-import { EventState } from "@/api/types";
 
 export function EventList() {
   const { events, isLoading, isError, hasMore, loadMore, reload } =
     useHomeEvents();
-  const { status } = useHomeStore();
+  console.log("events", events);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
-
-  // Filter events by current status according to API doc:
-  // state: 1 (preheat), 2 (ongoing), 3 (completed)
-  const filteredEvents = useMemo(() => {
-    const expectedState =
-      status === "preheat"
-        ? EventState.PREHEAT
-        : status === "ongoing"
-        ? EventState.ONGOING
-        : EventState.COMPLETED;
-
-    return events.filter((event) => event.state === expectedState);
-  }, [events, status]);
 
   // infinite scroll
   useEffect(() => {
@@ -59,7 +44,7 @@ export function EventList() {
     );
   }
 
-  const isEmpty = !isLoading && filteredEvents.length === 0;
+  const isEmpty = !isLoading && events.length === 0;
 
   if (isEmpty) {
     return (
@@ -74,7 +59,7 @@ export function EventList() {
 
   return (
     <div className="mt-4 flex flex-col gap-4 md:gap-6">
-      {filteredEvents.map((event) => (
+      {events.map((event) => (
         <EventCard
           key={event.event_id}
           event={event}
@@ -92,7 +77,7 @@ export function EventList() {
             Loading...
           </div>
         )}
-        {!hasMore && !isLoading && filteredEvents.length > 0 && (
+        {!hasMore && !isLoading && events.length > 0 && (
           <div className="flex h-full items-center justify-center text-[11px] text-secondary">
             No more events
           </div>

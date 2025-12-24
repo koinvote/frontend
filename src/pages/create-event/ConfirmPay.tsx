@@ -1,19 +1,18 @@
-import { useLocation, useNavigate, useParams } from "react-router";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router";
+import { useEffect, useState, useMemo } from "react";
+import { Divider } from "antd";
 import { Button } from "@/components/base/Button";
-import { Loading } from "@/components/base/Loading";
 import { useToast } from "@/components/base/Toast/useToast";
-import { API } from "@/api";
 import type { EventType } from "@/api/types";
-import { DepositStatus } from "@/api/types";
-import type { DepositStatusRes } from "@/api/response";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import BTCIcon from "@/assets/icons/btc.svg?react";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { satsToBtc } from "@/utils/formatter";
+import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 
 const COUNTDOWN_MINUTES = 15;
-const POLL_INTERVAL_MS = 10_000; // 10 seconds
 const SATS_PER_BTC = 100_000_000;
+const MIN_REFUND_THRESHOLD = 0.0005; // 0.0005 BTC
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -44,402 +43,177 @@ function formatBtcDisplay(btc: string): string {
   return parseFloat(btc).toString();
 }
 
-// Thank You for Sponsoring - Underpaid Donation (no refund)
-function ThankYouDonation({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="flex-col flex items-center justify-center w-full min-h-screen">
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
-          Thank You for Sponsoring
-        </h1>
-        <div className="mt-6 space-y-4 text-primary tx-14 lh-20">
-          <p>Thank you for your support.</p>
-          <p>Your contribution has been successfully received on-chain.</p>
-          <p>
-            However, the amount does not meet the minimum requirement to create
-            this event.
-          </p>
-          <p>
-            If you have any questions, please contact{" "}
-            <span className="inline-flex items-center gap-1">
-              <a
-                href="mailto:support@koinvote.com"
-                className="text-(--color-orange-500) underline"
-              >
-                support@koinvote.com
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText("support@koinvote.com");
-                }}
-                className="p-1 hover:opacity-70"
-              >
-                <CopyIcon className="w-4 h-4 fill-current" />
-              </button>
-            </span>
-          </p>
-        </div>
-        <div className="mt-6 flex justify-center">
-          <Button
-            type="button"
-            appearance="solid"
-            tone="primary"
-            text="sm"
-            className="sm:w-[160px]"
-            onClick={onBack}
-          >
-            Back to Preview
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Thank You for Sponsoring - Underpaid with Refund
-function ThankYouRefund({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="flex-col flex items-center justify-center w-full min-h-screen">
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
-          Thank You for Sponsoring
-        </h1>
-        <div className="mt-6 space-y-4 text-primary tx-14 lh-20">
-          <p>Thank you for your support.</p>
-          <p>Your contribution has been successfully received on-chain.</p>
-          <p>
-            However, the amount does not meet the minimum requirement to create
-            this event.
-          </p>
-          <p>
-            Your payment will be refunded to your refund address after network
-            fees and applicable charges are deducted.
-          </p>
-          <p>
-            If you have any questions, please contact{" "}
-            <span className="inline-flex items-center gap-1">
-              <a
-                href="mailto:support@koinvote.com"
-                className="text-(--color-orange-500) underline"
-              >
-                support@koinvote.com
-              </a>
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard.writeText("support@koinvote.com");
-                }}
-                className="p-1 hover:opacity-70"
-              >
-                <CopyIcon className="w-4 h-4 fill-current" />
-              </button>
-            </span>
-          </p>
-        </div>
-        <div className="mt-6 flex justify-center">
-          <Button
-            type="button"
-            appearance="solid"
-            tone="primary"
-            text="sm"
-            className="sm:w-[160px]"
-            onClick={onBack}
-          >
-            Back to Preview
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Payment Expired
-function PaymentExpired({ onBack }: { onBack: () => void }) {
-  return (
-    <div className="flex-col flex items-center justify-center w-full min-h-screen">
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
-          Payment Instructions
-        </h1>
-        <div className="mt-6 space-y-4 text-primary tx-14 lh-20 text-center">
-          <p>This payment session has expired.</p>
-          <p>Please return to Preview and submit again.</p>
-          <p className="text-secondary">
-            If a payment is received after this session expires, it will be
-            automatically refunded to your refund address, minus applicable
-            network fees.
-          </p>
-        </div>
-        <div className="mt-6 flex justify-center">
-          <Button
-            type="button"
-            appearance="solid"
-            tone="primary"
-            text="sm"
-            className="sm:w-[160px]"
-            onClick={onBack}
-          >
-            Back to Preview
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function ConfirmPay() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { eventId } = useParams<{ eventId: string }>();
   const state = location.state as PreviewEventState | undefined;
   const { showToast } = useToast();
 
   const systemParams = useSystemParametersStore((s) => s.params);
-  const sponsorshipThreshold =
-    systemParams?.min_reward_amount_satoshi ?? 50_000; // Default 0.0005 BTC
 
   const [countdown, setCountdown] = useState(COUNTDOWN_MINUTES * 60);
-  const [isExpired, setIsExpired] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [expectedAmountSats, setExpectedAmountSats] = useState(0);
-  const [depositAddress, setDepositAddress] = useState("");
-  const [receivedAmountSats, setReceivedAmountSats] = useState(0);
-  const [status, setStatus] = useState<string>("");
-  const [expiredAt, setExpiredAt] = useState<number | null>(null);
 
-  // Calculate amounts from state (for display, will use API amounts when available)
-  const { rewardAmountBtc, preheatFeeBtc } = useMemo(() => {
-    const reward =
-      state?.isRewarded && state?.rewardBtc ? parseFloat(state.rewardBtc) : 0;
-
-    // Preheat fee - TODO: get from API response (preheat_fee_satoshi from event detail)
-    const preheat = state?.enablePreheat && state?.preheatHours ? 0.0002 : 0; // Placeholder
-
-    return {
-      rewardAmountBtc: reward.toFixed(8),
-      preheatFeeBtc: preheat.toFixed(8),
-    };
-  }, [state]);
-
-  // Calculate total amount from API (expected_amount_satoshi from deposit status)
-  const totalAmountBtc = useMemo(() => {
-    if (expectedAmountSats > 0) {
-      return (expectedAmountSats / SATS_PER_BTC).toFixed(8);
-    }
-    // Fallback to calculated value if API hasn't returned yet
-    const reward =
-      state?.isRewarded && state?.rewardBtc ? parseFloat(state.rewardBtc) : 0;
-    const rewardSats = Math.round(reward * SATS_PER_BTC);
-    const preheat = state?.enablePreheat && state?.preheatHours ? 0.0002 : 0;
-    const preheatSats = Math.round(preheat * SATS_PER_BTC);
-    const platformFee = !state?.isRewarded ? 0.001 : 0; // Placeholder
-    const platformFeeSats = Math.round(platformFee * SATS_PER_BTC);
-    const totalSats = rewardSats + preheatSats + platformFeeSats;
-    return (totalSats / SATS_PER_BTC).toFixed(8);
-  }, [expectedAmountSats, state]);
-
-  // Countdown timer
+  // Initialize countdown timer
   useEffect(() => {
-    if (isExpired || !expiredAt) return;
+    if (!state) return;
 
+    const expirationTime = Date.now() + COUNTDOWN_MINUTES * 60 * 1000;
     const updateCountdown = () => {
       const now = Date.now();
-      const remaining = Math.max(0, Math.floor((expiredAt - now) / 1000));
-
-      if (remaining <= 0) {
-        setIsExpired(true);
-        setCountdown(0);
-      } else {
-        setCountdown(remaining);
-      }
+      const remaining = Math.max(0, Math.floor((expirationTime - now) / 1000));
+      setCountdown(remaining);
     };
 
     updateCountdown();
     const interval = setInterval(updateCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [isExpired, expiredAt]);
+  }, [state]);
 
-  // Fetch deposit status
-  const fetchDepositStatus = useCallback(async () => {
-    if (!eventId) return;
+  // Calculate platform fee for non-reward events
+  // Formula: [Duration - free_hours] × satoshi_per_duration_hour × platform_fee_percentage
+  const platformFeeSatoshi = useMemo(() => {
+    // Only calculate for non-reward events
+    if (state?.isRewarded) return null;
 
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res = (await API.getDepositStatus(eventId)()) as any;
-      const envelope = res?.success !== undefined ? res : res?.data;
+    // Check if system parameters are loaded
+    if (!systemParams) return null;
 
-      if (!envelope?.success || !envelope?.data) {
-        throw new Error(envelope?.message || "Failed to fetch deposit status");
-      }
+    const duration = state?.durationHours ?? 0;
+    const freeHours = systemParams.free_hours ?? 0;
+    const satoshiPerDurationHour = systemParams.satoshi_per_duration_hour ?? 0;
+    const platformFeePercentage = systemParams.platform_fee_percentage ?? 0;
 
-      const data = envelope.data as DepositStatusRes;
-      setDepositAddress(data.deposit_address || "");
-      setExpectedAmountSats(data.expected_amount_satoshi || 0);
-      setReceivedAmountSats(data.received_amount_satoshi || 0);
-      setStatus(data.status || "");
+    // If duration is invalid or not provided, return null
+    if (!Number.isFinite(duration) || duration <= 0) return null;
 
-      // Set expiration time from API
-      if (data.initial_timeout_at) {
-        const timeoutDate = new Date(data.initial_timeout_at).getTime();
-        setExpiredAt(timeoutDate);
-      }
+    // If free_hours is 0, it means no free hours, calculate for full duration
+    // If duration <= free_hours, platform fee is 0
+    const billableHours =
+      freeHours > 0 ? Math.max(0, duration - freeHours) : duration;
 
-      // Handle different statuses
-      if (data.status === DepositStatus.COMPLETED) {
-        // Payment completed - check if amount matches, exceeds, or is less
-        const received = data.received_amount_satoshi || 0;
-        const expected = data.expected_amount_satoshi || 0;
-        const difference = received - expected;
+    // If no billable hours, platform fee is 0
+    if (billableHours <= 0) return 0;
 
-        if (difference === 0) {
-          // Exact amount - redirect to home
-          navigate("/");
-        } else if (difference > 0) {
-          // Overpaid
-          const excess = difference;
-          if (excess > sponsorshipThreshold) {
-            // Show toast and redirect
-            showToast(
-              "success",
-              "Payment received. Your event has been successfully created. Any excess amount has been scheduled for refund to your refund address.",
-              0 // 0 means user must click to dismiss
-            );
-            navigate("/");
-          } else {
-            // No refund, just redirect
-            navigate("/");
-          }
-        } else {
-          // Underpaid
-          const paidAmount = received;
-          if (paidAmount <= sponsorshipThreshold) {
-            // Donation - no refund
-            // Will show ThankYouDonation component (handled in render)
-          } else {
-            // Will refund - show ThankYouRefund component (handled in render)
-          }
-        }
-      } else if (data.status === DepositStatus.EXPIRED) {
-        setIsExpired(true);
-      } else if (
-        data.status === DepositStatus.DONATION ||
-        data.status === DepositStatus.WAIT_FOR_REFUND
-      ) {
-        // Handle underpaid cases
-        const paidAmount = data.received_amount_satoshi || 0;
-        if (paidAmount <= sponsorshipThreshold) {
-          // Donation - no refund (will show ThankYouDonation)
-        } else {
-          // Will refund (will show ThankYouRefund)
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching deposit status:", error);
-      // Don't show error toast on every poll, only on initial load
-      if (isLoading) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorAny = error as any;
-        const errorMessage =
-          errorAny?.apiMessage ||
-          (error instanceof Error
-            ? error.message
-            : "Failed to fetch deposit status. Please try again.");
-        showToast("error", errorMessage);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  }, [eventId, navigate, showToast, isLoading, sponsorshipThreshold]);
+    // Calculate: billableHours × satoshi_per_duration_hour × platform_fee_percentage
+    const fee =
+      billableHours * satoshiPerDurationHour * (platformFeePercentage / 100);
 
-  // Initial fetch and polling
-  useEffect(() => {
-    if (!eventId) {
-      navigate("/create-event");
-      return;
+    // Round to nearest satoshi
+    return Math.round(fee);
+  }, [state?.isRewarded, state?.durationHours, systemParams]);
+
+  // Calculate preheat fee
+  // Formula: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
+  const preheatFeeSatoshi = useMemo(() => {
+    // Only calculate if preheat is enabled
+    if (
+      !state?.enablePreheat ||
+      !state?.preheatHours ||
+      state.preheatHours <= 0
+    ) {
+      return null;
     }
 
-    // Fetch immediately
-    fetchDepositStatus();
+    // Check if system parameters are loaded
+    if (!systemParams) return null;
 
-    // Poll every 10 seconds
-    const pollInterval = setInterval(() => {
-      if (!isExpired && status !== DepositStatus.COMPLETED) {
-        fetchDepositStatus();
-      }
-    }, POLL_INTERVAL_MS);
+    const preheatHoursNum = state.preheatHours;
+    const satoshiPerDurationHour = systemParams.satoshi_per_duration_hour ?? 0;
+    const platformFeePercentage = systemParams.platform_fee_percentage ?? 0;
 
-    return () => clearInterval(pollInterval);
-  }, [eventId, navigate, fetchDepositStatus, isExpired, status]);
+    // Validate preheat hours (must be between 1 and 720)
+    if (preheatHoursNum < 1 || preheatHoursNum > 720) {
+      return null;
+    }
+
+    // Calculate: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
+    const multiplier = 0.2 + 0.8 * (preheatHoursNum / 720);
+    const fee =
+      preheatHoursNum *
+      satoshiPerDurationHour *
+      (platformFeePercentage / 100) *
+      multiplier;
+
+    // Round to nearest satoshi
+    return Math.round(fee);
+  }, [state?.enablePreheat, state?.preheatHours, systemParams]);
+
+  // Calculate reward amount in satoshi
+  const rewardAmountSatoshi = useMemo(() => {
+    if (!state?.isRewarded || !state?.rewardBtc) return 0;
+    return Math.round(parseFloat(state.rewardBtc) * SATS_PER_BTC);
+  }, [state?.isRewarded, state?.rewardBtc]);
+
+  // Calculate total amount
+  const totalAmountSatoshi = useMemo(() => {
+    const platform = platformFeeSatoshi ?? 0;
+    const preheat = preheatFeeSatoshi ?? 0;
+    const reward = rewardAmountSatoshi;
+    return reward + platform + preheat;
+  }, [platformFeeSatoshi, preheatFeeSatoshi, rewardAmountSatoshi]);
+
+  // Format amounts for display
+  const rewardAmountBtc = useMemo(() => {
+    if (rewardAmountSatoshi === 0) return "0";
+    return satsToBtc(rewardAmountSatoshi, { suffix: false });
+  }, [rewardAmountSatoshi]);
+
+  const preheatFeeBtc = useMemo(() => {
+    return satsToBtc(preheatFeeSatoshi, { suffix: false });
+  }, [preheatFeeSatoshi]);
+
+  const platformFeeBtc = useMemo(() => {
+    return satsToBtc(platformFeeSatoshi, { suffix: false });
+  }, [platformFeeSatoshi]);
+
+  const totalAmountBtc = useMemo(() => {
+    return satsToBtc(totalAmountSatoshi, { suffix: false });
+  }, [totalAmountSatoshi]);
 
   // Handle copy address
-  const handleCopyAddress = useCallback(
-    (address: string) => {
-      if (!address) return;
-      try {
-        navigator.clipboard.writeText(address);
-        showToast("success", "Address copied to clipboard");
-      } catch (error) {
-        console.error("Failed to copy:", error);
-        showToast("error", "Failed to copy address");
-      }
-    },
-    [showToast]
-  );
-
-  // Handle back to preview
-  const handleBackToPreview = useCallback(() => {
-    if (state) {
-      navigate("/preview-event", { state });
-    } else {
-      navigate("/create-event");
+  const handleCopyAddress = (address: string) => {
+    if (!address) return;
+    try {
+      navigator.clipboard.writeText(address);
+      showToast("success", "Address copied to clipboard");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showToast("error", "Failed to copy address");
     }
-  }, [navigate, state]);
+  };
 
-  // Handle cancel
-  const handleCancel = useCallback(() => {
-    handleBackToPreview();
-  }, [handleBackToPreview]);
+  // Handle cancel - go back to create event
+  const handleCancel = () => {
+    navigate("/create-event");
+  };
 
-  // Show expired page
-  if (isExpired) {
-    return <PaymentExpired onBack={handleBackToPreview} />;
+  // Redirect if no state
+  if (!state) {
+    navigate("/create-event");
+    return null;
   }
 
-  // Show underpaid donation page (no refund)
-  if (
-    status === DepositStatus.DONATION ||
-    (status === DepositStatus.COMPLETED &&
-      receivedAmountSats < expectedAmountSats &&
-      receivedAmountSats <= sponsorshipThreshold)
-  ) {
-    return <ThankYouDonation onBack={handleBackToPreview} />;
-  }
+  const refundAddress = state.creatorAddress || state.refundAddress || "";
+  // Placeholder BTC address (will be replaced with API data later)
+  const depositAddress = "bc1q333z0tdzpwwt03y8emfpjp78kaqkzuj7ecnmk4";
 
-  // Show underpaid refund page
-  if (
-    status === DepositStatus.WAIT_FOR_REFUND ||
-    (status === DepositStatus.COMPLETED &&
-      receivedAmountSats < expectedAmountSats &&
-      receivedAmountSats > sponsorshipThreshold)
-  ) {
-    return <ThankYouRefund onBack={handleBackToPreview} />;
-  }
-
-  // Show loading state
-  if (isLoading || !depositAddress) {
-    return (
-      <div className="flex-col flex items-center justify-center w-full min-h-screen">
-        <Loading />
-      </div>
-    );
-  }
-
-  const refundAddress = state?.creatorAddress || state?.refundAddress || "";
+  // Check if platform fee should be shown
+  // Platform fee is shown for non-reward events that have fees (preheat or duration > free_hours)
+  const showPlatformFee =
+    !state.isRewarded && platformFeeSatoshi !== null && platformFeeSatoshi > 0;
 
   return (
-    <div className="flex-col flex items-center justify-center w-full min-h-screen">
+    <div className="flex-col flex items-center justify-center w-full">
+      <div className="h-[50px] w-full relative">
+        <button
+          type="button"
+          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+          onClick={() => navigate(-1)}
+        >
+          <CircleLeftIcon className="w-8 h-8 fill-current" />
+        </button>
+      </div>
       <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           Payment Instructions
@@ -452,30 +226,8 @@ export default function ConfirmPay() {
         </p>
 
         <div className="mt-6 space-y-4">
-          {/* BTC Address (Refund Address) */}
-          <div className="space-y-1">
-            <div className="tx-12 lh-18 text-secondary">BTC Address</div>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
-                {refundAddress || "--"}
-              </div>
-              {refundAddress && (
-                <button
-                  type="button"
-                  onClick={() => handleCopyAddress(refundAddress)}
-                  className="p-1 hover:opacity-70"
-                >
-                  <CopyIcon className="w-5 h-5 fill-current text-secondary" />
-                </button>
-              )}
-            </div>
-            <p className="tx-12 lh-18 text-secondary">
-              Your BTC address is used for refund as well.
-            </p>
-          </div>
-
           {/* Reward Amount (only if rewarded) */}
-          {state?.isRewarded && parseFloat(rewardAmountBtc) > 0 && (
+          {state.isRewarded && rewardAmountSatoshi > 0 && (
             <div className="space-y-1">
               <div className="tx-12 lh-18 text-secondary">Reward Amount</div>
               <div className="tx-14 lh-20 text-primary">
@@ -485,27 +237,23 @@ export default function ConfirmPay() {
           )}
 
           {/* Preheat Fee (only if enabled) */}
-          {state?.enablePreheat && parseFloat(preheatFeeBtc) > 0 && (
-            <div className="space-y-1">
-              <div className="tx-12 lh-18 text-secondary">Preheat Fee</div>
-              <div className="tx-14 lh-20 text-primary">
-                {formatBtcDisplay(preheatFeeBtc)} BTC
+          {state.enablePreheat &&
+            preheatFeeSatoshi !== null &&
+            preheatFeeSatoshi > 0 && (
+              <div className="space-y-1">
+                <div className="tx-12 lh-18 text-secondary">Preheat Fee</div>
+                <div className="tx-14 lh-20 text-primary">
+                  {formatBtcDisplay(preheatFeeBtc)} BTC
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Platform Fee (only for non-reward events, calculated as total - preheat if any) */}
-          {!state?.isRewarded && parseFloat(totalAmountBtc) > 0 && (
+          {/* Platform Fee (only for non-reward events with fees) */}
+          {showPlatformFee && (
             <div className="space-y-1">
               <div className="tx-12 lh-18 text-secondary">Platform Fee</div>
               <div className="tx-14 lh-20 text-primary">
-                {formatBtcDisplay(
-                  (
-                    parseFloat(totalAmountBtc) -
-                    (state?.enablePreheat ? parseFloat(preheatFeeBtc) : 0)
-                  ).toFixed(8)
-                )}{" "}
-                BTC
+                {formatBtcDisplay(platformFeeBtc)} BTC
               </div>
             </div>
           )}
@@ -518,8 +266,27 @@ export default function ConfirmPay() {
             </div>
           </div>
 
+          {/* Refund Address */}
+          <div className="space-y-1">
+            <div className="tx-12 lh-18 text-secondary">Refund Address</div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
+                {refundAddress || "--"}
+              </div>
+              {refundAddress && (
+                <button
+                  type="button"
+                  onClick={() => handleCopyAddress(refundAddress)}
+                  className="p-1 hover:opacity-70 cursor-pointer"
+                >
+                  <CopyIcon className="w-4 h-4 text-secondary" />
+                </button>
+              )}
+            </div>
+          </div>
+
           {/* Divider */}
-          <div className="border-t border-border my-4"></div>
+          <Divider className="bg-border" />
 
           {/* Send exactly */}
           <div className="space-y-4">
@@ -530,20 +297,41 @@ export default function ConfirmPay() {
               </div>
             </div>
 
+            {/* Warning message */}
+            <div className="flex items-start gap-2 tx-12 lh-18 text-secondary">
+              <span
+                className="text-secondary inline-block"
+                style={{ filter: "grayscale(100%)", opacity: 0.7 }}
+              >
+                ⚠️
+              </span>
+              <span>
+                Do NOT split your payment. Transactions below{" "}
+                {MIN_REFUND_THRESHOLD} BTC will NOT trigger a refund.
+              </span>
+            </div>
+
             {/* To this address */}
             <div className="space-y-1">
               <div className="tx-12 lh-18 text-secondary">To this address</div>
               <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-bg">
-                <BTCIcon className="w-5 h-5 flex-shrink-0" />
+                <div className="w-5 h-5 flex-shrink-0 rounded-full bg-secondary flex items-center justify-center">
+                  <BTCIcon
+                    className="w-3 h-3 [&>path]:stroke-[#A1A1A1]"
+                    style={{
+                      filter: "grayscale(100%) brightness(1.5)",
+                    }}
+                  />
+                </div>
                 <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
                   {depositAddress}
                 </div>
                 <button
                   type="button"
                   onClick={() => handleCopyAddress(depositAddress)}
-                  className="p-1 hover:opacity-70 flex-shrink-0"
+                  className="p-1 hover:opacity-70 flex-shrink-0 cursor-pointer"
                 >
-                  <CopyIcon className="w-5 h-5 fill-current text-secondary" />
+                  <CopyIcon className="w-4 h-4 text-secondary" />
                 </button>
               </div>
             </div>

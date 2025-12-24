@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next'
+import { useEffect } from 'react'
 
 export default function Terms() {
   const { t } = useTranslation()
+
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27">

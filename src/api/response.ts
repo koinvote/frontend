@@ -60,7 +60,7 @@ export interface EventListDataRes {
   event_id: string;
   title: string;
   description: string;
-  state: 1 | 2 | 3; // 1: preheat, 2: ongoing, 3: completed
+  state: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 1: preheat, 2: ongoing, 3: completed, 4: ended (已結束，等待派獎), 5: completed(已結束，派獎完成), 6: cancelled, 7: refunded, 8: expired
   hashtags: string[];
   created_at: string;
   deadline_at: string;

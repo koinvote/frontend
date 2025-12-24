@@ -43,7 +43,7 @@
       { "value": "rewarded", "label": "Rewarded" },
       { "value": "non_reward", "label": "Non-Rewarded" }
     ],
-    "minimum": "Minimum",
+    "minimum": "Use Min",
     "numberOfRecipients": "Number of Recipients",
     "enablePreheat": "Enable Preheat",
     "enablePreheatTooltip": "Preheat lets people see the event before replies open. During this time, the event is visible but replies are disabled.",

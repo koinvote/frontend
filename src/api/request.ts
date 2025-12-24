@@ -1,8 +1,5 @@
 // api/request.ts
-import type {
-  EventType,
-  EventRewardType,
-} from "./types";
+import type { EventType, EventRewardType } from "./types";
 
 export interface CreateEventReq {
   title: string;
@@ -18,7 +15,7 @@ export interface CreateEventReq {
 }
 
 export interface GetEventListReq {
-  state: "1" | "2" | "3"; // 1: preheat, 2: ongoing, 3: completed
+  tab: "preheat" | "ongoing" | "completed";
   q: string;
   page: string;
   limit: string;

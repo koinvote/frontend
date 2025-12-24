@@ -4,13 +4,11 @@ import { API, type ApiResponse } from "@/api/index";
 import { mapApiEventToEventSummary } from "@/utils/eventTransform";
 import type { GetEventListRes } from "@/api/response";
 
-// Map frontend status filter to backend state code
-const mapStatusToState = (
+// Map frontend status filter to backend tab parameter
+const mapStatusToTab = (
   status: "preheat" | "ongoing" | "completed"
-): "1" | "2" | "3" => {
-  if (status === "preheat") return "1";
-  if (status === "ongoing") return "2";
-  return "3";
+): "preheat" | "ongoing" | "completed" => {
+  return status;
 };
 
 // Map frontend sortField to backend sortBy
@@ -91,13 +89,13 @@ export function useHomeEvents() {
     // Capture the status at the time of request
     const requestStatus = status;
     requestStatusRef.current = requestStatus;
-    
+
     setLoading(true);
     setError(false);
     try {
       const currentPage = 1;
       const res = (await API.getEventList({
-        state: mapStatusToState(requestStatus),
+        tab: mapStatusToTab(requestStatus),
         q: debouncedSearch || "",
         page: String(currentPage),
         limit: String(limit),
@@ -147,17 +145,17 @@ export function useHomeEvents() {
 
   const loadMore = useCallback(async () => {
     if (isLoading || !hasMore) return;
-    
+
     // Capture the status at the time of request
     const requestStatus = status;
-    
+
     setLoading(true);
     setError(false);
     try {
       // Calculate page number from offset
       const currentPage = Math.floor(offset / limit) + 1;
       const res = (await API.getEventList({
-        state: mapStatusToState(requestStatus),
+        tab: mapStatusToTab(requestStatus),
         q: debouncedSearch || "",
         page: String(currentPage),
         limit: String(limit),

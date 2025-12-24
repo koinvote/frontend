@@ -6,8 +6,8 @@ import type { EventType } from "@/api/types";
 import { API } from "@/api";
 import type { CreateEventReq } from "@/api/request";
 import { useToast } from "@/components/base/Toast/useToast";
-
-const FREE_HOURS = 24; // 先用常數，之後從 Admin 設定帶進來
+import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { satsToBtc } from "@/utils/formatter";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -43,67 +43,160 @@ export default function PreviewEvent() {
   const [agree, setAgree] = useState(false);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
+  // Get system parameters
+  const params = useSystemParametersStore((s) => s.params);
+
   // Extract values with safe defaults for useMemo (must be before early return)
   const enablePreheat = state?.enablePreheat ?? false;
   const preheatHours = state?.preheatHours ?? 0;
   const isRewarded = state?.isRewarded ?? false;
   const durationHours = state?.durationHours ?? 0;
 
+  // Calculate max recipients for rewarded events
+  // Formula: [用户输入的奖金金额] / [satoshi_per_extra_winner], 无条件舍去取整数
+  const maxRecipients = useMemo(() => {
+    if (!isRewarded || !state?.rewardBtc) return null;
+
+    const rewardAmountSatoshi = Math.round(
+      parseFloat(state.rewardBtc) * 100_000_000
+    );
+    if (!Number.isFinite(rewardAmountSatoshi) || rewardAmountSatoshi <= 0) {
+      return null;
+    }
+
+    const satoshiPerExtraWinner = params?.satoshi_per_extra_winner ?? 0;
+    if (!satoshiPerExtraWinner || satoshiPerExtraWinner <= 0) {
+      return null;
+    }
+
+    // 无条件舍去取整数
+    return Math.floor(rewardAmountSatoshi / satoshiPerExtraWinner);
+  }, [isRewarded, state?.rewardBtc, params?.satoshi_per_extra_winner]);
+
+  // Calculate platform fee for non-reward events
+  // Formula: [Duration - free_hours] × satoshi_per_duration_hour × platform_fee_percentage
+  const platformFeeSatoshi = useMemo(() => {
+    // Only calculate for non-reward events
+    if (isRewarded) return null;
+
+    // Check if system parameters are loaded
+    if (!params) return null;
+
+    const freeHours = params.free_hours ?? 0;
+    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
+    const platformFeePercentage = params.platform_fee_percentage ?? 0;
+
+    // If duration is invalid or not provided, return null
+    if (!Number.isFinite(durationHours) || durationHours <= 0) return null;
+
+    // If free_hours is 0, it means no free hours, calculate for full duration
+    // If duration <= free_hours, platform fee is 0
+    const billableHours =
+      freeHours > 0 ? Math.max(0, durationHours - freeHours) : durationHours;
+
+    // If no billable hours, platform fee is 0
+    if (billableHours <= 0) return 0;
+
+    // Calculate: billableHours × satoshi_per_duration_hour × platform_fee_percentage
+    const fee =
+      billableHours * satoshiPerDurationHour * (platformFeePercentage / 100);
+
+    // Round to nearest satoshi
+    return Math.round(fee);
+  }, [isRewarded, params, durationHours]);
+
+  // Calculate preheat fee
+  // Formula: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
+  const preheatFeeSatoshi = useMemo(() => {
+    // Only calculate if preheat is enabled
+    if (!enablePreheat || !preheatHours || preheatHours <= 0) return null;
+
+    // Check if system parameters are loaded
+    if (!params) return null;
+
+    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
+    const platformFeePercentage = params.platform_fee_percentage ?? 0;
+
+    // Validate preheat hours (must be between 1 and 720)
+    if (preheatHours < 1 || preheatHours > 720) {
+      return null;
+    }
+
+    // Calculate: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
+    const multiplier = 0.2 + 0.8 * (preheatHours / 720);
+    const fee =
+      preheatHours *
+      satoshiPerDurationHour *
+      (platformFeePercentage / 100) *
+      multiplier;
+
+    // Round to nearest satoshi
+    return Math.round(fee);
+  }, [enablePreheat, params, preheatHours]);
+
+  // Format fees for display
+  const platformFeeDisplay = useMemo(() => {
+    return satsToBtc(platformFeeSatoshi);
+  }, [platformFeeSatoshi]);
+
+  const preheatFeeDisplay = useMemo(() => {
+    return satsToBtc(preheatFeeSatoshi);
+  }, [preheatFeeSatoshi]);
+
+  // Calculate reward amount in satoshi (for rewarded events)
+  const rewardAmountSatoshi = useMemo(() => {
+    if (!isRewarded || !state?.rewardBtc) return 0;
+    return Math.round(parseFloat(state.rewardBtc) * 100_000_000);
+  }, [isRewarded, state?.rewardBtc]);
+
+  // Calculate total amount
+  // For rewarded events: total = reward amount + preheat fee (if enabled)
+  // For non-rewarded events: total = platform fee + preheat fee (if enabled)
+  const totalAmountSatoshi = useMemo(() => {
+    const preheat = preheatFeeSatoshi ?? 0;
+
+    if (isRewarded) {
+      // For rewarded events, total = reward amount + preheat fee
+      return rewardAmountSatoshi + preheat;
+    }
+
+    // For non-rewarded events, calculate platform fee + preheat fee
+    // If both are null, return null
+    if (platformFeeSatoshi === null && preheatFeeSatoshi === null) {
+      return null;
+    }
+
+    // Sum up the fees (treat null as 0)
+    const platform = platformFeeSatoshi ?? 0;
+    return platform + preheat;
+  }, [isRewarded, rewardAmountSatoshi, platformFeeSatoshi, preheatFeeSatoshi]);
+
+  const totalFeeDisplay = useMemo(() => {
+    return satsToBtc(totalAmountSatoshi);
+  }, [totalAmountSatoshi]);
+
   // ----- FREE / PAID 判斷 -----
-  const {
-    isFree,
-    primaryButtonLabel,
-    headerSubTitle,
-    platformFeeText,
-    preheatFeeText,
-    totalFeeText,
-  } = useMemo(() => {
+  const { isFree, primaryButtonLabel, headerSubTitle } = useMemo(() => {
     const hasPreheat = enablePreheat && preheatHours > 0;
-    const isDurationWithinFree = !isRewarded && durationHours <= FREE_HOURS;
+    const freeHours = params?.free_hours ?? 24; // Use system parameter or default to 24
+    const isDurationWithinFree = !isRewarded && durationHours <= freeHours;
 
     const free =
       !isRewarded && // 無獎金
       !hasPreheat && // 沒預熱
-      isDurationWithinFree; // 時數在 FREE_HOURS 內
+      isDurationWithinFree; // 時數在免費時數內
 
     const primaryLabel = free ? "Confirm & Sign" : "Confirm & Pay";
     const subTitle = free
       ? "Please review and confirm your event."
       : "Please complete your payment";
 
-    // 平台費：現在先用 UI 區分，實際金額之後接後端
-    // 只有無獎金事件才需要平台費
-    const platformFee = !isRewarded ? (free ? "0" : "--") : undefined;
-    // 預熱費：之後用 API 回傳，先留佔位
-    const preheatFee = hasPreheat ? "--" : undefined;
-
-    // 計算總費用
-    // 1. 免費事件（無獎金 + 無預熱 + <=24小時）：0
-    // 2. 有獎事件：0（因為平台費只對無獎金事件收取）
-    // 3. 無獎金事件但不是免費的：平台費 + 預熱費（如果有）
-    let totalFee: string;
-    if (free) {
-      totalFee = "0";
-    } else if (isRewarded) {
-      // 有獎事件，總費用為 0
-      totalFee = "0";
-    } else {
-      // 無獎金事件但不是免費的
-      // 如果平台費和預熱費都是 "--"，總費用也顯示 "--"
-      // 如果其中一個是 "--"，總費用顯示 "--"
-      // 如果都是數字，需要相加（但目前都是 "--"，所以先顯示 "--"）
-      totalFee = "--";
-    }
-
     return {
       isFree: free,
       primaryButtonLabel: primaryLabel,
       headerSubTitle: subTitle,
-      platformFeeText: platformFee,
-      preheatFeeText: preheatFee,
-      totalFeeText: totalFee,
     };
-  }, [enablePreheat, preheatHours, isRewarded, durationHours]);
+  }, [enablePreheat, preheatHours, isRewarded, durationHours, params]);
 
   // 如果 user 直接打網址進來，沒有 state，就導回 create-event
   if (!state) {
@@ -144,7 +237,6 @@ export default function PreviewEvent() {
     hashtag,
     eventType,
     rewardBtc,
-    maxRecipient,
     options = [],
   } = state;
 
@@ -325,7 +417,11 @@ export default function PreviewEvent() {
                 {rewardBtc ? `${rewardBtc} BTC` : "--"}
               </Field>
               <Field label="Max Recipient">
-                {typeof maxRecipient === "number" ? maxRecipient : "--"}
+                {maxRecipients !== null && maxRecipients > 0
+                  ? maxRecipients === 1
+                    ? "1 Address"
+                    : `${maxRecipients} Addresses`
+                  : "--"}
               </Field>
             </>
           )}
@@ -349,17 +445,19 @@ export default function PreviewEvent() {
           </Field>
 
           {/* Platform fee（只有無獎金事件顯示） */}
-          {!isRewarded && <Field label="Platform fee">{platformFeeText}</Field>}
+          {!isRewarded && (
+            <Field label="Platform fee">{platformFeeDisplay}</Field>
+          )}
 
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (
             <>
               <Field label="Preheat">{`${preheatHours} hours`}</Field>
-              <Field label="Preheat fee">{preheatFeeText ?? "--"}</Field>
+              <Field label="Preheat fee">{preheatFeeDisplay}</Field>
             </>
           )}
           {/* Your Total */}
-          <Field label="Your Total">{totalFeeText}</Field>
+          <Field label="Your Total">{totalFeeDisplay}</Field>
         </div>
 
         {/* 同意條款 */}
@@ -373,24 +471,30 @@ export default function PreviewEvent() {
             />
             <span>
               By proceeding, you agree to the{" "}
-              <Link
-                to="/charges-refunds"
-                className="text-(--color-orange-500) underline"
-              >
-                Charges and Refund
-              </Link>
-              ,{" "}
               <Link to="/terms" className="text-(--color-orange-500) underline">
                 Terms of Service
               </Link>
-              , and{" "}
+              ,{" "}
+              <Link
+                to="/terms-reward-distribution"
+                className="text-(--color-orange-500) underline"
+              >
+                Reward Distribution
+              </Link>
+              ,{" "}
               <Link
                 to="/privacy"
                 className="text-(--color-orange-500) underline"
               >
                 Privacy Policy
               </Link>
-              .
+              , and{" "}
+              <Link
+                to="/charges-refunds"
+                className="text-(--color-orange-500) underline"
+              >
+                Charges &amp; Refunds
+              </Link>
             </span>
           </label>
         </div>

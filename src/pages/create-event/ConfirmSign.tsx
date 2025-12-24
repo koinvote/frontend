@@ -163,46 +163,6 @@ export default function ConfirmSign() {
     }
   }, [plaintext, showToast]);
 
-  const handleRegeneratePlaintext = useCallback(async () => {
-    if (!eventId || countdown > 0) return;
-
-    try {
-      setIsLoadingPlaintext(true);
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const plaintextRes = (await API.getSignaturePlainText(eventId)()) as any;
-      const plaintextEnvelope =
-        plaintextRes?.success !== undefined ? plaintextRes : plaintextRes?.data;
-
-      if (!plaintextEnvelope?.success || !plaintextEnvelope?.data) {
-        throw new Error(
-          plaintextEnvelope?.message || "Failed to get plaintext"
-        );
-      }
-
-      const plaintextData = plaintextEnvelope.data;
-      setPlaintext(plaintextData.plaintext);
-
-      // Calculate expiration time (15 minutes from timestamp)
-      const expirationTimestamp =
-        plaintextData.timestamp + COUNTDOWN_MINUTES * 60;
-      setExpiredAt(expirationTimestamp);
-      setCountdown(COUNTDOWN_MINUTES * 60);
-    } catch (error) {
-      console.error("Error regenerating plaintext:", error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const errorAny = error as any;
-      const errorMessage =
-        errorAny?.apiMessage ||
-        (error instanceof Error
-          ? error.message
-          : "Failed to regenerate plaintext");
-      showToast("error", errorMessage);
-    } finally {
-      setIsLoadingPlaintext(false);
-    }
-  }, [eventId, countdown, showToast]);
-
   const handleSubmit = async () => {
     if (!signature.trim()) {
       showToast("error", "Please enter a signature");
@@ -271,7 +231,8 @@ export default function ConfirmSign() {
         setTimeout(() => {
           navigate("/");
         }, 2000);
-      } else {        // Not success - show error
+      } else {
+        // Not success - show error
         const errorMessage =
           verifyData?.message || "Signature verification failed";
         setSignatureError(errorMessage);
@@ -314,7 +275,7 @@ export default function ConfirmSign() {
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           Confirm & Sign
         </h1>
-        <p className="mt-1 tx-14 lh-20 text-secondary">
+        <p className="mt-1 tx-14 lh-20 text-white">
           Sign to submit your event
         </p>
         <p className="mt-1 tx-12 lh-18 text-secondary">
@@ -364,17 +325,6 @@ export default function ConfirmSign() {
               </div>
             ) : plaintext ? (
               <div className="space-y-3">
-                <Button
-                  type="button"
-                  appearance="solid"
-                  tone="white"
-                  text="sm"
-                  className="w-full"
-                  disabled={countdown > 0}
-                  onClick={handleRegeneratePlaintext}
-                >
-                  Generate Plaintext
-                </Button>
                 <div className="relative">
                   <div className="px-3 py-2 rounded-lg border border-border bg-bg">
                     <div className="flex items-center justify-between gap-2">

@@ -46,7 +46,7 @@ function formatCountdown(event: EventSummary) {
     return `Starts in ${hours}h ${minutes}m`;
   }
 
-  // COMPLETED
+  // COMPLETED //
   if (event.state === EventState.COMPLETED) {
     if (event.ended_at) {
       const ended = dayjs(event.ended_at);
@@ -85,6 +85,7 @@ function formatCountdown(event: EventSummary) {
 }
 
 export function EventCard({ event, onClick }: EventCardProps) {
+  console.log("event", event);
   const countdown = formatCountdown(event);
   const primaryReply = event.top_replies[0];
   const secondaryReply = event.top_replies[1];
