@@ -994,14 +994,28 @@ export default function CreateEvent() {
             </div>
             <input
               required
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={durationHours}
               onChange={(e) => {
-                const v = e.target.value;
+                const v = e.target.value.replace(/[^0-9]/g, "");
                 setDurationHours(v);
                 const n = Number(v);
                 if (!Number.isFinite(n) || n <= 0) {
                   setRewardBtc("");
+                }
+              }}
+              onPaste={(e) => {
+                e.preventDefault();
+                const pastedText = e.clipboardData.getData("text");
+                const numbersOnly = pastedText.replace(/[^0-9]/g, "");
+                if (numbersOnly) {
+                  setDurationHours(numbersOnly);
+                  const n = Number(numbersOnly);
+                  if (!Number.isFinite(n) || n <= 0) {
+                    setRewardBtc("");
+                  }
                 }
               }}
               placeholder="Enter hours"
@@ -1021,11 +1035,37 @@ export default function CreateEvent() {
               <div className="flex items-center gap-2">
                 <input
                   disabled={Number(durationHours) <= 0}
-                  type="number"
-                  step="0.00000001"
-                  min={minRewardBtc}
+                  type="text"
+                  inputMode="decimal"
                   value={rewardBtc}
-                  onChange={(e) => setRewardBtc(e.target.value)}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9.]/g, "");
+                    const parts = v.split(".");
+                    const cleaned =
+                      parts.length > 0
+                        ? parts[0] +
+                          (parts.length > 1
+                            ? "." + parts.slice(1).join("")
+                            : "")
+                        : "";
+                    setRewardBtc(cleaned);
+                  }}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    const pastedText = e.clipboardData.getData("text");
+                    const cleaned = pastedText.replace(/[^0-9.]/g, "");
+                    const parts = cleaned.split(".");
+                    const numbersOnly =
+                      parts.length > 0
+                        ? parts[0] +
+                          (parts.length > 1
+                            ? "." + parts.slice(1).join("")
+                            : "")
+                        : "";
+                    if (numbersOnly) {
+                      setRewardBtc(numbersOnly);
+                    }
+                  }}
                   //if enabled, the placeholder need to be change to Enter reward ( Min 0.000011 ), and the number Min xxxx need to have a state so I can update it dynamically
                   placeholder={rewardBtcPlaceholder}
                   className={cn(
@@ -1120,9 +1160,22 @@ export default function CreateEvent() {
               </Tooltip>
             </div>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               value={preheatHours}
-              onChange={(e) => setPreheatHours(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value.replace(/[^0-9]/g, "");
+                setPreheatHours(v);
+              }}
+              onPaste={(e) => {
+                e.preventDefault();
+                const pastedText = e.clipboardData.getData("text");
+                const numbersOnly = pastedText.replace(/[^0-9]/g, "");
+                if (numbersOnly) {
+                  setPreheatHours(numbersOnly);
+                }
+              }}
               placeholder="Enter hours (max 720)"
               className={cn(
                 "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
@@ -1131,8 +1184,6 @@ export default function CreateEvent() {
                   : "border-border focus:ring-(--color-orange-500)"
               )}
               disabled={!enablePreheat}
-              min={1}
-              max={720}
             />
             {enablePreheat && preheatHoursValidation.error && (
               <p className="tx-12 lh-18 text-red-500 mt-1">
