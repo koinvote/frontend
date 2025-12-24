@@ -61,7 +61,7 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   search: "",
   debouncedSearch: "",
   sortField: "time",
-  sortOrder: "asc",
+  sortOrder: "desc",
   activeHashtag: null,
 
   events: [],
@@ -122,15 +122,12 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   setScrollY: (y) => set(() => ({ scrollY: y })),
 
   resetFilters: () =>
-    set((state) => ({
+    set(() => ({
       search: "",
       debouncedSearch: "",
       activeHashtag: null,
       sortField: "time",
-      sortOrder:
-        state.status === "ongoing" || state.status === "preheat"
-          ? "asc"
-          : "desc",
+      sortOrder: "desc",
       offset: 0,
     })),
 

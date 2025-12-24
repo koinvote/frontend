@@ -56,8 +56,7 @@ export function HomeToolbar() {
 
   const handleSortChange = (field: HomeSortField) => {
     // 根據狀態給預設順序
-    const defaultOrder: HomeSortOrder =
-      field === "time" ? (isOngoing || isPreheat ? "asc" : "desc") : "desc";
+    const defaultOrder: HomeSortOrder = "desc";
     setSort(field, defaultOrder);
   };
 
