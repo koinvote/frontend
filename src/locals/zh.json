@@ -1,7 +1,8 @@
 {
   "layout": {
     "title": "KoinVote",
-    "createEvent": "建立活動"
+    "createEvent": "建立活動",
+    "createEventFull": "建立活動"
   },
   "menu": {
     "about": "關於 Koinvote",

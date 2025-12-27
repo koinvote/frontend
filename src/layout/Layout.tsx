@@ -80,10 +80,13 @@ export default function Layout() {
               size="md"
               text="sm"
               block={false}
-              className="w-auto md:w-[100px] md:tx-14 lg:tx-16"
+              className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
               onClick={() => navigate("/create-event")}
             >
-              {t("layout.createEvent")}
+              <span className="md:hidden">{t("layout.createEvent")}</span>
+              <span className="hidden md:inline">
+                {t("layout.createEventFull")}
+              </span>
             </Button>
           </div>
         </div>

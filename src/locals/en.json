@@ -1,7 +1,8 @@
 {
   "layout": {
     "title": "Koinvote",
-    "createEvent": "Create"
+    "createEvent": "Create",
+    "createEventFull": "Create Event"
   },
   "menu": {
     "about": "About Koinvote",
@@ -29,8 +30,14 @@
     "responseType": "Response Type",
     "responseTypeTooltip": "Choose the response type for the event.",
     "responseTypeOptions": [
-      { "value": "open", "label": "Open-ended" },
-      { "value": "single_choice", "label": "Single-choice" }
+      {
+        "value": "open",
+        "label": "Open-ended"
+      },
+      {
+        "value": "single_choice",
+        "label": "Single-choice"
+      }
     ],
     "options": "Options",
     "optionsPlaceholder": "Enter option",
@@ -40,8 +47,14 @@
     "rewardBtc": "Reward (BTC)",
     "rewardBtcPlaceholder": "Set Duration First",
     "rewardTypeOptions": [
-      { "value": "rewarded", "label": "Rewarded" },
-      { "value": "non_reward", "label": "Non-Rewarded" }
+      {
+        "value": "rewarded",
+        "label": "Rewarded"
+      },
+      {
+        "value": "non_reward",
+        "label": "Non-Rewarded"
+      }
     ],
     "minimum": "Use Min",
     "numberOfRecipients": "Number of Recipients",
@@ -57,35 +70,28 @@
     "introductionText1": "This page guides you in independently verifying the fairness of results and the authenticity of your reply receipt using the provided data and open-source tools.",
     "introductionText2": "No trust in the platform is required, as all verification inputs and source code are publicly available.",
     "eventResultTitle": "Event Result Verification",
-
-  "step1Title": "Go to the Reward Distribution Report to download the verification package (CSV).",
-  "step1_1": "Go to the event page you want to verify.",
-  "step1_2": "View the Reward Distribution Report for that event.",
-  "step1_3": "Find the reward you want to verify and download the verification package.",
-
-  "step2Title": "Set Up and Run the Event Verifier",
-
-  "step2_1_title": "1. View the open-source code",
-  "step2_1_text_before": "Go to our",
-  "step2_1_linkLabel": "GitHub repository",
-  "step2_1_text_after": "to inspect or download the verification script.",
-
-  "step2_2_title": "2. Install Go",
-  "step2_2_text1": "To run the verifier, you need to install the Go programming language (version 1.20 or above).",
-  "step2_2_text2": "If you already have Go installed, you can skip this step.",
-
-  "step2_3_title": "3. Clone and Run the Verifier",
-  "step2_3_text": "Download the open-source verifier code from GitHub and run it using Go.",
-
-  "codeBlock_copy": "Copy code",
-  "codeBlock_content": "# Download the verifier\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# Compile the verifier\ngo build -o verify-event main.go\n\n# Run the verifier\n# Replace <your-report-file.csv> with the actual report file you downloaded\n./verify-event --report <your-report-file.csv>",
-  "receiptSectionTitle": "Receipt Verification",
-  "receiptStep1Title": "Download your reply receipt after submitting your reply",
-  "receiptStep1Subtitle": "Once your reply is submitted, click \"Download Receipt\" to save your receipt file.",
-  "receiptImageAlt": "Screenshot of the submission success screen with the Download Receipt button highlighted.",
-  "receiptStep2Title": "Set Up and Run the Receipt Verifier",
-
-  "receiptCodeBlock_content": "# Download the verifier\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# Compile and run the verifier\ngo build -o verify-receipt main.go\n\n# Run the verifier\n# Replace <your-receipt-file.json> with the actual receipt file you downloaded\n./verify-receipt --receipt <your-receipt-file.json>"
+    "step1Title": "Go to the Reward Distribution Report to download the verification package (CSV).",
+    "step1_1": "Go to the event page you want to verify.",
+    "step1_2": "View the Reward Distribution Report for that event.",
+    "step1_3": "Find the reward you want to verify and download the verification package.",
+    "step2Title": "Set Up and Run the Event Verifier",
+    "step2_1_title": "1. View the open-source code",
+    "step2_1_text_before": "Go to our",
+    "step2_1_linkLabel": "GitHub repository",
+    "step2_1_text_after": "to inspect or download the verification script.",
+    "step2_2_title": "2. Install Go",
+    "step2_2_text1": "To run the verifier, you need to install the Go programming language (version 1.20 or above).",
+    "step2_2_text2": "If you already have Go installed, you can skip this step.",
+    "step2_3_title": "3. Clone and Run the Verifier",
+    "step2_3_text": "Download the open-source verifier code from GitHub and run it using Go.",
+    "codeBlock_copy": "Copy code",
+    "codeBlock_content": "# Download the verifier\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# Compile the verifier\ngo build -o verify-event main.go\n\n# Run the verifier\n# Replace <your-report-file.csv> with the actual report file you downloaded\n./verify-event --report <your-report-file.csv>",
+    "receiptSectionTitle": "Receipt Verification",
+    "receiptStep1Title": "Download your reply receipt after submitting your reply",
+    "receiptStep1Subtitle": "Once your reply is submitted, click \"Download Receipt\" to save your receipt file.",
+    "receiptImageAlt": "Screenshot of the submission success screen with the Download Receipt button highlighted.",
+    "receiptStep2Title": "Set Up and Run the Receipt Verifier",
+    "receiptCodeBlock_content": "# Download the verifier\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# Compile and run the verifier\ngo build -o verify-receipt main.go\n\n# Run the verifier\n# Replace <your-receipt-file.json> with the actual receipt file you downloaded\n./verify-receipt --receipt <your-receipt-file.json>"
   },
   "about": {
     "title": "About Koinvote",
