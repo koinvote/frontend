@@ -74,7 +74,7 @@ export function HomeToolbar() {
         <div className="flex rounded-xl bg-surface border border-border p-1 w-full md:w-fit">
           <button
             type="button"
-            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center ${
+            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
               isPreheat ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("preheat")}
@@ -83,7 +83,7 @@ export function HomeToolbar() {
           </button>
           <button
             type="button"
-            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center ${
+            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
               isOngoing ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("ongoing")}
@@ -92,7 +92,7 @@ export function HomeToolbar() {
           </button>
           <button
             type="button"
-            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center ${
+            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
               isCompleted ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("completed")}

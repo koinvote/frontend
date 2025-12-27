@@ -257,3 +257,16 @@
 .radio-orange:checked::after {
   transform: scale(1);
 }
+
+/* EventCard tooltip responsive styles */
+.event-card-tooltip .ant-tooltip-inner,
+.event-card-tooltip .ant-tooltip-inner * {
+  white-space: normal !important;
+}
+
+@media (min-width: 768px) {
+  .event-card-tooltip .ant-tooltip-inner,
+  .event-card-tooltip .ant-tooltip-inner * {
+    white-space: nowrap !important;
+  }
+}

@@ -3,6 +3,8 @@ import { EventState } from "@/api/types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useToast } from "@/components/base/Toast/useToast";
+import { Tooltip } from "antd";
+import { useState, useEffect, useRef } from "react";
 
 import BTCIcon from "@/assets/icons/btc.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
@@ -93,8 +95,31 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const primaryReply = event.top_replies[0];
   const secondaryReply = event.top_replies[1];
 
+  const [isDesktop, setIsDesktop] = useState(false);
+  const lastCopyTimeRef = useRef<number>(0);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   const handleCopyUrl = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    const now = Date.now();
+    const timeSinceLastCopy = now - lastCopyTimeRef.current;
+
+    if (timeSinceLastCopy < 2000) {
+      return;
+    }
+
+    lastCopyTimeRef.current = now;
+
     try {
       const eventUrl = `${window.location.origin}/event/${event.event_id}`;
       await navigator.clipboard.writeText(eventUrl);
@@ -118,9 +143,23 @@ export function EventCard({ event, onClick }: EventCardProps) {
         <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-1 text-xs md:text-sm text-secondary">
           <span className="flex items-center gap-1">
             <BTCIcon />{" "}
-            <span className="font-semibold text-accent">
-              {event.total_reward_btc} BTC
-            </span>
+            <Tooltip
+              title="After the countdown, this reward will be distributed"
+              placement="topRight"
+              color="white"
+              overlayInnerStyle={{
+                maxWidth: isDesktop
+                  ? "max-content"
+                  : "min(300px, calc(100vw - 32px))",
+                whiteSpace: isDesktop ? "nowrap" : "normal",
+                width: isDesktop ? "max-content" : undefined,
+              }}
+              overlayClassName="event-card-tooltip"
+            >
+              <span className="font-semibold text-accent">
+                {event.total_reward_btc} BTC
+              </span>
+            </Tooltip>
           </span>
           <span>{countdown}</span>
         </div>
