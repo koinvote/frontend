@@ -92,13 +92,22 @@ export default function Layout() {
         </div>
       </header>
 
-      <div className="flex w-full">
+      <div className="relative flex w-full">
+        {/* Full-height divider line */}
+        <div
+          className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-border pointer-events-none z-0"
+          style={{
+            left: collapsed ? "70px" : "280px",
+            transition: "left 200ms ease-out",
+          }}
+        />
+
         <aside
           className={cn(
             "hidden md:sticky md:top-16 md:block md:shrink-0 md:h-[calc(100dvh-4rem)]",
             "md:backdrop-blur",
             "transition-[width] duration-200 ease-out",
-            " border-border bg-(--color-bg)",
+            "border-r border-border bg-(--color-bg)",
             collapsed ? "md:w-[70px]" : "md:w-[280px]"
           )}
         >
@@ -114,7 +123,7 @@ export default function Layout() {
 
         <div
           className="relative hidden md:block md:sticky md:top-16 md:h-[calc(100dvh-4rem)]
-            w-px bg-border"
+            w-px z-10"
         >
           <button
             type="button"
