@@ -21,6 +21,8 @@ export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
   const [collapsed, setCollapsed] = useState(false); // desktop sidebar
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useRef<HTMLDivElement | null>(null);
+  const touchStartX = useRef<number | null>(null);
   const { t } = useTranslation();
   const { theme, toggle } = useTheme();
   const { current, setLanguage } = useLanguagesStore();
@@ -36,11 +38,11 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-(--color-primary)">
+    <div className="min-h-screen bg-bg text-(--color-primary)">
       {/* Top bar */}
       <header
         className="px-2 sticky top-0 z-40 w-full border-b
-       border-border bg-[#0A0A0A] text-(--color-primary)"
+       border-border bg-bg text-(--color-primary)"
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
           <button
@@ -152,12 +154,46 @@ export default function Layout() {
 
         {/* Panel */}
         <div
+          ref={drawerRef}
           className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] transform bg-neutral-900 p-3 shadow-2xl transition-transform ${
             open ? "translate-x-0" : "-translate-x-full"
           }`}
           role="dialog"
           aria-modal="true"
           aria-label="Navigation menu"
+          onTouchStart={(e) => {
+            touchStartX.current = e.touches[0].clientX;
+          }}
+          onTouchMove={(e) => {
+            if (touchStartX.current === null) return;
+            const currentX = e.touches[0].clientX;
+            const diff = touchStartX.current - currentX;
+            // Only allow swiping left (positive diff) when drawer is open
+            if (open && diff > 0 && drawerRef.current) {
+              // Apply transform based on swipe distance, but don't exceed drawer width
+              const maxTranslate = drawerRef.current.offsetWidth;
+              const translate = Math.min(diff, maxTranslate);
+              drawerRef.current.style.transform = `translateX(-${translate}px)`;
+            }
+          }}
+          onTouchEnd={(e) => {
+            if (touchStartX.current === null) return;
+            const endX = e.changedTouches[0].clientX;
+            const diff = touchStartX.current - endX;
+            const threshold = 50; // Minimum swipe distance to close (in pixels)
+
+            // Reset transform
+            if (drawerRef.current) {
+              drawerRef.current.style.transform = "";
+            }
+
+            // If swiped left more than threshold, close the drawer
+            if (open && diff > threshold) {
+              setOpen(false);
+            }
+
+            touchStartX.current = null;
+          }}
         >
           <div className="mb-2 flex items-center justify-between">
             <span className="text-base font-semibold">Menu</span>

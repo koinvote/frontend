@@ -115,7 +115,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
         <h2 className="text-base md:text-lg font-semibold text-primary">
           {event.title}
         </h2>
-        <div className="flex flex-col gap-1 text-xs md:text-sm text-secondary">
+        <div className="flex flex-row md:flex-col items-center md:items-start gap-4 md:gap-1 text-xs md:text-sm text-secondary">
           <span className="flex items-center gap-1">
             <BTCIcon />{" "}
             <span className="font-semibold text-accent">
