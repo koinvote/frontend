@@ -68,12 +68,12 @@ export default function Layout() {
               <LanguagesEarth className="mr-2" />
               <span className="tx-12">{current === "en" ? "EN" : "中文"}</span>
             </Button>
-            {/* <Button size="md" onClick={toggle} className="w-auto px-3">
+            <Button size="md" onClick={toggle} className="w-auto px-3">
               {theme === "dark" ? <ModeLight /> : <ModeDark />}
               <span className="tx-12">
                 {theme === "dark" ? "Light" : "Dark"}
               </span>
-            </Button> */}
+            </Button>
             <Button
               size="md"
               text="sm"
