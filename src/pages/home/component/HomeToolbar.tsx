@@ -102,7 +102,7 @@ export function HomeToolbar() {
         </div>
 
         {/* search */}
-        <div className="relative flex flex-1 items-center">
+        <div className="relative flex flex-1 items-center min-w-0">
           <div className="absolute left-4 pointer-events-none">
             <SearchIcon className="w-4 h-4 text-secondary" />
           </div>
@@ -112,8 +112,8 @@ export function HomeToolbar() {
             onChange={(e) => setSearch(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
-            placeholder="Search by title, body, hashtag, Event ID, or BTC address..."
-            className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-sm md:text-base outline-none"
+            placeholder="Search by title, address or Event ID"
+            className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-base md:text-base outline-none w-full min-w-0"
           />
           {(isSearchFocused || search) && (
             <button

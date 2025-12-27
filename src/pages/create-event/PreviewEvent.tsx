@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useMemo, useState, type ReactNode } from "react";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import { Button } from "@/components/base/Button";
@@ -40,7 +40,6 @@ export default function PreviewEvent() {
   const state = location.state as PreviewEventState | undefined;
   const { showToast } = useToast();
 
-  const [agree, setAgree] = useState(false);
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
 
   // Get system parameters
@@ -241,8 +240,6 @@ export default function PreviewEvent() {
   } = state;
 
   const handlePrimaryClick = async () => {
-    if (!agree) return;
-
     if (isFree) {
       // FREE flow → 先創建 event，然後導航到簽名流程
       try {
@@ -460,45 +457,6 @@ export default function PreviewEvent() {
           <Field label="Your Total">{totalFeeDisplay}</Field>
         </div>
 
-        {/* 同意條款 */}
-        <div className="mt-6 pt-4 border-t border-border">
-          <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
-            <input
-              type="checkbox"
-              className="mt-[2px] accent-(--color-orange-500)"
-              checked={agree}
-              onChange={(e) => setAgree(e.target.checked)}
-            />
-            <span>
-              By proceeding, you agree to the{" "}
-              <Link to="/terms" className="text-(--color-orange-500) underline">
-                Terms of Service
-              </Link>
-              ,{" "}
-              <Link
-                to="/terms-reward-distribution"
-                className="text-(--color-orange-500) underline"
-              >
-                Reward Distribution
-              </Link>
-              ,{" "}
-              <Link
-                to="/privacy"
-                className="text-(--color-orange-500) underline"
-              >
-                Privacy Policy
-              </Link>
-              , and{" "}
-              <Link
-                to="/charges-refunds"
-                className="text-(--color-orange-500) underline"
-              >
-                Charges &amp; Refunds
-              </Link>
-            </span>
-          </label>
-        </div>
-
         {/* 按鈕區塊 */}
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
           <Button
@@ -517,7 +475,7 @@ export default function PreviewEvent() {
             tone="primary"
             text="sm"
             className="sm:w-[160px]"
-            disabled={!agree || isCreatingEvent}
+            disabled={isCreatingEvent}
             onClick={handlePrimaryClick}
           >
             {isCreatingEvent ? "Creating..." : primaryButtonLabel}

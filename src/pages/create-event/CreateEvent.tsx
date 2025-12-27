@@ -77,6 +77,30 @@ const normalizeTag = (raw: string) => {
   return cleaned.slice(0, 20); // 單一 tag 最多 20
 };
 
+// Helper function to add line breaks after periods for tooltip text
+const formatTooltipText = (text: string) => {
+  // Split by period followed by space
+  const parts = text.split(/(\.\s+)/);
+  const result: React.ReactNode[] = [];
+
+  parts.forEach((part, index) => {
+    if (part === "") return;
+
+    // If this part is a period followed by space, add period and line break
+    if (part.match(/^\.\s+$/)) {
+      result.push(".");
+      // Only add line break if not the last part
+      if (index < parts.length - 1) {
+        result.push(<br key={`br-${index}`} />);
+      }
+    } else {
+      result.push(<span key={`text-${index}`}>{part}</span>);
+    }
+  });
+
+  return <>{result}</>;
+};
+
 export default function CreateEvent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -105,10 +129,10 @@ export default function CreateEvent() {
   const [addrError, setAddrError] = useState<string>("");
 
   /** 回覆類型：open / single_choice */
-  const [eventType, setEventType] = useState<EventType>("open");
+  const [eventType, setEventType] = useState<EventType>("single_choice");
 
   /** 是否有獎金 */
-  const [isRewarded, setIsRewarded] = useState(false);
+  const [isRewarded, setIsRewarded] = useState(true);
   const [rewardBtc, setRewardBtc] = useState(""); // 使用者輸入的 BTC 字串
 
   /** 單選題選項 */
@@ -184,8 +208,8 @@ export default function CreateEvent() {
           .map((s) => s.trim())
           .filter(Boolean)
       );
-      setEventType(draft.eventType ?? "open");
-      setIsRewarded(draft.isRewarded ?? false);
+      setEventType(draft.eventType ?? "single_choice");
+      setIsRewarded(draft.isRewarded ?? true);
       setRewardBtc(draft.rewardBtc ?? "");
       setOptions(draft.options && draft.options.length ? draft.options : [""]);
       setDurationHours(draft.durationHours ?? "");
@@ -253,8 +277,8 @@ export default function CreateEvent() {
     setAddrStatus("idle");
     setAddrInfo(null);
     setAddrError("");
-    setEventType("open");
-    setIsRewarded(false);
+    setEventType("single_choice");
+    setIsRewarded(true);
     setRewardBtc("");
     setOptions([""]);
     setDurationHours("");
@@ -294,7 +318,11 @@ export default function CreateEvent() {
     let cleanedOptions: string[] | undefined;
     if (eventType === "single_choice") {
       const list = options.map((o) => o.trim()).filter(Boolean);
-      if (list.length) cleanedOptions = list;
+      if (list.length === 0) {
+        alert("Please enter at least one option for single-choice events.");
+        return;
+      }
+      cleanedOptions = list;
     }
 
     const previewData: PreviewEventState = {
@@ -596,6 +624,23 @@ export default function CreateEvent() {
     return { isValid: true, error: null };
   }, [enablePreheat, preheatHours]);
 
+  // Validate options for single_choice events
+  const optionsValidation = useMemo(() => {
+    if (eventType !== "single_choice") {
+      return { isValid: true, error: null };
+    }
+
+    const validOptions = options.map((o) => o.trim()).filter(Boolean);
+    if (validOptions.length === 0) {
+      return {
+        isValid: false,
+        error: "At least one option is required",
+      };
+    }
+
+    return { isValid: true, error: null };
+  }, [eventType, options]);
+
   // Check if Preview button should be disabled
   const isPreviewDisabled = useMemo(() => {
     return (
@@ -603,6 +648,7 @@ export default function CreateEvent() {
       isSubmitting ||
       !preheatHoursValidation.isValid ||
       !rewardBtcValidation.isValid ||
+      !optionsValidation.isValid ||
       addrStatus !== "valid"
     );
   }, [
@@ -610,6 +656,7 @@ export default function CreateEvent() {
     isSubmitting,
     preheatHoursValidation.isValid,
     rewardBtcValidation.isValid,
+    optionsValidation.isValid,
     addrStatus,
   ]);
 
@@ -617,7 +664,23 @@ export default function CreateEvent() {
   const addTag = (raw: string) => {
     const tag = normalizeTag(raw);
     if (!tag) return;
-    setHashtagList((prev) => (prev.includes(tag) ? prev : [...prev, tag]));
+
+    // 檢查總字符數是否超過限制
+    const MAX_TOTAL_HASHTAG_CHARS = 20;
+    setHashtagList((prev) => {
+      // 如果標籤已存在，不添加
+      if (prev.includes(tag)) return prev;
+
+      // 計算當前總字符數
+      const currentChars = prev.reduce((sum, t) => sum + t.length, 0);
+
+      // 如果添加新標籤後超過限制，不添加
+      if (currentChars + tag.length > MAX_TOTAL_HASHTAG_CHARS) {
+        return prev;
+      }
+
+      return [...prev, tag];
+    });
   };
 
   const removeTag = (tag: string) => {
@@ -653,6 +716,29 @@ export default function CreateEvent() {
       setHashtagInput("");
       return;
     }
+
+    // 計算已有標籤的字符數
+    const existingChars = hashtagList.reduce((sum, tag) => sum + tag.length, 0);
+
+    // 計算新輸入的字符數（清理後，排除 # 和非字母數字字符）
+    const cleaned = v.replace(/^#+/g, "").replace(/[^\w]/g, "");
+    const newInputChars = cleaned.length;
+
+    // 如果總字符數超過限制，截斷輸入
+    const MAX_TOTAL_HASHTAG_CHARS = 20;
+    if (existingChars + newInputChars > MAX_TOTAL_HASHTAG_CHARS) {
+      const maxAllowedChars = Math.max(
+        0,
+        MAX_TOTAL_HASHTAG_CHARS - existingChars
+      );
+      // 截斷輸入，只保留允許的字符數
+      const truncated = cleaned.slice(0, maxAllowedChars);
+      // 如果原輸入有 #，保留 #
+      const prefix = v.startsWith("#") ? "#" : "";
+      setHashtagInput(prefix + truncated);
+      return;
+    }
+
     setHashtagInput(v);
   };
 
@@ -703,6 +789,12 @@ export default function CreateEvent() {
                 placement="topLeft"
                 title={t("createEvent.creatorAddressTooltip")}
                 color="white"
+                arrow={{ pointAtCenter: true }}
+                overlayInnerStyle={{
+                  width: "max-content",
+                  maxWidth: "min(500px, calc(100vw - 32px))",
+                  whiteSpace: "nowrap",
+                }}
               >
                 <span className="tx-14 text-admin-text-main dark:text-white">
                   ⓘ
@@ -767,10 +859,8 @@ export default function CreateEvent() {
           <div>
             <label className="block tx-14 lh-20 fw-m text-primary mb-1">
               {t("createEvent.description")}
-              <span className="text-(--color-orange-500)">*</span>
             </label>
             <textarea
-              required
               maxLength={500}
               rows={3}
               value={description}
@@ -876,16 +966,6 @@ export default function CreateEvent() {
             <div className="space-y-2">
               <label className="flex items-center gap-2 tx-14 lh-20 text-primary">
                 <input
-                  className="radio-orange"
-                  type="radio"
-                  name="responseType"
-                  checked={eventType === "open"}
-                  onChange={() => setEventType("open")}
-                />
-                <span>{t("createEvent.responseTypeOptions.0.label")}</span>
-              </label>
-              <label className="flex items-center gap-2 tx-14 lh-20 text-primary">
-                <input
                   type="radio"
                   name="responseType"
                   className="radio-orange"
@@ -893,6 +973,16 @@ export default function CreateEvent() {
                   onChange={() => setEventType("single_choice")}
                 />
                 <span>{t("createEvent.responseTypeOptions.1.label")}</span>
+              </label>
+              <label className="flex items-center gap-2 tx-14 lh-20 text-primary">
+                <input
+                  className="radio-orange"
+                  type="radio"
+                  name="responseType"
+                  checked={eventType === "open"}
+                  onChange={() => setEventType("open")}
+                />
+                <span>{t("createEvent.responseTypeOptions.0.label")}</span>
               </label>
             </div>
           </div>
@@ -951,6 +1041,11 @@ export default function CreateEvent() {
                   );
                 })}
               </div>
+              {optionsValidation.error && (
+                <p className="tx-12 lh-18 text-red-500 mt-1">
+                  {optionsValidation.error}
+                </p>
+              )}
             </div>
           )}
 
@@ -1140,14 +1235,11 @@ export default function CreateEvent() {
               </label>
               <Tooltip
                 placement="topLeft"
-                title={t("createEvent.enablePreheatTooltip")}
+                title={formatTooltipText(t("createEvent.enablePreheatTooltip"))}
                 color="white"
+                arrow={{ pointAtCenter: true }}
                 overlayInnerStyle={{
-                  // Clamp to viewport on mobile while capping at a comfortable max on desktop
-                  maxWidth: "min(450px, calc(100vw - 32px))",
-                  whiteSpace: "normal",
-                  wordBreak: "break-word",
-                  overflowWrap: "anywhere",
+                  maxWidth: "min(500px, calc(100vw - 32px))",
                 }}
               >
                 <span

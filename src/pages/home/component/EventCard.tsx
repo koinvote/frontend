@@ -2,9 +2,11 @@ import { type EventSummary } from "@/pages/create-event/types/index";
 import { EventState } from "@/api/types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { useToast } from "@/components/base/Toast/useToast";
 
 import BTCIcon from "@/assets/icons/btc.svg?react";
-
+import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
+import CopyIcon from "@/assets/icons/copy.svg?react";
 dayjs.extend(relativeTime);
 
 interface EventCardProps {
@@ -86,9 +88,22 @@ function formatCountdown(event: EventSummary) {
 
 export function EventCard({ event, onClick }: EventCardProps) {
   console.log("event", event);
+  const { showToast } = useToast();
   const countdown = formatCountdown(event);
   const primaryReply = event.top_replies[0];
   const secondaryReply = event.top_replies[1];
+
+  const handleCopyUrl = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      const eventUrl = `${window.location.origin}/event/${event.event_id}`;
+      await navigator.clipboard.writeText(eventUrl);
+      showToast("success", "Copied URL to clipboard");
+    } catch (error) {
+      console.error("Failed to copy URL:", error);
+      showToast("error", "Failed to copy URL");
+    }
+  };
 
   return (
     <article
@@ -154,16 +169,28 @@ export function EventCard({ event, onClick }: EventCardProps) {
         </section>
       )}
 
-      {/* footer: participants + total stake */}
+      {/* footer: participants + total stake + copy */}
       <div className="mt-3 flex items-center justify-between text-[11px] md:text-xs text-secondary">
-        <div className="flex items-center gap-1">
-          <span>👥</span>
-          <span>{event.participants_count} participants</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <span>
+              <EventCardParticipantsIcon className="w-3 h-3" />
+            </span>
+            <span>{event.participants_count} participants</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span>₿</span>
+            <span>{event.total_stake_btc} BTC total</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          <span>₿</span>
-          <span>{event.total_stake_btc} BTC total</span>
-        </div>
+        <button
+          type="button"
+          onClick={handleCopyUrl}
+          className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
+          aria-label="Copy event URL"
+        >
+          <CopyIcon className="w-4 h-4 text-current" />
+        </button>
       </div>
     </article>
   );

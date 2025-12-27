@@ -37,12 +37,13 @@ export function Toast({ toast, onClose }: ToastProps) {
   return (
     <div
       className={cn(
-        "px-4 py-3 rounded-xl shadow-lg min-w-[260px]",
+        "px-4 py-3 rounded-xl shadow-lg",
         "tx-14 lh-20",
+        "w-fit",
         TYPE_STYLE[type]
       )}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center justify-center gap-3">
         <span>{message}</span>
         <button
           onClick={() => onClose(id)}
