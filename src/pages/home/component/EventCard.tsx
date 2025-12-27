@@ -115,7 +115,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
         <h2 className="text-base md:text-lg font-semibold text-primary">
           {event.title}
         </h2>
-        <div className="flex flex-row items-center gap-4 text-xs md:text-sm text-secondary">
+        <div className="flex flex-col gap-1 text-xs md:text-sm text-secondary">
           <span className="flex items-center gap-1">
             <BTCIcon />{" "}
             <span className="font-semibold text-accent">
@@ -176,11 +176,17 @@ export function EventCard({ event, onClick }: EventCardProps) {
             <span>
               <EventCardParticipantsIcon className="w-3 h-3" />
             </span>
-            <span>{event.participants_count} participants</span>
+            <span>
+              {event.participants_count}
+              <span className="hidden md:inline"> participants</span>
+            </span>
           </div>
           <div className="flex items-center gap-1">
             <span>₿</span>
-            <span>{event.total_stake_btc} BTC total</span>
+            <span>
+              {event.total_stake_btc}
+              <span className="hidden md:inline"> BTC total</span>
+            </span>
           </div>
         </div>
         <button
