@@ -36,7 +36,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg text-(--color-primary)">
+    <div className="min-h-screen bg-black text-(--color-primary)">
       {/* Top bar */}
       <header
         className="px-2 sticky top-0 z-40 w-full border-b
