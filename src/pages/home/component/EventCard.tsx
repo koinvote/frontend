@@ -108,7 +108,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
   return (
     <article
       onClick={onClick}
-      className="cursor-pointer rounded-2xl border border-border bg-surface px-4 py-3 md:px-6 md:py-4 transition md:hover:bg-surface/80"
+      className="cursor-pointer rounded-2xl border border-border bg-[#0A0A0A] px-4 py-3 md:px-6 md:py-4 transition md:hover:bg-surface/80"
     >
       {/* header row: title + reward + time */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
