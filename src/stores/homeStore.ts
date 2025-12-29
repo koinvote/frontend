@@ -100,6 +100,10 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
     set(() => ({
       activeHashtag: tag,
       offset: 0,
+      // 保留 sortField 和 sortOrder，但重置事件列表
+      events: [],
+      hasMore: true,
+      total: 0,
     })),
 
   setEvents: (events, total, hasMore, offset) =>

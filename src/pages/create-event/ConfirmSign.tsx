@@ -8,6 +8,7 @@ import { API } from "@/api";
 import type { EventType } from "@/api/types";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import { useHomeStore } from "@/stores/homeStore";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -41,6 +42,7 @@ export default function ConfirmSign() {
   const { eventId: eventIdParam } = useParams<{ eventId: string }>();
   const state = location.state as PreviewEventState | undefined;
   const { showToast } = useToast();
+  const { setStatus } = useHomeStore();
 
   const [btcAddress, setBtcAddress] = useState<string>("");
   const [plaintext, setPlaintext] = useState<string>("");
@@ -227,6 +229,9 @@ export default function ConfirmSign() {
         const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
         sessionStorage.removeItem(CREATE_EVENT_DRAFT_KEY);
 
+        // Reset home page status to "ongoing" before navigating
+        setStatus("ongoing");
+
         // Navigate to homepage after a delay to ensure toast is visible
         setTimeout(() => {
           navigate("/");
@@ -275,9 +280,7 @@ export default function ConfirmSign() {
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           Confirm & Sign
         </h1>
-        <p className="mt-1 tx-14 lh-20 text-white">
-          Sign to submit your event
-        </p>
+        <p className="mt-1 tx-14 lh-20 text-white">Sign to submit your event</p>
         <p className="mt-1 tx-12 lh-18 text-secondary">
           This step verifies you are a Bitcoiner
         </p>
@@ -312,7 +315,7 @@ export default function ConfirmSign() {
                 <span className="tx-12 lh-18 fw-m text-black">2</span>
               </div>
               <h2 className="tx-16 lh-20 fw-m text-primary">
-                Generate the Plaintext
+                Please Sign the Plaintext
               </h2>
             </div>
 

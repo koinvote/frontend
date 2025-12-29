@@ -4,6 +4,8 @@ import {
   type HomeSortField,
   type HomeSortOrder,
 } from "@/pages/create-event/types/index";
+import { API, type ApiResponse } from "@/api/index";
+import type { GetHotHashtagsRes } from "@/api/response";
 import SearchIcon from "@/assets/icons/search.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
 
@@ -60,10 +62,33 @@ export function HomeToolbar() {
     setSort(field, defaultOrder);
   };
 
+  // 获取热门标签
+  useEffect(() => {
+    const fetchHotHashtags = async () => {
+      try {
+        const res = (await API.getHotHashtags({
+          limit: 10,
+        })) as unknown as ApiResponse<GetHotHashtagsRes>;
+        if (res.success && res.data) {
+          // 确保标签有 # 前缀
+          const hashtags = res.data.map((tag) =>
+            tag.startsWith("#") ? tag : `#${tag}`
+          );
+          useHomeStore.getState().setPopularHashtags(hashtags);
+        }
+      } catch (error) {
+        console.error("Failed to fetch hot hashtags", error);
+      }
+    };
+    fetchHotHashtags();
+  }, []);
+
   const handleHashtagClick = (tag: string) => {
+    // 如果点击的是已选中的标签，清除筛选
     if (activeHashtag && activeHashtag.toLowerCase() === tag.toLowerCase()) {
       setActiveHashtag(null);
     } else {
+      // 否则直接切换到新标签（自动切换，不需要先取消）
       setActiveHashtag(tag);
     }
   };
@@ -112,7 +137,7 @@ export function HomeToolbar() {
             onChange={(e) => setSearch(e.target.value)}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
-            placeholder="Search by title, address or Event ID"
+            placeholder="Search by title, address, Event ID"
             className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-base md:text-base outline-none w-full min-w-0"
           />
           {(isSearchFocused || search) && (

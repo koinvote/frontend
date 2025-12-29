@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router";
 import { useHomeEvents } from "@/hooks/useHomeEvents";
 import { EventCard } from "@/pages/home/component/EventCard";
 
 export function EventList() {
+  const navigate = useNavigate();
   const { events, isLoading, isError, hasMore, loadMore, reload } =
     useHomeEvents();
-  console.log("events", events);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // infinite scroll
@@ -64,8 +65,7 @@ export function EventList() {
           key={event.event_id}
           event={event}
           onClick={() => {
-            // TODO: 之後接到 /event/:id 詳情頁
-            console.log("click event", event.event_id);
+            navigate(`/event/${event.event_id}`);
           }}
         />
       ))}

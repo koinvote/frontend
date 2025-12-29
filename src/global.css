@@ -8,6 +8,8 @@
   --color-gray-100: #f3f3f5;
   --color-gray-200: #dddddd;
   --color-gray-400: #a1a1a1;
+  --color-gray-450: #262626;
+  --color-gray-450-rgb: 38, 38, 38; /* RGB 值用于透明度 */
   --color-gray-500: #717182;
   --color-gray-950: #0a0a0a;
   --color-gray-600: #c0c0c0;
@@ -71,6 +73,8 @@
   --color-surface: #f3f3f5;
   --color-border: #e6e6ea;
   --color-primary-lightModeGray: var(--color-gray-600);
+  --color-gray-450: #f3f3f5; /* 浅色模式下的背景色 */
+  --color-gray-450-rgb: 243, 243, 245; /* 浅色模式下的 RGB 值 */
 
   --btn-primary-bg: #ff8904;
   --btn-primary-fg: #ffffff;

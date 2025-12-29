@@ -3,7 +3,6 @@ import type { ReplyPreview } from "@/pages/create-event/types";
 import type {
   EventType,
   EventRewardType,
-  EventState,
   EventStatus,
   DepositStatus,
 } from "./types";
@@ -60,7 +59,7 @@ export interface EventListDataRes {
   event_id: string;
   title: string;
   description: string;
-  state: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 1: preheat, 2: ongoing, 3: completed, 4: ended (已結束，等待派獎), 5: completed(已結束，派獎完成), 6: cancelled, 7: refunded, 8: expired
+  status: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 1=pending, 2=preheat, 3=active, 4=ended(已結束，等待派獎), 5=completed(已結束，派獎完成), 6=cancelled, 7=refunded, 8=expired
   hashtags: string[];
   created_at: string;
   deadline_at: string;
@@ -84,9 +83,9 @@ export interface EventDetailDataRes {
   event_type: EventType;
   event_reward_type: EventRewardType;
   status:
-    | typeof EventState.ONGOING
-    | typeof EventState.PREHEAT
-    | typeof EventState.COMPLETED;
+    | typeof EventStatus.ACTIVE
+    | typeof EventStatus.PREHEAT
+    | typeof EventStatus.COMPLETED;
   initial_reward_satoshi: number;
   total_reward_satoshi: number;
   winner_count: number;
@@ -100,6 +99,7 @@ export interface EventDetailDataRes {
   top_replies: ReplyPreview[];
   hashtags: string[];
   preheat_hours: number;
+  creator_address?: string; // TODO: Confirm with backend if this field exists
 }
 
 export interface GetSignaturePlainTextRes {
@@ -136,3 +136,34 @@ export interface DepositStatusRes {
   block_height: number;
   deposit_type: string;
 }
+
+export interface GetListRepliesRes {
+  replies: Reply[];
+  page: number;
+  limit: number;
+}
+
+export interface Reply {
+  id: number;
+  btc_address: string;
+  option_id?: number;
+  content?: string;
+  content_hash?: string;
+  plaintext: string;
+  signature: string;
+  balance_at_reply_satoshi: number;
+  balance_at_snapshot_satoshi: number;
+  balance_at_current_satoshi: number;
+  created_at: string;
+  is_reply_valid: boolean;
+}
+
+export interface GetReplyPlainTextRes {
+  event_id: string;
+  btc_address: string;
+  plaintext: string;
+  timestamp: number;
+  random_code: string;
+}
+
+export type GetHotHashtagsRes = string[];

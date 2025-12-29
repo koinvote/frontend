@@ -56,7 +56,7 @@
         "label": "Non-Rewarded"
       }
     ],
-    "minimum": "Use Min",
+    "minimum": "Min",
     "numberOfRecipients": "Number of Recipients",
     "enablePreheat": "Enable Preheat",
     "enablePreheatTooltip": "Preheat lets people see the event before replies open. During this time, the event is visible but replies are disabled.",

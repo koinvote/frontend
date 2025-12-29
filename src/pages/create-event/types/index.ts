@@ -1,21 +1,23 @@
 // src/pages/home/types.ts
-import type { EventState } from "@/api/types";
+import type { EventStatus } from "@/api/types";
 
 export interface ReplyPreview {
-  reply_id: string;
+  id?: string;
+  reply_id?: string;
   body: string;
   weight_percent: number;
-  amount_btc: string;
+  amount_satoshi: string;
 }
 
 export interface EventSummary {
+  id: number;
   event_id: string;
   title: string;
   description: string;
-  state:
-    | typeof EventState.ONGOING
-    | typeof EventState.PREHEAT
-    | typeof EventState.COMPLETED;
+  status:
+    | typeof EventStatus.ACTIVE
+    | typeof EventStatus.PREHEAT
+    | typeof EventStatus.COMPLETED;
 
   hashtags: string[];
 

@@ -21,6 +21,7 @@ import CreateEvent from "@/pages/create-event/CreateEvent";
 import PreviewEvent from "@/pages/create-event/PreviewEvent";
 import ConfirmSign from "@/pages/create-event/ConfirmSign";
 import ConfirmPay from "@/pages/create-event/ConfirmPay";
+import EventDetail from "@/pages/event-detail";
 
 // admin
 import AdminLayout from "@/layout/AdminLayout";
@@ -61,6 +62,8 @@ const publicChildren = isComingSoonMode
       { path: "preview-event", element: <PreviewEvent /> },
       { path: "confirm-sign/:eventId", element: <ConfirmSign /> },
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
+      // Event detail route - placed before other routes to ensure proper matching
+      { path: "event/:eventId", element: <EventDetail /> },
     ];
 
 export const router = createBrowserRouter([
@@ -82,8 +85,8 @@ export const router = createBrowserRouter([
           { path: "subscribers", element: <AdminSubscribersPage /> },
         ],
       },
-
       {
+        path: "*",
         element: <Layout />,
         children: publicChildren,
       },

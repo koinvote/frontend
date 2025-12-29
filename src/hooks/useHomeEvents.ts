@@ -19,38 +19,13 @@ const mapSortFieldToSortBy = (
   return sortField;
 };
 
-// Calculate popular hashtags from events
-function calculatePopularHashtags(
-  events: Array<{ hashtags: string[] }>
-): string[] {
-  const hashtagCount = new Map<string, number>();
-
-  // Count hashtag occurrences (remove # prefix for counting)
-  events.forEach((event) => {
-    event.hashtags.forEach((tag) => {
-      const normalizedTag = tag.startsWith("#")
-        ? tag.slice(1).toLowerCase()
-        : tag.toLowerCase();
-      hashtagCount.set(
-        normalizedTag,
-        (hashtagCount.get(normalizedTag) || 0) + 1
-      );
-    });
-  });
-
-  // Sort by count (descending) and take top 8
-  const sortedHashtags = Array.from(hashtagCount.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([tag]) => `#${tag}`);
-
-  return sortedHashtags;
-}
+// 移除 calculatePopularHashtags，改为从 API 获取
 
 export function useHomeEvents() {
   const {
     status,
     debouncedSearch,
+    activeHashtag,
     sortField,
     sortOrder,
     events,
@@ -63,22 +38,10 @@ export function useHomeEvents() {
     appendEvents,
     setLoading,
     setError,
-    setPopularHashtags,
   } = useHomeStore();
 
   // Track the status when request was made to prevent race conditions
   const requestStatusRef = useRef(status);
-
-  // Calculate popular hashtags from current events
-  const popularHashtags = useMemo(
-    () => calculatePopularHashtags(events),
-    [events]
-  );
-
-  // Update popular hashtags in store when events change
-  useEffect(() => {
-    setPopularHashtags(popularHashtags);
-  }, [popularHashtags, setPopularHashtags]);
 
   // Update requestStatusRef when status changes
   useEffect(() => {
@@ -94,9 +57,18 @@ export function useHomeEvents() {
     setError(false);
     try {
       const currentPage = 1;
+      // 合并 debouncedSearch 和 activeHashtag 到 q 参数
+      // 如果 activeHashtag 存在，优先使用它；否则使用 debouncedSearch
+      // 去掉 activeHashtag 的 # 前缀（如果存在）再传入 API
+      const hashtagForQuery = activeHashtag
+        ? activeHashtag.startsWith("#")
+          ? activeHashtag.slice(1)
+          : activeHashtag
+        : "";
+      const q = hashtagForQuery || debouncedSearch || "";
       const res = (await API.getEventList({
         tab: mapStatusToTab(requestStatus),
-        q: debouncedSearch || "",
+        q,
         page: String(currentPage),
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
@@ -135,6 +107,7 @@ export function useHomeEvents() {
   }, [
     status,
     debouncedSearch,
+    activeHashtag,
     sortField,
     sortOrder,
     limit,
@@ -154,9 +127,17 @@ export function useHomeEvents() {
     try {
       // Calculate page number from offset
       const currentPage = Math.floor(offset / limit) + 1;
+      // 合并 debouncedSearch 和 activeHashtag 到 q 参数
+      // 去掉 activeHashtag 的 # 前缀（如果存在）再传入 API
+      const hashtagForQuery = activeHashtag
+        ? activeHashtag.startsWith("#")
+          ? activeHashtag.slice(1)
+          : activeHashtag
+        : "";
+      const q = hashtagForQuery || debouncedSearch || "";
       const res = (await API.getEventList({
         tab: mapStatusToTab(requestStatus),
-        q: debouncedSearch || "",
+        q,
         page: String(currentPage),
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
@@ -194,6 +175,7 @@ export function useHomeEvents() {
   }, [
     status,
     debouncedSearch,
+    activeHashtag,
     sortField,
     sortOrder,
     offset,

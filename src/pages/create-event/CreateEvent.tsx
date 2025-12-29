@@ -105,6 +105,18 @@ export default function CreateEvent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsDesktop(window.innerWidth >= 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   const ACTIVE_BTC_NETWORK =
     import.meta.env.MODE === "production" ? Network.mainnet : Network.testnet;
 
@@ -134,9 +146,11 @@ export default function CreateEvent() {
   /** 是否有獎金 */
   const [isRewarded, setIsRewarded] = useState(true);
   const [rewardBtc, setRewardBtc] = useState(""); // 使用者輸入的 BTC 字串
+  const [rewardBtcTouched, setRewardBtcTouched] = useState(false); // Track if rewardBtc field has been interacted with
 
   /** 單選題選項 */
   const [options, setOptions] = useState<string[]>([""]);
+  const [optionsTouched, setOptionsTouched] = useState(false); // Track if options field has been interacted with
 
   /** Duration + Preheat */
   const [durationHours, setDurationHours] = useState(""); // 用字串綁 input，比較好處理空值
@@ -280,7 +294,9 @@ export default function CreateEvent() {
     setEventType("single_choice");
     setIsRewarded(true);
     setRewardBtc("");
+    setRewardBtcTouched(false); // Reset touched state
     setOptions([""]);
+    setOptionsTouched(false); // Reset touched state
     setDurationHours("");
     setEnablePreheat(false);
     setPreheatHours("");
@@ -478,6 +494,11 @@ export default function CreateEvent() {
       return { isValid: true, error: null };
     }
 
+    // Only show error if field has been touched
+    if (!rewardBtcTouched) {
+      return { isValid: true, error: null };
+    }
+
     if (!rewardBtc || rewardBtc.trim() === "") {
       return {
         isValid: false,
@@ -502,7 +523,7 @@ export default function CreateEvent() {
     }
 
     return { isValid: true, error: null };
-  }, [isRewarded, rewardBtc, minRewardBtc]);
+  }, [isRewarded, rewardBtc, minRewardBtc, rewardBtcTouched]);
 
   // Calculate platform fee for non-reward events
   // Formula: [Duration - free_hours] × satoshi_per_duration_hour × platform_fee_percentage
@@ -630,6 +651,11 @@ export default function CreateEvent() {
       return { isValid: true, error: null };
     }
 
+    // Only show error if field has been touched
+    if (!optionsTouched) {
+      return { isValid: true, error: null };
+    }
+
     const validOptions = options.map((o) => o.trim()).filter(Boolean);
     if (validOptions.length === 0) {
       return {
@@ -639,7 +665,7 @@ export default function CreateEvent() {
     }
 
     return { isValid: true, error: null };
-  }, [eventType, options]);
+  }, [eventType, options, optionsTouched]);
 
   // Check if Preview button should be disabled
   const isPreviewDisabled = useMemo(() => {
@@ -761,7 +787,7 @@ export default function CreateEvent() {
   }, [totalHashtagChars]);
 
   return (
-    <div className="flex-col flex items-center justify-center w-full">
+    <div className="flex-col flex items-center justify-center w-full px-1 md:px-0">
       <div className="h-[50px] w-full relative">
         <button
           type="button"
@@ -791,9 +817,11 @@ export default function CreateEvent() {
                 color="white"
                 arrow={{ pointAtCenter: true }}
                 overlayInnerStyle={{
-                  width: "max-content",
-                  maxWidth: "min(500px, calc(100vw - 32px))",
-                  whiteSpace: "nowrap",
+                  width: isDesktop ? "max-content" : undefined,
+                  maxWidth: isDesktop
+                    ? "min(800px, calc(100vw - 32px))"
+                    : "min(300px, calc(100vw - 32px))",
+                  whiteSpace: isDesktop ? "nowrap" : "normal",
                 }}
               >
                 <span className="tx-14 text-admin-text-main dark:text-white">
@@ -1008,6 +1036,7 @@ export default function CreateEvent() {
                         onChange={(e) =>
                           handleOptionChange(index, e.target.value)
                         }
+                        onBlur={() => setOptionsTouched(true)}
                         placeholder={t("createEvent.optionsPlaceholder")}
                         className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
@@ -1161,6 +1190,7 @@ export default function CreateEvent() {
                       setRewardBtc(numbersOnly);
                     }
                   }}
+                  onBlur={() => setRewardBtcTouched(true)}
                   //if enabled, the placeholder need to be change to Enter reward ( Min 0.000011 ), and the number Min xxxx need to have a state so I can update it dynamically
                   placeholder={rewardBtcPlaceholder}
                   className={cn(
@@ -1174,10 +1204,13 @@ export default function CreateEvent() {
                   disabled={Number(durationHours) <= 0}
                   type="button"
                   appearance="solid"
-                  tone="orange"
+                  tone="white"
                   text="sm"
                   className="w-[100px]"
-                  onClick={() => setRewardBtc(minRewardBtc.toString())}
+                  onClick={() => {
+                    setRewardBtc(minRewardBtc.toString());
+                    setRewardBtcTouched(true); // Mark as touched when user clicks Minimum button
+                  }}
                 >
                   {t("createEvent.minimum")}
                 </Button>
