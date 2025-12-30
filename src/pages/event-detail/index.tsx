@@ -39,6 +39,8 @@ const EventDetail = () => {
     enabled: !!eventId,
   });
 
+  console.log(eventDetail);
+
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);
   };
@@ -84,7 +86,9 @@ const EventDetail = () => {
         <EventInfo event={eventDetail} />
 
         {/* Divider */}
-        <Divider />
+        <div className="my-6 md:my-8">
+          <Divider />
+        </div>
 
         {/* Second Section: Search and Filter */}
         <SearchAndFilter

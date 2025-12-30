@@ -1,9 +1,17 @@
 import { useMemo, useState, useEffect } from "react";
-import dayjs from "dayjs";
 import { useToast } from "@/components/base/Toast/useToast";
 import { Button } from "@/components/base/Button";
-import { satsToBtc } from "@/utils/formatter";
+import {
+  satsToBtc,
+  formatPreheatDuration,
+  formatEventDuration,
+  formatPreheatCountdown,
+  formatOngoingCountdown,
+  formatCompletedTime,
+} from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
 import type { EventDetailDataRes } from "@/api/response";
+import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { TopReplyBar } from "./TopReplyBar";
 import { EventCTAButton } from "./EventCTAButton";
@@ -12,46 +20,10 @@ interface EventInfoProps {
   event: EventDetailDataRes;
 }
 
-function formatDuration(hours: number): string {
-  if (hours < 24) {
-    return `${hours}h`;
-  }
-  const days = Math.floor(hours / 24);
-  const remainingHours = hours % 24;
-  if (remainingHours === 0) {
-    return `${days}d`;
-  }
-  return `${days}d ${remainingHours}h`;
-}
-
-function formatTimeRemaining(deadlineAt: string): string {
-  const now = dayjs();
-  const deadline = dayjs(deadlineAt);
-  const diffMs = deadline.diff(now);
-
-  if (diffMs <= 0) {
-    return "Ended";
-  }
-
-  const totalSeconds = Math.floor(diffMs / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  if (days > 0) {
-    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
-  }
-  if (hours > 0) {
-    return `${hours}h ${minutes}m ${seconds}s`;
-  }
-  return `${minutes}m ${seconds}s`;
-}
-
 export function EventInfo({ event }: EventInfoProps) {
   const { showToast } = useToast();
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = useDebouncedClick(async () => {
     const eventUrl = `${window.location.origin}/event/${event.event_id}`;
     try {
       await navigator.clipboard.writeText(eventUrl);
@@ -60,59 +32,254 @@ export function EventInfo({ event }: EventInfoProps) {
       console.error("Failed to copy link:", error);
       showToast("error", "Failed to copy link");
     }
-  };
+  });
 
+  const isPreheat = event.status === EventStatus.PREHEAT;
+  const isOngoing = event.status === EventStatus.ACTIVE;
+  const isCompleted = event.status === EventStatus.COMPLETED;
+  const isRewarded = event.event_reward_type === "rewarded";
+
+  // Reward calculations
   const rewardAmountBtc = useMemo(
     () => satsToBtc(event.initial_reward_satoshi, { suffix: false }),
     [event.initial_reward_satoshi]
   );
 
   const additionalRewardBtc = useMemo(() => {
-    const additional =
-      event.total_reward_satoshi - event.initial_reward_satoshi;
-    if (additional <= 0) return "0";
-    return satsToBtc(additional, { suffix: false });
-  }, [event.total_reward_satoshi, event.initial_reward_satoshi]);
+    if (event.additional_reward_satoshi <= 0) return null;
+    return satsToBtc(event.additional_reward_satoshi, { suffix: false });
+  }, [event.additional_reward_satoshi]);
 
-  const durationDisplay = useMemo(
-    () => formatDuration(event.duration_hours),
-    [event.duration_hours]
-  );
+  // Duration calculations
+  const eventDurationDisplay = useMemo(() => {
+    if (isOngoing || isCompleted) {
+      return formatEventDuration(event.started_at, event.deadline_at);
+    }
+    return null;
+  }, [isOngoing, isCompleted, event.started_at, event.deadline_at]);
 
-  const preheatDurationDisplay = useMemo(
-    () => (event.preheat_hours > 0 ? formatDuration(event.preheat_hours) : "0"),
-    [event.preheat_hours]
-  );
+  const preheatDurationDisplay = useMemo(() => {
+    if (event.preheat_hours > 0) {
+      return formatPreheatDuration(event.preheat_hours);
+    }
+    return null;
+  }, [event.preheat_hours]);
 
   // Time remaining with real-time updates
-  const [timeRemaining, setTimeRemaining] = useState(() =>
-    formatTimeRemaining(event.deadline_at)
-  );
+  const [timeRemaining, setTimeRemaining] = useState(() => {
+    if (isPreheat) {
+      return formatPreheatCountdown(event.started_at, event.preheat_hours);
+    }
+    if (isOngoing) {
+      return formatOngoingCountdown(event.deadline_at);
+    }
+    if (isCompleted) {
+      return formatCompletedTime(event.deadline_at);
+    }
+    return "";
+  });
 
   useEffect(() => {
+    if (isCompleted) {
+      // Completed state doesn't need countdown
+      setTimeRemaining(formatCompletedTime(event.deadline_at));
+      return;
+    }
+
     const updateTimeRemaining = () => {
-      setTimeRemaining(formatTimeRemaining(event.deadline_at));
+      if (isPreheat) {
+        setTimeRemaining(
+          formatPreheatCountdown(event.started_at, event.preheat_hours)
+        );
+      } else if (isOngoing) {
+        setTimeRemaining(formatOngoingCountdown(event.deadline_at));
+      }
     };
 
     updateTimeRemaining();
     const interval = setInterval(updateTimeRemaining, 1000);
 
     return () => clearInterval(interval);
-  }, [event.deadline_at]);
+  }, [
+    isPreheat,
+    isOngoing,
+    isCompleted,
+    event.started_at,
+    event.preheat_hours,
+    event.deadline_at,
+  ]);
 
-  const isRewarded = event.event_reward_type === "rewarded";
+  // Get top 2 replies sorted by amount_satoshi (descending)
+  const topTwoReplies = useMemo(() => {
+    if (!event.top_replies || event.top_replies.length === 0) return [];
+    return [...event.top_replies]
+      .sort((a, b) => {
+        const amountA = Number(a.amount_satoshi) || 0;
+        const amountB = Number(b.amount_satoshi) || 0;
+        return amountB - amountA; // 降序排序
+      })
+      .slice(0, 2); // 只取前兩個
+  }, [event.top_replies]);
 
-  // Calculate max recipients for rewarded events
-  const maxRecipients = useMemo(() => {
-    if (!isRewarded || event.winner_count === 0) return null;
-    return event.winner_count;
-  }, [isRewarded, event.winner_count]);
+  // Build field list for mobile (ordered list)
+  const mobileFields = useMemo(() => {
+    const fields: Array<{
+      label: string;
+      value: React.ReactNode;
+      key: string;
+    }> = [];
+
+    // Only show rewards in ongoing or completed state
+    if ((isOngoing || isCompleted) && isRewarded && rewardAmountBtc) {
+      fields.push({
+        key: "reward-amount",
+        label: "Reward Amount:",
+        value: (
+          <span className="text-xs md:text-sm font-semibold text-primary">
+            {rewardAmountBtc} BTC ({event.winner_count}{" "}
+            {event.winner_count === 1 ? "Address" : "Addresses"})
+          </span>
+        ),
+      });
+    }
+
+    if ((isOngoing || isCompleted) && isRewarded && additionalRewardBtc) {
+      fields.push({
+        key: "additional-reward",
+        label: "Additional Reward:",
+        value: (
+          <span className="text-xs md:text-sm text-primary">
+            {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
+            {event.additional_winner_count === 1 ? "Address" : "Addresses"})
+          </span>
+        ),
+      });
+    }
+
+    fields.push({
+      key: "time-remaining",
+      label: "Time Remaining:",
+      value: isCompleted ? (
+        <div className="text-xs md:text-sm font-semibold text-accent mt-1">
+          {timeRemaining}
+        </div>
+      ) : (
+        <span className="text-xs md:text-sm font-semibold text-accent">
+          {timeRemaining}
+        </span>
+      ),
+    });
+
+    // Only show event duration in ongoing or completed state
+    if ((isOngoing || isCompleted) && eventDurationDisplay) {
+      fields.push({
+        key: "duration",
+        label: "Duration of This Event:",
+        value: (
+          <span className="text-xs md:text-sm text-primary">
+            {eventDurationDisplay}
+          </span>
+        ),
+      });
+    }
+
+    if (preheatDurationDisplay) {
+      fields.push({
+        key: "preheat-duration",
+        label: "Preheat Duration:",
+        value: (
+          <span className="text-xs md:text-sm text-primary">
+            {preheatDurationDisplay}
+          </span>
+        ),
+      });
+    }
+
+    fields.push({
+      key: "event-id",
+      label: "Event-ID:",
+      value: (
+        <span className="text-xs md:text-sm text-primary">
+          {event.event_id}
+        </span>
+      ),
+    });
+
+    // Only show creator address in ongoing or completed state
+    if ((isOngoing || isCompleted) && event.creator_address) {
+      fields.push({
+        key: "creator-address",
+        label: "Creator address:",
+        value: (
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-xs md:text-sm text-primary font-mono">
+              {event.creator_address.length > 10
+                ? `${event.creator_address.slice(
+                    0,
+                    6
+                  )}...${event.creator_address.slice(-4)}`
+                : event.creator_address}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(event.creator_address!)
+                  .then(() => showToast("success", "Address copied"))
+                  .catch(() => showToast("error", "Failed to copy"));
+              }}
+              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
+              aria-label="Copy creator address"
+            >
+              <CopyIcon className="w-4 h-4 text-current" />
+            </button>
+          </div>
+        ),
+      });
+    }
+
+    if (event.hashtags && event.hashtags.length > 0) {
+      fields.push({
+        key: "hashtags",
+        label: event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:",
+        value: (
+          <div className="flex flex-wrap gap-2 mt-1">
+            {event.hashtags.map((tag, index) => (
+              <span
+                key={index}
+                className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm"
+              >
+                #{tag}
+              </span>
+            ))}
+          </div>
+        ),
+      });
+    }
+
+    return fields;
+  }, [
+    isOngoing,
+    isCompleted,
+    isRewarded,
+    rewardAmountBtc,
+    additionalRewardBtc,
+    event.winner_count,
+    event.additional_winner_count,
+    timeRemaining,
+    eventDurationDisplay,
+    preheatDurationDisplay,
+    event.event_id,
+    event.creator_address,
+    event.hashtags,
+    showToast,
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
       {/* Title and Copy Link */}
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-semibold text-primary flex-1">
+        <h1 className="text-2xl md:text-3xl font-semibold text-primary flex-1 break-words min-w-0">
           {event.title}
         </h1>
         <Button
@@ -135,115 +302,52 @@ export function EventInfo({ event }: EventInfoProps) {
         </p>
       )}
 
-      {/* Event Details Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      {/* Desktop: Two Column Layout */}
+      <div className="hidden md:grid grid-cols-2 gap-4 md:gap-6">
         {/* Left Column */}
         <div className="flex flex-col gap-3">
-          <div>
-            <span className="text-xs md:text-sm text-secondary">Event-ID:</span>
-            <span className="text-xs md:text-sm text-primary ml-2">
-              {event.event_id}
-            </span>
-          </div>
-
-          {isRewarded && (
-            <>
-              <div>
-                <span className="text-xs md:text-sm text-secondary">
-                  Reward Amount:
-                </span>
-                <span className="text-xs md:text-sm font-semibold text-primary ml-2">
-                  {rewardAmountBtc} BTC
-                </span>
-              </div>
-
-              {Number(additionalRewardBtc) > 0 && (
-                <div>
-                  <span className="text-xs md:text-sm text-secondary">
-                    Additional Reward:
-                  </span>
-                  <span className="text-xs md:text-sm text-primary ml-2">
-                    {additionalRewardBtc} BTC
-                  </span>
-                </div>
-              )}
-            </>
+          {/* Only show rewards in ongoing or completed state */}
+          {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
+            <div>
+              <span className="text-xs md:text-sm text-secondary">
+                Reward Amount:
+              </span>
+              <span className="text-xs md:text-sm font-semibold text-primary ml-2">
+                {rewardAmountBtc} BTC ({event.winner_count}{" "}
+                {event.winner_count === 1 ? "Address" : "Addresses"})
+              </span>
+            </div>
           )}
 
-          <div>
-            <span className="text-xs md:text-sm text-secondary">
-              Duration of This Event:
-            </span>
-            <span className="text-xs md:text-sm text-primary ml-2">
-              {durationDisplay}
-            </span>
-          </div>
+          {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
+            <div>
+              <span className="text-xs md:text-sm text-secondary">
+                Additional Reward:
+              </span>
+              <span className="text-xs md:text-sm text-primary ml-2">
+                {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
+                {event.additional_winner_count === 1 ? "Address" : "Addresses"})
+              </span>
+            </div>
+          )}
 
           <div>
             <span className="text-xs md:text-sm text-secondary">
               Time Remaining:
             </span>
-            <span className="text-xs md:text-sm font-semibold text-accent ml-2">
-              {timeRemaining}
-            </span>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="flex flex-col gap-3">
-          {event.hashtags && event.hashtags.length > 0 && (
-            <div>
-              <span className="text-xs md:text-sm text-secondary">
-                {event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:"}
-              </span>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {event.hashtags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full bg-surface border border-border text-xs md:text-sm text-secondary"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+            {isCompleted ? (
+              <div className="text-xs md:text-sm font-semibold text-accent mt-1">
+                {timeRemaining}
               </div>
-            </div>
-          )}
-
-          {isRewarded && maxRecipients && (
-            <div>
-              <span className="text-xs md:text-sm text-secondary">
-                Max Recipients:
+            ) : (
+              <span className="text-xs md:text-sm font-semibold text-accent ml-2">
+                {timeRemaining}
               </span>
-              <span className="text-xs md:text-sm text-primary ml-2">
-                {maxRecipients} {maxRecipients === 1 ? "Address" : "Addresses"}
-              </span>
-            </div>
-          )}
-
-          {event.preheat_hours > 0 && (
-            <div>
-              <span className="text-xs md:text-sm text-secondary">
-                Preheat Duration:
-              </span>
-              <span className="text-xs md:text-sm text-primary ml-2">
-                {preheatDurationDisplay}
-              </span>
-            </div>
-          )}
-
-          <div>
-            <span className="text-xs md:text-sm text-secondary">
-              Response type:
-            </span>
-            <span className="text-xs md:text-sm text-primary ml-2">
-              {event.event_type === "single_choice"
-                ? "Single-choice"
-                : "Open-ended"}
-            </span>
+            )}
           </div>
 
-          {/* Creator Address */}
-          {event.creator_address && (
+          {/* Only show creator address in ongoing or completed state */}
+          {(isOngoing || isCompleted) && event.creator_address && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
                 Creator address:
@@ -274,16 +378,78 @@ export function EventInfo({ event }: EventInfoProps) {
             </div>
           )}
         </div>
+
+        {/* Right Column */}
+        <div className="flex flex-col gap-3">
+          {/* Only show event duration in ongoing or completed state */}
+          {(isOngoing || isCompleted) && eventDurationDisplay && (
+            <div>
+              <span className="text-xs md:text-sm text-secondary">
+                Duration of This Event:
+              </span>
+              <span className="text-xs md:text-sm text-primary ml-2">
+                {eventDurationDisplay}
+              </span>
+            </div>
+          )}
+
+          {/* Show preheat duration in all states if it exists */}
+          {preheatDurationDisplay && (
+            <div>
+              <span className="text-xs md:text-sm text-secondary">
+                Preheat Duration:
+              </span>
+              <span className="text-xs md:text-sm text-primary ml-2">
+                {preheatDurationDisplay}
+              </span>
+            </div>
+          )}
+
+          <div>
+            <span className="text-xs md:text-sm text-secondary">Event-ID:</span>
+            <span className="text-xs md:text-sm text-primary ml-2">
+              {event.event_id}
+            </span>
+          </div>
+
+          {event.hashtags && event.hashtags.length > 0 && (
+            <div>
+              <span className="text-xs md:text-sm text-secondary">
+                {event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:"}
+              </span>
+              <div className="flex flex-wrap gap-2 mt-1">
+                {event.hashtags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile: Ordered List */}
+      <div className="md:hidden flex flex-col gap-3">
+        {mobileFields.map((field) => (
+          <div key={field.key}>
+            <span className="text-xs text-secondary">{field.label}</span>
+            <div className="mt-1">{field.value}</div>
+          </div>
+        ))}
       </div>
 
       {/* Top Reply */}
-      {event.top_replies && event.top_replies.length > 0 && (
+      {topTwoReplies.length > 0 && (
         <div>
           <h2 className="text-sm md:text-base font-semibold text-primary mb-3">
             Top Reply
           </h2>
           <div className="space-y-2">
-            {event.top_replies.map((reply, index) => (
+            {topTwoReplies.map((reply, index) => (
               <TopReplyBar key={reply.id || index} reply={reply} />
             ))}
           </div>

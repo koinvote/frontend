@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { API, type ApiResponse } from "@/api";
 import { ReplySortBy } from "@/api/types";
@@ -6,11 +6,13 @@ import type { Reply, GetListRepliesRes } from "@/api/response";
 import { satsToBtc } from "@/utils/formatter";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 
 dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 interface ReplyListProps {
   eventId: string;
@@ -20,7 +22,8 @@ interface ReplyListProps {
 }
 
 function formatRelativeTime(dateString: string): string {
-  const date = dayjs(dateString);
+  // 確保將服務器返回的 UTC 時間正確解析為 UTC
+  const date = dayjs.utc(dateString);
   const now = dayjs();
   const diffDays = now.diff(date, "day");
 
@@ -35,7 +38,11 @@ function formatRelativeTime(dateString: string): string {
   return `${weeks}w ago`;
 }
 
-function truncateAddress(address: string, startLength = 6, endLength = 4): string {
+function truncateAddress(
+  address: string,
+  startLength = 6,
+  endLength = 4
+): string {
   if (address.length <= startLength + endLength) {
     return address;
   }
@@ -215,4 +222,3 @@ function ReplyItem({ reply, onCopy }: ReplyItemProps) {
     </div>
   );
 }
-

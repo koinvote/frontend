@@ -2,15 +2,18 @@ import { type EventSummary } from "@/pages/create-event/types/index";
 import { EventStatus } from "@/api/types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 import { useToast } from "@/components/base/Toast/useToast";
 import { Tooltip } from "antd";
 import { useState, useEffect, useRef } from "react";
 import { satsToBtc } from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
 
 import BTCIcon from "@/assets/icons/btc.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 interface EventCardProps {
   event: EventSummary;
@@ -20,7 +23,8 @@ interface EventCardProps {
 function formatCountdown(event: EventSummary) {
   if (event.status === EventStatus.ACTIVE) {
     const now = dayjs();
-    const deadline = dayjs(event.deadline_at);
+    // 確保將服務器返回的 UTC 時間正確解析為 UTC
+    const deadline = dayjs.utc(event.deadline_at);
     if (deadline.isBefore(now)) return "Closing soon";
     const diffMs = deadline.diff(now);
     const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
@@ -37,7 +41,8 @@ function formatCountdown(event: EventSummary) {
   // PREHEAT
   if (event.status === EventStatus.PREHEAT) {
     const now = dayjs();
-    const deadline = dayjs(event.deadline_at);
+    // 確保將服務器返回的 UTC 時間正確解析為 UTC
+    const deadline = dayjs.utc(event.deadline_at);
     if (deadline.isBefore(now)) return "Starting soon";
     const diffMs = deadline.diff(now);
     const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
@@ -54,7 +59,8 @@ function formatCountdown(event: EventSummary) {
   // COMPLETED //
   if (event.status === EventStatus.COMPLETED) {
     if (event.ended_at) {
-      const ended = dayjs(event.ended_at);
+      // 確保將服務器返回的 UTC 時間正確解析為 UTC
+      const ended = dayjs.utc(event.ended_at);
       const now = dayjs();
       const diffDays = now.diff(ended, "day");
 
@@ -69,7 +75,8 @@ function formatCountdown(event: EventSummary) {
       return `${weeks}w ago`;
     }
     // If no ended_at, use deadline_at as fallback
-    const deadline = dayjs(event.deadline_at);
+    // 確保將服務器返回的 UTC 時間正確解析為 UTC
+    const deadline = dayjs.utc(event.deadline_at);
     const now = dayjs();
     if (deadline.isBefore(now)) {
       const diffDays = now.diff(deadline, "day");
@@ -209,7 +216,6 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const secondaryReply = sortedReplies[1];
 
   const [isDesktop, setIsDesktop] = useState(false);
-  const lastCopyTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -221,27 +227,16 @@ export function EventCard({ event, onClick }: EventCardProps) {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const handleCopyUrl = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-
-    const now = Date.now();
-    const timeSinceLastCopy = now - lastCopyTimeRef.current;
-
-    if (timeSinceLastCopy < 2000) {
-      return;
-    }
-
-    lastCopyTimeRef.current = now;
-
+  const handleCopyUrl = useDebouncedClick(async () => {
+    const eventUrl = `${window.location.origin}/event/${event.event_id}`;
     try {
-      const eventUrl = `${window.location.origin}/event/${event.event_id}`;
       await navigator.clipboard.writeText(eventUrl);
       showToast("success", "Copied URL to clipboard");
     } catch (error) {
       console.error("Failed to copy URL:", error);
       showToast("error", "Failed to copy URL");
     }
-  };
+  });
 
   const handleCardClick = (e: React.MouseEvent<HTMLElement>) => {
     // Don't trigger if clicking on a button or inside top replies section

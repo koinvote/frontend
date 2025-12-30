@@ -17,6 +17,7 @@
   --color-white: #ffffff;
   --color-black: #000000;
   --color-orange-500: #ff8904;
+  --color-orange-btc: #f7931a; /* Top reply background color */
   --color-red-500: #ff0000;
 
   --color-primary: var(--color-gray-50);

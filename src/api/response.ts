@@ -1,5 +1,5 @@
 // api/response.ts
-import type { ReplyPreview } from "@/pages/create-event/types";
+import type { TopReply } from "@/pages/create-event/types";
 import type {
   EventType,
   EventRewardType,
@@ -86,20 +86,22 @@ export interface EventDetailDataRes {
     | typeof EventStatus.ACTIVE
     | typeof EventStatus.PREHEAT
     | typeof EventStatus.COMPLETED;
-  initial_reward_satoshi: number;
-  total_reward_satoshi: number;
+  initial_reward_satoshi: number; //事件建立時的初始獎金
+  additional_reward_satoshi: number; //額外獎金
+  total_reward_satoshi: number; //total reward指的是總獎金
   winner_count: number;
+  additional_winner_count: number;
   duration_hours: number;
+  creator_address: string;
   created_at: string;
   started_at: string;
   deadline_at: string;
   participants_count: number;
-  total_stake_satoshi: number;
+  total_stake_satoshi: number; //所有有參與回覆的人，錢包加起來總共有多少餘額
   options: string[];
-  top_replies: ReplyPreview[];
+  top_replies: TopReply[];
   hashtags: string[];
   preheat_hours: number;
-  creator_address?: string; // TODO: Confirm with backend if this field exists
 }
 
 export interface GetSignaturePlainTextRes {

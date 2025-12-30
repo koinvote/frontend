@@ -1,9 +1,8 @@
 // src/pages/home/types.ts
 import type { EventStatus } from "@/api/types";
 
-export interface ReplyPreview {
-  id?: string;
-  reply_id?: string;
+export interface TopReply {
+  id: string;
   body: string;
   weight_percent: number;
   amount_satoshi: string;
@@ -29,7 +28,7 @@ export interface EventSummary {
   participants_count: number;
   total_stake_btc: string;
 
-  top_replies: ReplyPreview[];
+  top_replies: TopReply[];
 }
 
 // Home 狀態、排序（UI）
