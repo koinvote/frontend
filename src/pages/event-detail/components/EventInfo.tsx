@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { useToast } from "@/components/base/Toast/useToast";
-import { Button } from "@/components/base/Button";
+// import { Button } from "@/components/base/Button";
 import {
   satsToBtc,
   formatPreheatDuration,
@@ -9,7 +9,7 @@ import {
   formatOngoingCountdown,
   formatCompletedTime,
 } from "@/utils/formatter";
-import { useDebouncedClick } from "@/utils/helper";
+// import { useDebouncedClick } from "@/utils/helper";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -23,16 +23,16 @@ interface EventInfoProps {
 export function EventInfo({ event }: EventInfoProps) {
   const { showToast } = useToast();
 
-  const handleCopyLink = useDebouncedClick(async () => {
-    const eventUrl = `${window.location.origin}/event/${event.event_id}`;
-    try {
-      await navigator.clipboard.writeText(eventUrl);
-      showToast("success", "Link copied to clipboard");
-    } catch (error) {
-      console.error("Failed to copy link:", error);
-      showToast("error", "Failed to copy link");
-    }
-  });
+  // const handleCopyLink = useDebouncedClick(async () => {
+  //   const eventUrl = `${window.location.origin}/event/${event.event_id}`;
+  //   try {
+  //     await navigator.clipboard.writeText(eventUrl);
+  //     showToast("success", "Link copied to clipboard");
+  //   } catch (error) {
+  //     console.error("Failed to copy link:", error);
+  //     showToast("error", "Failed to copy link");
+  //   }
+  // });
 
   const isPreheat = event.status === EventStatus.PREHEAT;
   const isOngoing = event.status === EventStatus.ACTIVE;
@@ -160,7 +160,7 @@ export function EventInfo({ event }: EventInfoProps) {
       key: "time-remaining",
       label: "Time Remaining:",
       value: isCompleted ? (
-        <div className="text-xs md:text-sm font-semibold text-accent mt-1">
+        <div className="text-xs md:text-sm font-semibold text-black dark:text-white mt-1">
           {timeRemaining}
         </div>
       ) : (
@@ -282,7 +282,7 @@ export function EventInfo({ event }: EventInfoProps) {
         <h1 className="text-2xl md:text-3xl font-semibold text-primary flex-1 break-words min-w-0">
           {event.title}
         </h1>
-        <Button
+        {/* <Button
           type="button"
           appearance="outline"
           tone="primary"
@@ -292,7 +292,7 @@ export function EventInfo({ event }: EventInfoProps) {
         >
           <CopyIcon className="w-4 h-4 mr-2" />
           Copy Link
-        </Button>
+        </Button> */}
       </div>
 
       {/* Description */}
@@ -336,7 +336,7 @@ export function EventInfo({ event }: EventInfoProps) {
               Time Remaining:
             </span>
             {isCompleted ? (
-              <div className="text-xs md:text-sm font-semibold text-accent mt-1">
+              <div className="text-xs md:text-sm font-semibold text-black dark:text-white mt-1">
                 {timeRemaining}
               </div>
             ) : (

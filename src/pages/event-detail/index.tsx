@@ -39,7 +39,6 @@ const EventDetail = () => {
     enabled: !!eventId,
   });
 
-  console.log(eventDetail);
 
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);

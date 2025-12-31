@@ -356,7 +356,6 @@ export default function CreateEvent() {
       preheatHours: enablePreheat && preheat > 0 ? preheat : undefined,
     };
 
-    console.log("PreviewEventState →", previewData);
 
     navigate("/preview-event", { state: previewData });
 

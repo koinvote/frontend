@@ -216,6 +216,9 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const secondaryReply = sortedReplies[1];
 
   const [isDesktop, setIsDesktop] = useState(false);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [showDescriptionToggle, setShowDescriptionToggle] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -226,6 +229,64 @@ export function EventCard({ event, onClick }: EventCardProps) {
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  // Check if description overflows
+  useEffect(() => {
+    const checkDescriptionOverflow = () => {
+      if (!descriptionRef.current) return;
+
+      // Get computed styles
+      const computedStyle = window.getComputedStyle(descriptionRef.current);
+      const lineHeight =
+        parseFloat(computedStyle.lineHeight) ||
+        parseFloat(computedStyle.fontSize) * 1.5;
+
+      // Create a clone to measure without affecting the original
+      const clone = descriptionRef.current.cloneNode(true) as HTMLElement;
+      clone.className = descriptionRef.current.className.replace(
+        "line-clamp-2",
+        ""
+      );
+      clone.style.position = "absolute";
+      clone.style.visibility = "hidden";
+      clone.style.width = `${descriptionRef.current.offsetWidth}px`;
+      clone.style.whiteSpace = "normal";
+      clone.style.wordBreak = "break-word";
+      clone.style.overflow = "visible";
+      clone.style.height = "auto";
+      clone.style.maxHeight = "none";
+
+      document.body.appendChild(clone);
+      const fullHeight = clone.scrollHeight;
+      document.body.removeChild(clone);
+
+      const clampedHeight = descriptionRef.current.clientHeight;
+
+      // Calculate expected height for 2 lines
+      const expectedHeight = lineHeight * 2;
+      const TOLERANCE = 2;
+
+      // Check if content exceeds 2 lines
+      const isOverflowing =
+        fullHeight > expectedHeight + TOLERANCE ||
+        fullHeight > clampedHeight + TOLERANCE;
+
+      setShowDescriptionToggle(isOverflowing || isDescriptionExpanded);
+    };
+
+    // Use setTimeout to ensure DOM is ready
+    const timer = setTimeout(checkDescriptionOverflow, 0);
+    window.addEventListener("resize", checkDescriptionOverflow);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", checkDescriptionOverflow);
+    };
+  }, [event.description, isDescriptionExpanded]);
+
+  const handleDescriptionToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
 
   const handleCopyUrl = useDebouncedClick(async () => {
     const eventUrl = `${window.location.origin}/event/${event.event_id}`;
@@ -239,12 +300,13 @@ export function EventCard({ event, onClick }: EventCardProps) {
   });
 
   const handleCardClick = (e: React.MouseEvent<HTMLElement>) => {
-    // Don't trigger if clicking on a button or inside top replies section
+    // Don't trigger if clicking on a button, description area, or inside top replies section
     const target = e.target as HTMLElement;
     if (
       target.tagName === "BUTTON" ||
       target.closest("button") ||
-      target.closest("section[data-top-replies]")
+      target.closest("section[data-top-replies]") ||
+      target.closest("[data-description-area]")
     ) {
       return;
     }
@@ -290,22 +352,34 @@ export function EventCard({ event, onClick }: EventCardProps) {
         </div>
       </div>
 
-      {/* description preview */}
-      <p className="mt-2 line-clamp-2 text-xs md:text-sm text-secondary">
-        {event.description}
-      </p>
-
-      {/* show more (靜態 placeholder，之後可以做可展開描述) */}
-      <button
-        type="button"
-        className="mt-1 text-xs md:text-sm cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick?.();
+      {/* Description section - full width clickable area */}
+      <div
+        data-description-area
+        className="w-full min-w-0"
+        onClick={showDescriptionToggle ? handleDescriptionToggle : undefined}
+        style={{
+          cursor: showDescriptionToggle ? "pointer" : "default",
         }}
       >
-        Show more
-      </button>
+        <p
+          ref={descriptionRef}
+          className={`mt-2 text-xs md:text-sm text-secondary break-words overflow-wrap-anywhere ${
+            isDescriptionExpanded ? "" : "line-clamp-2"
+          }`}
+        >
+          {event.description}
+        </p>
+
+        {showDescriptionToggle && (
+          <button
+            type="button"
+            className="mt-1 text-xs md:text-sm cursor-pointer"
+            onClick={handleDescriptionToggle}
+          >
+            {isDescriptionExpanded ? "Show less" : "Show more"}
+          </button>
+        )}
+      </div>
 
       {/* top replies */}
       {(primaryReply || secondaryReply) && (
