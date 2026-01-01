@@ -25,7 +25,7 @@ import EventDetail from "@/pages/event-detail";
 
 // admin
 import AdminLayout from "@/layout/AdminLayout";
-import AdminLogin from "@/admin/component/AdminLogin";
+import AdminLoginPage from "@/admin/pages/login";
 import AdminRewardRulesPage from "@/admin/pages/rewardRules";
 import AdminFeesPage from "@/admin/pages/fee";
 import AdminRefundsPage from "@/admin/pages/refund";
@@ -71,7 +71,7 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
-      { path: "admin/login", element: <AdminLogin /> },
+      { path: "admin/login", element: <AdminLoginPage /> },
       {
         path: "admin",
         element: <AdminLayout />,

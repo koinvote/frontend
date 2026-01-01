@@ -31,3 +31,19 @@ export interface GetListRepliesReq {
   sortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME; //default balance
   order: "desc" | "asc"; //default desc
 }
+
+// Admin API Request Types
+export interface AdminLoginReq {
+  address: string;
+  plaintext: string;
+  signature: string;
+}
+
+export interface UpdateSystemParametersReq {
+  min_reward_sats: number;
+  sats_per_extra_winner: number;
+  sats_per_duration_hour: number;
+  platform_fee_percent: number;
+  min_payout_sats: number;
+  free_hours: number;
+}

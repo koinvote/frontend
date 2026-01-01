@@ -1,10 +1,12 @@
 // api/index.ts
-import http, { type RequestConf } from "./http.ts";
+import http, { adminHttp, type RequestConf } from "./http.ts";
 
 import type {
   CreateEventReq,
   GetEventListReq,
   GetListRepliesReq,
+  AdminLoginReq,
+  UpdateSystemParametersReq,
 } from "./request.ts";
 
 import type {
@@ -18,6 +20,8 @@ import type {
   GetReplyPlainTextRes,
   GetListRepliesRes,
   GetHotHashtagsRes,
+  AdminLoginRes,
+  AdminSystemParametersRes,
 } from "./response.ts";
 
 export function get<R = unknown, D = unknown>(path: string) {
@@ -38,6 +42,22 @@ export function del<R = unknown, D = unknown>(path: TemplateStringsArray) {
 export function patch<R = unknown, D = unknown>(path: TemplateStringsArray) {
   return (data?: D, config: RequestConf = {}) =>
     http.patch<R>(path[0], data, config);
+}
+
+// Admin API helper functions (using adminHttp with token)
+export function adminGet<R = unknown, D = unknown>(path: string) {
+  return (data?: D, config: RequestConf = {}) =>
+    adminHttp.get<R>(path, { ...config, params: data });
+}
+
+export function adminPost<R = unknown, D = unknown>(path: string) {
+  return (data?: D, config: RequestConf = {}) =>
+    adminHttp.post<R>(path, data, config);
+}
+
+export function adminPut<R = unknown, D = unknown>(path: string) {
+  return (data?: D, config: RequestConf = {}) =>
+    adminHttp.put<R>(path, data, config);
 }
 
 export interface ApiResponse<T> {
@@ -88,7 +108,19 @@ export const API = {
       `/events/${eventId}/replies`
     ),
 
-  // 之後 Admin FREE_HOURS 會用到，可以先留 TODO：
-  // getSystemConfig: get<ApiResponse<{ free_hours: number }>>`/admin/system-config`,
-  // updateFreeHours: patch<ApiResponse<{ free_hours: number }>, { free_hours: number }>`/admin/system-config`,
+};
+
+// Admin API (requires Bearer token authentication)
+// Note: Admin login endpoint does NOT require token, so it uses regular http
+export const AdminAPI = {
+  // Admin login (no token required - uses regular http)
+  login: post<ApiResponse<AdminLoginRes>, AdminLoginReq>("/admin/login"),
+  // Admin system parameters (requires token - uses adminHttp)
+  getSystemParameters: adminGet<ApiResponse<AdminSystemParametersRes>, void>(
+    "/admin/system-parameters"
+  ),
+  updateSystemParameters: adminPut<
+    ApiResponse<void>,
+    UpdateSystemParametersReq
+  >("/admin/system-parameters"),
 };

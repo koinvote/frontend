@@ -169,3 +169,17 @@ export interface GetReplyPlainTextRes {
 }
 
 export type GetHotHashtagsRes = string[];
+
+// Admin API Response Types
+export interface AdminLoginRes {
+  token: string;
+}
+
+export interface AdminSystemParametersRes {
+  min_reward_sats: number;
+  sats_per_extra_winner: number;
+  sats_per_duration_hour: number;
+  platform_fee_percent: number;
+  min_payout_sats: number;
+  free_hours: number;
+}

@@ -41,6 +41,7 @@
   /* font weight */
   --fw-regular: 400;
   --fw-medium: 500;
+  --fw-large: 600;
 
   /* letter-spacing tokens (px) */
   --track-0: 0px;
@@ -169,6 +170,10 @@
 }
 @utility fw-m {
   font-weight: var(--fw-medium);
+}
+
+@utility fw-l {
+  font-weight: var(--fw-large);
 }
 
 /* font-size */
