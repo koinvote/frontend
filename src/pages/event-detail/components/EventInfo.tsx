@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { useToast } from "@/components/base/Toast/useToast";
 // import { Button } from "@/components/base/Button";
 import {
@@ -9,7 +10,8 @@ import {
   formatOngoingCountdown,
   formatCompletedTime,
 } from "@/utils/formatter";
-// import { useDebouncedClick } from "@/utils/helper";
+import { useDebouncedClick } from "@/utils/helper";
+import { useHomeStore } from "@/stores/homeStore";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -22,6 +24,20 @@ interface EventInfoProps {
 
 export function EventInfo({ event }: EventInfoProps) {
   const { showToast } = useToast();
+  const navigate = useNavigate();
+  const { setActiveHashtag, setStatus } = useHomeStore();
+
+  // Debounced copy handler for creator address
+  const handleCopyCreatorAddress = useDebouncedClick(async () => {
+    if (event.creator_address) {
+      try {
+        await navigator.clipboard.writeText(event.creator_address);
+        showToast("success", "Address copied");
+      } catch {
+        showToast("error", "Failed to copy");
+      }
+    }
+  });
 
   // const handleCopyLink = useDebouncedClick(async () => {
   //   const eventUrl = `${window.location.origin}/event/${event.event_id}`;
@@ -336,7 +352,7 @@ export function EventInfo({ event }: EventInfoProps) {
               Time Remaining:
             </span>
             {isCompleted ? (
-              <div className="text-xs md:text-sm font-semibold text-black dark:text-white mt-1">
+              <div className="text-xs md:text-sm text-black dark:text-white mt-1">
                 {timeRemaining}
               </div>
             ) : (
@@ -352,8 +368,13 @@ export function EventInfo({ event }: EventInfoProps) {
               <span className="text-xs md:text-sm text-secondary">
                 Creator address:
               </span>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-xs md:text-sm text-primary font-mono">
+              <button
+                type="button"
+                onClick={handleCopyCreatorAddress}
+                className="flex items-center gap-2 mt-1 group cursor-pointer"
+                aria-label="Copy creator address"
+              >
+                <span className="text-xs md:text-sm text-primary font-mono border-b border-dashed border-secondary group-hover:border-primary transition-colors">
                   {event.creator_address.length > 10
                     ? `${event.creator_address.slice(
                         0,
@@ -361,20 +382,8 @@ export function EventInfo({ event }: EventInfoProps) {
                       )}...${event.creator_address.slice(-4)}`
                     : event.creator_address}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard
-                      .writeText(event.creator_address!)
-                      .then(() => showToast("success", "Address copied"))
-                      .catch(() => showToast("error", "Failed to copy"));
-                  }}
-                  className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
-                  aria-label="Copy creator address"
-                >
-                  <CopyIcon className="w-4 h-4 text-current" />
-                </button>
-              </div>
+                <CopyIcon className="w-4 h-4 text-secondary group-hover:text-primary transition-colors" />
+              </button>
             </div>
           )}
         </div>
@@ -418,14 +427,32 @@ export function EventInfo({ event }: EventInfoProps) {
                 {event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:"}
               </span>
               <div className="flex flex-wrap gap-2 mt-1">
-                {event.hashtags.map((tag, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm"
-                  >
-                    #{tag}
-                  </span>
-                ))}
+                {event.hashtags.map((tag, index) => {
+                  const hashtagWithPrefix = tag.startsWith("#")
+                    ? tag
+                    : `#${tag}`;
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => {
+                        // 根据当前事件状态设置对应的 status
+                        if (isPreheat) {
+                          setStatus("preheat");
+                        } else if (isOngoing) {
+                          setStatus("ongoing");
+                        } else if (isCompleted) {
+                          setStatus("completed");
+                        }
+                        setActiveHashtag(hashtagWithPrefix);
+                        navigate("/");
+                      }}
+                      className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
+                      {hashtagWithPrefix}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

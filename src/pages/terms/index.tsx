@@ -10,7 +10,7 @@ export default function Terms() {
   }, [])
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27">
+    <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27 px-2 md:px-0">
       <h1 className="text-2xl md:text-3xl fw-m text-center">
         {t('terms.title')}
       </h1>

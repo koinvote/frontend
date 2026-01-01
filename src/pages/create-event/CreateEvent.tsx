@@ -356,7 +356,6 @@ export default function CreateEvent() {
       preheatHours: enablePreheat && preheat > 0 ? preheat : undefined,
     };
 
-
     navigate("/preview-event", { state: previewData });
 
     // const initialRewardSatoshi = isRewarded ? btcToSats(rewardBtc) : 0
@@ -1141,7 +1140,9 @@ export default function CreateEvent() {
                   }
                 }
               }}
-              placeholder="Enter hours"
+              placeholder={
+                isRewarded ? "Enter hours (Min 1)" : "First 24 hours are free"
+              }
               className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
                          focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
@@ -1228,11 +1229,11 @@ export default function CreateEvent() {
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
                 {t("createEvent.numberOfRecipients")}
               </p>
-              <p className="tx-12 lh-18 text-secondary">
+              <p className="tx-12 lh-18 text-white">
                 {maxRecipients !== null && maxRecipients > 0
-                  ? maxRecipients === 1
-                    ? "1 Address"
-                    : `${maxRecipients} Addresses`
+                  ? `The reward will be distributed to up to ${maxRecipients} address${
+                      maxRecipients === 1 ? "" : "es"
+                    }`
                   : "--"}
               </p>
             </div>
@@ -1244,7 +1245,7 @@ export default function CreateEvent() {
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
                 Platform fee:
               </p>
-              <p className="tx-12 lh-18 text-secondary">{platformFeeDisplay}</p>
+              <p className="tx-12 lh-18 dark:text-white text-black">{platformFeeDisplay}</p>
             </div>
           )}
 
@@ -1319,7 +1320,7 @@ export default function CreateEvent() {
           {/* Preheat fee */}
           <div>
             <p className="tx-14 lh-20 fw-m text-primary mb-1">Preheat fee:</p>
-            <p className="tx-12 lh-18 text-secondary">{preheatFeeDisplay}</p>
+            <p className="tx-12 lh-18 dark:text-white text-black">{preheatFeeDisplay}</p>
           </div>
 
           {/* Terms checkbox */}

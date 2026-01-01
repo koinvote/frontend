@@ -22,7 +22,7 @@ const VerificaionTool = () => {
   }, [])
 
   return (
-    <div className="flex flex-col items-start justify-start space-y-6 mt-8 overflow-x-hidden ">
+    <div className="flex flex-col items-start justify-start space-y-6 mt-8 overflow-x-hidden px-2 md:px-0">
       {/* Intro card */}
       <div className="flex gap-4 md:items-center justify-center">
         <span><VerificationIcon /></span>

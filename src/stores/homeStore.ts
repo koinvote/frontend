@@ -99,6 +99,9 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   setActiveHashtag: (tag) =>
     set(() => ({
       activeHashtag: tag,
+      // 同步到 search input 中显示
+      search: tag || "",
+      debouncedSearch: tag || "",
       offset: 0,
       // 保留 sortField 和 sortOrder，但重置事件列表
       events: [],

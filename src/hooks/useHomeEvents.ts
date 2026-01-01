@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo, useRef } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useHomeStore } from "@/stores/homeStore";
 import { API, type ApiResponse } from "@/api/index";
 import { mapApiEventToEventSummary } from "@/utils/eventTransform";
@@ -57,15 +57,14 @@ export function useHomeEvents() {
     setError(false);
     try {
       const currentPage = 1;
-      // 合并 debouncedSearch 和 activeHashtag 到 q 参数
-      // 如果 activeHashtag 存在，优先使用它；否则使用 debouncedSearch
-      // 去掉 activeHashtag 的 # 前缀（如果存在）再传入 API
-      const hashtagForQuery = activeHashtag
-        ? activeHashtag.startsWith("#")
-          ? activeHashtag.slice(1)
-          : activeHashtag
+      // 使用 debouncedSearch 作为 q 参数
+      // activeHashtag 已经同步到 search/debouncedSearch 中
+      // 去掉 # 前缀（如果存在）再传入 API
+      const q = debouncedSearch
+        ? debouncedSearch.startsWith("#")
+          ? debouncedSearch.slice(1)
+          : debouncedSearch
         : "";
-      const q = hashtagForQuery || debouncedSearch || "";
       const res = (await API.getEventList({
         tab: mapStatusToTab(requestStatus),
         q,

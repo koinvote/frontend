@@ -1,5 +1,11 @@
-import { useLocation, useNavigate } from "react-router";
-import { useMemo, useState, type ReactNode } from "react";
+import { useLocation, useNavigate, Link } from "react-router";
+import {
+  useMemo,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import { Button } from "@/components/base/Button";
 import type { EventType } from "@/api/types";
@@ -197,38 +203,6 @@ export default function PreviewEvent() {
     };
   }, [enablePreheat, preheatHours, isRewarded, durationHours, params]);
 
-  // 如果 user 直接打網址進來，沒有 state，就導回 create-event
-  if (!state) {
-    return (
-      <div className="flex-col flex items-center justify-center w-full">
-        <div className="h-[50px] w-full relative">
-          <button
-            type="button"
-            className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-            onClick={() => navigate(-1)}
-          >
-            <CircleLeftIcon className="w-8 h-8 fill-current" />
-          </button>
-        </div>
-        <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
-          <p className="tx-14 lh-20 text-primary">
-            No event data to preview. Please create an event first.
-          </p>
-          <div className="mt-4">
-            <Button
-              appearance="solid"
-              tone="primary"
-              text="sm"
-              onClick={() => navigate("/create-event")}
-            >
-              Back to Create Event
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const {
     creatorAddress,
     title,
@@ -237,9 +211,10 @@ export default function PreviewEvent() {
     eventType,
     rewardBtc,
     options = [],
-  } = state;
+  } = state || {};
 
-  const handlePrimaryClick = async () => {
+  const handlePrimaryClick = useCallback(async () => {
+    if (!state) return;
     if (isFree) {
       // FREE flow → 先創建 event，然後導航到簽名流程
       try {
@@ -357,7 +332,62 @@ export default function PreviewEvent() {
         setIsCreatingEvent(false);
       }
     }
-  };
+  }, [isFree, state, navigate, showToast]);
+
+  // Handle Enter key press for free events
+  useEffect(() => {
+    if (!isFree || !state) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Check if Enter key is pressed and no input/textarea is focused
+      if (
+        event.key === "Enter" &&
+        !(event.target instanceof HTMLInputElement) &&
+        !(event.target instanceof HTMLTextAreaElement) &&
+        !isCreatingEvent
+      ) {
+        event.preventDefault();
+        handlePrimaryClick();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isFree, isCreatingEvent, handlePrimaryClick, state]);
+
+  // 如果 user 直接打網址進來，沒有 state，就導回 create-event
+  if (!state) {
+    return (
+      <div className="flex-col flex items-center justify-center w-full">
+        <div className="h-[50px] w-full relative">
+          <button
+            type="button"
+            className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+            onClick={() => navigate(-1)}
+          >
+            <CircleLeftIcon className="w-8 h-8 fill-current" />
+          </button>
+        </div>
+        <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+          <p className="tx-14 lh-20 text-primary">
+            No event data to preview. Please create an event first.
+          </p>
+          <div className="mt-4">
+            <Button
+              appearance="solid"
+              tone="primary"
+              text="sm"
+              onClick={() => navigate("/create-event")}
+            >
+              Back to Create Event
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-col flex items-center justify-center w-full">
@@ -455,6 +485,35 @@ export default function PreviewEvent() {
           )}
           {/* Your Total */}
           <Field label="Your Total">{totalFeeDisplay}</Field>
+        </div>
+
+        {/* Terms */}
+        <div className="pt-2 border-t border-border mt-2">
+          <p className="tx-12 lh-18 text-secondary">
+            By proceeding, you agree to the{" "}
+            <Link to="/terms" className="text-(--color-orange-500) underline">
+              Terms of Service
+            </Link>
+            ,{" "}
+            <Link
+              to="/terms-reward-distribution"
+              className="text-(--color-orange-500) underline"
+            >
+              Reward Distribution
+            </Link>
+            ,{" "}
+            <Link to="/privacy" className="text-(--color-orange-500) underline">
+              Privacy Policy
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/charges-refunds"
+              className="text-(--color-orange-500) underline"
+            >
+              Charges &amp; Refunds
+            </Link>
+            .
+          </p>
         </div>
 
         {/* 按鈕區塊 */}

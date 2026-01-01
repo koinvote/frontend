@@ -134,7 +134,13 @@ export function HomeToolbar() {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              // 如果用户手动输入，清除 activeHashtag
+              if (activeHashtag && e.target.value !== activeHashtag) {
+                setActiveHashtag(null);
+              }
+            }}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
             placeholder="Search by title, address, Event ID"
@@ -145,6 +151,8 @@ export function HomeToolbar() {
               type="button"
               onClick={() => {
                 setSearch("");
+                setDebouncedSearch("");
+                setActiveHashtag(null);
                 setIsSearchFocused(false);
               }}
               className="absolute right-3 flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-hover text-secondary hover:text-primary transition-colors"
