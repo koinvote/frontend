@@ -44,7 +44,7 @@ export default function Layout() {
       <header
         // 使用 CSS 变量 --header-bg 自动适应 Dark/Light 模式
         // 添加 backdrop-blur 和 Webkit 前缀
-        className="px-2 sticky top-0 z-40 w-full border-b border-border text-(--color-primary)"
+        className="px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
         style={{
           paddingTop: "env(safe-area-inset-top)",
           backgroundColor: "var(--header-bg)",
