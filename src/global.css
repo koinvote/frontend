@@ -96,6 +96,14 @@
 } */
 
 @layer base {
+  :root {
+    /* ✅ 給 Layout / sticky top / 高度計算用 */
+    --sat: env(safe-area-inset-top);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+    --sar: env(safe-area-inset-right);
+  }
+
   html,
   body {
     min-height: 100vh;
@@ -103,6 +111,7 @@
     width: 100%;
     overflow-x: hidden;
 
+    /* ✅ safe-area 顯示的是 html/body 的背景 */
     background-color: var(--color-bg);
   }
 
@@ -113,17 +122,17 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  body {
+    @apply bg-bg text-primary;
+    font-weight: var(--fw-regular);
+    font-size: 14px;
+    overflow-x: hidden;
+  }
+
   #root {
     min-height: 100vh;
     min-height: -webkit-fill-available;
     width: 100%;
-    overflow-x: hidden;
-  }
-
-  body {
-    @apply text-primary;
-    font-weight: var(--fw-regular);
-    font-size: 14px;
     overflow-x: hidden;
   }
 
@@ -145,12 +154,10 @@
       -webkit-border-radius: 0;
     }
 
-    /* Ensure all containers don't cause horizontal scroll */
     * {
       box-sizing: border-box;
     }
 
-    /* Prevent horizontal scroll on main containers */
     body > *,
     #root > *,
     main,
@@ -160,6 +167,7 @@
     }
   }
 }
+
 
 /* weights */
 @utility fw-r {

@@ -42,8 +42,10 @@ export default function Layout() {
     <div className="min-h-screen bg-bg text-(--color-primary)">
       {/* Top bar */}
       <header
-        className="px-2 sticky top-0 z-40 w-full border-b
-       border-border bg-bg text-(--color-primary)"
+        className="px-2 sticky top-0 z-40 w-full border-b border-border bg-bg text-(--color-primary)"
+        style={{
+          paddingTop: "env(safe-area-inset-top)",
+        }}
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
           <button
@@ -114,7 +116,9 @@ export default function Layout() {
 
         <aside
           className={cn(
-            "hidden md:sticky md:top-16 md:block md:shrink-0 md:h-[calc(100dvh-4rem)]",
+            "hidden md:block md:shrink-0",
+            "md:sticky md:top-[calc(4rem+var(--sat))]",
+            "md:h-[calc(100dvh-4rem-var(--sat))]",
             "md:backdrop-blur",
             "transition-[width] duration-200 ease-out",
             "border-r border-border bg-(--color-bg)",
@@ -131,10 +135,7 @@ export default function Layout() {
           </div>
         </aside>
 
-        <div
-          className="relative hidden md:block md:sticky md:top-16 md:h-[calc(100dvh-4rem)]
-            w-px z-10"
-        >
+        <div className="relative hidden md:block md:sticky md:top-[calc(4rem+var(--sat))] md:h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
           <button
             type="button"
             onClick={() => setCollapsed((v) => !v)}
