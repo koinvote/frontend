@@ -39,11 +39,12 @@ export function CustomTooltip({
   void autoAdjustOverflow; // Keep for API compatibility
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenedByClick, setIsOpenedByClick] = useState(false);
+  const [, setTick] = useState(0); // 用于强制重新渲染以更新位置
   const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLElement | null>(null);
 
-  // 当 Tooltip 打开时设置容器
+  // 当 Tooltip 打开时设置容器并监听滚动
   useEffect(() => {
     if (isOpen && triggerRef.current) {
       if (getPopupContainer) {
@@ -51,6 +52,19 @@ export function CustomTooltip({
       } else {
         containerRef.current = document.body;
       }
+
+      // 监听滚动和窗口大小变化，强制重新渲染以更新位置
+      const handleUpdate = () => {
+        setTick((t) => t + 1); // 触发重新渲染，让 getPositionStyle 重新执行
+      };
+
+      window.addEventListener("scroll", handleUpdate, true); // 使用 capture phase 确保捕获所有滚动
+      window.addEventListener("resize", handleUpdate);
+
+      return () => {
+        window.removeEventListener("scroll", handleUpdate, true);
+        window.removeEventListener("resize", handleUpdate);
+      };
     }
   }, [isOpen, getPopupContainer]);
 
@@ -192,7 +206,7 @@ export function CustomTooltip({
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            handleClick(e as any);
+            handleClick(e as unknown as React.MouseEvent);
           }
         }}
       >

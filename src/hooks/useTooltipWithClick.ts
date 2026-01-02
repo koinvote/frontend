@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 /**
  * Custom hook for Tooltip with click and hover interactions
@@ -14,6 +14,7 @@ import { useState, useEffect, useCallback } from "react";
 export function useTooltipWithClick() {
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipOpenedByClick, setTooltipOpenedByClick] = useState(false);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
   // 点击外部关闭 tooltip（如果是因为点击打开的）
   useEffect(() => {
@@ -21,10 +22,9 @@ export function useTooltipWithClick() {
 
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const triggerElement = document.querySelector("[data-tooltip-trigger]");
 
       // 如果点击的是触发区域本身，不在这里处理（由 onClick 处理）
-      if (triggerElement && triggerElement.contains(target)) {
+      if (triggerRef.current && triggerRef.current.contains(target)) {
         return;
       }
 
@@ -47,8 +47,9 @@ export function useTooltipWithClick() {
 
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
-      // 阻止点击事件冒泡
+      // 阻止点击事件冒泡和默认行为
       e.stopPropagation();
+      e.preventDefault();
       // 如果已经打开且是点击打开的，则关闭；否则打开
       if (tooltipOpenedByClick && tooltipOpen) {
         setTooltipOpenedByClick(false);
@@ -80,16 +81,26 @@ export function useTooltipWithClick() {
 
   const handleOpenChange = useCallback(
     (open: boolean) => {
-      // 关闭时：如果是点击打开的，不关闭；如果是 hover 打开的，可以关闭
+      // 如果 tooltip 是因为点击打开的，我们需要阻止它关闭
       if (!open && tooltipOpenedByClick) {
-        // 点击打开的，保持打开
-        setTooltipOpen(true);
-      } else {
-        setTooltipOpen(open);
+        // 点击打开的，保持打开 - 使用 setTimeout 确保在下一个事件循环中设置
+        setTimeout(() => {
+          setTooltipOpen(true);
+        }, 0);
+        return;
       }
+      // hover 打开的，可以正常关闭
+      setTooltipOpen(open);
     },
     [tooltipOpenedByClick]
   );
+
+  // 确保当 tooltipOpenedByClick 为 true 时，tooltip 保持打开
+  useEffect(() => {
+    if (tooltipOpenedByClick && !tooltipOpen) {
+      setTooltipOpen(true);
+    }
+  }, [tooltipOpenedByClick, tooltipOpen]);
 
   return {
     tooltipProps: {
@@ -98,6 +109,9 @@ export function useTooltipWithClick() {
       onOpenChange: handleOpenChange,
     },
     triggerProps: {
+      ref: (node: HTMLElement | null) => {
+        triggerRef.current = node;
+      },
       "data-tooltip-trigger": true,
       onClick: handleClick,
       onMouseEnter: handleMouseEnter,

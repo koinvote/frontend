@@ -11,7 +11,7 @@ import { Tooltip } from "antd";
 // import { useMutation } from '@tanstack/react-query'
 
 import { Button } from "@/components/base/Button";
-import { CustomTooltip } from "@/components/base/CustomTooltip";
+import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import MinusIcon from "@/assets/icons/minus.svg?react";
 import PlusIcon from "@/assets/icons/plus.svg?react";
@@ -107,6 +107,13 @@ export default function CreateEvent() {
   const navigate = useNavigate();
   const location = useLocation();
   const isFromCreateEventRef = useRef(false);
+
+  // Tooltip hooks for response type options
+  const singleChoiceTooltip = useTooltipWithClick();
+  const openEndedTooltip = useTooltipWithClick();
+  // Tooltip hooks for other tooltips
+  const creatorAddressTooltip = useTooltipWithClick();
+  const enablePreheatTooltip = useTooltipWithClick();
 
   // 检查是否是从 CreateEvent 页面再次进入的
   useEffect(() => {
@@ -836,6 +843,7 @@ export default function CreateEvent() {
                 title={t("createEvent.creatorAddressTooltip")}
                 color="white"
                 arrow={{ pointAtCenter: true }}
+                {...creatorAddressTooltip.tooltipProps}
                 overlayInnerStyle={{
                   width: isDesktop ? "max-content" : undefined,
                   maxWidth: isDesktop
@@ -844,7 +852,10 @@ export default function CreateEvent() {
                   whiteSpace: isDesktop ? "nowrap" : "normal",
                 }}
               >
-                <span className="tx-14 text-admin-text-main dark:text-white">
+                <span
+                  {...creatorAddressTooltip.triggerProps}
+                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer"
+                >
                   ⓘ
                 </span>
               </Tooltip>
@@ -1021,13 +1032,19 @@ export default function CreateEvent() {
                   onChange={() => setEventType("single_choice")}
                 />
                 <span>{t("createEvent.responseTypeOptions.1.label")}</span>
-                <CustomTooltip
+                <Tooltip
                   title="Participants can submit their own responses."
                   placement="top"
                   color="white"
+                  {...singleChoiceTooltip.tooltipProps}
                 >
-                  ⓘ
-                </CustomTooltip>
+                  <span
+                    {...singleChoiceTooltip.triggerProps}
+                    className="cursor-pointer"
+                  >
+                    ⓘ
+                  </span>
+                </Tooltip>
               </label>
               <label className="flex items-center gap-2 tx-14 lh-20 text-primary">
                 <input
@@ -1038,13 +1055,19 @@ export default function CreateEvent() {
                   onChange={() => setEventType("open")}
                 />
                 <span>{t("createEvent.responseTypeOptions.0.label")}</span>
-                <CustomTooltip
+                <Tooltip
                   title="Participants choose one option from a list you create."
                   placement="top"
                   color="white"
+                  {...openEndedTooltip.tooltipProps}
                 >
-                  ⓘ
-                </CustomTooltip>
+                  <span
+                    {...openEndedTooltip.triggerProps}
+                    className="cursor-pointer"
+                  >
+                    ⓘ
+                  </span>
+                </Tooltip>
               </label>
             </div>
           </div>
@@ -1309,14 +1332,14 @@ export default function CreateEvent() {
                 title={formatTooltipText(t("createEvent.enablePreheatTooltip"))}
                 color="white"
                 arrow={{ pointAtCenter: true }}
+                {...enablePreheatTooltip.tooltipProps}
                 overlayInnerStyle={{
                   maxWidth: "min(500px, calc(100vw - 32px))",
                 }}
               >
                 <span
-                  className="tx-14 text-admin-text-main dark:text-white cursor-default"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={(e) => e.stopPropagation()}
+                  {...enablePreheatTooltip.triggerProps}
+                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer"
                 >
                   ⓘ
                 </span>
