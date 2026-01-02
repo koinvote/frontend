@@ -309,39 +309,41 @@ export function EventCard({ event, onClick }: EventCardProps) {
     >
       {/* header row: title + reward + time */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <h2 className="text-base md:text-lg font-semibold text-primary">
+        <h2 className="text-base md:text-lg font-semibold text-primary min-w-0 flex-1 md:flex-shrink">
           {event.title}
         </h2>
-        <Tooltip
-          title="After the countdown, this reward will be distributed"
-          placement={isDesktop ? "topRight" : "bottomLeft"}
-          color="white"
-          {...tooltipProps}
-          getPopupContainer={(triggerNode) =>
-            triggerNode.parentElement || document.body
-          }
-          autoAdjustOverflow={false}
-          overlayInnerStyle={{
-            maxWidth: isDesktop
-              ? "max-content"
-              : "min(300px, calc(100vw - 32px))",
-            whiteSpace: isDesktop ? "nowrap" : "normal",
-            width: isDesktop ? "max-content" : undefined,
-          }}
-          overlayClassName="event-card-tooltip"
-        >
-          <div
-            {...triggerProps}
-            className="flex flex-row md:flex-col items-center md:items-start 
-          gap-4 md:gap-1 text-xs md:text-sm text-secondary"
+        <div className="flex-shrink-0">
+          <Tooltip
+            title="After the countdown, this reward will be distributed"
+            placement={isDesktop ? "topRight" : "bottomLeft"}
+            color="white"
+            {...tooltipProps}
+            getPopupContainer={(triggerNode) =>
+              triggerNode.parentElement || document.body
+            }
+            autoAdjustOverflow={false}
+            overlayInnerStyle={{
+              maxWidth: isDesktop
+                ? "max-content"
+                : "min(300px, calc(100vw - 32px))",
+              whiteSpace: isDesktop ? "nowrap" : "normal",
+              width: isDesktop ? "max-content" : undefined,
+            }}
+            overlayClassName="event-card-tooltip"
           >
-            <span className="font-semibold text-accent flex items-center gap-1">
-              <BTCIcon />
-              {event.total_reward_btc} BTC
-            </span>
-            <span>{countdown}</span>
-          </div>
-        </Tooltip>
+            <div
+              {...triggerProps}
+              className="flex flex-row md:flex-col items-center md:items-start 
+          gap-4 md:gap-1 text-xs md:text-sm text-secondary"
+            >
+              <span className="font-semibold text-accent flex items-center gap-1">
+                <BTCIcon />
+                {event.total_reward_btc} BTC
+              </span>
+              <span>{countdown}</span>
+            </div>
+          </Tooltip>
+        </div>
       </div>
 
       {/* Description section - full width clickable area */}
