@@ -57,7 +57,6 @@ export function HomeToolbar() {
   };
 
   const handleSortChange = (field: HomeSortField) => {
-    // 根據狀態給預設順序
     const defaultOrder: HomeSortOrder = "desc";
     setSort(field, defaultOrder);
   };
@@ -84,11 +83,9 @@ export function HomeToolbar() {
   }, []);
 
   const handleHashtagClick = (tag: string) => {
-    // 如果点击的是已选中的标签，清除筛选
     if (activeHashtag && activeHashtag.toLowerCase() === tag.toLowerCase()) {
       setActiveHashtag(null);
     } else {
-      // 否则直接切换到新标签（自动切换，不需要先取消）
       setActiveHashtag(tag);
     }
   };
@@ -136,7 +133,6 @@ export function HomeToolbar() {
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
-              // 如果用户手动输入，清除 activeHashtag
               if (activeHashtag && e.target.value !== activeHashtag) {
                 setActiveHashtag(null);
               }
@@ -173,12 +169,12 @@ export function HomeToolbar() {
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
           <select
-            className="flex-1 md:flex-none h-9 rounded-xl border border-border bg-surface px-3 text-sm md:text-base"
+            className="flex-1 md:flex-none h-9 rounded-xl border border-border bg-surface px-3 text-sm md:text-base text-center"
             value={sortField}
             onChange={(e) => handleSortChange(e.target.value as HomeSortField)}
           >
             {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
+              <option key={opt.value} value={opt.value} className="text-center">
                 {opt.label}
               </option>
             ))}
