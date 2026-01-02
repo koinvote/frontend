@@ -140,7 +140,7 @@ export default function CreateEvent() {
   }, []);
 
   const ACTIVE_BTC_NETWORK =
-    import.meta.env.MODE === "production" ? Network.mainnet : Network.testnet;
+    import.meta.env.MODE === "development" ? Network.mainnet : Network.testnet;
 
   const networkLabel =
     ACTIVE_BTC_NETWORK === Network.mainnet ? "mainnet" : "testnet";
