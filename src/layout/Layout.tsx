@@ -42,12 +42,12 @@ export default function Layout() {
     <div className="min-h-screen bg-bg text-(--color-primary)">
       {/* Top bar */}
       <header
-        // 使用 rgba 手动设置背景色以确保透明度生效，避免 css 变量解析问题
+        // 使用 CSS 变量 --header-bg 自动适应 Dark/Light 模式
         // 添加 backdrop-blur 和 Webkit 前缀
         className="px-2 sticky top-0 z-40 w-full border-b border-border text-(--color-primary)"
         style={{
           paddingTop: "env(safe-area-inset-top)",
-          backgroundColor: "rgba(10, 10, 10, 0.8)", // 对应 --color-gray-950 #0a0a0a 的 80% 透明度
+          backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
         }}

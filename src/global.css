@@ -65,6 +65,9 @@
   --btn-outline-fg: #ffffff;
   --btn-outline-border: #e6e6ea33;
   --btn-outline-bg-hover: #111214;
+
+  /* ✅ Header 背景色 (Dark 模式默认) */
+  --header-bg: rgba(10, 10, 10, 0.8);
 }
 
 /* light mode */
@@ -77,6 +80,9 @@
   --color-primary-lightModeGray: var(--color-gray-600);
   --color-gray-450: #f3f3f5; /* 浅色模式下的背景色 */
   --color-gray-450-rgb: 243, 243, 245; /* 浅色模式下的 RGB 值 */
+
+  /* ✅ Header 背景色 (Light 模式) */
+  --header-bg: rgba(255, 255, 255, 0.8);
 
   --btn-primary-bg: #ff8904;
   --btn-primary-fg: #ffffff;
@@ -111,7 +117,6 @@
     width: 100%;
     overflow-x: hidden;
 
-    /* ✅ safe-area 顯示的是 html/body 的背景 */
     background-color: var(--color-bg);
   }
 
@@ -167,7 +172,6 @@
     }
   }
 }
-
 
 /* weights */
 @utility fw-r {
