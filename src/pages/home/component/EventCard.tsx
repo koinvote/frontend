@@ -309,7 +309,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
     >
       {/* header row: title + reward + time */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <h2 className="text-base md:text-lg font-semibold text-primary min-w-0 flex-1 md:flex-shrink">
+        <h2 className="text-base md:text-lg font-semibold text-primary w-full md:min-w-0 md:flex-1 md:flex-shrink break-words">
           {event.title}
         </h2>
         <div className="flex-shrink-0">
