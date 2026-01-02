@@ -36,115 +36,23 @@ export function CustomTooltip({
   autoAdjustOverflow = true,
   arrowOffset = 0,
 }: CustomTooltipProps) {
+  void autoAdjustOverflow; // Keep for API compatibility
   const [isOpen, setIsOpen] = useState(false);
   const [isOpenedByClick, setIsOpenedByClick] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLElement | null>(null);
 
-  // 计算 Tooltip 位置
-  const updatePosition = () => {
-    if (!triggerRef.current || !tooltipRef.current) return;
-
-    const triggerRect = triggerRef.current.getBoundingClientRect();
-    const tooltipRect = tooltipRef.current.getBoundingClientRect();
-    const container = containerRef.current || document.body;
-    const containerRect = container.getBoundingClientRect();
-
-    let top = 0;
-    let left = 0;
-    const offset = align?.offset || [0, 0];
-
-    switch (placement) {
-      case "top":
-        top = triggerRect.top - tooltipRect.height - 8 + offset[1];
-        left =
-          triggerRect.left +
-          triggerRect.width / 2 -
-          tooltipRect.width / 2 +
-          offset[0];
-        break;
-      case "topLeft":
-        top = triggerRect.top - tooltipRect.height - 8 + offset[1];
-        left = triggerRect.left + offset[0];
-        break;
-      case "topRight":
-        top = triggerRect.top - tooltipRect.height - 8 + offset[1];
-        left = triggerRect.right - tooltipRect.width + offset[0];
-        break;
-      case "bottom":
-        top = triggerRect.bottom + 8 + offset[1];
-        left =
-          triggerRect.left +
-          triggerRect.width / 2 -
-          tooltipRect.width / 2 +
-          offset[0];
-        break;
-      case "bottomLeft":
-        top = triggerRect.bottom + 8 + offset[1];
-        left = triggerRect.left + offset[0];
-        break;
-      case "bottomRight":
-        top = triggerRect.bottom + 8 + offset[1];
-        left = triggerRect.right - tooltipRect.width + offset[0];
-        break;
-      case "left":
-        top =
-          triggerRect.top +
-          triggerRect.height / 2 -
-          tooltipRect.height / 2 +
-          offset[1];
-        left = triggerRect.left - tooltipRect.width - 8 + offset[0];
-        break;
-      case "right":
-        top =
-          triggerRect.top +
-          triggerRect.height / 2 -
-          tooltipRect.height / 2 +
-          offset[1];
-        left = triggerRect.right + 8 + offset[0];
-        break;
-    }
-
-    // 边界调整
-    if (autoAdjustOverflow) {
-      const padding = 8;
-      if (left < containerRect.left + padding) {
-        left = containerRect.left + padding;
-      }
-      if (left + tooltipRect.width > containerRect.right - padding) {
-        left = containerRect.right - tooltipRect.width - padding;
-      }
-      if (top < containerRect.top + padding) {
-        top = containerRect.top + padding;
-      }
-      if (top + tooltipRect.height > containerRect.bottom - padding) {
-        top = containerRect.bottom - tooltipRect.height - padding;
-      }
-    }
-
-    setPosition({ top, left });
-  };
-
-  // 当 Tooltip 打开时更新位置
+  // 当 Tooltip 打开时设置容器
   useEffect(() => {
-    if (isOpen) {
-      // 使用 setTimeout 确保 DOM 已渲染
-      const timer = setTimeout(() => {
-        updatePosition();
-      }, 0);
-      const handleResize = () => updatePosition();
-      window.addEventListener("resize", handleResize);
-      window.addEventListener("scroll", handleResize, true);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener("resize", handleResize);
-        window.removeEventListener("scroll", handleResize, true);
-      };
+    if (isOpen && triggerRef.current) {
+      if (getPopupContainer) {
+        containerRef.current = getPopupContainer(triggerRef.current);
+      } else {
+        containerRef.current = document.body;
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen, placement]);
+  }, [isOpen, getPopupContainer]);
 
   // 点击外部关闭（如果是由点击打开的）
   useEffect(() => {
@@ -172,15 +80,6 @@ export function CustomTooltip({
     };
   }, [isOpenedByClick]);
 
-  // 设置容器
-  useEffect(() => {
-    if (triggerRef.current && getPopupContainer) {
-      containerRef.current = getPopupContainer(triggerRef.current);
-    } else {
-      containerRef.current = document.body;
-    }
-  }, [getPopupContainer]);
-
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isOpenedByClick && isOpen) {
@@ -205,6 +104,76 @@ export function CustomTooltip({
     // 如果是由点击打开的，保持打开（不执行任何操作）
   };
 
+  // 计算位置样式
+  const getPositionStyle = () => {
+    if (!triggerRef.current) return {};
+
+    const triggerRect = triggerRef.current.getBoundingClientRect();
+    const offset = align?.offset || [0, 0];
+
+    const baseStyle: React.CSSProperties = {
+      position: "fixed",
+      zIndex: 9999,
+    };
+
+    switch (placement) {
+      case "top":
+        return {
+          ...baseStyle,
+          bottom: `${window.innerHeight - triggerRect.top + 8}px`,
+          left: `${triggerRect.left + triggerRect.width / 2}px`,
+          transform: `translateX(-50%) translateY(0)`,
+        };
+      case "topLeft":
+        return {
+          ...baseStyle,
+          bottom: `${window.innerHeight - triggerRect.top + 8}px`,
+          left: `${triggerRect.left + offset[0]}px`,
+        };
+      case "topRight":
+        return {
+          ...baseStyle,
+          bottom: `${window.innerHeight - triggerRect.top + 8}px`,
+          right: `${window.innerWidth - triggerRect.right + offset[0]}px`,
+        };
+      case "bottom":
+        return {
+          ...baseStyle,
+          top: `${triggerRect.bottom + 8}px`,
+          left: `${triggerRect.left + triggerRect.width / 2}px`,
+          transform: `translateX(-50%)`,
+        };
+      case "bottomLeft":
+        return {
+          ...baseStyle,
+          top: `${triggerRect.bottom + 8}px`,
+          left: `${triggerRect.left + offset[0]}px`,
+        };
+      case "bottomRight":
+        return {
+          ...baseStyle,
+          top: `${triggerRect.bottom + 8}px`,
+          right: `${window.innerWidth - triggerRect.right + offset[0]}px`,
+        };
+      case "left":
+        return {
+          ...baseStyle,
+          top: `${triggerRect.top + triggerRect.height / 2}px`,
+          right: `${window.innerWidth - triggerRect.left + 8}px`,
+          transform: `translateY(-50%)`,
+        };
+      case "right":
+        return {
+          ...baseStyle,
+          top: `${triggerRect.top + triggerRect.height / 2}px`,
+          left: `${triggerRect.right + 8}px`,
+          transform: `translateY(-50%)`,
+        };
+      default:
+        return baseStyle;
+    }
+  };
+
   if (!containerRef.current) {
     containerRef.current = document.body;
   }
@@ -225,13 +194,14 @@ export function CustomTooltip({
         createPortal(
           <div
             ref={tooltipRef}
-            className={`absolute z-[9999] px-3 py-2 rounded-lg text-sm shadow-lg ${overlayClassName}`}
+            className={`px-3 py-2 rounded-lg text-sm shadow-lg ${overlayClassName}`}
             style={{
-              top: `${position.top}px`,
-              left: `${position.left}px`,
+              ...getPositionStyle(),
               backgroundColor: color,
               color: color === "white" ? "#000" : "#fff",
               pointerEvents: "none",
+              overflow: "visible",
+              maxHeight: "none",
               ...overlayInnerStyle,
             }}
             onMouseEnter={() => {
@@ -247,11 +217,12 @@ export function CustomTooltip({
               }
             }}
           >
-            {title}
+            <div style={{ position: "relative", zIndex: 1 }}>{title}</div>
             {/* Tooltip 箭头 */}
             <div
               className="absolute w-0 h-0"
               style={{
+                zIndex: 2,
                 ...(placement.startsWith("top")
                   ? {
                       bottom: "-6px",

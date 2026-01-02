@@ -443,8 +443,12 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <div className="flex items-center gap-4">
             <CustomTooltip
               title="Total participation addresses"
-              placement="topLeft"
+              placement={isDesktop ? "topLeft" : "top"}
               color="white"
+              getPopupContainer={(triggerNode) =>
+                triggerNode.parentElement || document.body
+              }
+              autoAdjustOverflow={false}
             >
               <div className="flex items-center gap-1">
                 <span>
