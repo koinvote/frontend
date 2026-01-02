@@ -43,16 +43,12 @@
       (function () {
         const THEME_KEY = 'PREFERRED_THEME'
         const saved = localStorage.getItem(THEME_KEY)
-        const prefersDark =
-          window.matchMedia &&
-          window.matchMedia('(prefers-color-scheme: dark)').matches
 
+        // 如果有保存的主题偏好，使用保存的值；否则默认使用深色模式
         const initial =
           saved === 'light' || saved === 'dark'
             ? saved
-            : prefersDark
-              ? 'dark'
-              : 'light'
+            : 'dark'
 
         if (initial === 'dark') {
           document.documentElement.classList.add('dark')
