@@ -5,11 +5,15 @@ const THEME_KEY = 'PREFERRED_THEME'
 
 const applyTheme = (t: Theme) => {
   const el = document.documentElement
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]')
 
   if (t === 'dark') {
     el.classList.add('dark')
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#000000')
   } else {
     el.classList.remove('dark')
+    // 浅色模式下设为白色（或您的浅色背景色 #ffffff / #f3f3f5）
+    if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff')
   }
 }
 
@@ -21,7 +25,8 @@ export function useTheme() {
 
   useEffect(() => {
     const saved = localStorage.getItem(THEME_KEY) as Theme | null
-    const initial = saved ?? getSystemPref()
+    // 默认优先使用深色模式，除非有保存的设置
+    const initial = saved ?? 'dark'
 
     setTheme(initial)
     applyTheme(initial)

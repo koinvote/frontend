@@ -35,6 +35,7 @@
 
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#000000" />
 
     <link href="/src/global.css" rel="stylesheet" />
 
@@ -49,10 +50,15 @@
             ? saved
             : 'dark'
 
+        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
         if (initial === 'dark') {
           document.documentElement.classList.add('dark')
+          if (metaThemeColor) metaThemeColor.setAttribute('content', '#000000');
         } else {
           document.documentElement.classList.remove('dark')
+          // 浅色模式下，如果 Header 是白色的，这里设为白色；如果是透明/模糊，通常设为背景色
+          if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
         }
       })()
     </script>
