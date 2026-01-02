@@ -17,6 +17,7 @@ export interface CreateEventReq {
 export interface GetEventListReq {
   tab: "preheat" | "ongoing" | "completed";
   q: string;
+  tag?: string;
   page: string;
   limit: string;
   sortBy: "time" | "reward" | "participation";

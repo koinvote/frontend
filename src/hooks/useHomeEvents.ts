@@ -57,17 +57,22 @@ export function useHomeEvents() {
     setError(false);
     try {
       const currentPage = 1;
-      // 使用 debouncedSearch 作为 q 参数
-      // activeHashtag 已经同步到 search/debouncedSearch 中
-      // 去掉 # 前缀（如果存在）再传入 API
-      const q = debouncedSearch
-        ? debouncedSearch.startsWith("#")
-          ? debouncedSearch.slice(1)
-          : debouncedSearch
-        : "";
+      // 区分 hashtag 搜索和普通搜索
+      // 如果 activeHashtag 存在，使用 tag 参数；否则使用 q 参数
+      const hashtagForTag = activeHashtag
+        ? activeHashtag.startsWith("#")
+          ? activeHashtag.slice(1)
+          : activeHashtag
+        : undefined;
+
+      // q 参数用于用户手动输入的搜索（title/description/Event ID）
+      // 如果 activeHashtag 存在，q 应该为空（因为使用 tag 参数）
+      const q = activeHashtag ? "" : debouncedSearch || "";
+
       const res = (await API.getEventList({
         tab: mapStatusToTab(requestStatus),
         q,
+        tag: hashtagForTag,
         page: String(currentPage),
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
@@ -126,17 +131,22 @@ export function useHomeEvents() {
     try {
       // Calculate page number from offset
       const currentPage = Math.floor(offset / limit) + 1;
-      // 合并 debouncedSearch 和 activeHashtag 到 q 参数
-      // 去掉 activeHashtag 的 # 前缀（如果存在）再传入 API
-      const hashtagForQuery = activeHashtag
+      // 区分 hashtag 搜索和普通搜索
+      // 如果 activeHashtag 存在，使用 tag 参数；否则使用 q 参数
+      const hashtagForTag = activeHashtag
         ? activeHashtag.startsWith("#")
           ? activeHashtag.slice(1)
           : activeHashtag
-        : "";
-      const q = hashtagForQuery || debouncedSearch || "";
+        : undefined;
+
+      // q 参数用于用户手动输入的搜索（title/description/Event ID）
+      // 如果 activeHashtag 存在，q 应该为空（因为使用 tag 参数）
+      const q = activeHashtag ? "" : debouncedSearch || "";
+
       const res = (await API.getEventList({
         tab: mapStatusToTab(requestStatus),
         q,
+        tag: hashtagForTag,
         page: String(currentPage),
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
