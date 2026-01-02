@@ -436,7 +436,6 @@ export function EventInfo({ event }: EventInfoProps) {
                       key={index}
                       type="button"
                       onClick={() => {
-                        // 根据当前事件状态设置对应的 status
                         if (isPreheat) {
                           setStatus("preheat");
                         } else if (isOngoing) {
