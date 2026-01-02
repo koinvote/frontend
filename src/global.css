@@ -99,10 +99,16 @@
   html,
   body {
     min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari 支持 */
     background-color: #000000;
     overflow-x: hidden;
     width: 100%;
     position: relative;
+    /* 支持安全区域，让内容可以延伸到 notch/Dynamic Island 区域 */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 
   html {
@@ -115,9 +121,15 @@
 
   #root {
     min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS Safari 支持 */
     width: 100%;
     overflow-x: hidden;
     position: relative;
+    /* 确保内容可以延伸到安全区域 */
+    margin-top: calc(-1 * env(safe-area-inset-top));
+    margin-bottom: calc(-1 * env(safe-area-inset-bottom));
+    margin-left: calc(-1 * env(safe-area-inset-left));
+    margin-right: calc(-1 * env(safe-area-inset-right));
   }
 
   body {
@@ -128,6 +140,8 @@
     width: 100%;
     position: relative;
     -webkit-overflow-scrolling: touch;
+    /* 确保背景透明，让安全区域可见 */
+    background-color: transparent;
   }
 
   /* Prevent iOS Safari from auto-zooming on input focus */
