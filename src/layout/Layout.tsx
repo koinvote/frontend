@@ -42,7 +42,9 @@ export default function Layout() {
     <div className="min-h-screen bg-bg text-(--color-primary)">
       {/* Top bar */}
       <header
-        className="px-2 sticky top-0 z-40 w-full border-b border-border bg-bg text-(--color-primary)"
+        // 1. 加入 backdrop-blur-md (毛玻璃模糊效果)
+        // 2. 將 bg-bg 改為支援透明度的寫法。由於你的 CSS 變數是 Hex，建議使用 color-mix 或 rgba
+        className="px-2 sticky top-0 z-40 w-full border-b border-border bg-[color-mix(in_srgb,var(--color-bg),transparent_20%)] backdrop-blur-md text-(--color-primary)"
         style={{
           paddingTop: "env(safe-area-inset-top)",
         }}
