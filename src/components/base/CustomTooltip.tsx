@@ -82,6 +82,7 @@ export function CustomTooltip({
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault(); // 阻止默认行为，防止触发 label 的点击
     if (isOpenedByClick && isOpen) {
       setIsOpenedByClick(false);
       setIsOpen(false);
@@ -185,7 +186,15 @@ export function CustomTooltip({
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={{ display: "inline-block" }}
+        style={{ display: "inline-block", cursor: "pointer" }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleClick(e as any);
+          }
+        }}
       >
         {children}
       </div>

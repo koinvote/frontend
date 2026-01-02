@@ -477,7 +477,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <button
             type="button"
             onClick={handleCopyUrl}
-            className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary flex-shrink-0"
+            className="cursor-pointer flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary flex-shrink-0"
             aria-label="Copy event URL"
           >
             <CopyIcon className="w-4 h-4 text-current" />

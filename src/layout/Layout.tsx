@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router";
+import { Link, Outlet, useNavigate, useLocation } from "react-router";
 
 import Menu from "../components/Menu";
 import { Button } from "../components/base/Button";
@@ -28,6 +28,7 @@ export default function Layout() {
   const { current, setLanguage } = useLanguagesStore();
   const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -81,7 +82,16 @@ export default function Layout() {
               text="sm"
               block={false}
               className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
-              onClick={() => navigate("/create-event")}
+              onClick={() => {
+                // 如果当前已经在 create-event 页面，就导航到首页
+                if (location.pathname === "/create-event") {
+                  // 设置标记，表示是从 CreateEvent 页面再次进入的
+                  sessionStorage.setItem("fromCreateEvent", "true");
+                  navigate("/");
+                } else {
+                  navigate("/create-event");
+                }
+              }}
             >
               <span className="md:hidden">{t("layout.createEvent")}</span>
               <span className="hidden md:inline">

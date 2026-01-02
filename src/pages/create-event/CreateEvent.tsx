@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useLocation } from "react-router";
 import {
   type FormEvent,
   useState,
@@ -11,6 +11,7 @@ import { Tooltip } from "antd";
 // import { useMutation } from '@tanstack/react-query'
 
 import { Button } from "@/components/base/Button";
+import { CustomTooltip } from "@/components/base/CustomTooltip";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import MinusIcon from "@/assets/icons/minus.svg?react";
 import PlusIcon from "@/assets/icons/plus.svg?react";
@@ -104,6 +105,20 @@ const formatTooltipText = (text: string) => {
 export default function CreateEvent() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isFromCreateEventRef = useRef(false);
+
+  // 检查是否是从 CreateEvent 页面再次进入的
+  useEffect(() => {
+    // 检查 sessionStorage 中是否有标记
+    const fromCreateEvent = sessionStorage.getItem("fromCreateEvent");
+    if (fromCreateEvent === "true") {
+      isFromCreateEventRef.current = true;
+      sessionStorage.removeItem("fromCreateEvent");
+    } else {
+      isFromCreateEventRef.current = false;
+    }
+  }, [location.pathname]);
 
   const [isDesktop, setIsDesktop] = useState(false);
 
@@ -790,7 +805,14 @@ export default function CreateEvent() {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            // 如果是从 CreateEvent 页面再次进入的，或者没有历史记录，就导航到首页
+            if (isFromCreateEventRef.current || window.history.length <= 1) {
+              navigate("/");
+            } else {
+              navigate(-1);
+            }
+          }}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>
@@ -999,6 +1021,13 @@ export default function CreateEvent() {
                   onChange={() => setEventType("single_choice")}
                 />
                 <span>{t("createEvent.responseTypeOptions.1.label")}</span>
+                <CustomTooltip
+                  title="Participants can submit their own responses."
+                  placement="top"
+                  color="white"
+                >
+                  ⓘ
+                </CustomTooltip>
               </label>
               <label className="flex items-center gap-2 tx-14 lh-20 text-primary">
                 <input
@@ -1009,6 +1038,13 @@ export default function CreateEvent() {
                   onChange={() => setEventType("open")}
                 />
                 <span>{t("createEvent.responseTypeOptions.0.label")}</span>
+                <CustomTooltip
+                  title="Participants choose one option from a list you create."
+                  placement="top"
+                  color="white"
+                >
+                  ⓘ
+                </CustomTooltip>
               </label>
             </div>
           </div>
@@ -1245,7 +1281,9 @@ export default function CreateEvent() {
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
                 Platform fee:
               </p>
-              <p className="tx-12 lh-18 dark:text-white text-black">{platformFeeDisplay}</p>
+              <p className="tx-12 lh-18 dark:text-white text-black">
+                {platformFeeDisplay}
+              </p>
             </div>
           )}
 
@@ -1320,7 +1358,9 @@ export default function CreateEvent() {
           {/* Preheat fee */}
           <div>
             <p className="tx-14 lh-20 fw-m text-primary mb-1">Preheat fee:</p>
-            <p className="tx-12 lh-18 dark:text-white text-black">{preheatFeeDisplay}</p>
+            <p className="tx-12 lh-18 dark:text-white text-black">
+              {preheatFeeDisplay}
+            </p>
           </div>
 
           {/* Terms checkbox */}
