@@ -40,9 +40,9 @@ export default function Layout() {
 
   return (
     <div className="bg-bg text-(--color-primary) min-h-screen relative">
-      {/* Top bar - 改為 absolute 以實現覆蓋內容且隨頁面滾動的效果 */}
+      {/* Top bar - 回歸 relative, 測試是否能消除白邊 */}
       <header
-        className="absolute px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
+        className="relative px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
