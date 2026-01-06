@@ -120,7 +120,7 @@ export default function Layout() {
       </header>
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-screen">
+      <div className="relative flex w-full min-h-screen md:pt-16">
         {/* Full-height divider line (Desktop Only) */}
         {isDesktop && (
           <div
