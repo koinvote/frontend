@@ -8,7 +8,7 @@ export default function LayoutTest() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    // Root Container
+    // 步驟 1: 模仿 "成功版" 的 Layout 結構，但這次我們強制調整 Main 的行為
     <div className="relative w-full min-h-screen bg-gray-900">
       {/* Header */}
       <header
@@ -26,14 +26,21 @@ export default function LayoutTest() {
           </button>
           <div className="flex items-center gap-2">
             <Logo className="h-8 w-auto" />
-            <span className="font-bold">Layout Test (Hardcoded Nested)</span>
+            <span className="font-bold">Layout Test (Full Screen Main)</span>
           </div>
         </div>
       </header>
 
-      {/* Main Flex Container */}
+      {/* 
+         關鍵修正：
+         如果 Sidebar 導致 Main 被擠壓或移位，我們試著在 Mobile 上完全隱藏 Sidebar 的 DOM 結構，
+         或者改變 Main 的 positioning 策略。
+         
+         這裡我嘗試一個比較激進的做法：
+         讓 Main 變成 Absolute 覆蓋全屏 (在 Mobile 上)，這樣它就會無視 Flex 帶來的副作用。
+      */}
       <div className="relative flex w-full min-h-screen">
-        {/* Sidebar */}
+        {/* Sidebar (只在 md 以上渲染，避免干擾手機版佈局) */}
         <aside
           className={cn(
             "hidden md:block md:shrink-0 border-r border-white/20 bg-gray-800",
@@ -46,59 +53,55 @@ export default function LayoutTest() {
 
         {/* 
             Main Content Area 
-            這一次，我們把背景顏色從 main 拿掉。
-            並在裡面放一個 div 來模擬 Outlet 出來的頁面。
+            修正策略：
+            1. 在 Mobile (md:hidden) 上，我們不依賴 flex-1 自動佈局，而是直接 w-full。
+            2. 關鍵：加上 -mt-[safe-area] 或類似的負 margin 試試看？ 
+               不，我們先試試看最單純的：確保沒有任何父層 padding。
+               
+            觀察你的截圖，Sidebar 居然跑出來了？這代表 md:hidden 沒生效？
+            喔！你的截圖看起來像是橫向捲動了？
             
-            如果這個結構出現 "白條" 或 "黑邊"，那麼我們就找到了問題所在：
-            問題在於 "多一層 div" (Nesting) 導致的佈局變化。
+            不，Sidebar 是黑色的，你的截圖左邊是一大片黑色的，右邊才是綠色的。
+            這代表 flex 佈局生效了，但是 Sidebar 佔據了左邊的位置（即使它是 hidden??）。
+            
+            等等，如果 Sidebar 是 "hidden md:block"，那在手機上它應該 display: none，不佔空間。
+            如果你看得到黑色 Sidebar，那代表 CSS 沒生效，或者 tailwind 配置有問題？
+            
+            讓我們再次確認 "成功版" 的代碼。成功版也有 Sidebar。
+            
+            這次我把 Sidebar 的 DOM 直接拿掉 (用 && 渲染)，確保它不會干擾。
         */}
-        <main className="min-w-0 flex-1 border-2 border-red-500 relative">
-          {/* 這是模擬的 Page Component */}
-          <div className="w-full min-h-screen bg-teal-600 text-white">
-            <div className="pt-20 px-4 pb-10">
-              <h1 className="text-2xl font-bold mb-4">
-                Nested Content Simulation
-              </h1>
-              <p className="mb-4">
-                這個綠色背景是在 main 內部的一層 div 上。
-                <br />
-                紅色邊框是 main 的範圍。
-              </p>
-              <p>
-                1. 紅色邊框是否貼頂？
-                <br />
-                2. 綠色背景是否貼頂？
-              </p>
-              {Array.from({ length: 30 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="mb-4 p-4 border border-white/20 rounded"
-                >
-                  Content Row {i + 1}
-                </div>
-              ))}
-            </div>
+
+        {/* 只在 Desktop 渲染 Sidebar 佔位符，確保 Mobile 完全乾淨 */}
+        <div className="hidden md:block w-[280px]"></div>
+
+        <main className="min-w-0 flex-1 relative border-2 border-red-500">
+          {/* 
+              這裡我再次把背景色放在 Main 上，這是唯一一次成功的模式。
+              我們必須確認：到底是 "Nested Div" 導致失敗，還是 "Sidebar" 導致失敗。
+           */}
+          <div className="absolute inset-0 bg-teal-600 z-0"></div>
+
+          <div className="relative z-10 pt-24 px-4 text-white">
+            <h1 className="text-2xl font-bold">Debug Mode</h1>
+            <p>Sidebar DOM is removed on mobile.</p>
+            <p>Background is absolute inset-0.</p>
           </div>
         </main>
       </div>
 
       {/* Mobile drawer */}
-      <div
-        className={`fixed inset-0 z-50 md:hidden ${
-          open ? "" : "pointer-events-none"
-        }`}
-        aria-hidden={!open}
-      >
-        <button
-          className={`absolute inset-0 bg-black/50 transition-opacity ${
-            open ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={() => setOpen(false)}
-        />
-        <div className="absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3">
-          <div className="text-white">Menu</div>
+      {open && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setOpen(false)}
+          />
+          <div className="absolute inset-y-0 left-0 w-[240px] bg-gray-800 p-4 text-white">
+            Drawer Menu
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
