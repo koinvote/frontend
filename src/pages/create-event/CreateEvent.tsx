@@ -978,9 +978,6 @@ export default function CreateEvent() {
                 value={hashtagInput}
                 onChange={(e) => handleHashtagChange(e.target.value)}
                 onKeyDown={handleHashtagKeyDown}
-                placeholder={
-                  hashtagList.length ? "" : t("createEvent.hashtagsPlaceholder")
-                }
                 className={cn(
                   "min-w-[120px] flex-1",
                   "bg-transparent outline-none",
