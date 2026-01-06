@@ -39,7 +39,9 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="w-full">
+    // 1. Root Container: Relative + Min-H-Screen (Matches LayoutTest)
+    <div className="relative w-full min-h-screen">
+      {/* 2. Header: Absolute Top-0 (Matches LayoutTest) */}
       <header
         className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
@@ -104,8 +106,13 @@ export default function Layout() {
         </div>
       </header>
 
+      {/* 3. Main Content Container */}
+      {/* 
+          - Mobile: Acts as a simple flow container (matches LayoutTest). 
+          - Desktop: Uses flex for sidebar.
+      */}
       <div className="relative flex w-full min-h-screen">
-        {/* Full-height divider line */}
+        {/* Full-height divider line (Desktop only) */}
         <div
           className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-border pointer-events-none z-0"
           style={{
@@ -114,10 +121,11 @@ export default function Layout() {
           }}
         />
 
+        {/* Sidebar (Desktop only) */}
         <aside
           className={cn(
             "hidden md:block md:shrink-0",
-            "md:sticky md:top-[calc(4rem+var(--sat))]", // Adjust sticky top to account for header height + safe area
+            "md:sticky md:top-[calc(4rem+var(--sat))]", // Adjust sticky top
             "md:h-[calc(100dvh-4rem-var(--sat))]",
             "md:backdrop-blur",
             "transition-[width] duration-200 ease-out",
@@ -135,6 +143,7 @@ export default function Layout() {
           </div>
         </aside>
 
+        {/* Sidebar Toggle (Desktop only) */}
         <div className="relative hidden md:block md:sticky md:top-[calc(4rem+var(--sat))] md:h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
           <button
             type="button"
@@ -151,10 +160,15 @@ export default function Layout() {
           </button>
         </div>
 
-        {/* Content */}
+        {/* Main Content Area */}
         <main className="min-w-0 flex-1">
-          {/* Removed default padding to allow pages to extend behind the header for transparency. 
-              Pages that need spacing should apply their own padding. */}
+          {/* 
+             CRITICAL: 
+             No wrapping div with padding here. 
+             Outlet renders directly. 
+             Pages must handle their own top spacing if they want to clear the header.
+             This allows full-bleed backgrounds to reach the top.
+          */}
           <Outlet />
         </main>
       </div>
