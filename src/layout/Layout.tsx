@@ -39,10 +39,10 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="bg-bg text-(--color-primary) min-h-screen relative">
-      {/* Top bar - 改為 fixed, 強制貼頂測試 */}
+    <div className="bg-bg text-(--color-primary) min-h-screen">
+      {/* Top bar - 改為 absolute 且移除外層 relative，讓 header 直接相對於 root/body 定位 */}
       <header
-        className="fixed px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
+        className="absolute px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
