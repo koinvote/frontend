@@ -39,7 +39,7 @@
 
     <link href="/src/global.css" rel="stylesheet" />
 
-    <!-- <script>
+    <script>
       (function () {
         const THEME_KEY = 'PREFERRED_THEME'
         const saved = localStorage.getItem(THEME_KEY)
@@ -49,19 +49,8 @@
           saved === 'light' || saved === 'dark'
             ? saved
             : 'dark'
-
-        const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-
-        if (initial === 'dark') {
-          document.documentElement.classList.add('dark')
-          if (metaThemeColor) metaThemeColor.setAttribute('content', '#000000');
-        } else {
-          document.documentElement.classList.remove('dark')
-          // 浅色模式下，如果 Header 是白色的，这里设为白色；如果是透明/模糊，通常设为背景色
-          if (metaThemeColor) metaThemeColor.setAttribute('content', '#ffffff');
-        }
       })()
-    </script> -->
+    </script>
     <script src="https://kit.fontawesome.com/916299e405.js" crossorigin="anonymous"></script>
   </head>
 
