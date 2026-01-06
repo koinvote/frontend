@@ -30,6 +30,17 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Handle window resize to auto-close drawer on desktop
+  useEffect(() => {
+    function onResize() {
+      if (window.innerWidth >= 768) {
+        setOpen(false);
+      }
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
@@ -39,16 +50,16 @@ export default function Layout() {
   }, []);
 
   return (
-    // 1. Root Container: Relative + Min-H-Screen (Matches LayoutTest)
+    // 1. Root Container
     <div className="relative w-full min-h-screen">
-      {/* 2. Header: Absolute Top-0 (Matches LayoutTest) */}
+      {/* 2. Header */}
       <header
         className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          paddingTop: "env(safe-area-inset-top)", // Direct env usage
+          paddingTop: "env(safe-area-inset-top)",
         }}
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
@@ -106,26 +117,32 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* 3. Main Content Container */}
       {/* 
-          - Mobile: Acts as a simple flow container (matches LayoutTest). 
-          - Desktop: Uses flex for sidebar.
+          3. Main Content Container 
+          
+          FIX: Sidebar DOM removal on Mobile.
+          我們使用 CSS Grid 或 Flex 都可以，但重點是：
+          在 Mobile (md:hidden) 時，我們不要渲染 Sidebar 的 HTML 結構，
+          避免 flex item 即使 hidden 也可能造成的佈局怪異 (雖然理論上不應該，但在 iOS safari 有時會有 ghost space)。
+          或者更簡單：直接在 JSX 裡條件渲染 Sidebar。
       */}
       <div className="relative flex w-full min-h-screen">
-        {/* Full-height divider line (Desktop only) */}
+        {/* Full-height divider line (Desktop Only) */}
+        {/* 使用 media query 隱藏 DOM 可能更保險，但這裡我們先用 CSS hidden */}
         <div
-          className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-border pointer-events-none z-0"
+          className="hidden md:block absolute left-0 top-0 bottom-0 w-px bg-border pointer-events-none z-0"
           style={{
             left: collapsed ? "70px" : "280px",
             transition: "left 200ms ease-out",
           }}
         />
 
-        {/* Sidebar (Desktop only) */}
+        {/* Sidebar (Desktop Only - Conditional Rendering recommended if flex issues persist, but CSS hidden usually works) */}
+        {/* 為了保險起見，我們這裡保持 hidden md:block，但在 content 裡我們會確保它是 flex-1 */}
         <aside
           className={cn(
             "hidden md:block md:shrink-0",
-            "md:sticky md:top-[calc(4rem+var(--sat))]", // Adjust sticky top
+            "md:sticky md:top-[calc(4rem+var(--sat))]",
             "md:h-[calc(100dvh-4rem-var(--sat))]",
             "md:backdrop-blur",
             "transition-[width] duration-200 ease-out",
@@ -143,7 +160,7 @@ export default function Layout() {
           </div>
         </aside>
 
-        {/* Sidebar Toggle (Desktop only) */}
+        {/* Sidebar Toggle (Desktop Only) */}
         <div className="relative hidden md:block md:sticky md:top-[calc(4rem+var(--sat))] md:h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
           <button
             type="button"
@@ -161,19 +178,17 @@ export default function Layout() {
         </div>
 
         {/* Main Content Area */}
-        <main className="min-w-0 flex-1">
+        <main className="min-w-0 flex-1 relative">
           {/* 
-             CRITICAL: 
-             No wrapping div with padding here. 
-             Outlet renders directly. 
-             Pages must handle their own top spacing if they want to clear the header.
-             This allows full-bleed backgrounds to reach the top.
-          */}
+              注意：這裡沒有任何 padding，也沒有 overflow-hidden (除非必要)。
+              內容組件 (Outlet) 負責填滿這個空間。
+           */}
           <Outlet />
         </main>
       </div>
 
       {/* Mobile drawer */}
+      {/* 條件渲染：只在 open 時渲染 DOM，或者保持 hidden */}
       <div
         className={`fixed inset-0 z-50 md:hidden ${
           open ? "" : "pointer-events-none"
