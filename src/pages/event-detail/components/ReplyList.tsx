@@ -63,7 +63,7 @@ export function ReplyList({
   order = "desc",
 }: ReplyListProps) {
   const { showToast } = useToast();
-  const [page, setPage] = useState(1);
+  const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
   const limit = 20;
 
   const {
@@ -73,12 +73,13 @@ export function ReplyList({
   } = useQuery({
     queryKey: ["replies", eventId, page, limit, search, sortBy, order],
     queryFn: async () => {
-      const response = (await API.getListReplies(eventId)({
-        page,
-        limit,
-        q: search || undefined,
+      const response = (await API.getListReplies()({
+        event_id: eventId,
+        search: search || undefined,
         sortBy,
         order,
+        page,
+        limit,
       })) as unknown as ApiResponse<GetListRepliesRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch replies");

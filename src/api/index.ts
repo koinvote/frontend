@@ -103,11 +103,9 @@ export const API = {
     get<ApiResponse<GetReplyPlainTextRes>, void>(
       `/events/${eventId}/reply-plaintext`
     ),
-  // /api/v1/events/{event-id}/replies
-  getListReplies: (eventId: string) =>
-    get<ApiResponse<GetListRepliesRes>, GetListRepliesReq>(
-      `/events/${eventId}/replies`
-    ),
+  // GET /api/v1/replies?event_id={event_id}
+  getListReplies: () =>
+    get<ApiResponse<GetListRepliesRes>, GetListRepliesReq>("/replies"),
 };
 
 // Admin API (requires Bearer token authentication)

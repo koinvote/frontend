@@ -25,12 +25,12 @@ export interface GetEventListReq {
 }
 
 export interface GetListRepliesReq {
-  page: number;
-  limit: number;
-  q?: string;
-  address?: string;
-  sortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME; //default balance
-  order: "desc" | "asc"; //default desc
+  event_id: string;
+  search?: string;
+  sortBy?: "time" | "balance"; // default: balance
+  order?: "desc" | "asc"; // default: desc
+  page?: number; // default: 1
+  limit?: number; // default: 20, max: 100
 }
 
 // Admin API Request Types

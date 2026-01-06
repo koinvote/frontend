@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useToast } from "@/components/base/Toast/useToast";
 // import { Button } from "@/components/base/Button";
@@ -25,7 +25,8 @@ interface EventInfoProps {
 export function EventInfo({ event }: EventInfoProps) {
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { setActiveHashtag, setStatus } = useHomeStore();
+  const { setActiveHashtag, setStatus, setSearch, setDebouncedSearch } =
+    useHomeStore();
 
   // Debounced copy handler for creator address
   const handleCopyCreatorAddress = useDebouncedClick(async () => {
@@ -38,6 +39,25 @@ export function EventInfo({ event }: EventInfoProps) {
       }
     }
   });
+
+  // Handle address click - navigate to home with search
+  const handleAddressClick = useCallback(() => {
+    if (event.creator_address) {
+      // Clear hashtag if any
+      setActiveHashtag(null);
+      // Set search to the address
+      setSearch(event.creator_address);
+      setDebouncedSearch(event.creator_address);
+      // Navigate to home
+      navigate("/");
+    }
+  }, [
+    event.creator_address,
+    setActiveHashtag,
+    setSearch,
+    setDebouncedSearch,
+    navigate,
+  ]);
 
   // const handleCopyLink = useDebouncedClick(async () => {
   //   const eventUrl = `${window.location.origin}/event/${event.event_id}`;
@@ -228,23 +248,25 @@ export function EventInfo({ event }: EventInfoProps) {
         label: "Creator address:",
         value: (
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-xs md:text-sm text-primary font-mono">
+            <button
+              type="button"
+              onClick={handleAddressClick}
+              className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed 
+              border-black dark:border-white hover:border-gray-500 dark:hover:border-gray-400 
+              transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
+              aria-label="Search events by creator address"
+            >
               {event.creator_address.length > 10
                 ? `${event.creator_address.slice(
                     0,
                     6
                   )}...${event.creator_address.slice(-4)}`
                 : event.creator_address}
-            </span>
+            </button>
             <button
               type="button"
-              onClick={() => {
-                navigator.clipboard
-                  .writeText(event.creator_address!)
-                  .then(() => showToast("success", "Address copied"))
-                  .catch(() => showToast("error", "Failed to copy"));
-              }}
-              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
+              onClick={handleCopyCreatorAddress}
+              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
               aria-label="Copy creator address"
             >
               <CopyIcon className="w-4 h-4 text-current" />
@@ -289,6 +311,7 @@ export function EventInfo({ event }: EventInfoProps) {
     event.creator_address,
     event.hashtags,
     showToast,
+    handleAddressClick,
   ]);
 
   return (
@@ -368,22 +391,30 @@ export function EventInfo({ event }: EventInfoProps) {
               <span className="text-xs md:text-sm text-secondary">
                 Creator address:
               </span>
-              <button
-                type="button"
-                onClick={handleCopyCreatorAddress}
-                className="flex items-center gap-2 mt-1 group cursor-pointer"
-                aria-label="Copy creator address"
-              >
-                <span className="text-xs md:text-sm text-primary font-mono border-b border-dashed border-secondary group-hover:border-primary transition-colors">
+              <div className="flex items-center gap-2 mt-1">
+                <button
+                  type="button"
+                  onClick={handleAddressClick}
+                  className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed border-black 
+                  dark:border-white hover:border-gray-500 dark:hover:border-gray-400 transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
+                  aria-label="Search events by creator address"
+                >
                   {event.creator_address.length > 10
                     ? `${event.creator_address.slice(
                         0,
                         6
                       )}...${event.creator_address.slice(-4)}`
                     : event.creator_address}
-                </span>
-                <CopyIcon className="w-4 h-4 text-secondary group-hover:text-primary transition-colors" />
-              </button>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyCreatorAddress}
+                  className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
+                  aria-label="Copy creator address"
+                >
+                  <CopyIcon className="w-4 h-4 text-current" />
+                </button>
+              </div>
             </div>
           )}
         </div>
