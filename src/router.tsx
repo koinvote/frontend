@@ -3,7 +3,6 @@ import { createBrowserRouter } from "react-router";
 import { Root } from "./Root";
 import { ErrorPage } from "@/error";
 import Layout from "@/layout/Layout";
-import LayoutTest from "@/layout/LayoutTest";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Chargesnrefunds from "@/pages/chargesnrefunds";
@@ -61,44 +60,12 @@ const publicChildren = isComingSoonMode
       { path: "event/:eventId", element: <EventDetail /> },
     ];
 
-// Test Page Component for LayoutTest
-// 這裡我們完全模仿上次成功時，main 裡面的 div 結構
-// 關鍵：min-h-screen，並且 bg-teal-600 在這裡
-const LayoutTestPage = () => (
-  <div className="w-full min-h-screen bg-teal-600 text-white">
-    {/* 
-        模仿上次的 pt-20 px-4 pb-10
-        注意：這個 div 會是 main 的直接子元素 (透過 Outlet 渲染)
-     */}
-    <div className="pt-20 px-4 pb-10">
-      <h1 className="text-2xl font-bold mb-4">
-        Outlet Content Test (Restored Structure)
-      </h1>
-      <p className="mb-4">
-        我們恢復了上次成功的 Layout 結構，只是把內容換成了 Outlet。
-        <br />
-        如果這個綠色背景能延伸到頂部，那就證明 Outlet 本身沒有問題。
-      </p>
-      {Array.from({ length: 30 }).map((_, i) => (
-        <div key={i} className="mb-4 p-4 border border-white/20 rounded">
-          Child Content Row {i + 1}
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
 export const router = createBrowserRouter([
   {
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
       { path: "test-safe-area", element: <TestSafeArea /> },
-      {
-        path: "layout-test",
-        element: <LayoutTest />,
-        children: [{ index: true, element: <LayoutTestPage /> }],
-      },
       { path: "admin/login", element: <AdminLoginPage /> },
       {
         path: "admin",

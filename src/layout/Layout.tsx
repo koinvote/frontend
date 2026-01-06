@@ -178,7 +178,7 @@ export default function Layout() {
         )}
 
         {/* Main Content Area */}
-        <main className="min-w-0 flex-1 relative">
+        <main className="min-w-0 flex-1 relative pt-[calc(3.5rem+env(safe-area-inset-top))] md:pt-0">
           {/* Debug: Add a temporary background to verify main extends to top */}
           {/* <div className="absolute inset-0 bg-blue-500/10 pointer-events-none z-0" /> */}
 
