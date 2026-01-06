@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Outlet } from "react-router";
 import { cn } from "@/utils/style";
 import Logo from "@/assets/logo/logo.svg?react";
 import MenuIcon from "@/assets/icons/menu.svg?react";
@@ -9,9 +8,9 @@ export default function LayoutTest() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    // 步驟 1: 恢復為上次成功的結構 (relative + min-h-screen)
+    // Root Container
     <div className="relative w-full min-h-screen bg-gray-900">
-      {/* Header: 完全複製成功的樣式 */}
+      {/* Header */}
       <header
         className="absolute top-0 left-0 w-full z-50 border-b border-white/20 px-2"
         style={{
@@ -27,14 +26,14 @@ export default function LayoutTest() {
           </button>
           <div className="flex items-center gap-2">
             <Logo className="h-8 w-auto" />
-            <span className="font-bold">Layout Test (Restored)</span>
+            <span className="font-bold">Layout Test (Hardcoded Nested)</span>
           </div>
         </div>
       </header>
 
-      {/* 步驟 2: 恢復主要的容器結構 (relative + flex) */}
+      {/* Main Flex Container */}
       <div className="relative flex w-full min-h-screen">
-        {/* Sidebar (Desktop only) */}
+        {/* Sidebar */}
         <aside
           className={cn(
             "hidden md:block md:shrink-0 border-r border-white/20 bg-gray-800",
@@ -42,22 +41,48 @@ export default function LayoutTest() {
             collapsed ? "md:w-[70px]" : "md:w-[280px]"
           )}
         >
-          <div className="p-4 text-white">Sidebar Content</div>
+          <div className="p-4 text-white">Sidebar</div>
         </aside>
 
         {/* 
-            Main Content:
-            上次成功的關鍵點：
-            1. bg-teal-600 是直接下在 main 標籤上 (我這裡先拿掉，讓 Outlet 的內容來決定背景)
-            2. main 是 flex-1
+            Main Content Area 
+            這一次，我們把背景顏色從 main 拿掉。
+            並在裡面放一個 div 來模擬 Outlet 出來的頁面。
+            
+            如果這個結構出現 "白條" 或 "黑邊"，那麼我們就找到了問題所在：
+            問題在於 "多一層 div" (Nesting) 導致的佈局變化。
         */}
-        <main className="min-w-0 flex-1">
-          {/* 這裡插入 Outlet */}
-          <Outlet />
+        <main className="min-w-0 flex-1 border-2 border-red-500 relative">
+          {/* 這是模擬的 Page Component */}
+          <div className="w-full min-h-screen bg-teal-600 text-white">
+            <div className="pt-20 px-4 pb-10">
+              <h1 className="text-2xl font-bold mb-4">
+                Nested Content Simulation
+              </h1>
+              <p className="mb-4">
+                這個綠色背景是在 main 內部的一層 div 上。
+                <br />
+                紅色邊框是 main 的範圍。
+              </p>
+              <p>
+                1. 紅色邊框是否貼頂？
+                <br />
+                2. 綠色背景是否貼頂？
+              </p>
+              {Array.from({ length: 30 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="mb-4 p-4 border border-white/20 rounded"
+                >
+                  Content Row {i + 1}
+                </div>
+              ))}
+            </div>
+          </div>
         </main>
       </div>
 
-      {/* Mobile drawer (為了完整性保留) */}
+      {/* Mobile drawer */}
       <div
         className={`fixed inset-0 z-50 md:hidden ${
           open ? "" : "pointer-events-none"
@@ -70,12 +95,8 @@ export default function LayoutTest() {
           }`}
           onClick={() => setOpen(false)}
         />
-        <div
-          className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] transform bg-neutral-900 p-3 shadow-2xl transition-transform ${
-            open ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <div className="text-white p-4">Menu</div>
+        <div className="absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3">
+          <div className="text-white">Menu</div>
         </div>
       </div>
     </div>
