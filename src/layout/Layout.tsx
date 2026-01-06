@@ -39,17 +39,14 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen">
-      {/* Debug Gradient: To confirm if content can actually reach the safe area */}
-      <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-red-500 via-orange-500 to-transparent pointer-events-none z-0 opacity-50" />
-
+    <div className="w-full">
       <header
         className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
-          paddingTop: "var(--sat)", // Use CSS variable for safe-area-inset-top
+          paddingTop: "env(safe-area-inset-top)", // Direct env usage
         }}
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
