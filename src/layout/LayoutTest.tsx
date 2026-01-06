@@ -93,9 +93,12 @@ export default function LayoutTest() {
         </div>
 
         {/* Main Content Area */}
-        <main className="min-w-0 flex-1">
+        {/* 
+            Update: Added 'flex flex-col relative' 
+            Added debug border (red) to see where 'main' actually starts.
+        */}
+        <main className="min-w-0 flex-1 flex flex-col relative border-2 border-red-500">
           {/* Outlet Renders Here */}
-          {/* No padding here, just like in Layout.tsx */}
           <Outlet />
         </main>
       </div>
