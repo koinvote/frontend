@@ -39,10 +39,9 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="bg-bg text-(--color-primary) min-h-screen">
-      {/* Top bar - 改為 absolute 且移除外層 relative，讓 header 直接相對於 root/body 定位 */}
+    <div>
       <header
-        className=" px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
+        className="top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
