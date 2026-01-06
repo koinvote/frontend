@@ -40,7 +40,7 @@ export default function Layout() {
 
   return (
     <div>
-      <header
+      <div
         className="top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
@@ -103,7 +103,7 @@ export default function Layout() {
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="relative flex w-full">
         {/* Full-height divider line */}
