@@ -65,7 +65,6 @@ const publicChildren = isComingSoonMode
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
       // Event detail route - placed before other routes to ensure proper matching
       { path: "event/:eventId", element: <EventDetail /> },
-      { path: "test-safe-area", element: <TestSafeArea /> },
     ];
 
 export const router = createBrowserRouter([
@@ -73,6 +72,7 @@ export const router = createBrowserRouter([
     element: <Root />,
     errorElement: <ErrorPage />,
     children: [
+      { path: "test-safe-area", element: <TestSafeArea /> },
       { path: "admin/login", element: <AdminLoginPage /> },
       {
         path: "admin",
