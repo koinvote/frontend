@@ -27,6 +27,7 @@ interface HomeStoreState {
   isLoading: boolean;
   isError: boolean;
   scrollY: number;
+  isDesktop: boolean;
 
   // actions
   setStatus: (status: HomeStatusFilter) => void;
@@ -51,6 +52,7 @@ interface HomeStoreState {
   setError: (error: boolean) => void;
 
   setScrollY: (y: number) => void;
+  setIsDesktop: (isDesktop: boolean) => void;
   resetFilters: () => void;
   resetList: () => void;
   setPopularHashtags: (hashtags: string[]) => void;
@@ -74,6 +76,7 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   isLoading: false,
   isError: false,
   scrollY: 0,
+  isDesktop: false,
 
   setStatus: (status) =>
     set(() => ({
@@ -127,6 +130,7 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   setError: (isError) => set(() => ({ isError })),
 
   setScrollY: (y) => set(() => ({ scrollY: y })),
+  setIsDesktop: (isDesktop) => set(() => ({ isDesktop })),
 
   resetFilters: () =>
     set(() => ({

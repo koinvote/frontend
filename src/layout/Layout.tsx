@@ -16,6 +16,7 @@ import MenuIcon from "@/assets/icons/menu.svg?react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguagesStore } from "@/stores/languagesStore";
+import { useHomeStore } from "@/stores/homeStore";
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
@@ -29,14 +30,14 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [isDesktop, setIsDesktop] = useState(false);
+  const { isDesktop, setIsDesktop } = useHomeStore();
 
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
     checkDesktop();
     window.addEventListener("resize", checkDesktop);
     return () => window.removeEventListener("resize", checkDesktop);
-  }, []);
+  }, [setIsDesktop]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

@@ -5,11 +5,11 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
 import { useToast } from "@/components/base/Toast/useToast";
 import { Tooltip } from "antd";
-import { CustomTooltip } from "@/components/base/CustomTooltip";
 import { useState, useEffect, useRef } from "react";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
+import { useHomeStore } from "@/stores/homeStore";
 
 import BTCIcon from "@/assets/icons/btc.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
@@ -204,20 +204,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const primaryReply = sortedReplies[0];
   const secondaryReply = sortedReplies[1];
 
-  const [isDesktop, setIsDesktop] = useState(false);
+  const { isDesktop } = useHomeStore();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [showDescriptionToggle, setShowDescriptionToggle] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
 
   // Check if description overflows
   useEffect(() => {
@@ -399,92 +389,94 @@ export function EventCard({ event, onClick }: EventCardProps) {
 
       {/* footer: participants + total stake + copy */}
       <div className="mt-3 text-[11px] md:text-xs text-secondary">
-        {/* 手机版：三个元素平均分配 */}
-        <div className="flex items-center justify-between md:hidden">
-          <CustomTooltip
-            title="Total participation addresses"
-            placement="topLeft"
-            color="white"
-            getPopupContainer={(triggerNode) =>
-              triggerNode.parentElement || document.body
-            }
-            autoAdjustOverflow={false}
-            align={{
-              offset: [-16, -2],
-            }}
-          >
-            <div className="flex items-center gap-1">
-              <span>
-                <EventCardParticipantsIcon className="w-3 h-3" />
-              </span>
-              <span>{event.participants_count}</span>
-            </div>
-          </CustomTooltip>
-          <CustomTooltip
-            title="Total participation amount"
-            placement="top"
-            color="white"
-          >
-            <div className="flex items-center gap-1">
-              <span>₿</span>
-              <span>{event.total_stake_btc}</span>
-            </div>
-          </CustomTooltip>
-          <button
-            type="button"
-            onClick={handleCopyUrl}
-            className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
-            aria-label="Copy event URL"
-          >
-            <CopyIcon className="w-4 h-4 text-current" />
-          </button>
-        </div>
-
-        {/* 电脑版：左边两个，右边一个 */}
-        <div className="hidden md:flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <CustomTooltip
+        {!isDesktop ? (
+          /* Mobile Layout: Three items distributed evenly */
+          <div className="flex items-center justify-between">
+            <Tooltip
               title="Total participation addresses"
-              placement={isDesktop ? "topLeft" : "top"}
+              placement="topLeft"
               color="white"
               getPopupContainer={(triggerNode) =>
                 triggerNode.parentElement || document.body
               }
               autoAdjustOverflow={false}
+              align={{
+                offset: [-16, -2],
+              }}
             >
               <div className="flex items-center gap-1">
                 <span>
                   <EventCardParticipantsIcon className="w-3 h-3" />
                 </span>
-                <span>
-                  {event.participants_count}
-                  <span className="hidden md:inline"> participants</span>
-                </span>
+                <span>{event.participants_count}</span>
               </div>
-            </CustomTooltip>
-            <CustomTooltip
+            </Tooltip>
+            <Tooltip
               title="Total participation amount"
               placement="top"
               color="white"
             >
               <div className="flex items-center gap-1">
                 <span>₿</span>
-                <span>
-                  {event.total_stake_btc}
-                  <span className="hidden md:inline"> BTC total</span>
-                </span>
+                <span>{event.total_stake_btc}</span>
               </div>
-            </CustomTooltip>
+            </Tooltip>
+            <button
+              type="button"
+              onClick={handleCopyUrl}
+              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
+              aria-label="Copy event URL"
+            >
+              <CopyIcon className="w-4 h-4 text-current" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleCopyUrl}
-            className="cursor-pointer flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary flex-shrink-0"
-            aria-label="Copy event URL"
-          >
-            <CopyIcon className="w-4 h-4 text-current" />
-          </button>
-        </div>
+        ) : (
+          /* Desktop Layout: Left two items, right copy button */
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Tooltip
+                title="Total participation addresses"
+                placement="topLeft"
+                color="white"
+                getPopupContainer={(triggerNode) =>
+                  triggerNode.parentElement || document.body
+                }
+                autoAdjustOverflow={false}
+              >
+                <div className="flex items-center gap-1">
+                  <span>
+                    <EventCardParticipantsIcon className="w-3 h-3" />
+                  </span>
+                  <span>
+                    {event.participants_count}
+                    <span className="hidden md:inline"> participants</span>
+                  </span>
+                </div>
+              </Tooltip>
+              <Tooltip
+                title="Total participation amount"
+                placement="top"
+                color="white"
+              >
+                <div className="flex items-center gap-1">
+                  <span>₿</span>
+                  <span>
+                    {event.total_stake_btc}
+                    <span className="hidden md:inline"> BTC total</span>
+                  </span>
+                </div>
+              </Tooltip>
+            </div>
+            <button
+              type="button"
+              onClick={handleCopyUrl}
+              className="cursor-pointer flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary flex-shrink-0"
+              aria-label="Copy event URL"
+            >
+              <CopyIcon className="w-4 h-4 text-current" />
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );

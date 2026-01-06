@@ -176,10 +176,16 @@ export interface AdminLoginRes {
 }
 
 export interface AdminSystemParametersRes {
-  min_reward_sats: number;
-  sats_per_extra_winner: number;
-  sats_per_duration_hour: number;
-  platform_fee_percent: number;
-  min_payout_sats: number;
-  free_hours: number;
+  min_reward_sats: number; // 最低發起獎金金額
+  sats_per_extra_winner: number; //中獎地址數 / 金額比例
+  sats_per_duration_hour: number; //活動最長存續時間 / 獎金金額比例 ( 多少BTC對應1小時)
+  platform_fee_percent: number; // 平台手續費百分比
+  min_payout_sats: number; //最低派獎門檻
+  free_hours: number; //免費時長
+  refund_service_fee_percentage: number; //退款服務費百分比
+  payout_fee_multiplier: number; //派獎手續費倍數
+  refund_fee_multiplier: number; //退款手續費倍數
+  withdrawal_fee_multiplier: number; //提款手續費倍數
+  maintenance_mode: boolean; //維護模式
+  required_confirmations: number; //所需確認數
 }
