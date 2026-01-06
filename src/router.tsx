@@ -4,6 +4,7 @@ import { Root } from "./Root";
 import { ErrorPage } from "@/error";
 // public layout + pages
 import Layout from "@/layout/Layout";
+import LayoutTest from "@/layout/LayoutTest"; // Import the new test layout
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Chargesnrefunds from "@/pages/chargesnrefunds";
@@ -73,6 +74,14 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: "test-safe-area", element: <TestSafeArea /> },
+      // 新增 Layout Test 路由
+      {
+        path: "layout-test",
+        element: <LayoutTest />,
+        children: [
+          { index: true, element: <div>Child Page Content Here</div> },
+        ],
+      },
       { path: "admin/login", element: <AdminLoginPage /> },
       {
         path: "admin",
