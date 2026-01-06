@@ -39,13 +39,14 @@ export default function Layout() {
   }, []);
 
   return (
-    <>
+    <div className="relative w-full min-h-screen">
       <header
         className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
+          paddingTop: "var(--sat)", // Use CSS variable for safe-area-inset-top
         }}
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
@@ -86,9 +87,7 @@ export default function Layout() {
               block={false}
               className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
               onClick={() => {
-                // 如果当前已经在 create-event 页面，就导航到首页
                 if (location.pathname === "/create-event") {
-                  // 设置标记，表示是从 CreateEvent 页面再次进入的
                   sessionStorage.setItem("fromCreateEvent", "true");
                   navigate("/");
                 } else {
@@ -118,7 +117,7 @@ export default function Layout() {
         <aside
           className={cn(
             "hidden md:block md:shrink-0",
-            "md:sticky md:top-[calc(4rem+var(--sat))]",
+            "md:sticky md:top-[calc(4rem+var(--sat))]", // Adjust sticky top to account for header height + safe area
             "md:h-[calc(100dvh-4rem-var(--sat))]",
             "md:backdrop-blur",
             "transition-[width] duration-200 ease-out",
@@ -154,9 +153,9 @@ export default function Layout() {
 
         {/* Content */}
         <main className="min-w-0 flex-1">
-          <div className=" py-4 md:px-6 md:py-6 lg:px-12 border-b border-border">
-            <Outlet />
-          </div>
+          {/* Removed default padding to allow pages to extend behind the header for transparency. 
+              Pages that need spacing should apply their own padding. */}
+          <Outlet />
         </main>
       </div>
 
@@ -192,9 +191,7 @@ export default function Layout() {
             if (touchStartX.current === null) return;
             const currentX = e.touches[0].clientX;
             const diff = touchStartX.current - currentX;
-            // Only allow swiping left (positive diff) when drawer is open
             if (open && diff > 0 && drawerRef.current) {
-              // Apply transform based on swipe distance, but don't exceed drawer width
               const maxTranslate = drawerRef.current.offsetWidth;
               const translate = Math.min(diff, maxTranslate);
               drawerRef.current.style.transform = `translateX(-${translate}px)`;
@@ -204,14 +201,12 @@ export default function Layout() {
             if (touchStartX.current === null) return;
             const endX = e.changedTouches[0].clientX;
             const diff = touchStartX.current - endX;
-            const threshold = 50; // Minimum swipe distance to close (in pixels)
+            const threshold = 50;
 
-            // Reset transform
             if (drawerRef.current) {
               drawerRef.current.style.transform = "";
             }
 
-            // If swiped left more than threshold, close the drawer
             if (open && diff > threshold) {
               setOpen(false);
             }
@@ -248,6 +243,6 @@ export default function Layout() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
