@@ -16,14 +16,14 @@ import MenuIcon from "@/assets/icons/menu.svg?react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguagesStore } from "@/stores/languagesStore";
-import { useMediaQuery } from "usehooks-ts"; // Assuming this might be available, if not I'll write a simple check or use CSS hidden as backup
+// import { useMediaQuery } from "usehooks-ts"; // Assuming this might be available, if not I'll write a simple check or use CSS hidden as backup
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
   const [collapsed, setCollapsed] = useState(false); // desktop sidebar
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
-  const touchStartX = useRef<number | null>(null);
+  // const touchStartX = useRef<number | null>(null);
   const { t } = useTranslation();
   const { theme, toggle } = useTheme();
   const { current, setLanguage } = useLanguagesStore();
