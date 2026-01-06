@@ -39,12 +39,15 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="bg-bg text-(--color-primary)">
-      {/* Top bar */}
+    <div className="bg-bg text-(--color-primary) min-h-screen relative">
+      {/* Top bar - 改为 fixed 以实现悬浮透明效果 */}
       <header
-        // 使用 CSS 变量 --header-bg 自动适应 Dark/Light 模式
-        // 添加 backdrop-blur 和 Webkit 前缀
-        className="px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
+        className="fixed top-0 left-0 right-0 z-40 w-full border-b border-border text-(--color-primary)"
+        style={{
+          backgroundColor: "var(--header-bg)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+        }}
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
           <button
@@ -103,7 +106,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <div className="relative flex w-full">
+      <div className="relative flex w-full pt-14 md:pt-16">
         {/* Full-height divider line */}
         <div
           className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-border pointer-events-none z-0"
