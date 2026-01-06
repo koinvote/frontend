@@ -165,7 +165,7 @@ export default function ConfirmSign() {
     }
   }, [plaintext, showToast]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (!signature.trim()) {
       showToast("error", "Please enter a signature");
       return;
@@ -257,7 +257,42 @@ export default function ConfirmSign() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [signature, eventId, countdown, showToast, setStatus, navigate]);
+
+  // Handle Enter key to submit
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if Enter key is pressed
+      if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        // Check if button is not disabled
+        const isDisabled =
+          !signature.trim() ||
+          isLoading ||
+          !plaintext ||
+          countdown <= 0 ||
+          isLoadingPlaintext;
+
+        // Allow Enter in input fields, but prevent in textarea (for multi-line input)
+        const target = e.target as HTMLElement;
+        const isTextarea = target.tagName === "TEXTAREA";
+
+        if (!isDisabled && !isTextarea) {
+          e.preventDefault();
+          handleSubmit();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    signature,
+    isLoading,
+    plaintext,
+    countdown,
+    isLoadingPlaintext,
+    handleSubmit,
+  ]);
 
   // If no state, redirect
   if (!state) {
