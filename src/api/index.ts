@@ -7,6 +7,7 @@ import type {
   GetListRepliesReq,
   AdminLoginReq,
   UpdateSystemParametersReq,
+  VerifySignatureReq,
 } from "./request.ts";
 
 import type {
@@ -89,7 +90,7 @@ export const API = {
     ),
 
   verifySignature: (eventId: string) =>
-    post<ApiResponse<VerifySignatureRes>, { signature: string }>(
+    post<ApiResponse<VerifySignatureRes>, VerifySignatureReq>(
       `/events/${eventId}/verify-signature`
     ),
 
@@ -107,7 +108,6 @@ export const API = {
     get<ApiResponse<GetListRepliesRes>, GetListRepliesReq>(
       `/events/${eventId}/replies`
     ),
-
 };
 
 // Admin API (requires Bearer token authentication)

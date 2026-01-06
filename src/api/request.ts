@@ -48,3 +48,7 @@ export interface UpdateSystemParametersReq {
   min_payout_sats: number;
   free_hours: number;
 }
+
+export interface VerifySignatureReq {
+  signature: string;
+}

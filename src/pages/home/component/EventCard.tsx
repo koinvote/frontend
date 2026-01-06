@@ -6,7 +6,7 @@ import utc from "dayjs/plugin/utc";
 import { useToast } from "@/components/base/Toast/useToast";
 import { Tooltip } from "antd";
 import { useState, useEffect, useRef } from "react";
-import { satsToBtc } from "@/utils/formatter";
+import { satsToBtc, formatOngoingCountdown } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
@@ -24,20 +24,8 @@ interface EventCardProps {
 
 function formatCountdown(event: EventSummary) {
   if (event.status === EventStatus.ACTIVE) {
-    const now = dayjs();
-    // 確保將服務器返回的 UTC 時間正確解析為 UTC
-    const deadline = dayjs.utc(event.deadline_at);
-    if (deadline.isBefore(now)) return "Closing soon";
-    const diffMs = deadline.diff(now);
-    const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
-    const days = Math.floor(totalSeconds / 86400);
-    const hours = Math.floor((totalSeconds % 86400) / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-    if (days > 0) {
-      return `${days}d ${hours}h`;
-    }
-    return `${hours}h ${minutes}m`;
+    // 使用 formatOngoingCountdown 显示详细的倒计时（包含秒数）
+    return formatOngoingCountdown(event.deadline_at);
   }
 
   // PREHEAT
