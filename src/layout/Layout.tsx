@@ -40,9 +40,9 @@ export default function Layout() {
 
   return (
     <div className="bg-bg text-(--color-primary) min-h-screen relative">
-      {/* Top bar - 改为 fixed 以实现悬浮透明效果 */}
+      {/* Top bar - 移除 fixed, 讓它自然滾動 */}
       <header
-        className="fixed top-0 left-0 right-0 z-40 w-full border-b border-border text-(--color-primary)"
+        className="relative px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
@@ -106,7 +106,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <div className="relative flex w-full pt-14 md:pt-16">
+      <div className="relative flex w-full">
         {/* Full-height divider line */}
         <div
           className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-border pointer-events-none z-0"
