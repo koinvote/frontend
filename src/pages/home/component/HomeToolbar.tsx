@@ -96,7 +96,7 @@ export function HomeToolbar() {
         <div className="flex rounded-xl bg-surface border border-border p-1 w-full md:w-fit">
           <button
             type="button"
-            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
+            className={`cursor-pointer flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
               isPreheat ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("preheat")}
@@ -105,7 +105,7 @@ export function HomeToolbar() {
           </button>
           <button
             type="button"
-            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
+            className={`cursor-pointer flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
               isOngoing ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("ongoing")}
@@ -114,7 +114,7 @@ export function HomeToolbar() {
           </button>
           <button
             type="button"
-            className={`flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
+            className={`cursor-pointer flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
               isCompleted ? "bg-white text-black" : "text-secondary"
             }`}
             onClick={() => setStatus("completed")}
@@ -164,12 +164,12 @@ export function HomeToolbar() {
           <button
             type="button"
             onClick={toggleSortOrder}
-            className="flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-xs flex-shrink-0"
+            className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-xs flex-shrink-0"
           >
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
           <select
-            className="flex-1 md:flex-none h-9 rounded-xl border border-border bg-surface px-3 text-sm md:text-base text-center"
+            className="cursor-pointer flex-1 md:flex-none h-9 rounded-xl border border-border bg-surface px-3 text-sm md:text-base text-center"
             value={sortField}
             onChange={(e) => handleSortChange(e.target.value as HomeSortField)}
           >
@@ -209,7 +209,7 @@ export function HomeToolbar() {
                   key={tag}
                   type="button"
                   onClick={() => handleHashtagClick(tag)}
-                  className={`rounded-xl px-3 py-1 text-xs md:text-sm border ${
+                  className={`cursor-pointer rounded-xl px-3 py-1 text-xs md:text-sm border ${
                     isActive
                       ? "bg-accent text-accent-foreground border-accent"
                       : "bg-surface border-border text-secondary"

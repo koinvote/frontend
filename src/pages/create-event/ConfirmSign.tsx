@@ -234,7 +234,7 @@ export default function ConfirmSign() {
 
         // Navigate to homepage after a delay to ensure toast is visible
         setTimeout(() => {
-          navigate("/");
+          navigate(`/event/${eventId}`);
         }, 2000);
       } else {
         // Not success - show error
