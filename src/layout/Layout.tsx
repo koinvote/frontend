@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router";
 
 import Menu from "../components/Menu";
@@ -20,9 +20,13 @@ import { useHomeStore } from "@/stores/homeStore";
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
+  const [isClosing, setIsClosing] = useState(false); // 控制关闭动画
+  const [isOpening, setIsOpening] = useState(false); // 控制打开动画
   const [collapsed, setCollapsed] = useState(false); // desktop sidebar
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
   const { t } = useTranslation();
   const { theme, toggle } = useTheme();
   const { current, setLanguage } = useLanguagesStore();
@@ -39,13 +43,56 @@ export default function Layout() {
     return () => window.removeEventListener("resize", checkDesktop);
   }, [setIsDesktop]);
 
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setOpen(false);
+      setIsClosing(false);
+    }, 200);
+  }, []);
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") handleClose();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [handleClose]);
+
+  useEffect(() => {
+    if (open) {
+      setIsClosing(false);
+      setIsOpening(true);
+      const timer = setTimeout(() => {
+        setIsOpening(false);
+      }, 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsOpening(false);
+    }
+  }, [open]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchStartX.current - touchEndX;
+    const deltaY = Math.abs(touchStartY.current - touchEndY);
+
+    const SWIPE_THRESHOLD = 50;
+    if (deltaX > SWIPE_THRESHOLD && deltaX > deltaY) {
+      handleClose();
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
 
   return (
     // 1. Root Container
@@ -145,7 +192,7 @@ export default function Layout() {
                 collapsed ? "px-0" : "px-2"
               )}
             >
-              <Menu collapsed={collapsed} onItemClick={() => setOpen(false)} />
+              <Menu collapsed={collapsed} onItemClick={handleClose} />
             </div>
           </aside>
         )}
@@ -183,19 +230,25 @@ export default function Layout() {
       {open && (
         <div className="fixed inset-0 z-50 md:hidden">
           <button
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setOpen(false)}
+            className="absolute inset-0 bg-black/50 transition-opacity duration-200"
+            style={{ opacity: isClosing ? 0 : 1 }}
+            onClick={handleClose}
             aria-label="Close menu backdrop"
           />
           <div
             ref={drawerRef}
-            className="absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3 shadow-2xl animate-in slide-in-from-left duration-200"
+            className={cn(
+              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
+              isClosing || isOpening ? "-translate-x-full" : "translate-x-0"
+            )}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             <div className="mb-2 flex items-center justify-between">
               <span className="text-base font-semibold">Menu</span>
               <button
                 ref={closeBtnRef}
-                onClick={() => setOpen(false)}
+                onClick={handleClose}
                 className="rounded-md p-2"
                 aria-label="Close menu"
               >
@@ -216,7 +269,7 @@ export default function Layout() {
               </button>
             </div>
             <div className="max-h-[calc(100dvh-72px)] overflow-y-auto">
-              <Menu onItemClick={() => setOpen(false)} />
+              <Menu onItemClick={handleClose} />
             </div>
           </div>
         </div>
