@@ -194,6 +194,15 @@ export function EventCard({ event, onClick }: EventCardProps) {
   // 使用 Tooltip hook（用于 reward countdown）
   const { tooltipProps, triggerProps } = useTooltipWithClick();
 
+  // 为 footer 中的 tooltip 创建独立的 hooks
+  const {
+    tooltipProps: participantsTooltipProps,
+    triggerProps: participantsTriggerProps,
+  } = useTooltipWithClick();
+
+  const { tooltipProps: amountTooltipProps, triggerProps: amountTriggerProps } =
+    useTooltipWithClick();
+
   // 根据 amount_satoshi 排序 top_replies（降序）
   const sortedReplies = [...event.top_replies].sort((a, b) => {
     const amountA = parseFloat(a.amount_satoshi || "0");
@@ -396,6 +405,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
               title="Total participation addresses"
               placement="topLeft"
               color="white"
+              {...participantsTooltipProps}
               getPopupContainer={(triggerNode) =>
                 triggerNode.parentElement || document.body
               }
@@ -404,7 +414,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 offset: [-16, -2],
               }}
             >
-              <div className="flex items-center gap-1">
+              <div
+                {...participantsTriggerProps}
+                className="flex items-center gap-1"
+              >
                 <span>
                   <EventCardParticipantsIcon className="w-3 h-3" />
                 </span>
@@ -415,8 +428,9 @@ export function EventCard({ event, onClick }: EventCardProps) {
               title="Total participation amount"
               placement="top"
               color="white"
+              {...amountTooltipProps}
             >
-              <div className="flex items-center gap-1">
+              <div {...amountTriggerProps} className="flex items-center gap-1">
                 <span>₿</span>
                 <span>{event.total_stake_btc}</span>
               </div>
@@ -438,12 +452,16 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 title="Total participation addresses"
                 placement="topLeft"
                 color="white"
+                {...participantsTooltipProps}
                 getPopupContainer={(triggerNode) =>
                   triggerNode.parentElement || document.body
                 }
                 autoAdjustOverflow={false}
               >
-                <div className="flex items-center gap-1">
+                <div
+                  {...participantsTriggerProps}
+                  className="flex items-center gap-1"
+                >
                   <span>
                     <EventCardParticipantsIcon className="w-3 h-3" />
                   </span>
@@ -457,8 +475,12 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 title="Total participation amount"
                 placement="top"
                 color="white"
+                {...amountTooltipProps}
               >
-                <div className="flex items-center gap-1">
+                <div
+                  {...amountTriggerProps}
+                  className="flex items-center gap-1"
+                >
                   <span>₿</span>
                   <span>
                     {event.total_stake_btc}
