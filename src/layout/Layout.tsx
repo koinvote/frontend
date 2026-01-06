@@ -16,6 +16,7 @@ import MenuIcon from "@/assets/icons/menu.svg?react";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguagesStore } from "@/stores/languagesStore";
+import { useMediaQuery } from "usehooks-ts"; // Assuming this might be available, if not I'll write a simple check or use CSS hidden as backup
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
@@ -30,15 +31,16 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle window resize to auto-close drawer on desktop
+  // Simple check for desktop to conditionally render Sidebar DOM
+  // We use a state to ensure hydration matches, or just css hidden if we want to be safe.
+  // But since we want to remove DOM to fix the bug:
+  const [isDesktop, setIsDesktop] = useState(false);
+
   useEffect(() => {
-    function onResize() {
-      if (window.innerWidth >= 768) {
-        setOpen(false);
-      }
-    }
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
+    checkDesktop();
+    window.addEventListener("resize", checkDesktop);
+    return () => window.removeEventListener("resize", checkDesktop);
   }, []);
 
   useEffect(() => {
@@ -117,161 +119,115 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* 
-          3. Main Content Container 
-          
-          FIX: Sidebar DOM removal on Mobile.
-          我們使用 CSS Grid 或 Flex 都可以，但重點是：
-          在 Mobile (md:hidden) 時，我們不要渲染 Sidebar 的 HTML 結構，
-          避免 flex item 即使 hidden 也可能造成的佈局怪異 (雖然理論上不應該，但在 iOS safari 有時會有 ghost space)。
-          或者更簡單：直接在 JSX 裡條件渲染 Sidebar。
-      */}
+      {/* 3. Main Content Container */}
       <div className="relative flex w-full min-h-screen">
         {/* Full-height divider line (Desktop Only) */}
-        {/* 使用 media query 隱藏 DOM 可能更保險，但這裡我們先用 CSS hidden */}
-        <div
-          className="hidden md:block absolute left-0 top-0 bottom-0 w-px bg-border pointer-events-none z-0"
-          style={{
-            left: collapsed ? "70px" : "280px",
-            transition: "left 200ms ease-out",
-          }}
-        />
-
-        {/* Sidebar (Desktop Only - Conditional Rendering recommended if flex issues persist, but CSS hidden usually works) */}
-        {/* 為了保險起見，我們這裡保持 hidden md:block，但在 content 裡我們會確保它是 flex-1 */}
-        <aside
-          className={cn(
-            "hidden md:block md:shrink-0",
-            "md:sticky md:top-[calc(4rem+var(--sat))]",
-            "md:h-[calc(100dvh-4rem-var(--sat))]",
-            "md:backdrop-blur",
-            "transition-[width] duration-200 ease-out",
-            "border-r border-border bg-(--color-bg)",
-            collapsed ? "md:w-[70px]" : "md:w-[280px]"
-          )}
-        >
+        {isDesktop && (
           <div
+            className="absolute left-0 top-0 bottom-0 w-px bg-border pointer-events-none z-0"
+            style={{
+              left: collapsed ? "70px" : "280px",
+              transition: "left 200ms ease-out",
+            }}
+          />
+        )}
+
+        {/* Sidebar (Desktop Only - REMOVED FROM DOM ON MOBILE) */}
+        {isDesktop && (
+          <aside
             className={cn(
-              "h-full overflow-y-auto py-2",
-              collapsed ? "px-0" : "px-2"
+              "shrink-0",
+              "sticky top-[calc(4rem+var(--sat))]",
+              "h-[calc(100dvh-4rem-var(--sat))]",
+              "backdrop-blur",
+              "transition-[width] duration-200 ease-out",
+              "border-r border-border bg-(--color-bg)",
+              collapsed ? "w-[70px]" : "w-[280px]"
             )}
           >
-            <Menu collapsed={collapsed} onItemClick={() => setOpen(false)} />
-          </div>
-        </aside>
+            <div
+              className={cn(
+                "h-full overflow-y-auto py-2",
+                collapsed ? "px-0" : "px-2"
+              )}
+            >
+              <Menu collapsed={collapsed} onItemClick={() => setOpen(false)} />
+            </div>
+          </aside>
+        )}
 
         {/* Sidebar Toggle (Desktop Only) */}
-        <div className="relative hidden md:block md:sticky md:top-[calc(4rem+var(--sat))] md:h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
-          <button
-            type="button"
-            onClick={() => setCollapsed((v) => !v)}
-            aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}
-            className={cn(
-              "absolute left-1/2 -translate-x-1/2 mt-3",
-              "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
-              "border border-border bg-surface",
-              "shadow hover:bg-surface/80 transition-colors cursor-pointer"
-            )}
-          >
-            {collapsed ? <RightArrow /> : <LeftArrow />}
-          </button>
-        </div>
+        {isDesktop && (
+          <div className="relative sticky top-[calc(4rem+var(--sat))] h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
+            <button
+              type="button"
+              onClick={() => setCollapsed((v) => !v)}
+              aria-label={
+                collapsed ? "Expand navigation" : "Collapse navigation"
+              }
+              className={cn(
+                "absolute left-1/2 -translate-x-1/2 mt-3",
+                "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
+                "border border-border bg-surface",
+                "shadow hover:bg-surface/80 transition-colors cursor-pointer"
+              )}
+            >
+              {collapsed ? <RightArrow /> : <LeftArrow />}
+            </button>
+          </div>
+        )}
 
         {/* Main Content Area */}
         <main className="min-w-0 flex-1 relative">
-          {/* 
-              注意：這裡沒有任何 padding，也沒有 overflow-hidden (除非必要)。
-              內容組件 (Outlet) 負責填滿這個空間。
-           */}
+          {/* Debug: Add a temporary background to verify main extends to top */}
+          {/* <div className="absolute inset-0 bg-blue-500/10 pointer-events-none z-0" /> */}
+
           <Outlet />
         </main>
       </div>
 
       {/* Mobile drawer */}
-      {/* 條件渲染：只在 open 時渲染 DOM，或者保持 hidden */}
-      <div
-        className={`fixed inset-0 z-50 md:hidden ${
-          open ? "" : "pointer-events-none"
-        }`}
-        aria-hidden={!open}
-      >
-        {/* Backdrop */}
-        <button
-          className={`absolute inset-0 bg-black/50 transition-opacity ${
-            open ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={() => setOpen(false)}
-          aria-label="Close menu backdrop"
-        />
-
-        {/* Panel */}
-        <div
-          ref={drawerRef}
-          className={`absolute inset-y-0 left-0 w-[85%] max-w-[320px] transform bg-neutral-900 p-3 shadow-2xl transition-transform ${
-            open ? "translate-x-0" : "-translate-x-full"
-          }`}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Navigation menu"
-          onTouchStart={(e) => {
-            touchStartX.current = e.touches[0].clientX;
-          }}
-          onTouchMove={(e) => {
-            if (touchStartX.current === null) return;
-            const currentX = e.touches[0].clientX;
-            const diff = touchStartX.current - currentX;
-            if (open && diff > 0 && drawerRef.current) {
-              const maxTranslate = drawerRef.current.offsetWidth;
-              const translate = Math.min(diff, maxTranslate);
-              drawerRef.current.style.transform = `translateX(-${translate}px)`;
-            }
-          }}
-          onTouchEnd={(e) => {
-            if (touchStartX.current === null) return;
-            const endX = e.changedTouches[0].clientX;
-            const diff = touchStartX.current - endX;
-            const threshold = 50;
-
-            if (drawerRef.current) {
-              drawerRef.current.style.transform = "";
-            }
-
-            if (open && diff > threshold) {
-              setOpen(false);
-            }
-
-            touchStartX.current = null;
-          }}
-        >
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-base font-semibold">Menu</span>
-            <button
-              ref={closeBtnRef}
-              onClick={() => setOpen(false)}
-              className="rounded-md p-2"
-              aria-label="Close menu"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
+      {open && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <button
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu backdrop"
+          />
+          <div
+            ref={drawerRef}
+            className="absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3 shadow-2xl animate-in slide-in-from-left duration-200"
+          >
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-base font-semibold">Menu</span>
+              <button
+                ref={closeBtnRef}
+                onClick={() => setOpen(false)}
+                className="rounded-md p-2"
+                aria-label="Close menu"
               >
-                <path
-                  d="M6 6l12 12M18 6L6 18"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="max-h-[calc(100dvh-72px)] overflow-y-auto">
-            <Menu onItemClick={() => setOpen(false)} />
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 6l12 12M18 6L6 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="max-h-[calc(100dvh-72px)] overflow-y-auto">
+              <Menu onItemClick={() => setOpen(false)} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
