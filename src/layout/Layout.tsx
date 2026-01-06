@@ -39,9 +39,9 @@ export default function Layout() {
   }, []);
 
   return (
-    <div>
-      <div
-        className="top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
+    <>
+      <header
+        className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
@@ -103,9 +103,9 @@ export default function Layout() {
             </Button>
           </div>
         </div>
-      </div>
+      </header>
 
-      <div className="relative flex w-full">
+      <div className="relative flex w-full min-h-screen">
         {/* Full-height divider line */}
         <div
           className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-border pointer-events-none z-0"
@@ -248,6 +248,6 @@ export default function Layout() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
