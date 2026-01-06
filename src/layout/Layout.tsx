@@ -179,7 +179,9 @@ export default function Layout() {
 
         {/* Main Content Area */}
         <main className="min-w-0 flex-1 ">
-          <Outlet />
+          <div className=" py-4 md:px-6 md:py-6 lg:px-12 border-b border-border">
+            <Outlet />
+          </div>
         </main>
       </div>
 
