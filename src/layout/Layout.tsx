@@ -40,6 +40,9 @@ export default function Layout() {
 
   return (
     <div className="relative w-full min-h-screen">
+      {/* Debug Gradient: To confirm if content can actually reach the safe area */}
+      <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-red-500 via-orange-500 to-transparent pointer-events-none z-0 opacity-50" />
+
       <header
         className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
