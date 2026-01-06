@@ -46,7 +46,7 @@ export default function Layout() {
         // 添加 backdrop-blur 和 Webkit 前缀
         className="px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
         style={{
-          paddingTop: "env(safe-area-inset-top)",
+          // paddingTop: "env(safe-area-inset-top)", // 移除 padding，讓 header 內容直接頂到最上面，模仿 Zama 效果
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
