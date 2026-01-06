@@ -38,13 +38,20 @@ export default function LayoutTest() {
           </button>
           <div className="flex items-center gap-2">
             <Logo className="h-8 w-auto" />
-            <span className="font-bold">Layout Test (With Outlet)</span>
+            <span className="font-bold">Layout Test (Fixed)</span>
           </div>
         </div>
       </header>
 
-      {/* Main Flex Container */}
-      <div className="relative flex w-full min-h-screen">
+      {/* 
+          CRITICAL FIX: 
+          Remove "relative" from this flex container.
+          If this container is 'relative', its top edge might be respecting the document flow 
+          (which might be pushed down by something else, though theoretically it shouldn't be).
+          
+          More importantly, we want 'main' to be able to go to the very top.
+      */}
+      <div className="flex w-full min-h-screen">
         {/* Full-height divider line (Desktop) */}
         <div
           className="absolute left-0 top-0 bottom-0 hidden md:block w-px bg-white/20 pointer-events-none z-0"
@@ -58,10 +65,8 @@ export default function LayoutTest() {
         <aside
           className={cn(
             "hidden md:block md:shrink-0 border-r border-white/20 bg-gray-800",
-            // Note: mimicking Layout.tsx sticky behavior exactly
-            "md:sticky md:top-[calc(4rem+env(safe-area-inset-top))]",
-            "md:h-[calc(100dvh-4rem-env(safe-area-inset-top))]",
-            "md:backdrop-blur",
+            "md:sticky md:top-0",
+            "md:h-screen",
             "transition-[width] duration-200 ease-out",
             collapsed ? "md:w-[70px]" : "md:w-[280px]"
           )}
@@ -77,7 +82,7 @@ export default function LayoutTest() {
         </aside>
 
         {/* Sidebar Toggle (Desktop) */}
-        <div className="relative hidden md:block md:sticky md:top-[calc(4rem+env(safe-area-inset-top))] md:h-[calc(100dvh-4rem-env(safe-area-inset-top))] w-px z-10">
+        <div className="relative hidden md:block md:sticky md:top-0 md:h-screen w-px z-10">
           <button
             type="button"
             onClick={() => setCollapsed((v) => !v)}
@@ -92,13 +97,12 @@ export default function LayoutTest() {
           </button>
         </div>
 
-        {/* Main Content Area */}
         {/* 
-            Update: Added 'flex flex-col relative' 
-            Added debug border (red) to see where 'main' actually starts.
+            Main Content Area 
+            - Removed 'relative' from here to see if that helps.
+            - Kept border-red-500 for debugging.
         */}
-        <main className="min-w-0 flex-1 flex flex-col relative border-2 border-red-500">
-          {/* Outlet Renders Here */}
+        <main className="min-w-0 flex-1 flex flex-col border-2 border-red-500">
           <Outlet />
         </main>
       </div>
