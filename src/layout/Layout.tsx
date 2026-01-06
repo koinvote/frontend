@@ -39,18 +39,12 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-bg text-(--color-primary)">
+    <div className="bg-bg text-(--color-primary)">
       {/* Top bar */}
       <header
         // 使用 CSS 变量 --header-bg 自动适应 Dark/Light 模式
         // 添加 backdrop-blur 和 Webkit 前缀
         className="px-2 top-0 z-40 w-full border-b border-border text-(--color-primary)"
-        style={{
-          // paddingTop: "env(safe-area-inset-top)", // 移除 padding，讓 header 內容直接頂到最上面，模仿 Zama 效果
-          backgroundColor: "var(--header-bg)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
-        }}
       >
         <div className="flex h-14 w-full items-center md:h-16 md:px-4">
           <button
