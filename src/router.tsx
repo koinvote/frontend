@@ -1,10 +1,9 @@
-// router.tsx (or whatever your router file is)
+// router.tsx
 import { createBrowserRouter } from "react-router";
 import { Root } from "./Root";
 import { ErrorPage } from "@/error";
-// public layout + pages
 import Layout from "@/layout/Layout";
-import LayoutTest from "@/layout/LayoutTest"; // Import the new test layout
+import LayoutTest from "@/layout/LayoutTest";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Chargesnrefunds from "@/pages/chargesnrefunds";
@@ -15,9 +14,7 @@ import Subscribe from "@/pages/subscribe";
 import Support from "@/pages/support";
 import VerificaionTool from "@/pages/verificaionTool";
 import TermsOfRewardDistribution from "./pages/terms/TermsOfRewardDistribution";
-
 import ComingSoon from "./pages/comingSoon";
-
 import CreateEvent from "@/pages/create-event/CreateEvent";
 import PreviewEvent from "@/pages/create-event/PreviewEvent";
 import ConfirmSign from "@/pages/create-event/ConfirmSign";
@@ -25,7 +22,7 @@ import ConfirmPay from "@/pages/create-event/ConfirmPay";
 import EventDetail from "@/pages/event-detail";
 import TestSafeArea from "@/pages/TestSafeArea";
 
-// admin
+// Admin imports...
 import AdminLayout from "@/layout/AdminLayout";
 import AdminLoginPage from "@/admin/pages/login";
 import AdminRewardRulesPage from "@/admin/pages/rewardRules";
@@ -39,10 +36,7 @@ const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
 
 const publicChildren = isComingSoonMode
   ? [
-      // public home -> coming soon
       { index: true, element: <ComingSoon /> },
-
-      // IMPORTANT: wildcard only inside Layout => does NOT affect /admin/*
       { path: "*", element: <ComingSoon /> },
     ]
   : [
@@ -64,9 +58,27 @@ const publicChildren = isComingSoonMode
       { path: "preview-event", element: <PreviewEvent /> },
       { path: "confirm-sign/:eventId", element: <ConfirmSign /> },
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
-      // Event detail route - placed before other routes to ensure proper matching
       { path: "event/:eventId", element: <EventDetail /> },
     ];
+
+// Test Page Component for LayoutTest
+const LayoutTestPage = () => (
+  <div className="w-full bg-teal-600 text-white min-h-[200vh]">
+    <div className="pt-24 px-4">
+      <h1 className="text-2xl font-bold mb-4">Outlet Content Test</h1>
+      <p className="mb-4">
+        This content is rendered via &lt;Outlet /&gt;.
+        <br />
+        Background color is on this child component.
+      </p>
+      {Array.from({ length: 30 }).map((_, i) => (
+        <div key={i} className="mb-4 p-4 border border-white/20 rounded">
+          Child Content Row {i + 1}
+        </div>
+      ))}
+    </div>
+  </div>
+);
 
 export const router = createBrowserRouter([
   {
@@ -74,13 +86,10 @@ export const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { path: "test-safe-area", element: <TestSafeArea /> },
-      // 新增 Layout Test 路由
       {
         path: "layout-test",
         element: <LayoutTest />,
-        children: [
-          { index: true, element: <div>Child Page Content Here</div> },
-        ],
+        children: [{ index: true, element: <LayoutTestPage /> }],
       },
       { path: "admin/login", element: <AdminLoginPage /> },
       {
