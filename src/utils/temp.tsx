@@ -53,10 +53,10 @@ export default function Layout() {
 
   return (
     // 1. Root Container
-    <div className=" w-full min-h-screen">
+    <div className="relative w-full min-h-screen">
       {/* 2. Header */}
       <header
-        className="top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
+        className="absolute top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
@@ -120,7 +120,7 @@ export default function Layout() {
       </header>
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-screen">
+      <div className="relative flex w-full min-h-screen md:pt-16">
         {/* Full-height divider line (Desktop Only) */}
         {isDesktop && (
           <div
