@@ -32,6 +32,7 @@ import type { AddressValidationStatus } from "./types/index";
 
 import { useTranslation } from "react-i18next";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { useHomeStore } from "@/stores/homeStore";
 import { satsToBtc } from "@/utils/formatter";
 
 type PreviewEventState = {
@@ -75,22 +76,18 @@ const normalizeTag = (raw: string) => {
   const cleaned = noHash.replace(/[^\w]/g, "");
 
   if (!cleaned) return null;
-  return cleaned.slice(0, 20); // 單一 tag 最多 20
+  return cleaned.slice(0, 20);
 };
 
-// Helper function to add line breaks after periods for tooltip text
 const formatTooltipText = (text: string) => {
-  // Split by period followed by space
   const parts = text.split(/(\.\s+)/);
   const result: React.ReactNode[] = [];
 
   parts.forEach((part, index) => {
     if (part === "") return;
 
-    // If this part is a period followed by space, add period and line break
     if (part.match(/^\.\s+$/)) {
       result.push(".");
-      // Only add line break if not the last part
       if (index < parts.length - 1) {
         result.push(<br key={`br-${index}`} />);
       }
@@ -108,16 +105,7 @@ export default function CreateEvent() {
   const location = useLocation();
   const isFromCreateEventRef = useRef(false);
 
-  // Tooltip hooks for response type options
-  const singleChoiceTooltip = useTooltipWithClick();
-  const openEndedTooltip = useTooltipWithClick();
-  // Tooltip hooks for other tooltips
-  const creatorAddressTooltip = useTooltipWithClick();
-  const enablePreheatTooltip = useTooltipWithClick();
-
-  // 检查是否是从 CreateEvent 页面再次进入的
   useEffect(() => {
-    // 检查 sessionStorage 中是否有标记
     const fromCreateEvent = sessionStorage.getItem("fromCreateEvent");
     if (fromCreateEvent === "true") {
       isFromCreateEventRef.current = true;
@@ -127,17 +115,12 @@ export default function CreateEvent() {
     }
   }, [location.pathname]);
 
-  const [isDesktop, setIsDesktop] = useState(false);
+  const { isDesktop } = useHomeStore();
 
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
+  const singleChoiceTooltip = useTooltipWithClick({ singleLine: isDesktop });
+  const openEndedTooltip = useTooltipWithClick({ singleLine: isDesktop });
+  const creatorAddressTooltip = useTooltipWithClick({ singleLine: isDesktop });
+  const enablePreheatTooltip = useTooltipWithClick();
 
   const ACTIVE_BTC_NETWORK =
     import.meta.env.MODE === "development" ? Network.mainnet : Network.testnet;
@@ -807,7 +790,7 @@ export default function CreateEvent() {
   }, [totalHashtagChars]);
 
   return (
-    <div className="flex-col flex items-center justify-center w-full px-1 md:px-0">
+    <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
       <div className="h-[50px] w-full relative">
         <button
           type="button"
@@ -845,11 +828,8 @@ export default function CreateEvent() {
                 arrow={{ pointAtCenter: true }}
                 {...creatorAddressTooltip.tooltipProps}
                 overlayInnerStyle={{
-                  width: isDesktop ? "max-content" : undefined,
-                  maxWidth: isDesktop
-                    ? "min(800px, calc(100vw - 32px))"
-                    : "min(300px, calc(100vw - 32px))",
-                  whiteSpace: isDesktop ? "nowrap" : "normal",
+                  // 合并 hook 返回的 overlayInnerStyle（包含 singleLine 时的宽度自适应设置）
+                  ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
                 }}
               >
                 <span
@@ -900,6 +880,7 @@ export default function CreateEvent() {
               required
               type="text"
               value={title}
+              maxLength={120}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t("createEvent.titlePlaceholder")}
               className="w-full rounded-xl border border-border bg-white px-3 py-2
@@ -923,7 +904,11 @@ export default function CreateEvent() {
               maxLength={500}
               rows={3}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                if (e.target.value.length <= 500) {
+                  setDescription(e.target.value);
+                }
+              }}
               placeholder={t("createEvent.descriptionPlaceholder")}
               className={`w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary

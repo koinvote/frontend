@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 
 /**
  * Custom hook for Tooltip with click and hover interactions
@@ -11,7 +11,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
  *
  * @returns Object containing tooltip state and event handlers
  */
-export function useTooltipWithClick() {
+interface UseTooltipWithClickOptions {
+  singleLine?: boolean;
+}
+
+export function useTooltipWithClick(options?: UseTooltipWithClickOptions) {
+  const { singleLine = false } = options || {};
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipOpenedByClick, setTooltipOpenedByClick] = useState(false);
   const triggerRef = useRef<HTMLElement | null>(null);
@@ -102,11 +107,31 @@ export function useTooltipWithClick() {
     }
   }, [tooltipOpenedByClick, tooltipOpen]);
 
+  // 使用 useMemo 确保样式会根据 singleLine 的变化更新
+  // 当 singleLine 为 true 时，设置 whiteSpace 为 nowrap，并让宽度自动适应内容
+  const overlayStyle = useMemo(
+    () => (singleLine ? { whiteSpace: "nowrap" } : undefined),
+    [singleLine]
+  );
+
+  const overlayInnerStyle = useMemo(
+    () =>
+      singleLine
+        ? {
+            whiteSpace: "nowrap",
+            width: "max-content",
+          }
+        : undefined,
+    [singleLine]
+  );
+
   return {
     tooltipProps: {
       trigger: [] as ("hover" | "focus" | "click" | "contextMenu")[],
       open: tooltipOpen,
       onOpenChange: handleOpenChange,
+      overlayStyle,
+      overlayInnerStyle,
     },
     triggerProps: {
       ref: (node: HTMLElement | null) => {

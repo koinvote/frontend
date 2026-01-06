@@ -99,11 +99,9 @@ export default function Layout() {
               className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
               onClick={() => {
                 if (location.pathname === "/create-event") {
-                  sessionStorage.setItem("fromCreateEvent", "true");
-                  navigate("/");
-                } else {
-                  navigate("/create-event");
+                  return;
                 }
+                navigate("/create-event");
               }}
             >
               <span className="md:hidden">{t("layout.createEvent")}</span>
