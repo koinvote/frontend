@@ -63,7 +63,7 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   search: "",
   debouncedSearch: "",
   sortField: "time",
-  sortOrder: "desc",
+  sortOrder: "asc",
   activeHashtag: null,
 
   events: [],
@@ -138,7 +138,7 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
       debouncedSearch: "",
       activeHashtag: null,
       sortField: "time",
-      sortOrder: "desc",
+      sortOrder: "asc", // 升序：事件快结束的排第一
       offset: 0,
     })),
 

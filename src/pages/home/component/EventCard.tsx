@@ -24,7 +24,6 @@ interface EventCardProps {
 
 function formatCountdown(event: EventSummary) {
   if (event.status === EventStatus.ACTIVE) {
-    // 使用 formatOngoingCountdown 显示详细的倒计时（包含秒数）
     return formatOngoingCountdown(event.deadline_at);
   }
 
@@ -177,12 +176,27 @@ function ReplyItem({ reply, isLast }: ReplyItemProps) {
 
 export function EventCard({ event, onClick }: EventCardProps) {
   const { showToast } = useToast();
-  const countdown = formatCountdown(event);
+  const [countdown, setCountdown] = useState(() => formatCountdown(event));
 
-  // 使用 Tooltip hook（用于 reward countdown）
+  useEffect(() => {
+    if (event.status !== EventStatus.ACTIVE) {
+      setCountdown(formatCountdown(event));
+      return;
+    }
+
+    const updateCountdown = () => {
+      setCountdown(formatOngoingCountdown(event.deadline_at));
+    };
+
+    updateCountdown();
+
+    const interval = setInterval(updateCountdown, 1000);
+
+    return () => clearInterval(interval);
+  }, [event]);
+
   const { tooltipProps, triggerProps } = useTooltipWithClick();
 
-  // 为 footer 中的 tooltip 创建独立的 hooks
   const {
     tooltipProps: participantsTooltipProps,
     triggerProps: participantsTriggerProps,
@@ -191,7 +205,6 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const { tooltipProps: amountTooltipProps, triggerProps: amountTriggerProps } =
     useTooltipWithClick();
 
-  // 根据 amount_satoshi 排序 top_replies（降序）
   const sortedReplies = [...event.top_replies].sort((a, b) => {
     const amountA = parseFloat(a.amount_satoshi || "0");
     const amountB = parseFloat(b.amount_satoshi || "0");
