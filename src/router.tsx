@@ -19,6 +19,7 @@ import PreviewEvent from "@/pages/create-event/PreviewEvent";
 import ConfirmSign from "@/pages/create-event/ConfirmSign";
 import ConfirmPay from "@/pages/create-event/ConfirmPay";
 import EventDetail from "@/pages/event-detail";
+import ReplyPage from "@/pages/reply";
 import TestSafeArea from "@/pages/TestSafeArea";
 
 // Admin imports...
@@ -58,6 +59,7 @@ const publicChildren = isComingSoonMode
       { path: "confirm-sign/:eventId", element: <ConfirmSign /> },
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
       { path: "event/:eventId", element: <EventDetail /> },
+      { path: "event/:eventId/reply", element: <ReplyPage /> },
     ];
 
 export const router = createBrowserRouter([

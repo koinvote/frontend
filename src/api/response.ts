@@ -75,6 +75,12 @@ export interface GetEventListRes {
   limit: number;
 }
 
+export interface EventOption {
+  id: number;
+  option_text: string;
+  order: number;
+}
+
 export interface EventDetailDataRes {
   id: number;
   event_id: string;
@@ -91,6 +97,7 @@ export interface EventDetailDataRes {
   total_reward_satoshi: number; //total reward指的是總獎金
   winner_count: number;
   additional_winner_count: number;
+  max_recipient?: number; // Added based on UI requirement
   duration_hours: number;
   creator_address: string;
   created_at: string;
@@ -98,7 +105,7 @@ export interface EventDetailDataRes {
   deadline_at: string;
   participants_count: number;
   total_stake_satoshi: number; //所有有參與回覆的人，錢包加起來總共有多少餘額
-  options: string[];
+  options: EventOption[] | string[]; // Allow both for compatibility or if backend changes
   top_replies: TopReply[];
   hashtags: string[];
   preheat_hours: number;
@@ -164,7 +171,7 @@ export interface GetReplyPlainTextRes {
   event_id: string;
   btc_address: string;
   plaintext: string;
-  timestamp: number;
+  nonce_timestamp: number; // API doc says 1701612345 (number or string? Example shows 1701612345 in JSON value, can be number)
   random_code: string;
 }
 

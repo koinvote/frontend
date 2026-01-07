@@ -8,6 +8,8 @@ import type {
   AdminLoginReq,
   UpdateSystemParametersReq,
   VerifySignatureReq,
+  SubmitReplyReq,
+  GenerateReplyPlaintextReq,
 } from "./request.ts";
 
 import type {
@@ -99,13 +101,15 @@ export const API = {
       `/events/${eventId}/deposit-status`
     ),
 
-  getReplyPlainText: (eventId: string) =>
-    get<ApiResponse<GetReplyPlainTextRes>, void>(
-      `/events/${eventId}/reply-plaintext`
+  generateReplyPlaintext: () =>
+    post<ApiResponse<GetReplyPlainTextRes>, GenerateReplyPlaintextReq>(
+      "/replies/generate-plaintext"
     ),
   // GET /api/v1/replies?event_id={event_id}
   getListReplies: () =>
     get<ApiResponse<GetListRepliesRes>, GetListRepliesReq>("/replies"),
+
+  submitReply: () => post<ApiResponse<void>, SubmitReplyReq>("/replies"),
 };
 
 // Admin API (requires Bearer token authentication)

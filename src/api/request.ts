@@ -52,3 +52,21 @@ export interface UpdateSystemParametersReq {
 export interface VerifySignatureReq {
   signature: string;
 }
+
+export interface SubmitReplyReq {
+  event_id: string;
+  btc_address: string;
+  content?: string; // For open-ended
+  option_id?: number; // For single-choice
+  plaintext: string;
+  signature: string;
+  nonce_timestamp: string;
+  random_code: string;
+}
+
+export interface GenerateReplyPlaintextReq {
+  event_id: string;
+  btc_address: string;
+  option_id?: number; // For single-choice
+  content?: string; // For open-ended
+}
