@@ -119,7 +119,9 @@ export default function CreateEvent() {
 
   const singleChoiceTooltip = useTooltipWithClick({ singleLine: isDesktop });
   const openEndedTooltip = useTooltipWithClick({ singleLine: isDesktop });
-  const creatorAddressTooltip = useTooltipWithClick({ singleLine: isDesktop });
+  const creatorAddressTooltip = useTooltipWithClick({
+    singleLine: isDesktop
+  });
   const enablePreheatTooltip = useTooltipWithClick();
 
   const ACTIVE_BTC_NETWORK =
@@ -1315,9 +1317,6 @@ export default function CreateEvent() {
                 color="white"
                 arrow={{ pointAtCenter: true }}
                 {...enablePreheatTooltip.tooltipProps}
-                overlayInnerStyle={{
-                  maxWidth: "min(500px, calc(100vw - 32px))",
-                }}
               >
                 <span
                   {...enablePreheatTooltip.triggerProps}
