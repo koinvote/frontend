@@ -168,17 +168,52 @@ export function HomeToolbar() {
           >
             {sortOrder === "asc" ? "↑" : "↓"}
           </button>
-          <select
-            className="cursor-pointer flex-1 md:flex-none h-9 rounded-xl border border-border bg-surface px-3 text-sm md:text-base text-center"
-            value={sortField}
-            onChange={(e) => handleSortChange(e.target.value as HomeSortField)}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value} className="text-center">
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative flex-1 md:flex-none">
+            <select
+              className="cursor-pointer w-full h-9 rounded-xl 
+              border border-border bg-surface px-3 pr-8 text-sm 
+              md:text-base text-center appearance-none 
+              outline-none transition-all"
+              style={{
+                textAlign: "center",
+                textAlignLast: "center",
+              }}
+              value={sortField}
+              onChange={(e) =>
+                handleSortChange(e.target.value as HomeSortField)
+              }
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  className="text-center"
+                  style={{ textAlign: "center" }}
+                >
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {/* 自定义下拉箭头 */}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-secondary"
+              >
+                <path
+                  d="M3 4.5L6 7.5L9 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
       </div>
 

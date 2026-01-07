@@ -153,7 +153,30 @@
     select {
       font-size: 16px !important;
       -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
       -webkit-border-radius: 0;
+    }
+
+    /* 确保 select option 在 macOS 上也居中 */
+    select option {
+      text-align: center;
+      text-align-last: center;
+    }
+
+    /* 为 select 添加统一的样式，确保跨平台一致 */
+    select {
+      background-image: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      outline: none;
+    }
+
+    /* 移除 select 的 focus outline */
+    select:focus {
+      outline: none;
+      border-color: var(--color-border);
     }
 
     * {
