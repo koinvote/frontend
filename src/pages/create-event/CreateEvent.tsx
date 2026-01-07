@@ -120,7 +120,7 @@ export default function CreateEvent() {
   const singleChoiceTooltip = useTooltipWithClick({ singleLine: isDesktop });
   const openEndedTooltip = useTooltipWithClick({ singleLine: isDesktop });
   const creatorAddressTooltip = useTooltipWithClick({
-    singleLine: isDesktop
+    singleLine: isDesktop,
   });
   const enablePreheatTooltip = useTooltipWithClick();
 
@@ -819,8 +819,8 @@ export default function CreateEvent() {
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Creator address */}
           <div>
-            <div className="flex items-center">
-              <label className="block tx-14 lh-20 fw-m text-primary mb-1 mr-1">
+            <div className="flex items-center gap-1 mb-1">
+              <label className="tx-14 lh-20 fw-m text-primary mr-1">
                 {t("createEvent.creatorAddress")}
               </label>
               <Tooltip
@@ -830,13 +830,12 @@ export default function CreateEvent() {
                 arrow={{ pointAtCenter: true }}
                 {...creatorAddressTooltip.tooltipProps}
                 overlayInnerStyle={{
-                  // 合并 hook 返回的 overlayInnerStyle（包含 singleLine 时的宽度自适应设置）
                   ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
                 }}
               >
                 <span
                   {...creatorAddressTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer"
+                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer flex items-center"
                 >
                   ⓘ
                 </span>
