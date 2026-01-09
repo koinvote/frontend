@@ -61,7 +61,8 @@
     "enablePreheat": "Enable Preheat",
     "enablePreheatTooltip": "Preheat lets people see the event before replies open. During this time, the event is visible but replies are disabled.",
     "durationOfEvent": "Duration of this event",
-    "rewardBtcPlaceholderEnabled": "Enter reward (Min {{min}})"
+    "rewardBtcPlaceholderEnabled": "Enter reward (Min {{min}})",
+    "optionPlaceholder": "Option {{n}}"
   },
   "verificationTool": {
     "title": "Verification Guide",
