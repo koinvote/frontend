@@ -1070,18 +1070,28 @@ export default function CreateEvent() {
 
                   return (
                     <div key={index} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={opt}
-                        onChange={(e) =>
-                          handleOptionChange(index, e.target.value)
-                        }
-                        onBlur={() => setOptionsTouched(true)}
-                        placeholder={t("createEvent.optionsPlaceholder")}
-                        className="w-full rounded-xl border border-border bg-white px-3 py-2
-                         tx-14 lh-20 text-black placeholder:text-secondary
-                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
-                      />
+                      <div className="relative w-full">
+                        <input
+                          type="text"
+                          value={opt}
+                          maxLength={20}
+                          onChange={(e) =>
+                            handleOptionChange(index, e.target.value)
+                          }
+                          onBlur={() => setOptionsTouched(true)}
+                          placeholder={t("createEvent.optionsPlaceholder")}
+                          className="w-full rounded-xl border border-border bg-white px-3 py-2
+                           tx-14 lh-20 text-black placeholder:text-secondary
+                           focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
+                        />
+                        <span
+                          className={`tx-12 lh-18 absolute right-3 bottom-1 ${
+                            opt.length >= 20 ? "text-red-500" : "text-secondary"
+                          }`}
+                        >
+                          {opt.length}/20
+                        </span>
+                      </div>
 
                       {/* 減號：有兩個以上 option 才顯示 */}
                       {canRemove && (
