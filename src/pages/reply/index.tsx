@@ -433,7 +433,12 @@ export default function ReplyPage() {
                         checked={selectedOptionId === optionId}
                         onChange={() => setSelectedOptionId(optionId)}
                       />
-                      <span className="text-primary">{optionText}</span>
+                      <span
+                        className="text-primary wrap-break-word whitespace-normal"
+                        style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                      >
+                        {optionText}
+                      </span>
                     </label>
                   );
                 })}
