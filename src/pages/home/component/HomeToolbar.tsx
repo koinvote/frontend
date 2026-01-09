@@ -57,8 +57,7 @@ export function HomeToolbar() {
   };
 
   const handleSortChange = (field: HomeSortField) => {
-    const defaultOrder: HomeSortOrder = field === "time" ? "asc" : "desc";
-    setSort(field, defaultOrder);
+    setSort(field, sortOrder);
   };
 
   // 获取热门标签
