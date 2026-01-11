@@ -23,7 +23,7 @@ export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
   const [isClosing, setIsClosing] = useState(false); // 控制关闭动画
   const [isOpening, setIsOpening] = useState(false); // 控制打开动画
-  const [collapsed, setCollapsed] = useState(false); // desktop sidebar
+  // desktop sidebar state persisted in store
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
@@ -35,7 +35,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { isDesktop, setIsDesktop } = useHomeStore();
+  const { isDesktop, setIsDesktop, collapsed, setCollapsed } = useHomeStore();
 
   useEffect(() => {
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 768);
@@ -207,7 +207,7 @@ export default function Layout() {
             >
               <button
                 type="button"
-                onClick={() => setCollapsed((v) => !v)}
+                onClick={() => setCollapsed(!collapsed)}
                 aria-label={
                   collapsed ? "Expand navigation" : "Collapse navigation"
                 }

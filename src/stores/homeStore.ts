@@ -28,6 +28,7 @@ interface HomeStoreState {
   isError: boolean;
   scrollY: number;
   isDesktop: boolean;
+  collapsed: boolean;
 
   // actions
   setStatus: (status: HomeStatusFilter) => void;
@@ -35,6 +36,7 @@ interface HomeStoreState {
   setDebouncedSearch: (value: string) => void;
   setSort: (field: HomeSortField, order: HomeSortOrder) => void;
   setActiveHashtag: (tag: string | null) => void;
+  setCollapsed: (collapsed: boolean) => void;
 
   setEvents: (
     events: EventSummary[],
@@ -77,6 +79,10 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
   isError: false,
   scrollY: 0,
   isDesktop: false,
+  collapsed:
+    typeof window !== "undefined"
+      ? localStorage.getItem("sidebarCollapsed") === "true"
+      : false,
 
   setStatus: (status) =>
     set(() => ({
@@ -111,6 +117,17 @@ export const useHomeStore = create<HomeStoreState>((set) => ({
       hasMore: true,
       total: 0,
     })),
+  setCollapsed: (collapsed) =>
+    set(() => {
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("sidebarCollapsed", String(collapsed));
+        } catch {
+          // ignore storage errors
+        }
+      }
+      return { collapsed };
+    }),
 
   setEvents: (events, total, hasMore, offset) =>
     set(() => ({
