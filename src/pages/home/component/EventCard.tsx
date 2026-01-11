@@ -195,15 +195,17 @@ export function EventCard({ event, onClick }: EventCardProps) {
     return () => clearInterval(interval);
   }, [event]);
 
+  const { isDesktop } = useHomeStore();
+
   const { tooltipProps, triggerProps } = useTooltipWithClick();
 
   const {
     tooltipProps: participantsTooltipProps,
     triggerProps: participantsTriggerProps,
-  } = useTooltipWithClick();
+  } = useTooltipWithClick({ keepOpenOnClick: !isDesktop });
 
   const { tooltipProps: amountTooltipProps, triggerProps: amountTriggerProps } =
-    useTooltipWithClick();
+    useTooltipWithClick({ keepOpenOnClick: !isDesktop });
 
   const sortedReplies = [...event.top_replies].sort((a, b) => {
     const amountA = parseFloat(a.amount_satoshi || "0");
@@ -214,7 +216,6 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const primaryReply = sortedReplies[0];
   const secondaryReply = sortedReplies[1];
 
-  const { isDesktop } = useHomeStore();
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [showDescriptionToggle, setShowDescriptionToggle] = useState(false);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
