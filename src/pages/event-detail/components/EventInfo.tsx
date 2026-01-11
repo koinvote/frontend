@@ -75,6 +75,23 @@ export function EventInfo({ event }: EventInfoProps) {
   const isCompleted = event.status === EventStatus.COMPLETED;
   const isRewarded = event.event_reward_type === "rewarded";
 
+  // Handle hashtag click - navigate to home with hashtag filter and keep current status tab
+  const handleHashtagClick = useCallback(
+    (rawTag: string) => {
+      const hashtagWithPrefix = rawTag.startsWith("#") ? rawTag : `#${rawTag}`;
+      if (isPreheat) {
+        setStatus("preheat");
+      } else if (isOngoing) {
+        setStatus("ongoing");
+      } else if (isCompleted) {
+        setStatus("completed");
+      }
+      setActiveHashtag(hashtagWithPrefix);
+      navigate("/");
+    },
+    [isPreheat, isOngoing, isCompleted, setStatus, setActiveHashtag, navigate]
+  );
+
   // Reward calculations
   const rewardAmountBtc = useMemo(
     () => satsToBtc(event.initial_reward_satoshi, { suffix: false }),
@@ -282,14 +299,20 @@ export function EventInfo({ event }: EventInfoProps) {
         label: event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:",
         value: (
           <div className="flex flex-wrap gap-2 mt-1">
-            {event.hashtags.map((tag, index) => (
-              <span
-                key={index}
-                className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm"
-              >
-                #{tag}
-              </span>
-            ))}
+            {event.hashtags.map((tag, index) => {
+              const hashtagWithPrefix = tag.startsWith("#") ? tag : `#${tag}`;
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={() => handleHashtagClick(tag)}
+                  className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
+                  aria-label={`Filter by ${hashtagWithPrefix}`}
+                >
+                  {hashtagWithPrefix}
+                </button>
+              );
+            })}
           </div>
         ),
       });
@@ -312,6 +335,7 @@ export function EventInfo({ event }: EventInfoProps) {
     event.hashtags,
     showToast,
     handleAddressClick,
+    handleHashtagClick,
   ]);
 
   return (
@@ -466,18 +490,9 @@ export function EventInfo({ event }: EventInfoProps) {
                     <button
                       key={index}
                       type="button"
-                      onClick={() => {
-                        if (isPreheat) {
-                          setStatus("preheat");
-                        } else if (isOngoing) {
-                          setStatus("ongoing");
-                        } else if (isCompleted) {
-                          setStatus("completed");
-                        }
-                        setActiveHashtag(hashtagWithPrefix);
-                        navigate("/");
-                      }}
+                      onClick={() => handleHashtagClick(tag)}
                       className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
+                      aria-label={`Filter by ${hashtagWithPrefix}`}
                     >
                       {hashtagWithPrefix}
                     </button>

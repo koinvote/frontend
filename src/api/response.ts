@@ -56,17 +56,23 @@ export interface TopReplyRes {
 
 export interface EventListDataRes {
   id: number;
+  event_type: EventType;
   event_id: string;
   title: string;
   description: string;
   status: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8; // 1=pending, 2=preheat, 3=active, 4=ended(已結束，等待派獎), 5=completed(已結束，派獎完成), 6=cancelled, 7=refunded, 8=expired
   hashtags: string[];
   created_at: string;
+  preheat_start_at: string;
+  started_at: string;
   deadline_at: string;
+  ended_at: string;
+  updated_at: string;
   total_reward_satoshi: number;
   participants_count: number;
   total_stake_satoshi: number;
   top_replies: TopReplyRes[];
+  options: EventOption[] | string[]; // Allow both for compatibility or if backend changes
 }
 
 export interface GetEventListRes {
@@ -79,6 +85,8 @@ export interface EventOption {
   id: number;
   option_text: string;
   order: number;
+  weight_percent: number;
+  amount_satoshi: number;
 }
 
 export interface EventDetailDataRes {
