@@ -1,6 +1,7 @@
 import { NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/utils/style";
+import { Tooltip } from "antd";
 
 import AboutIcon from "@/assets/icons/menu-about.svg?react";
 import SupportIcon from "@/assets/icons/menu-support.svg?react";
@@ -69,17 +70,33 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           }
           onClick={onItemClick}
         >
-          <span
-            className={cn(
-              "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
-              "text-current"
-            )}
-          >
-            <Icon
-              className="!h-5 !w-5"
-              style={{ width: "1.25rem", height: "1.25rem" }}
-            />
-          </span>
+          {collapsed ? (
+            <Tooltip placement="right" title={t(key)}>
+              <span
+                className={cn(
+                  "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                  "text-current"
+                )}
+              >
+                <Icon
+                  className="!h-5 !w-5"
+                  style={{ width: "1.25rem", height: "1.25rem" }}
+                />
+              </span>
+            </Tooltip>
+          ) : (
+            <span
+              className={cn(
+                "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                "text-current"
+              )}
+            >
+              <Icon
+                className="!h-5 !w-5"
+                style={{ width: "1.25rem", height: "1.25rem" }}
+              />
+            </span>
+          )}
 
           <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
         </NavLink>

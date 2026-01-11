@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 
 interface CustomTooltipProps {
   title: string;
+  trigger?: "hover" | "click" | "both";
   placement?:
     | "top"
     | "bottom"
@@ -26,6 +27,7 @@ interface CustomTooltipProps {
 
 export function CustomTooltip({
   title,
+  trigger = "both",
   placement = "top",
   color = "white",
   children,
@@ -95,6 +97,9 @@ export function CustomTooltip({
   }, [isOpenedByClick]);
 
   const handleClick = (e: React.MouseEvent) => {
+    if (trigger === "hover") {
+      return;
+    }
     e.stopPropagation();
     e.preventDefault(); // 阻止默认行为，防止触发 label 的点击
     if (isOpenedByClick && isOpen) {
@@ -201,10 +206,10 @@ export function CustomTooltip({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         style={{ display: "inline-block", cursor: "pointer" }}
-        role="button"
-        tabIndex={0}
+        role={trigger === "hover" ? undefined : "button"}
+        tabIndex={trigger === "hover" ? -1 : 0}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
+          if (trigger !== "hover" && (e.key === "Enter" || e.key === " ")) {
             e.preventDefault();
             handleClick(e as unknown as React.MouseEvent);
           }

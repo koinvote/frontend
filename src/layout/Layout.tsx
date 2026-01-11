@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguagesStore } from "@/stores/languagesStore";
 import { useHomeStore } from "@/stores/homeStore";
+import { Tooltip } from "antd";
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
@@ -200,21 +201,26 @@ export default function Layout() {
         {/* Sidebar Toggle (Desktop Only) */}
         {isDesktop && (
           <div className="relative sticky top-[calc(4rem+var(--sat))] h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
-            <button
-              type="button"
-              onClick={() => setCollapsed((v) => !v)}
-              aria-label={
-                collapsed ? "Expand navigation" : "Collapse navigation"
-              }
-              className={cn(
-                "absolute left-1/2 -translate-x-1/2 mt-3",
-                "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
-                "border border-border bg-surface",
-                "shadow hover:bg-surface/80 transition-colors cursor-pointer"
-              )}
+            <Tooltip
+              placement="right"
+              title={collapsed ? "Expand navigation" : "Collapse navigation"}
             >
-              {collapsed ? <RightArrow /> : <LeftArrow />}
-            </button>
+              <button
+                type="button"
+                onClick={() => setCollapsed((v) => !v)}
+                aria-label={
+                  collapsed ? "Expand navigation" : "Collapse navigation"
+                }
+                className={cn(
+                  "absolute left-1/2 -translate-x-1/2 mt-3",
+                  "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
+                  "border border-border bg-surface",
+                  "shadow hover:bg-surface/80 transition-colors cursor-pointer"
+                )}
+              >
+                {collapsed ? <RightArrow /> : <LeftArrow />}
+              </button>
+            </Tooltip>
           </div>
         )}
 
