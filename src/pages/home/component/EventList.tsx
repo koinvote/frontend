@@ -2,9 +2,11 @@ import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useHomeEvents } from "@/hooks/useHomeEvents";
 import { EventCard } from "@/pages/home/component/EventCard";
+import { useHomeStore } from "@/stores/homeStore";
 
 export function EventList() {
   const navigate = useNavigate();
+  const { setScrollY } = useHomeStore();
   const { events, isLoading, isError, hasMore, loadMore, reload } =
     useHomeEvents();
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -65,6 +67,8 @@ export function EventList() {
           key={event.event_id}
           event={event}
           onClick={() => {
+            // Save scroll position before navigation
+            setScrollY(window.scrollY);
             navigate(`/event/${event.event_id}`);
           }}
         />
