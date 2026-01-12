@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API, type ApiResponse } from "@/api";
 import { ReplySortBy } from "@/api/types";
 import type { EventDetailDataRes } from "@/api/response";
@@ -14,6 +14,10 @@ import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 const EventDetail = () => {
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [eventId]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
