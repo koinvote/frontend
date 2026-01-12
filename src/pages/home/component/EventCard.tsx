@@ -197,7 +197,9 @@ export function EventCard({ event, onClick }: EventCardProps) {
 
   const { isDesktop } = useHomeStore();
 
-  const { tooltipProps, triggerProps } = useTooltipWithClick();
+  const { tooltipProps, triggerProps } = useTooltipWithClick({
+    keepOpenOnClick: !isDesktop,
+  });
 
   const {
     tooltipProps: participantsTooltipProps,
@@ -212,6 +214,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
     const amountB = parseFloat(b.amount_satoshi || "0");
     return amountB - amountA; // 降序排序
   });
+  console.log("sortedReplies", sortedReplies);
 
   const primaryReply = sortedReplies[0];
   const secondaryReply = sortedReplies[1];
@@ -323,21 +326,23 @@ export function EventCard({ event, onClick }: EventCardProps) {
               triggerNode.parentElement || document.body
             }
             autoAdjustOverflow={false}
-            overlayInnerStyle={{
-              maxWidth: isDesktop
-                ? "max-content"
-                : "min(300px, calc(100vw - 32px))",
-              whiteSpace: isDesktop ? "nowrap" : "normal",
-              width: isDesktop ? "max-content" : undefined,
+            styles={{
+              container: {
+                maxWidth: isDesktop
+                  ? "max-content"
+                  : "min(300px, calc(100vw - 32px))",
+                whiteSpace: isDesktop ? "nowrap" : "normal",
+                width: isDesktop ? "max-content" : undefined,
+              },
             }}
             overlayClassName="event-card-tooltip"
           >
             <div
               {...triggerProps}
-              className="flex flex-row md:flex-col items-center md:items-start 
+              className="flex flex-row md:flex-col items-center md:items-end 
           gap-4 md:gap-1 text-xs md:text-sm text-secondary"
             >
-              <span className="font-semibold text-accent flex items-center gap-1">
+              <span className="font-semibold text-accent flex items-center gap-1 ">
                 <BTCIcon />
                 {event.total_reward_btc} BTC
               </span>
@@ -380,10 +385,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       {(primaryReply || secondaryReply) && (
         <section
           data-top-replies
-          className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm"
-          style={{
-            backgroundColor: "rgba(var(--color-gray-450-rgb), 0.5)",
-          }}
+          className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm transition-colors bg-[rgba(var(--color-gray-450-rgb),0.5)] md:hover:bg-[rgba(var(--color-gray-450-rgb),0.7)]"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-1 text-[11px] md:text-xs text-secondary">
