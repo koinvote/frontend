@@ -352,6 +352,10 @@ export default function ReplyPage() {
               value={btcAddress}
               onChange={(e) => setBtcAddress(e.target.value)}
               placeholder="Please enter your BTC address"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               className={cn(
                 "w-full px-3 py-2 rounded-lg border bg-bg text-primary tx-14 outline-none focus:ring-2 transition-all",
                 btcAddress && !isAddressValid

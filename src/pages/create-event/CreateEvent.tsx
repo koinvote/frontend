@@ -848,6 +848,10 @@ export default function CreateEvent() {
               value={creatorAddress}
               onChange={handleCreatorAddressChange}
               placeholder={t("createEvent.creatorAddressPlaceholder")}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
               className={`w-full rounded-xl border border-border bg-white px-3 py-2
     tx-14 lh-20 text-black placeholder:text-secondary
     focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
@@ -1079,7 +1083,9 @@ export default function CreateEvent() {
                             handleOptionChange(index, e.target.value)
                           }
                           onBlur={() => setOptionsTouched(true)}
-                          placeholder={t('createEvent.optionPlaceholder', { n: index + 1 })}
+                          placeholder={t("createEvent.optionPlaceholder", {
+                            n: index + 1,
+                          })}
                           className="w-full rounded-xl border border-border bg-white px-3 py-2
                            tx-14 lh-20 text-black placeholder:text-secondary
                            focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
