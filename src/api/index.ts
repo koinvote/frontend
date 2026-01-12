@@ -29,38 +29,38 @@ import type {
 
 export function get<R = unknown, D = unknown>(path: string) {
   return (data?: D, config: RequestConf = {}) =>
-    http.get<R>(path, { ...config, params: data });
+    http.get<R>(path, { ...config, params: data }) as Promise<R>;
 }
 
 export function post<R = unknown, D = unknown>(path: string) {
   return (data?: D, config: RequestConf = {}) =>
-    http.post<R>(path, data, config);
+    http.post<R>(path, data, config) as Promise<R>;
 }
 
 export function del<R = unknown, D = unknown>(path: TemplateStringsArray) {
   return (data?: D, config: RequestConf = {}) =>
-    http.delete<R>(path[0], { ...config, params: data });
+    http.delete<R>(path[0], { ...config, params: data }) as Promise<R>;
 }
 
 export function patch<R = unknown, D = unknown>(path: TemplateStringsArray) {
   return (data?: D, config: RequestConf = {}) =>
-    http.patch<R>(path[0], data, config);
+    http.patch<R>(path[0], data, config) as Promise<R>;
 }
 
 // Admin API helper functions (using adminHttp with token)
 export function adminGet<R = unknown, D = unknown>(path: string) {
   return (data?: D, config: RequestConf = {}) =>
-    adminHttp.get<R>(path, { ...config, params: data });
+    adminHttp.get<R>(path, { ...config, params: data }) as Promise<R>;
 }
 
 export function adminPost<R = unknown, D = unknown>(path: string) {
   return (data?: D, config: RequestConf = {}) =>
-    adminHttp.post<R>(path, data, config);
+    adminHttp.post<R>(path, data, config) as Promise<R>;
 }
 
 export function adminPut<R = unknown, D = unknown>(path: string) {
   return (data?: D, config: RequestConf = {}) =>
-    adminHttp.put<R>(path, data, config);
+    adminHttp.put<R>(path, data, config) as Promise<R>;
 }
 
 export interface ApiResponse<T> {

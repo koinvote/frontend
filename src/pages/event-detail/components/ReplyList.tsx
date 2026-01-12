@@ -2,14 +2,18 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { API, type ApiResponse } from "@/api";
 import { ReplySortBy } from "@/api/types";
-import type { Reply, GetListRepliesRes } from "@/api/response";
+import type { Reply, GetListRepliesRes, EventOption } from "@/api/response";
 import { satsToBtc } from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
+import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
+import ReportIcon from "@/assets/icons/report.svg?react";
+import { Divider } from "./Divider";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -19,6 +23,7 @@ interface ReplyListProps {
   search?: string;
   sortBy?: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME;
   order?: "desc" | "asc";
+  options?: EventOption[] | string[];
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -49,7 +54,7 @@ function truncateAddress(
   return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
 }
 
-function truncateText(text: string, maxLength = 50): string {
+function truncateText(text: string, maxLength = 20): string {
   if (text.length <= maxLength) {
     return text;
   }
@@ -61,6 +66,7 @@ export function ReplyList({
   search = "",
   sortBy = ReplySortBy.BALANCE,
   order = "desc",
+  options = [],
 }: ReplyListProps) {
   const { showToast } = useToast();
   const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
@@ -81,6 +87,7 @@ export function ReplyList({
         page,
         limit,
       })) as unknown as ApiResponse<GetListRepliesRes>;
+      console.log("response", response);
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch replies");
       }
@@ -89,7 +96,7 @@ export function ReplyList({
     enabled: !!eventId,
   });
 
-  const handleCopy = async (text: string, label: string) => {
+  const handleCopy = useDebouncedClick(async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
       showToast("success", `${label} copied to clipboard`);
@@ -97,7 +104,7 @@ export function ReplyList({
       console.error(`Failed to copy ${label}:`, error);
       showToast("error", `Failed to copy ${label}`);
     }
-  };
+  });
 
   if (isLoading) {
     return <PageLoading />;
@@ -127,7 +134,12 @@ export function ReplyList({
   return (
     <div className="flex flex-col gap-4">
       {repliesData.replies.map((reply) => (
-        <ReplyItem key={reply.id} reply={reply} onCopy={handleCopy} />
+        <ReplyItem
+          key={reply.id}
+          reply={reply}
+          onCopy={handleCopy}
+          options={options}
+        />
       ))}
     </div>
   );
@@ -135,87 +147,136 @@ export function ReplyList({
 
 interface ReplyItemProps {
   reply: Reply;
-  onCopy: (text: string, label: string) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onCopy: any; // Using any for debounced function return type compatibility
+  options: EventOption[] | string[];
 }
 
-function ReplyItem({ reply, onCopy }: ReplyItemProps) {
-  const balanceBtc = satsToBtc(reply.balance_at_current_satoshi, {
+function ReplyItem({ reply, onCopy, options }: ReplyItemProps) {
+  const balanceBtc = satsToBtc(reply.balance_at_reply_satoshi, {
     suffix: false,
   });
   const timeAgo = formatRelativeTime(reply.created_at);
 
+  // Helper to get option text
+  const getOptionText = (optionId: number) => {
+    if (!options || options.length === 0) return `Option ${optionId}`;
+
+    // Handle EventOption[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const foundOption = (options as any[]).find((opt) =>
+      typeof opt === "object" ? opt.id === optionId : false
+    );
+
+    if (foundOption) return foundOption.option_text;
+
+    // Fallback if options are strings or not found by ID (though with API they should be objects with IDs)
+    // If it's a simple string array, we might assume 1-based index maps to array index
+    if (typeof options[0] === "string") {
+      return options[optionId - 1] || `Option ${optionId}`;
+    }
+
+    return `Option ${optionId}`;
+  };
+
+  const displayText =
+    reply.content ||
+    (reply.option_id !== undefined ? getOptionText(reply.option_id) : "");
+
   return (
-    <div className="rounded-xl border border-border bg-bg p-4 md:p-6">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+    <div className="rounded-xl border border-border bg-bg p-4 md:p-6 relative group flex flex-col h-full">
+      <div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-4 flex-1">
         {/* Left Column: Balance and Content */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-base md:text-lg font-semibold text-primary">
               {balanceBtc} BTC
             </span>
             {reply.is_reply_valid && (
-              <span className="text-green-500 text-xs">✓</span>
+              <span className="text-green-500 text-xs">
+                <ReplyValidateIcon className="w-4 h-4 text-current" />
+              </span>
             )}
           </div>
-          {(reply.content || reply.option_id !== undefined) && (
-            <p className="text-sm md:text-base text-primary mb-2">
-              {reply.content ||
-                (reply.option_id !== undefined
-                  ? `Option ${reply.option_id}`
-                  : "")}
+          {displayText && (
+            <p className="text-sm md:text-base text-primary mb-4 break-words">
+              {displayText}
             </p>
           )}
+
+          <div className="flex-1"></div>
+
+          <button
+            type="button"
+            className="flex items-center gap-1 text-secondary hover:text-primary transition-colors mt-2"
+            onClick={() => {
+              /* Logic to be added later */
+            }}
+          >
+            <ReportIcon className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Right Column: Time and Details */}
-        <div className="flex flex-col items-start md:items-end gap-3">
-          <span className="text-xs md:text-sm text-secondary">{timeAgo}</span>
+        <div className="flex flex-col items-start md:items-end gap-3 min-w-[280px]">
+          <span className="text-xs md:text-sm text-secondary text-right w-full">
+            {timeAgo}
+          </span>
 
-          {/* Details */}
-          <div className="flex flex-col gap-2 text-xs md:text-sm">
-            <div className="flex items-center gap-2">
-              <span className="text-secondary">Bitcoin Address:</span>
-              <span className="text-primary font-mono">
-                {truncateAddress(reply.btc_address)}
-              </span>
-              <button
-                type="button"
-                onClick={() => onCopy(reply.btc_address, "Bitcoin Address")}
-                className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
-                aria-label="Copy Bitcoin address"
-              >
-                <CopyIcon className="w-4 h-4 text-current" />
-              </button>
+          <div className="flex flex-col gap-4 w-full">
+            {/* Bitcoin Address */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-secondary">Bitcoin Address</span>
+              <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
+                <span className="text-xs text-primary font-mono truncate">
+                  {truncateAddress(reply.btc_address)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onCopy(reply.btc_address, "Bitcoin Address")}
+                  className="flex-shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
+                >
+                  <CopyIcon className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-secondary">Bitcoin Signature:</span>
-              <span className="text-primary font-mono">
-                {truncateText(reply.signature, 20)}
-              </span>
-              <button
-                type="button"
-                onClick={() => onCopy(reply.signature, "Bitcoin Signature")}
-                className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
-                aria-label="Copy Bitcoin signature"
-              >
-                <CopyIcon className="w-4 h-4 text-current" />
-              </button>
+            <Divider />
+
+            {/* Bitcoin Signature */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-secondary">Bitcoin Signature</span>
+              <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
+                <span className="text-xs text-primary font-mono truncate">
+                  {truncateText(reply.signature, 20)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onCopy(reply.signature, "Bitcoin Signature")}
+                  className="flex-shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
+                >
+                  <CopyIcon className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-secondary">Plaintext:</span>
-              <span className="text-primary font-mono">
-                {truncateText(reply.plaintext, 20)}
-              </span>
-              <button
-                type="button"
-                onClick={() => onCopy(reply.plaintext, "Plaintext")}
-                className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
-                aria-label="Copy plaintext"
-              >
-                <CopyIcon className="w-4 h-4 text-current" />
-              </button>
+            <Divider />
+
+            {/* Plaintext */}
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-secondary">Plaintext</span>
+              <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
+                <span className="text-xs text-primary font-mono truncate">
+                  {truncateText(reply.plaintext, 20)}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onCopy(reply.plaintext, "Plaintext")}
+                  className="flex-shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
+                >
+                  <CopyIcon className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

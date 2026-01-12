@@ -162,25 +162,32 @@ export interface GetListRepliesRes {
 
 export interface Reply {
   id: number;
+  event_id: string;
   btc_address: string;
   option_id?: number;
   content?: string;
   content_hash?: string;
   plaintext: string;
   signature: string;
-  balance_at_reply_satoshi: number;
-  balance_at_snapshot_satoshi: number;
-  balance_at_current_satoshi: number;
-  created_at: string;
+  nonce_timestamp: string;
+  random_code: string;
   is_reply_valid: boolean;
+  balance_at_reply_satoshi: number; //Balance when reply was submitted
+  balance_at_snapshot_satoshi: number; //Balance at event snapshot time
+  balance_at_current_satoshi: number; //Current real-time balance
+  balance_last_updated_at: string;
+  is_hidden: boolean;
+  hidden_at: string;
+  hidden_by_admin_id: string;
+  created_at: string;
+  created_by_ip: string;
+  updated_at: string;
 }
 
 export interface GetReplyPlainTextRes {
-  event_id: string;
-  btc_address: string;
-  plaintext: string;
-  nonce_timestamp: number; // API doc says 1701612345 (number or string? Example shows 1701612345 in JSON value, can be number)
-  random_code: string;
+  plaintext: string; // "koinvote.com | type:single | Option A | EVT_20241203_ABC123 | 1701612345 | 123456"
+  nonce_timestamp: string; // "1701612345"
+  random_code: string; //123456
 }
 
 export type GetHotHashtagsRes = string[];

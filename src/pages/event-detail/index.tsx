@@ -39,7 +39,6 @@ const EventDetail = () => {
     enabled: !!eventId,
   });
 
-
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);
   };
@@ -102,6 +101,7 @@ const EventDetail = () => {
           search={search}
           sortBy={sortBy}
           order={order}
+          options={eventDetail.options}
         />
       </div>
     </div>

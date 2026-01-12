@@ -149,21 +149,27 @@ export default function ReplyPage() {
   const handleGeneratePlaintext = async () => {
     if (!event || !eventId) return;
     setIsGeneratingPlaintext(true);
-    try {
-      const res = await API.generateReplyPlaintext()({
-        event_id: eventId,
-        btc_address: btcAddress,
-        content: event.event_type === "open" ? replyContent : undefined,
-        option_id:
-          event.event_type === "single_choice"
-            ? selectedOptionId || undefined
-            : undefined,
-      });
 
-      if (res.data.success) {
-        setPlaintext(res.data.data.plaintext);
-        setNonceTimestamp(res.data.data.nonce_timestamp.toString());
-        setRandomCode(res.data.data.random_code);
+    const minDelay = new Promise((resolve) => setTimeout(resolve, 500));
+
+    try {
+      const [res] = await Promise.all([
+        API.generateReplyPlaintext()({
+          event_id: eventId,
+          btc_address: btcAddress,
+          content: event.event_type === "open" ? replyContent : undefined,
+          option_id:
+            event.event_type === "single_choice"
+              ? selectedOptionId || undefined
+              : undefined,
+        }),
+        minDelay,
+      ]);
+
+      if (res.success) {
+        setPlaintext(res.data.plaintext);
+        setNonceTimestamp(res.data.nonce_timestamp);
+        setRandomCode(res.data.random_code);
 
         // Set expiration time (15 minutes from now)
         const now = Math.floor(Date.now() / 1000);
@@ -172,7 +178,7 @@ export default function ReplyPage() {
 
         showToast("success", "Plaintext generated");
       } else {
-        showToast("error", res.data.message || "Failed to generate plaintext");
+        showToast("error", res.message || "Failed to generate plaintext");
       }
     } catch (error) {
       console.error(error);
@@ -213,12 +219,12 @@ export default function ReplyPage() {
         random_code: randomCode,
       });
 
-      if (res.data.success) {
+      if (res.success) {
         showToast("success", "Reply submitted successfully");
         // Navigate back to event detail
         navigate(`/event/${eventId}`);
       } else {
-        showToast("error", res.data.message || "Failed to submit reply");
+        showToast("error", res.message || "Failed to submit reply");
       }
     } catch (error) {
       console.error(error);
@@ -435,7 +441,10 @@ export default function ReplyPage() {
                       />
                       <span
                         className="text-primary wrap-break-word whitespace-normal"
-                        style={{ wordBreak: "break-word", overflowWrap: "anywhere" }}
+                        style={{
+                          wordBreak: "break-word",
+                          overflowWrap: "anywhere",
+                        }}
                       >
                         {optionText}
                       </span>
@@ -468,7 +477,7 @@ export default function ReplyPage() {
 
           {plaintext && (
             <div className="mt-4 space-y-2">
-              <div className="p-3 bg-bg rounded-lg border border-border break-all font-mono text-xs text-secondary">
+              <div className="tx-12 lh-18 text-green-500 p-3 bg-bg rounded-lg border border-border break-all font-mono">
                 {plaintext}
               </div>
 

@@ -22,17 +22,23 @@ import { useRef, useCallback } from "react";
  *   showToast("success", "Action completed!");
  * });
  */
-export function useDebouncedClick(
-  clickFn: () => Promise<void> | void,
-  delay: number = 2000
-) {
+export function useDebouncedClick<
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends (...args: any[]) => Promise<void> | void
+>(clickFn: T, delay: number = 2000) {
   const lastClickTimeRef = useRef<number>(0);
 
   const debouncedClick = useCallback(
-    async (e?: React.MouseEvent) => {
-      // Stop event propagation if event is provided
-      if (e) {
-        e.stopPropagation();
+    async (...args: Parameters<T>) => {
+      // If the last argument is a React event, stop propagation
+      const lastArg = args[args.length - 1];
+      if (
+        lastArg &&
+        typeof lastArg === "object" &&
+        "stopPropagation" in lastArg
+      ) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (lastArg as any).stopPropagation();
       }
 
       const now = Date.now();
@@ -47,7 +53,7 @@ export function useDebouncedClick(
       lastClickTimeRef.current = now;
 
       // Execute the click function
-      await clickFn();
+      await clickFn(...args);
     },
     [clickFn, delay]
   );

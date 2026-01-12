@@ -1,5 +1,5 @@
 // api/request.ts
-import type { EventType, EventRewardType, ReplySortBy } from "./types";
+import type { EventType, EventRewardType } from "./types";
 
 export interface CreateEventReq {
   title: string;
@@ -26,8 +26,8 @@ export interface GetEventListReq {
 
 export interface GetListRepliesReq {
   event_id: string;
-  search?: string;
-  sortBy?: "time" | "balance"; // default: balance
+  search?: string; //Search supports partial matching on BTC address, reply content, and option text
+  sortBy?: "time" | "balance"; // Default sorting is by balance (descending), then by creation time
   order?: "desc" | "asc"; // default: desc
   page?: number; // default: 1
   limit?: number; // default: 20, max: 100
