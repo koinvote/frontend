@@ -17,7 +17,6 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "@/hooks/useTheme";
 import { useLanguagesStore } from "@/stores/languagesStore";
 import { useHomeStore } from "@/stores/homeStore";
-import { Tooltip } from "antd";
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
@@ -201,10 +200,6 @@ export default function Layout() {
         {/* Sidebar Toggle (Desktop Only) */}
         {isDesktop && (
           <div className="relative sticky top-[calc(4rem+var(--sat))] h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
-            <Tooltip
-              placement="right"
-              title={collapsed ? "Expand navigation" : "Collapse navigation"}
-            >
               <button
                 type="button"
                 onClick={() => setCollapsed(!collapsed)}
@@ -220,7 +215,6 @@ export default function Layout() {
               >
                 {collapsed ? <RightArrow /> : <LeftArrow />}
               </button>
-            </Tooltip>
           </div>
         )}
 
