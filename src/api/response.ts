@@ -86,7 +86,7 @@ export interface EventOption {
   option_text: string;
   order: number;
   weight_percent: number;
-  amount_satoshi: number;
+  total_stake_satoshi: number;
 }
 
 export interface EventDetailDataRes {

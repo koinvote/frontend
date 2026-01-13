@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { API, type ApiResponse } from "@/api";
 import { ReplySortBy } from "@/api/types";
 import type { EventDetailDataRes } from "@/api/response";
@@ -14,10 +14,9 @@ import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 const EventDetail = () => {
   const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
+  const hasRestoredScroll = useRef(false);
+  const isRestoringRef = useRef(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [eventId]);
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
@@ -42,6 +41,95 @@ const EventDetail = () => {
     },
     enabled: !!eventId,
   });
+
+  // Disable browser's automatic scroll restoration
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      "scrollRestoration" in window.history
+    ) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  // Save scroll position on scroll
+  useEffect(() => {
+    if (!eventId) return;
+
+    const scrollKey = `event-detail-scroll-${eventId}`;
+    let scrollTimer: number | null = null;
+
+    const handleScroll = () => {
+      if (isRestoringRef.current || scrollTimer) return;
+      scrollTimer = window.setTimeout(() => {
+        sessionStorage.setItem(scrollKey, window.scrollY.toString());
+        scrollTimer = null;
+      }, 150);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimer) clearTimeout(scrollTimer);
+    };
+  }, [eventId]);
+
+  // Restore scroll position after data is loaded
+  useEffect(() => {
+    if (
+      !eventId ||
+      isLoadingEvent ||
+      !eventDetail ||
+      hasRestoredScroll.current
+    ) {
+      return;
+    }
+
+    hasRestoredScroll.current = true;
+    const scrollKey = `event-detail-scroll-${eventId}`;
+    const savedScrollY = sessionStorage.getItem(scrollKey);
+
+    if (savedScrollY && savedScrollY !== "0") {
+      const scrollY = parseInt(savedScrollY, 10);
+      if (!isNaN(scrollY) && scrollY > 0) {
+        isRestoringRef.current = true;
+
+        const tryScroll = () => {
+          const docHeight = document.documentElement.scrollHeight;
+          if (docHeight >= scrollY - 50) {
+            window.scrollTo(0, scrollY);
+            setTimeout(() => {
+              isRestoringRef.current = false;
+            }, 500);
+            return true;
+          }
+          return false;
+        };
+
+        // Try immediately
+        if (!tryScroll()) {
+          // Use ResizeObserver to wait for document to grow
+          const observer = new ResizeObserver(() => {
+            if (tryScroll()) {
+              observer.disconnect();
+            }
+          });
+          observer.observe(document.documentElement);
+
+          // Fallback timeout
+          setTimeout(() => {
+            observer.disconnect();
+            tryScroll();
+          }, 3000);
+        }
+      }
+    }
+  }, [eventId, isLoadingEvent, eventDetail]);
+
+  // Reset restore flag when eventId changes
+  useEffect(() => {
+    hasRestoredScroll.current = false;
+  }, [eventId]);
 
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);

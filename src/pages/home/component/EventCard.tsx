@@ -234,7 +234,6 @@ export function EventCard({ event, onClick }: EventCardProps) {
     const amountB = parseFloat(b.amount_satoshi || "0");
     return amountB - amountA; // 降序排序
   });
-  console.log("sortedReplies", sortedReplies);
 
   const primaryReply = sortedReplies[0];
   const secondaryReply = sortedReplies[1];

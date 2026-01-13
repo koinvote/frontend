@@ -12,11 +12,14 @@ import {
 } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { useHomeStore } from "@/stores/homeStore";
-import type { EventDetailDataRes } from "@/api/response";
+import type { EventDetailDataRes, EventOption } from "@/api/response";
 import { EventStatus } from "@/api/types";
+import type { TopReply } from "@/pages/create-event/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { TopReplyBar } from "./TopReplyBar";
 import { EventCTAButton } from "./EventCTAButton";
+import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
+import ArrowUpIcon from "@/assets/icons/arrowUp.svg?react";
 
 interface EventInfoProps {
   event: EventDetailDataRes;
@@ -162,17 +165,112 @@ export function EventInfo({ event }: EventInfoProps) {
     event.deadline_at,
   ]);
 
-  // Get top 2 replies sorted by amount_satoshi (descending)
-  const topTwoReplies = useMemo(() => {
-    if (!event.top_replies || event.top_replies.length === 0) return [];
-    return [...event.top_replies]
-      .sort((a, b) => {
-        const amountA = Number(a.amount_satoshi) || 0;
-        const amountB = Number(b.amount_satoshi) || 0;
-        return amountB - amountA; // 降序排序
-      })
-      .slice(0, 2); // 只取前兩個
-  }, [event.top_replies]);
+  // Prepare data for Top Reply/Options display
+  const { displayData, displayTitle, hasMore } = useMemo(() => {
+    const isSingleChoice = event.event_type === "single_choice";
+    const isOpen = event.event_type === "open";
+
+    // PREHEAT + single_choice: Show Options
+    if (isPreheat && isSingleChoice) {
+      if (!event.options || event.options.length === 0) {
+        return { displayData: [], displayTitle: "", hasMore: false };
+      }
+
+      // Filter out string options, only use EventOption objects
+      const validOptions = (event.options as (EventOption | string)[]).filter(
+        (opt): opt is EventOption => typeof opt === "object" && "id" in opt
+      );
+
+      // Sort by order
+      const sortedOptions = [...validOptions].sort((a, b) => a.order - b.order);
+
+      // Convert EventOption to TopReply format
+      const convertedData: TopReply[] = sortedOptions.map((opt) => ({
+        id: opt.id.toString(),
+        body: opt.option_text,
+        weight_percent: opt.weight_percent,
+        amount_satoshi: opt.total_stake_satoshi.toString(),
+      }));
+
+      const title = validOptions.length > 1 ? "Options" : "Option";
+      return {
+        displayData: convertedData,
+        displayTitle: title,
+        hasMore: convertedData.length > 2,
+      };
+    }
+
+    // ACTIVE/COMPLETED + single_choice: Show Options or Top Reply
+    if ((isOngoing || isCompleted) && isSingleChoice) {
+      if (!event.options || event.options.length === 0) {
+        return { displayData: [], displayTitle: "", hasMore: false };
+      }
+
+      // Filter out string options, only use EventOption objects
+      const validOptions = (event.options as (EventOption | string)[]).filter(
+        (opt): opt is EventOption => typeof opt === "object" && "id" in opt
+      );
+
+      // Check if any option has weight_percent > 0
+      const hasReplies = validOptions.some((opt) => opt.weight_percent > 0);
+
+      // Sort by order
+      const sortedOptions = [...validOptions].sort((a, b) => a.order - b.order);
+
+      // Convert EventOption to TopReply format
+      const convertedData: TopReply[] = sortedOptions.map((opt) => ({
+        id: opt.id.toString(),
+        body: opt.option_text,
+        weight_percent: opt.weight_percent,
+        amount_satoshi: opt.total_stake_satoshi.toString(),
+      }));
+
+      const title = hasReplies ? "Top Reply" : "Options";
+      return {
+        displayData: convertedData,
+        displayTitle: title,
+        hasMore: convertedData.length > 2,
+      };
+    }
+
+    // PREHEAT + open: Don't show anything
+    if (isPreheat && isOpen) {
+      return { displayData: [], displayTitle: "", hasMore: false };
+    }
+
+    // ACTIVE/COMPLETED + open: Show Top Reply from top_replies
+    if ((isOngoing || isCompleted) && isOpen) {
+      if (!event.top_replies || event.top_replies.length === 0) {
+        return { displayData: [], displayTitle: "", hasMore: false };
+      }
+
+      // Sort by weight_percent descending, limit to 5
+      const sortedReplies = [...event.top_replies]
+        .sort((a, b) => {
+          const weightA = a.weight_percent || 0;
+          const weightB = b.weight_percent || 0;
+          return weightB - weightA;
+        })
+        .slice(0, 5);
+
+      return {
+        displayData: sortedReplies,
+        displayTitle: "Top Reply",
+        hasMore: sortedReplies.length > 2,
+      };
+    }
+
+    return { displayData: [], displayTitle: "", hasMore: false };
+  }, [
+    event.event_type,
+    event.options,
+    event.top_replies,
+    isPreheat,
+    isOngoing,
+    isCompleted,
+  ]);
+
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Build field list for mobile (ordered list)
   const mobileFields = useMemo(() => {
@@ -338,6 +436,7 @@ export function EventInfo({ event }: EventInfoProps) {
     handleHashtagClick,
   ]);
 
+  
   return (
     <div className="flex flex-col gap-6">
       {/* Title and Copy Link */}
@@ -514,17 +613,38 @@ export function EventInfo({ event }: EventInfoProps) {
         ))}
       </div>
 
-      {/* Top Reply */}
-      {topTwoReplies.length > 0 && (
+      {/* Top Reply / Options */}
+      {displayData.length > 0 && displayTitle && (
         <div>
           <h2 className="text-sm md:text-base font-semibold text-primary mb-3">
-            Top Reply
+            {displayTitle}
           </h2>
           <div className="space-y-2">
-            {topTwoReplies.map((reply, index) => (
-              <TopReplyBar key={reply.id || index} reply={reply} />
-            ))}
+            {(isExpanded ? displayData : displayData.slice(0, 2)).map(
+              (reply, index) => (
+                <TopReplyBar key={reply.id || index} reply={reply} />
+              )
+            )}
           </div>
+          {hasMore && (
+            <div className="text-center mt-2">
+              <button
+                type="button"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="mt-2 text-xs md:text-sm text-secondary 
+               hover:underline cursor-pointer"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  {isExpanded ? "Show less" : "Show more"}{" "}
+                  {isExpanded ? (
+                    <ArrowUpIcon className="w-3 h-3" />
+                  ) : (
+                    <ArrowDownIcon className="w-3 h-3" />
+                  )}
+                </span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
