@@ -165,11 +165,12 @@ function ReplyItem({ reply }: ReplyItemProps) {
   return (
     <div
       ref={containerRef}
-      className={`rounded-lg px-2 py-1 -mx-2 -my-1 transition-colors md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)]`}
+      className={`rounded-lg px-2 py-1 -mx-2 -my-1 transition-colors 
+        dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)] md:hover:bg-gray-200`}
     >
       <p
         ref={textRef}
-        className={`text-primary break-words ${
+        className={`text-primary break-words pt-1 ${
           isExpanded ? "" : "line-clamp-1"
         } ${showToggle ? "cursor-pointer" : ""}`}
         onClick={showToggle ? handleToggle : undefined}
@@ -179,7 +180,7 @@ function ReplyItem({ reply }: ReplyItemProps) {
       <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
         {/* Weight and Amount - 手机版在下一行靠右，桌面版也靠右 */}
         <div className="flex items-center justify-end gap-2 md:gap-2">
-          <span>Weight: {reply.weight_percent}%</span>
+          <span>Weight: {Number(reply.weight_percent.toFixed(2))}%</span>
           <span>
             Amount:{" "}
             {satsToBtc(parseFloat(reply.amount_satoshi || "0"), {
