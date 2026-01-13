@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { API } from '@/api'
+import { API, type ApiResponse } from '@/api'
 import type { SystemConfigRes } from '@/api/response'
 
 interface SystemParametersState {
@@ -48,12 +48,11 @@ export const useSystemParametersStore = create<SystemParametersState>((set, get)
     try {
       // Note: our axios instance returns response.data via interceptor at runtime,
       // but types may still reflect AxiosResponse. Handle both shapes safely.
-      const res = (await API.getSystemConfig()) as any
-      const envelope = res?.success !== undefined ? res : res?.data
+      const res = (await API.getSystemConfig()) as ApiResponse<SystemConfigRes>
 
-      if (envelope?.success) {
+      if (res?.success) {
         set({
-          params: envelope.data as SystemConfigRes,
+          params: res.data as SystemConfigRes,
           lastUpdatedAt: Date.now(),
           isError: false,
           errorMessage: null,
@@ -61,13 +60,13 @@ export const useSystemParametersStore = create<SystemParametersState>((set, get)
       } else {
         set({
           isError: true,
-          errorMessage: envelope?.message ?? 'Failed to fetch system parameters',
+          errorMessage: res?.message ?? 'Failed to fetch system parameters',
         })
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       set({
         isError: true,
-        errorMessage: err?.message ?? 'Network error while fetching system parameters',
+        errorMessage: (err as Error)?.message ?? 'Network error while fetching system parameters',
       })
     } finally {
       set({ isLoading: false })

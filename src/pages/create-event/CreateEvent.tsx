@@ -1207,7 +1207,9 @@ export default function CreateEvent() {
                 }
               }}
               placeholder={
-                isRewarded ? "Enter hours (Min 1)" : "First 24 hours are free"
+                isRewarded
+                  ? "Enter hours (Min 1)"
+                  : `First ${params?.free_hours} hours are free`
               }
               className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
