@@ -10,6 +10,8 @@ import {
   mockGetListRepliesResponse,
   mockAdminSystemParameters,
   mockEventList,
+  mockPayoutReport,
+  mockVerificationCsvContent,
 } from "./data";
 
 const API_BASE_URL = "/api/v1";
@@ -311,4 +313,48 @@ export const handlers = [
       data: undefined as any,
     });
   }),
+
+  // GET /events/:eventId/payout-report - Get payout report
+  http.get(`${API_BASE_URL}/events/:eventId/payout-report`, ({ params }) => {
+    const { eventId } = params;
+
+    // Return payout report for the event
+    return HttpResponse.json<ApiResponse<typeof mockPayoutReport>>({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        ...mockPayoutReport,
+        event_id: eventId as string,
+      },
+    });
+  }),
+
+  // GET /events/:eventId/verification-csv - Get verification CSV
+  http.get(
+    `${API_BASE_URL}/events/:eventId/verification-csv`,
+    ({ params, request }) => {
+      const { eventId } = params;
+      const url = new URL(request.url);
+      const planId = url.searchParams.get("plan_id");
+
+      console.log(
+        `[Mock] Generating verification CSV for event ${eventId}, plan ${planId}`
+      );
+
+      // Create a Blob from CSV content
+      const csvBlob = new Blob([mockVerificationCsvContent], {
+        type: "text/csv",
+      });
+
+      // Return CSV as binary stream with proper headers
+      return new HttpResponse(csvBlob, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/csv",
+          "Content-Disposition": `attachment; filename="payout_verification_${eventId}.csv"`,
+        },
+      });
+    }
+  ),
 ];

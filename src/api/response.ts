@@ -1,10 +1,10 @@
 // api/response.ts
 import type { TopReply } from "@/pages/create-event/types";
 import type {
-  EventType,
+  DepositStatus,
   EventRewardType,
   EventStatus,
-  DepositStatus,
+  EventType,
 } from "./types";
 
 export interface SystemConfigRes {
@@ -211,4 +211,49 @@ export interface AdminSystemParametersRes {
   withdrawal_fee_multiplier: number; //提款手續費倍數
   maintenance_mode: boolean; //維護模式
   required_confirmations: number; //所需確認數
+}
+
+// Payout Report Types
+export type PayoutStatus =
+  | "completed"             // 已完成派獎
+  | "processing"            // 派獎處理中
+  | "dust_redistributed"    // 低於 dust 門檻，獎金重分配給其他中獎者
+  | "failed"                // 派獎失敗
+  | "pending";              // 等待派獎
+
+export type RewardType = "initial" | "additional";
+
+export interface PayoutWinner {
+  winner_address: string;
+  balance_at_snapshot_satoshi: number;
+  win_probability_percent: number;
+  is_dust: boolean;
+  reward_satoshi: number;
+  payout_status: PayoutStatus;
+  payout_txid: string;
+  payout_at: string;
+}
+
+export interface RewardDetail {
+  reward_type: RewardType;
+  deposit_id: number;
+  plan_id: number;
+  original_amount_satoshi: number;
+  platform_fee_satoshi: number;
+  estimated_miner_fee_satoshi: number;
+  distributable_satoshi: number;
+  winner_count: number;
+  winners: PayoutWinner[];
+}
+
+export interface PayoutReportRes {
+  event_id: string;
+  event_title: string;
+  completed_at: string;
+  snapshot_block_height: number;
+  initial_reward_satoshi: number;
+  additional_reward_1_satoshi: number;
+  additional_reward_2_satoshi: number;
+  total_reward_pool_satoshi: number;
+  reward_details: RewardDetail[];
 }

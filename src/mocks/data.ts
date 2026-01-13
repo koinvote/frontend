@@ -9,6 +9,9 @@ import type {
   GetListRepliesRes,
   Reply,
   AdminSystemParametersRes,
+  PayoutReportRes,
+  PayoutWinner,
+  RewardDetail,
 } from "@/api/response";
 import { EventStatus, DepositStatus } from "@/api/types";
 
@@ -348,3 +351,166 @@ export const mockAdminSystemParameters: AdminSystemParametersRes = {
   maintenance_mode: false,
   required_confirmations: 3,
 };
+
+// Payout Report Mock Data
+export const mockPayoutWinners: PayoutWinner[] = [
+  {
+    winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    balance_at_snapshot_satoshi: 500000,
+    win_probability_percent: 20.0,
+    is_dust: false,
+    reward_satoshi: 57500,
+    payout_status: "completed",
+    payout_txid:
+      "3e1b3d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5",
+    payout_at: "2026-01-16T16:00:00Z",
+  },
+  {
+    winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    balance_at_snapshot_satoshi: 450000,
+    win_probability_percent: 18.0,
+    is_dust: false,
+    reward_satoshi: 51750,
+    payout_status: "completed",
+    payout_txid:
+      "4f2c4e8f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c",
+    payout_at: "2026-01-16T16:01:00Z",
+  },
+  {
+    winner_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
+    balance_at_snapshot_satoshi: 400000,
+    win_probability_percent: 16.0,
+    is_dust: false,
+    reward_satoshi: 46000,
+    payout_status: "completed",
+    payout_txid:
+      "5g3d5f9g1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d",
+    payout_at: "2026-01-16T16:02:00Z",
+  },
+  {
+    winner_address: "bc1qabc123xyz456def789ghi012jkl345mno678pqr",
+    balance_at_snapshot_satoshi: 350000,
+    win_probability_percent: 14.0,
+    is_dust: false,
+    reward_satoshi: 40250,
+    payout_status: "completed",
+    payout_txid:
+      "6h4e6g0h2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e",
+    payout_at: "2026-01-16T16:03:00Z",
+  },
+  {
+    winner_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    balance_at_snapshot_satoshi: 300000,
+    win_probability_percent: 12.0,
+    is_dust: false,
+    reward_satoshi: 34500,
+    payout_status: "completed",
+    payout_txid:
+      "7i5f7h1i3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f",
+    payout_at: "2026-01-16T16:04:00Z",
+  },
+  {
+    winner_address: "bc1qdef456uvw789xyz012abc345ghi678jkl901mno",
+    balance_at_snapshot_satoshi: 250000,
+    win_probability_percent: 10.0,
+    is_dust: false,
+    reward_satoshi: 28750,
+    payout_status: "completed",
+    payout_txid:
+      "8j6g8i2j4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
+    payout_at: "2026-01-16T16:05:00Z",
+  },
+];
+
+export const mockAdditionalPayoutWinners: PayoutWinner[] = [
+  {
+    winner_address: "bc1qghi789rst012uvw345xyz678abc901def234ghi",
+    balance_at_snapshot_satoshi: 800000,
+    win_probability_percent: 32.0,
+    is_dust: false,
+    reward_satoshi: 61280,
+    payout_status: "completed",
+    payout_txid:
+      "9k7h9j3k5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
+    payout_at: "2026-01-16T16:05:00Z",
+  },
+  {
+    winner_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc",
+    balance_at_snapshot_satoshi: 650000,
+    win_probability_percent: 26.0,
+    is_dust: false,
+    reward_satoshi: 49790,
+    payout_status: "completed",
+    payout_txid:
+      "al8i0k4l6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c",
+    payout_at: "2026-01-16T16:06:00Z",
+  },
+  {
+    winner_address: "bc1qmno345pqr678stu901vwx234yz567abc890def",
+    balance_at_snapshot_satoshi: 550000,
+    win_probability_percent: 22.0,
+    is_dust: false,
+    reward_satoshi: 42130,
+    payout_status: "completed",
+    payout_txid:
+      "bm9j1l5m7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d",
+    payout_at: "2026-01-16T16:07:00Z",
+  },
+  {
+    winner_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi",
+    balance_at_snapshot_satoshi: 500000,
+    win_probability_percent: 20.0,
+    is_dust: false,
+    reward_satoshi: 38300,
+    payout_status: "completed",
+    payout_txid:
+      "cn0k2m6n8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e",
+    payout_at: "2026-01-16T16:08:00Z",
+  },
+];
+
+export const mockRewardDetails: RewardDetail[] = [
+  {
+    reward_type: "initial",
+    deposit_id: 123,
+    plan_id: 456,
+    original_amount_satoshi: 300000,
+    platform_fee_satoshi: 7500,
+    estimated_miner_fee_satoshi: 5000,
+    distributable_satoshi: 287500,
+    winner_count: 6,
+    winners: mockPayoutWinners,
+  },
+  {
+    reward_type: "additional",
+    deposit_id: 124,
+    plan_id: 457,
+    original_amount_satoshi: 200000,
+    platform_fee_satoshi: 5000,
+    estimated_miner_fee_satoshi: 3500,
+    distributable_satoshi: 191500,
+    winner_count: 4,
+    winners: mockAdditionalPayoutWinners,
+  },
+];
+
+export const mockPayoutReport: PayoutReportRes = {
+  event_id: "evt_001_mock",
+  event_title: "What's the best Bitcoin scaling solution?",
+  completed_at: "2026-01-16T15:00:00Z",
+  snapshot_block_height: 850000,
+  initial_reward_satoshi: 300000,
+  additional_reward_1_satoshi: 200000,
+  additional_reward_2_satoshi: 0,
+  total_reward_pool_satoshi: 500000,
+  reward_details: mockRewardDetails,
+};
+
+// Mock CSV data for verification
+export const mockVerificationCsvContent = `plan_id,deposit_id,event_id,winner_address,balance_satoshi,win_probability,original_reward_satoshi,is_dust,final_reward_satoshi,payout_txid,payout_status,csv_sha256
+456,123,evt_001_mock,bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh,500000,0.20,57500,0,57500,3e1b3d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
+456,123,evt_001_mock,bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq,450000,0.18,51750,0,51750,4f2c4e8f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
+456,123,evt_001_mock,bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4,400000,0.16,46000,0,46000,5g3d5f9g1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
+456,123,evt_001_mock,bc1qabc123xyz456def789ghi012jkl345mno678pqr,350000,0.14,40250,0,40250,6h4e6g0h2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
+456,123,evt_001_mock,bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej,300000,0.12,34500,0,34500,7i5f7h1i3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
+456,123,evt_001_mock,bc1qdef456uvw789xyz012abc345ghi678jkl901mno,250000,0.10,28750,0,28750,8j6g8i2j4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567`;

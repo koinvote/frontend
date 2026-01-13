@@ -64,6 +64,8 @@ npm run dev
 - ✅ `GET /events/:eventId/replies` - 取得回覆列表（支援搜尋、排序、分頁）
 - ✅ `GET /events/:eventId/reply-plaintext` - 取得回覆明文
 - ✅ `GET /hot-hashtags` - 取得熱門標籤
+- ✅ `GET /events/:eventId/payout-report` - 取得派獎報告
+- ✅ `GET /events/:eventId/verification-csv` - 下載驗證 CSV 檔案
 
 ### 管理員 API
 

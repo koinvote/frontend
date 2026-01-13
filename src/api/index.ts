@@ -25,6 +25,7 @@ import type {
   GetHotHashtagsRes,
   AdminLoginRes,
   AdminSystemParametersRes,
+  PayoutReportRes,
 } from "./response.ts";
 
 export function get<R = unknown, D = unknown>(path: string) {
@@ -110,6 +111,18 @@ export const API = {
     get<ApiResponse<GetListRepliesRes>, GetListRepliesReq>("/replies"),
 
   submitReply: () => post<ApiResponse<void>, SubmitReplyReq>("/replies"),
+
+  // Payout Report API
+  getPayoutReport: (eventId: string) =>
+    get<ApiResponse<PayoutReportRes>, void>(
+      `/events/${eventId}/payout-report`
+    ),
+
+  // Verification CSV API - Returns CSV file as blob
+  getVerificationCsv: (eventId: string, planId: number) =>
+    get<Blob, { plan_id: number }>(
+      `/events/${eventId}/verification-csv`
+    )({ plan_id: planId }, { responseType: 'blob' }),
 };
 
 // Admin API (requires Bearer token authentication)
