@@ -11,7 +11,9 @@ import { Loading } from "@/components/base/Loading";
 import { useToast } from "@/components/base/Toast/useToast";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import ClockIcon from "@/assets/icons/clock.svg?react";
+import CopyIcon from "@/assets/icons/copy.svg?react";
 import { EventInfoBox } from "@/components/base/EventInfoBox";
+import { useDebouncedClick } from "@/utils/helper";
 import {
   satsToBtc,
   formatOngoingCountdown,
@@ -194,6 +196,18 @@ export default function ReplyPage() {
       setIsGeneratingPlaintext(false);
     }
   };
+
+  const handleCopyPlaintext = useDebouncedClick(async () => {
+    if (!plaintext) return;
+
+    try {
+      await navigator.clipboard.writeText(plaintext);
+      showToast("success", "Plaintext copied to clipboard");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showToast("error", "Failed to copy plaintext");
+    }
+  });
 
   const handleSubmit = async () => {
     if (!eventId || !canSubmit) return;
@@ -481,8 +495,22 @@ export default function ReplyPage() {
 
           {plaintext && (
             <div className="mt-4 space-y-2">
-              <div className="tx-12 lh-18 text-green-500 p-3 bg-bg rounded-lg border border-border break-all font-mono">
-                {plaintext}
+              <div className="relative">
+                <div className="px-3 py-2 rounded-lg border border-border bg-bg">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="tx-12 lh-18 text-green-500 break-all font-mono flex-1">
+                      {plaintext}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleCopyPlaintext}
+                      className="flex-shrink-0 text-secondary hover:text-primary transition-colors cursor-pointer"
+                      aria-label="Copy plaintext"
+                    >
+                      <CopyIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {countdown > 0 ? (
