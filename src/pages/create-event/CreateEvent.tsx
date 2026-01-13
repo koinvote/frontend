@@ -1028,7 +1028,7 @@ export default function CreateEvent() {
                 />
                 <span>{t("createEvent.responseTypeOptions.1.label")}</span>
                 <Tooltip
-                  title="Participants can submit their own responses."
+                  title="Participants choose one option from a list you create."
                   placement="top"
                   color="white"
                   {...singleChoiceTooltip.tooltipProps}
@@ -1051,7 +1051,7 @@ export default function CreateEvent() {
                 />
                 <span>{t("createEvent.responseTypeOptions.0.label")}</span>
                 <Tooltip
-                  title="Participants choose one option from a list you create."
+                  title="Participants can submit their own responses."
                   placement="top"
                   color="white"
                   {...openEndedTooltip.tooltipProps}
