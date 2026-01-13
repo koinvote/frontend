@@ -14,7 +14,7 @@ import ModeDark from "@/assets/icons/mode-dark.svg?react";
 import MenuIcon from "@/assets/icons/menu.svg?react";
 
 import { useTranslation } from "react-i18next";
-import { useTheme } from "@/hooks/useTheme";
+import { useThemeStore } from "@/stores/themeStore";
 import { useLanguagesStore } from "@/stores/languagesStore";
 // import { useMediaQuery } from "usehooks-ts"; // Assuming this might be available, if not I'll write a simple check or use CSS hidden as backup
 
@@ -25,7 +25,8 @@ export default function Layout() {
   const drawerRef = useRef<HTMLDivElement | null>(null);
   // const touchStartX = useRef<number | null>(null);
   const { t } = useTranslation();
-  const { theme, toggle } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
+  const toggle = useThemeStore((state) => state.toggle);
   const { current, setLanguage } = useLanguagesStore();
   const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
   const navigate = useNavigate();

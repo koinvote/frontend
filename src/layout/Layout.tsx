@@ -13,9 +13,9 @@ import ModeLight from "@/assets/icons/mode-light.svg?react";
 import RightArrow from "@/assets/icons/rightArrow.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
 
-import { useTheme } from "@/hooks/useTheme";
 import { useHomeStore } from "@/stores/homeStore";
 import { useLanguagesStore } from "@/stores/languagesStore";
+import { useThemeStore } from "@/stores/themeStore";
 import { useTranslation } from "react-i18next";
 
 export default function Layout() {
@@ -30,7 +30,8 @@ export default function Layout() {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const { t } = useTranslation();
-  const { theme, toggle } = useTheme();
+  const theme = useThemeStore((state) => state.theme);
+  const toggle = useThemeStore((state) => state.toggle);
   const { current, setLanguage } = useLanguagesStore();
   const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
   const navigate = useNavigate();
