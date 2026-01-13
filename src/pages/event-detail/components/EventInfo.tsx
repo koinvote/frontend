@@ -411,7 +411,7 @@ export function EventInfo({ event }: EventInfoProps) {
 
           {/* Only show creator address in ongoing or completed state */}
           {(isOngoing || isCompleted) && event.creator_address && (
-            <div>
+            <div className="flex items-center gap-2">
               <span className="text-xs md:text-sm text-secondary">
                 Creator address:
               </span>
