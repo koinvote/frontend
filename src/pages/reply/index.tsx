@@ -57,6 +57,11 @@ export default function ReplyPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
+  // Scroll to top on mount
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // --- States ---
   const [btcAddress, setBtcAddress] = useState("");
   const [replyContent, setReplyContent] = useState(""); // For open-ended
@@ -477,8 +482,10 @@ export default function ReplyPage() {
         {/* 4. Generate Plaintext */}
         <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
-            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6">
+            <div
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
+            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
+            >
               <span className="text-black tx-12 md:tx-14">3</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">Generate the Plaintext</h2>
@@ -534,8 +541,10 @@ export default function ReplyPage() {
         {/* 5. Enter Signature */}
         <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
-            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6">
+            <div
+              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
+            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
+            >
               <span className="text-black tx-12 md:tx-14">4</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">Enter Signature</h2>
@@ -558,8 +567,10 @@ export default function ReplyPage() {
         {/* 6. Submit Reply */}
         <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-5 w-5 shrink-0 items-center justify-center 
-            rounded-full border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6">
+            <div
+              className="flex h-5 w-5 shrink-0 items-center justify-center 
+            rounded-full border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
+            >
               <span className="text-black tx-12 md:tx-14">5</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">Submit Reply</h2>

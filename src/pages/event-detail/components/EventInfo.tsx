@@ -206,16 +206,21 @@ export function EventInfo({ event }: EventInfoProps) {
         return { displayData: [], displayTitle: "", hasMore: false };
       }
 
-      // Filter out string options, only use EventOption objects
       const validOptions = (event.options as (EventOption | string)[]).filter(
         (opt): opt is EventOption => typeof opt === "object" && "id" in opt
       );
 
-      // Check if any option has weight_percent > 0
       const hasReplies = validOptions.some((opt) => opt.weight_percent > 0);
 
-      // Sort by order
-      const sortedOptions = [...validOptions].sort((a, b) => a.order - b.order);
+      const sortedOptions = [...validOptions].sort((a, b) => {
+        if (hasReplies) {
+          if (b.weight_percent !== a.weight_percent) {
+            return b.weight_percent - a.weight_percent;
+          }
+          return a.order - b.order;
+        }
+        return a.order - b.order;
+      });
 
       // Convert EventOption to TopReply format
       const convertedData: TopReply[] = sortedOptions.map((opt) => ({
@@ -434,9 +439,9 @@ export function EventInfo({ event }: EventInfoProps) {
     showToast,
     handleAddressClick,
     handleHashtagClick,
+    handleCopyCreatorAddress,
   ]);
 
-  
   return (
     <div className="flex flex-col gap-6">
       {/* Title and Copy Link */}
