@@ -740,6 +740,13 @@ export default function CreateEvent() {
     }
   };
 
+  const handleHashtagBlur = () => {
+    if (hashtagInput.trim()) {
+      commitByDelimiters(hashtagInput);
+      setHashtagInput("");
+    }
+  };
+
   const handleHashtagChange = (v: string) => {
     // 如果用戶貼上「#a #b,#c 」這種，直接拆 chips
     if (/[,\s]/.test(v)) {
@@ -983,6 +990,7 @@ export default function CreateEvent() {
                 value={hashtagInput}
                 onChange={(e) => handleHashtagChange(e.target.value)}
                 onKeyDown={handleHashtagKeyDown}
+                onBlur={handleHashtagBlur}
                 className={cn(
                   "min-w-[120px] flex-1",
                   "bg-transparent outline-none",
