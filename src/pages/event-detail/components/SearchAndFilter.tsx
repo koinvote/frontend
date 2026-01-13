@@ -1,10 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SearchIcon from "@/assets/icons/search.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
-import { ReplySortBy } from "@/api/types";
+import SortAscIcon from "@/assets/icons/sort-asc.svg?react";
+import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
+import PlusIcon from "@/assets/icons/plus.svg?react";
+import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
+import { ReplySortBy, EventStatus } from "@/api/types";
+import { useDebouncedClick } from "@/utils/helper";
+import { Button } from "@/components/base/Button";
 
 interface SearchAndFilterProps {
   eventId: string;
+  eventStatus?: number;
   onSearchChange?: (search: string) => void;
   onSortChange?: (
     sortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME,
@@ -13,16 +20,35 @@ interface SearchAndFilterProps {
 }
 
 export function SearchAndFilter({
-  eventId,
+  eventStatus,
   onSearchChange,
   onSortChange,
 }: SearchAndFilterProps) {
   const [search, setSearch] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
-  const [sortBy, setSortBy] = useState<typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME>(
-    ReplySortBy.BALANCE
-  );
+  const [sortBy, setSortBy] = useState<
+    typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
+  >(ReplySortBy.BALANCE);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSortDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -36,14 +62,26 @@ export function SearchAndFilter({
     setSearch(value);
   };
 
-  const handleSortChange = (
+  const toggleOrder = () => {
+    const newOrder = order === "desc" ? "asc" : "desc";
+    setOrder(newOrder);
+    onSortChange?.(sortBy, newOrder);
+  };
+
+  const handleSortFieldChange = (
     newSortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
   ) => {
-    const newOrder = newSortBy === sortBy && order === "desc" ? "asc" : "desc";
     setSortBy(newSortBy);
-    setOrder(newOrder);
-    onSortChange?.(newSortBy, newOrder);
+    setIsSortDropdownOpen(false);
+    onSortChange?.(newSortBy, order);
   };
+
+  const handleRewardClick = useDebouncedClick(() => {
+    // Logic not implemented yet
+    console.log("Reward clicked");
+  });
+
+  const isActive = eventStatus === EventStatus.ACTIVE;
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
@@ -58,8 +96,8 @@ export function SearchAndFilter({
           onChange={(e) => handleSearchChange(e.target.value)}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
-          placeholder="Search BTC address or reply content..."
-          className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-base md:text-base outline-none w-full min-w-0"
+          placeholder="Search by address, content or option"
+          className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-sm outline-none w-full min-w-0 focus:border-accent transition-colors"
         />
         {(isSearchFocused || search) && (
           <button
@@ -68,7 +106,9 @@ export function SearchAndFilter({
               handleSearchChange("");
               setIsSearchFocused(false);
             }}
-            className="absolute right-3 flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-hover text-secondary hover:text-primary transition-colors"
+            className="absolute right-3 flex items-center justify-center w-5 h-5 
+            rounded-full hover:bg-surface-hover text-secondary 
+            hover:text-primary transition-colors cursor-pointer"
             aria-label="Clear search"
           >
             <ClearIcon className="w-4 h-4 text-secondary" />
@@ -77,40 +117,94 @@ export function SearchAndFilter({
       </div>
 
       {/* Filter and Sort */}
-      <div className="flex items-center gap-2">
-        {/* Sort by Balance */}
-        <button
-          type="button"
-          onClick={() => handleSortChange(ReplySortBy.BALANCE)}
-          className={`flex items-center justify-center h-9 px-3 rounded-xl border border-border bg-surface text-xs md:text-sm transition-all duration-300 ease-in-out ${
-            sortBy === ReplySortBy.BALANCE
-              ? "bg-white text-black border-border"
-              : "text-secondary"
-          }`}
+      <div className="flex items-center gap-2 w-full md:w-auto">
+        {/* Sort Control */}
+        <div
+          className="flex-1 md:flex-none flex items-center h-9 bg-white 
+          dark:bg-surface rounded-lg border 
+          border-border"
         >
-          Balance
-          {sortBy === ReplySortBy.BALANCE && (
-            <span className="ml-1">{order === "desc" ? "↓" : "↑"}</span>
-          )}
-        </button>
+          {/* Order Toggle */}
+          <button
+            type="button"
+            onClick={toggleOrder}
+            className="flex items-center justify-center w-9 h-full border-r 
+            border-border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer"
+            aria-label={order === "desc" ? "Sort descending" : "Sort ascending"}
+          >
+            {order === "desc" ? (
+              <SortDescIcon className="w-4 h-4" />
+            ) : (
+              <SortAscIcon className="w-4 h-4" />
+            )}
+          </button>
 
-        {/* Sort by Time */}
-        <button
-          type="button"
-          onClick={() => handleSortChange(ReplySortBy.TIME)}
-          className={`flex items-center justify-center h-9 px-3 rounded-xl border border-border bg-surface text-xs md:text-sm transition-all duration-300 ease-in-out ${
-            sortBy === ReplySortBy.TIME
-              ? "bg-white text-black border-border"
-              : "text-secondary"
-          }`}
-        >
-          Time
-          {sortBy === ReplySortBy.TIME && (
-            <span className="ml-1">{order === "desc" ? "↓" : "↑"}</span>
+          {/* Sort Field Select */}
+          <div className="relative h-full flex-1" ref={sortDropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+              className="w-full h-full flex items-center justify-center gap-2 px-3 
+              hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors rounded-r-lg"
+            >
+              <span className="text-sm font-medium text-primary capitalize">
+                {sortBy}
+              </span>
+              <ArrowDownIcon
+                className={`w-2 h-2 text-secondary transition-transform duration-200 ${
+                  isSortDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isSortDropdownOpen && (
+              <div className="absolute top-full right-0 mt-1 min-w-full w-28 bg-white dark:bg-surface border border-border rounded-lg shadow-lg z-10 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => handleSortFieldChange(ReplySortBy.BALANCE)}
+                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50 
+                    dark:hover:bg-gray-900 transition-colors ${
+                      sortBy === ReplySortBy.BALANCE
+                        ? "text-accent font-medium bg-accent/5"
+                        : "text-primary"
+                    }`}
+                >
+                  Balance
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSortFieldChange(ReplySortBy.TIME)}
+                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50 
+                    dark:hover:bg-gray-900 transition-colors ${
+                      sortBy === ReplySortBy.TIME
+                        ? "text-accent font-medium bg-accent/5"
+                        : "text-primary"
+                    }`}
+                >
+                  Time
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Reward Button (Active Only) */}
+        <div className={isActive ? "flex-1 md:flex-none" : ""}>
+          {isActive && (
+            <Button
+              appearance="solid"
+              tone="surface"
+              text="sm"
+              className="h-9 gap-1 w-full md:w-auto dark:hover:bg-gray-900"
+              onClick={handleRewardClick}
+            >
+              <PlusIcon className="w-3 h-3" />
+              Reward
+            </Button>
           )}
-        </button>
+        </div>
       </div>
     </div>
   );
 }
-

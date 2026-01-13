@@ -183,9 +183,12 @@ const EventDetail = () => {
         {/* Second Section: Search and Filter */}
         <SearchAndFilter
           eventId={eventId!}
+          eventStatus={eventDetail.status}
           onSearchChange={handleSearchChange}
           onSortChange={handleSortChange}
         />
+
+        <div className="h-4" />
 
         {/* Third Section: Reply List */}
         <ReplyList

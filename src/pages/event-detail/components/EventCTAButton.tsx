@@ -64,7 +64,7 @@ export function EventCTAButton({
       appearance="solid"
       tone="primary"
       text="sm"
-      className="sm:w-[200px]"
+      className="w-full md:w-[150px]"
       disabled={isDisabled}
       onClick={handleClick}
     >

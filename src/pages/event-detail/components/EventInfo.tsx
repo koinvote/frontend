@@ -654,7 +654,7 @@ export function EventInfo({ event }: EventInfoProps) {
       )}
 
       {/* CTA Button */}
-      <div className="flex justify-end">
+      <div className="flex md:justify-end">
         <EventCTAButton
           status={event.status}
           eventRewardType={event.event_reward_type}
