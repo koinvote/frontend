@@ -91,10 +91,9 @@ interface ReplyItemProps {
     weight_percent: number;
     amount_satoshi: string;
   };
-  isLast: boolean;
 }
 
-function ReplyItem({ reply, isLast }: ReplyItemProps) {
+function ReplyItem({ reply }: ReplyItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showToggle, setShowToggle] = useState(false);
   const hasOverflowRef = useRef(false); // 使用 ref 记录是否曾经溢出，避免依赖问题
@@ -103,32 +102,50 @@ function ReplyItem({ reply, isLast }: ReplyItemProps) {
 
   useEffect(() => {
     const checkOverflow = () => {
-      if (textRef.current) {
-        if (isExpanded) {
-          setShowToggle(hasOverflowRef.current);
-          return;
-        }
+      if (!textRef.current) return;
 
-        // Temporarily remove line-clamp to check actual height
-        const originalClass = textRef.current.className;
-        textRef.current.className = textRef.current.className.replace(
-          "line-clamp-1",
-          ""
-        );
-        const fullHeight = textRef.current.scrollHeight;
-
-        // Restore line-clamp
-        textRef.current.className = originalClass;
-        const clampedHeight = textRef.current.clientHeight;
-
-        const TOLERANCE = 2;
-        const isOverflowing = fullHeight > clampedHeight + TOLERANCE;
-
-        if (isOverflowing) {
-          hasOverflowRef.current = true;
-        }
-        setShowToggle(hasOverflowRef.current || isOverflowing);
+      if (isExpanded) {
+        setShowToggle(hasOverflowRef.current);
+        return;
       }
+
+      // Get computed styles to calculate line height
+      const computedStyle = window.getComputedStyle(textRef.current);
+      const lineHeight =
+        parseFloat(computedStyle.lineHeight) ||
+        parseFloat(computedStyle.fontSize) * 1.5;
+
+      // Create a clone to measure full height without affecting the original
+      const clone = textRef.current.cloneNode(true) as HTMLElement;
+      clone.className = "text-primary break-words"; // Remove line-clamp, keep break-words
+      clone.style.position = "absolute";
+      clone.style.visibility = "hidden";
+      clone.style.width = `${textRef.current.offsetWidth}px`;
+      clone.style.whiteSpace = "normal";
+      clone.style.wordBreak = "break-word";
+      clone.style.overflow = "visible";
+      clone.style.height = "auto";
+      clone.style.maxHeight = "none";
+      clone.style.webkitLineClamp = "none";
+      clone.style.display = "block";
+
+      document.body.appendChild(clone);
+      const fullHeight = clone.scrollHeight;
+      document.body.removeChild(clone);
+
+      const clampedHeight = textRef.current.clientHeight;
+      const expectedHeight = lineHeight;
+      const TOLERANCE = 2;
+
+      // Check if content exceeds 1 line
+      const isOverflowing =
+        fullHeight > expectedHeight + TOLERANCE ||
+        fullHeight > clampedHeight + TOLERANCE;
+
+      if (isOverflowing) {
+        hasOverflowRef.current = true;
+      }
+      setShowToggle(hasOverflowRef.current || isOverflowing);
     };
 
     // Check on mount and resize, with a small delay to ensure DOM is ready
@@ -146,12 +163,15 @@ function ReplyItem({ reply, isLast }: ReplyItemProps) {
   };
 
   return (
-    <div ref={containerRef} className={isLast ? "" : "mb-1"}>
+    <div
+      ref={containerRef}
+      className={`rounded-lg px-2 py-1 -mx-2 -my-1 transition-colors md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)]`}
+    >
       <p
         ref={textRef}
-        className={`text-primary ${isExpanded ? "" : "line-clamp-1"} ${
-          showToggle ? "cursor-pointer" : ""
-        }`}
+        className={`text-primary break-words ${
+          isExpanded ? "" : "line-clamp-1"
+        } ${showToggle ? "cursor-pointer" : ""}`}
         onClick={showToggle ? handleToggle : undefined}
       >
         {reply.body}
@@ -169,7 +189,6 @@ function ReplyItem({ reply, isLast }: ReplyItemProps) {
           </span>
         </div>
       </div>
-      {!isLast && <div className="mt-2 border-t border-border pt-2" />}
     </div>
   );
 }
@@ -385,18 +404,20 @@ export function EventCard({ event, onClick }: EventCardProps) {
       {(primaryReply || secondaryReply) && (
         <section
           data-top-replies
-          className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm transition-colors bg-[rgba(var(--color-gray-450-rgb),0.5)] md:hover:bg-[rgba(var(--color-gray-450-rgb),0.7)]"
+          className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm bg-[rgba(var(--color-gray-450-rgb),0.5)]"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-1 text-[11px] md:text-xs text-secondary">
             Top reply
           </div>
 
-          {primaryReply && (
-            <ReplyItem reply={primaryReply} isLast={!secondaryReply} />
+          {primaryReply && <ReplyItem reply={primaryReply} />}
+
+          {primaryReply && secondaryReply && (
+            <div className="my-1 border-t border-border" />
           )}
 
-          {secondaryReply && <ReplyItem reply={secondaryReply} isLast={true} />}
+          {secondaryReply && <ReplyItem reply={secondaryReply} />}
         </section>
       )}
 
