@@ -1,19 +1,19 @@
 // Mock data for API responses
 import type {
-  SystemConfigRes,
-  EventListDataRes,
+  AdminSystemParametersRes,
+  DepositStatusRes,
   EventDetailDataRes,
+  EventListDataRes,
   GetEventListRes,
   GetHotHashtagsRes,
-  DepositStatusRes,
   GetListRepliesRes,
-  Reply,
-  AdminSystemParametersRes,
   PayoutReportRes,
   PayoutWinner,
+  Reply,
   RewardDetail,
+  SystemConfigRes,
 } from "@/api/response";
-import { EventStatus, DepositStatus } from "@/api/types";
+import { DepositStatus, EventStatus } from "@/api/types";
 
 // System Configuration Mock
 export const mockSystemConfig: SystemConfigRes = {
@@ -154,7 +154,8 @@ export const mockEventList: EventListDataRes[] = [
     event_type: "single-choice",
     event_id: "evt_004_mock",
     title: "Bitcoin halving prediction: What will the price be in 2028?",
-    description: "Make your prediction for Bitcoin price after the 2028 halving",
+    description:
+      "Make your prediction for Bitcoin price after the 2028 halving",
     status: 3, // active
     hashtags: ["bitcoin", "halving", "price"],
     created_at: "2026-01-08T10:00:00Z",
@@ -247,7 +248,8 @@ export const mockEventDetail: EventDetailDataRes = {
     },
     {
       id: 3,
-      btc_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+      btc_address:
+        "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
       body: "RGB protocol shows great promise for client-side validation and privacy. It's the future of Bitcoin DeFi.",
       weight_percent: 22,
       amount_satoshi: 22000,
@@ -297,7 +299,8 @@ export const mockReplies: Reply[] = [
       "Lightning Network is the most mature solution with excellent tooling.",
     plaintext:
       "Koinvote Event Reply\nEvent ID: evt_001_mock\nAddress: bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq\nNonce: 1705123456\nRandom: abc123",
-    signature: "H8j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2",
+    signature:
+      "H8j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2",
     balance_at_reply_satoshi: 1500000,
     balance_at_snapshot_satoshi: 1500000,
     balance_at_current_satoshi: 1600000,
@@ -311,7 +314,8 @@ export const mockReplies: Reply[] = [
       "Multiple L2 solutions are needed for different use cases and experimentation.",
     plaintext:
       "Koinvote Event Reply\nEvent ID: evt_001_mock\nAddress: bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4\nNonce: 1705123789\nRandom: xyz789",
-    signature: "I9j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3",
+    signature:
+      "I9j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3",
     balance_at_reply_satoshi: 1200000,
     balance_at_snapshot_satoshi: 1200000,
     balance_at_current_satoshi: 1250000,
@@ -320,11 +324,13 @@ export const mockReplies: Reply[] = [
   },
   {
     id: 3,
-    btc_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    btc_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
     content: "RGB protocol for client-side validation is revolutionary.",
     plaintext:
       "Koinvote Event Reply\nEvent ID: evt_001_mock\nAddress: bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej\nNonce: 1705124012\nRandom: rgb456",
-    signature: "J0k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4",
+    signature:
+      "J0k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4",
     balance_at_reply_satoshi: 950000,
     balance_at_snapshot_satoshi: 950000,
     balance_at_current_satoshi: 980000,
@@ -402,7 +408,8 @@ export const mockPayoutWinners: PayoutWinner[] = [
     payout_at: "2026-01-16T16:03:00Z",
   },
   {
-    winner_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    winner_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
     balance_at_snapshot_satoshi: 300000,
     win_probability_percent: 12.0,
     is_dust: false,

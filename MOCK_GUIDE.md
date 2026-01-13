@@ -214,6 +214,7 @@ public/
 ### Q: 為什麼看不到 mock 資料？
 
 A: 檢查以下項目：
+
 1. 確認瀏覽器控制台有顯示 `[MSW] Mocking enabled`
 2. 確認 `.env.mock` 或 `.env.development` 中 `VITE_USE_MOCK=true`
 3. 重新啟動開發伺服器
@@ -234,7 +235,9 @@ export const handlers = [
     return HttpResponse.json({
       code: "200",
       success: true,
-      data: { /* your mock data */ },
+      data: {
+        /* your mock data */
+      },
     });
   }),
 ];
@@ -290,6 +293,7 @@ http.post(`${API_BASE_URL}/events`, async ({ request }) => {
 ## 支援
 
 如有問題或需要新增更多 mock 資料，請查看：
+
 - `src/api/request.ts` - 請求型別定義
 - `src/api/response.ts` - 回應型別定義
 - `src/mocks/handlers.ts` - API handlers
