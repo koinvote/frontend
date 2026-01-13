@@ -276,19 +276,7 @@ function ReplyItem({ reply, onCopy, options, eventType }: ReplyItemProps) {
               )}
               {eventType === "open" && reply.content && contentHash && (
                 <Tooltip
-                  title={
-                    <div>
-                      SHA-256 (hex,{" "}
-                      <button
-                        type="button"
-                        onClick={handleCopyHash}
-                        className="cursor-pointer hover:underline bg-transparent border-0 p-0 text-current font-mono"
-                      >
-                        {contentHash}
-                      </button>
-                      )
-                    </div>
-                  }
+                  title="Tap to copy SHA-256 hash"
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
                   getPopupContainer={(triggerNode) =>
