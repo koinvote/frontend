@@ -179,3 +179,24 @@ export const formatCompletedTime = (deadlineAt: string): string => {
   const timeStr = deadline.format("HH:mm");
   return `Ended on ${dateStr} — ${timeStr} UTC`;
 };
+
+/**
+ * Format deposit countdown: 從 deposit_timeout_at (UTC) 計算，格式為 MM:SS
+ * 如果時間已過期或為 0，返回 "00:00"
+ */
+export const formatDepositCountdown = (depositTimeoutAt: string): string => {
+  const deadline = dayjs.utc(depositTimeoutAt);
+  const now = dayjs();
+  const diffMs = deadline.diff(now);
+
+  if (diffMs <= 0) {
+    return "00:00";
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
+};

@@ -139,7 +139,7 @@ export interface DepositStatusRes {
   status:
     | typeof DepositStatus.PENDING
     | typeof DepositStatus.UNCONFIRMED
-    | typeof DepositStatus.COMPLETED
+    | typeof DepositStatus.RECEIVED
     | typeof DepositStatus.DONATION
     | typeof DepositStatus.WAIT_FOR_REFUND
     | typeof DepositStatus.EXPIRED
@@ -147,6 +147,7 @@ export interface DepositStatusRes {
   confirmed_at: string;
   received_txid: string;
   confirmations: number;
+  deposit_timeout_at?: string;
   initial_timeout_at: string;
   extend_timeout_at: string;
   first_seen_at: string;

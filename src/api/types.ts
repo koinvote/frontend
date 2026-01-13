@@ -26,13 +26,13 @@ export const EventStatus = {
 } as const;
 
 export const DepositStatus = {
-  PENDING: "WAITING_FOR_PAYMENT",
-  UNCONFIRMED: "DETECTED_ZERO_CONFIRMATIONS",
-  COMPLETED: "PAYMENT_COMPLETED",
-  DONATION: "UNDERPAID_DONATION",
-  WAIT_FOR_REFUND: "UNDERPAID_WAIT_FOR_REFUND",
-  EXPIRED: "EXPIRED",
-  FROZEN: "MULTIPLE_TRANSACTIONS_FROZEN",
+  PENDING: "pending",
+  UNCONFIRMED: "unconfirmed",
+  RECEIVED: "received",
+  DONATION: "donation",
+  WAIT_FOR_REFUND: "wait_for_refund",
+  EXPIRED: "expired",
+  FROZEN: "frozen",
 } as const;
 
 export const ReplySortBy = {
