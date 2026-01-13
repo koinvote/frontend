@@ -1,19 +1,25 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { API, type ApiResponse } from "@/api";
-import { ReplySortBy } from "@/api/types";
+import { ReplySortBy, type EventType } from "@/api/types";
 import type { Reply, GetListRepliesRes, EventOption } from "@/api/response";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
+import { Tooltip } from "antd";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
+import InvalidateIcon from "@/assets/icons/invalidate.svg?react";
+import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
 // import ReportIcon from "@/assets/icons/report.svg?react";
 import { Divider } from "./Divider";
+import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
+import { useHomeStore } from "@/stores/homeStore";
+import { Button } from "@/components/base/Button";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -24,6 +30,7 @@ interface ReplyListProps {
   sortBy?: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME;
   order?: "desc" | "asc";
   options?: EventOption[] | string[];
+  eventType?: EventType;
 }
 
 function formatRelativeTime(dateString: string): string {
@@ -67,6 +74,7 @@ export function ReplyList({
   sortBy = ReplySortBy.BALANCE,
   order = "desc",
   options = [],
+  eventType,
 }: ReplyListProps) {
   const { showToast } = useToast();
   const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
@@ -139,6 +147,7 @@ export function ReplyList({
           reply={reply}
           onCopy={handleCopy}
           options={options}
+          eventType={eventType}
         />
       ))}
     </div>
@@ -150,13 +159,62 @@ interface ReplyItemProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onCopy: any; // Using any for debounced function return type compatibility
   options: EventOption[] | string[];
+  eventType?: EventType;
 }
 
-function ReplyItem({ reply, onCopy, options }: ReplyItemProps) {
+function ReplyItem({ reply, onCopy, options, eventType }: ReplyItemProps) {
+  const { isDesktop } = useHomeStore();
+  const { showToast } = useToast();
+  const { tooltipProps, triggerProps } = useTooltipWithClick({
+    keepOpenOnClick: !isDesktop,
+    singleLine: isDesktop,
+  });
+
   const balanceBtc = satsToBtc(reply.balance_at_reply_satoshi, {
     suffix: false,
   });
   const timeAgo = formatRelativeTime(reply.created_at);
+
+  // Calculate SHA-256 hash of reply content
+  const [contentHash, setContentHash] = useState<string | null>(null);
+
+  // Handle copy content hash
+  const handleCopyHash = useDebouncedClick(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!contentHash) return;
+    try {
+      await navigator.clipboard.writeText(contentHash);
+      showToast("success", "Hash copied to clipboard");
+    } catch (error) {
+      console.error("Failed to copy hash:", error);
+      showToast("error", "Failed to copy hash");
+    }
+  });
+
+  useEffect(() => {
+    const calculateHash = async () => {
+      if (!reply.content) {
+        setContentHash(null);
+        return;
+      }
+      try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(reply.content);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray
+          .map((b) => b.toString(16).padStart(2, "0"))
+          .join("");
+        setContentHash(hashHex);
+      } catch (error) {
+        console.error("Failed to calculate SHA-256 hash:", error);
+        setContentHash(null);
+      }
+    };
+
+    calculateHash();
+  }, [reply.content]);
 
   // Helper to get option text
   const getOptionText = (optionId: number) => {
@@ -190,13 +248,78 @@ function ReplyItem({ reply, onCopy, options }: ReplyItemProps) {
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="flex items-center justify-between gap-2 mb-2">
             <div className="flex items-center gap-2">
-              <span className="text-base md:text-lg font-semibold text-primary">
+              <span
+                className={`text-base md:text-lg font-semibold text-primary ${
+                  !reply.is_reply_valid ? "line-through" : ""
+                }`}
+              >
                 {balanceBtc} BTC
               </span>
-              {reply.is_reply_valid && (
+              {reply.is_reply_valid ? (
                 <span className="text-green-500 text-xs">
                   <ReplyValidateIcon className="w-4 h-4 text-current" />
                 </span>
+              ) : (
+                <Tooltip
+                  title="This address submitted a new signature before the deadline; this signature is void."
+                  placement={isDesktop ? "top" : "bottom"}
+                  color="white"
+                  {...tooltipProps}
+                  getPopupContainer={(triggerNode) =>
+                    triggerNode.parentElement || document.body
+                  }
+                >
+                  <span className="text-red-500 text-xs" {...triggerProps}>
+                    <InvalidateIcon className="w-4 h-4 text-current" />
+                  </span>
+                </Tooltip>
+              )}
+              {eventType === "open" && reply.content && contentHash && (
+                <Tooltip
+                  title={
+                    <div>
+                      SHA-256 (hex,{" "}
+                      <button
+                        type="button"
+                        onClick={handleCopyHash}
+                        className="cursor-pointer hover:underline bg-transparent border-0 p-0 text-current font-mono"
+                      >
+                        {contentHash}
+                      </button>
+                      )
+                    </div>
+                  }
+                  placement={isDesktop ? "top" : "bottom"}
+                  color="white"
+                  getPopupContainer={(triggerNode) =>
+                    triggerNode.parentElement || document.body
+                  }
+                  styles={{
+                    container: {
+                      maxWidth: isDesktop
+                        ? "max-content"
+                        : "min(300px, calc(100vw - 32px))",
+                      whiteSpace: isDesktop ? "nowrap" : "normal",
+                      width: isDesktop ? "max-content" : undefined,
+                    },
+                  }}
+                >
+                  <span>
+                    <Button
+                      appearance="outline"
+                      tone="primary"
+                      size="sm"
+                      text="xs"
+                      className="p-0 border-0 bg-transparent hover:bg-transparent hover:text-primary"
+                      onClick={handleCopyHash}
+                    >
+                      <VerificationWhiteIcon
+                        className="w-4 h-4"
+                        style={{ color: "#155DFC" }}
+                      />
+                    </Button>
+                  </span>
+                </Tooltip>
               )}
             </div>
             <span className="text-xs md:text-sm text-secondary md:hidden">
@@ -204,9 +327,13 @@ function ReplyItem({ reply, onCopy, options }: ReplyItemProps) {
             </span>
           </div>
           {displayText && (
-                <p className="text-sm md:text-base text-primary break-words">
-                  {displayText}
-                </p>
+            <p
+              className={`text-sm md:text-base text-primary break-words ${
+                !reply.is_reply_valid ? "line-through" : ""
+              }`}
+            >
+              {displayText}
+            </p>
           )}
 
           <div className="flex-1"></div>
@@ -222,7 +349,7 @@ function ReplyItem({ reply, onCopy, options }: ReplyItemProps) {
 
         {/* Right Column: Time and Details */}
         <div className="flex flex-col items-start md:items-end gap-3 min-w-[280px]">
-          <span className="text-xs md:text-sm text-secondary text-right w-full hidden md:block">
+          <span className="text-xs md:text-sm text-secondary text-right w-full hidden md:inline-block md:whitespace-nowrap">
             {timeAgo}
           </span>
 

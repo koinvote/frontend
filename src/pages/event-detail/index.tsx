@@ -106,6 +106,7 @@ const EventDetail = () => {
           sortBy={sortBy}
           order={order}
           options={eventDetail.options}
+          eventType={eventDetail.event_type}
         />
       </div>
     </div>
