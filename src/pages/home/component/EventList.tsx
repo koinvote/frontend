@@ -6,7 +6,8 @@ import { useHomeStore } from "@/stores/homeStore";
 
 export function EventList() {
   const navigate = useNavigate();
-  const { setScrollY } = useHomeStore();
+  // Optimize selector to avoid re-rendering on every scroll update
+  const setScrollY = useHomeStore((state) => state.setScrollY);
   const { events, isLoading, isError, hasMore, loadMore, reload } =
     useHomeEvents();
   const sentinelRef = useRef<HTMLDivElement | null>(null);

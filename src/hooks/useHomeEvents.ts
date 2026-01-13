@@ -198,8 +198,14 @@ export function useHomeEvents() {
 
   // filters 改變時重新載入第一頁
   useEffect(() => {
+    // 如果 store 中已經有數據（例如從 persist 恢復），且 offset > 0
+    // 說明是頁面刷新或導航返回，此時不應該重新加載第一頁，以免丟失滾動位置和數據
+    // 只有當 offset 為 0 (表示 filter 改變或被手動重置) 時才加載
+    if (events.length > 0 && offset > 0) {
+      return;
+    }
     loadFirstPage();
-  }, [loadFirstPage]);
+  }, [loadFirstPage, events.length, offset]);
 
   return {
     events,
