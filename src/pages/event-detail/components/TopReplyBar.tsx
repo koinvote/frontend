@@ -13,6 +13,7 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
       : reply.amount_satoshi;
   const amountBtc = satsToBtc(amountSatoshi, { suffix: false });
   const weightPercent = reply.weight_percent || 0;
+  const weightPercentDisplay = Number(weightPercent.toFixed(2));
 
   // Calculate bar width based on weight percentage
   const barWidth = `${Math.min(100, Math.max(0, weightPercent))}%`;
@@ -38,7 +39,7 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
             {amountBtc} BTC
           </span>
           <span className="text-xs md:text-sm font-semibold text-accent">
-            {weightPercent}%
+            {weightPercentDisplay}%
           </span>
         </div>
       </div>
