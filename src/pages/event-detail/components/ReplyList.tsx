@@ -12,7 +12,7 @@ import CopyIcon from "@/assets/icons/copy.svg?react";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
-import ReportIcon from "@/assets/icons/report.svg?react";
+// import ReportIcon from "@/assets/icons/report.svg?react";
 import { Divider } from "./Divider";
 
 dayjs.extend(relativeTime);
@@ -188,38 +188,41 @@ function ReplyItem({ reply, onCopy, options }: ReplyItemProps) {
       <div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-4 flex-1">
         {/* Left Column: Balance and Content */}
         <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-base md:text-lg font-semibold text-primary">
-              {balanceBtc} BTC
-            </span>
-            {reply.is_reply_valid && (
-              <span className="text-green-500 text-xs">
-                <ReplyValidateIcon className="w-4 h-4 text-current" />
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <div className="flex items-center gap-2">
+              <span className="text-base md:text-lg font-semibold text-primary">
+                {balanceBtc} BTC
               </span>
-            )}
+              {reply.is_reply_valid && (
+                <span className="text-green-500 text-xs">
+                  <ReplyValidateIcon className="w-4 h-4 text-current" />
+                </span>
+              )}
+            </div>
+            <span className="text-xs md:text-sm text-secondary md:hidden">
+              {timeAgo}
+            </span>
           </div>
           {displayText && (
-            <p className="text-sm md:text-base text-primary mb-4 break-words">
-              {displayText}
-            </p>
+                <p className="text-sm md:text-base text-primary break-words">
+                  {displayText}
+                </p>
           )}
 
           <div className="flex-1"></div>
-
-          <button
+          {/* Todo Next version: Add report button */}
+          {/* <button
             type="button"
             className="flex items-center gap-1 text-secondary hover:text-primary transition-colors mt-2"
-            onClick={() => {
-              /* Logic to be added later */
-            }}
+          
           >
             <ReportIcon className="w-4 h-4" />
-          </button>
+          </button> */}
         </div>
 
         {/* Right Column: Time and Details */}
         <div className="flex flex-col items-start md:items-end gap-3 min-w-[280px]">
-          <span className="text-xs md:text-sm text-secondary text-right w-full">
+          <span className="text-xs md:text-sm text-secondary text-right w-full hidden md:block">
             {timeAgo}
           </span>
 

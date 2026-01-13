@@ -34,11 +34,11 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
         <span className="text-sm md:text-base text-primary line-clamp-1 flex-1 pr-4">
           {reply.body}
         </span>
-        <div className="flex flex-col items-end gap-1 shrink-0">
+        <div className="flex flex-col items-end gap-1 shrink-0 ml-1">
           <span className="text-xs md:text-sm dark:text-white">
             {amountBtc} BTC
           </span>
-          <span className="text-xs md:text-sm font-semibold text-accent">
+          <span className="text-xs md:text-sm font-semibold">
             {weightPercentDisplay}%
           </span>
         </div>
