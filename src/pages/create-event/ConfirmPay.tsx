@@ -20,8 +20,8 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
-const SATS_PER_BTC = 100_000_000;
-const MIN_REFUND_THRESHOLD = 0.0005; // 0.0005 BTC
+const BTC_TO_SATS = 100_000_000;
+const MIN_REFUND_THRESHOLD = 0.0005; // fallback if system param is missing
 
 // For testing: Set to true to use hardcoded countdown
 // Set to false to use deposit_timeout_at from API
@@ -58,6 +58,13 @@ export default function ConfirmPay() {
   const { setStatus } = useHomeStore();
 
   const systemParams = useSystemParametersStore((s) => s.params);
+
+  const refundThresholdBtc = useMemo(() => {
+    const satoshiPerHour = systemParams?.satoshi_per_duration_hour;
+    if (!satoshiPerHour || satoshiPerHour <= 0)
+      return MIN_REFUND_THRESHOLD.toString();
+    return satsToBtc(satoshiPerHour, { suffix: false, trimTrailingZeros: true });
+  }, [systemParams]);
 
   const [depositStatus, setDepositStatus] = useState<DepositStatusRes | null>(
     null
@@ -305,7 +312,7 @@ export default function ConfirmPay() {
   // Calculate reward amount in satoshi
   const rewardAmountSatoshi = useMemo(() => {
     if (!state?.isRewarded || !state?.rewardBtc) return 0;
-    return Math.round(parseFloat(state.rewardBtc) * SATS_PER_BTC);
+    return Math.round(parseFloat(state.rewardBtc) * BTC_TO_SATS);
   }, [state?.isRewarded, state?.rewardBtc]);
 
   // Calculate total amount
@@ -544,7 +551,7 @@ export default function ConfirmPay() {
                 </span>
                 <span>
                   Do NOT split your payment. Transactions below{" "}
-                  {MIN_REFUND_THRESHOLD} BTC will NOT trigger a refund.
+                  {refundThresholdBtc} BTC will NOT trigger a refund.
                 </span>
               </div>
 

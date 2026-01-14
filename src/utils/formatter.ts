@@ -27,9 +27,15 @@ export const satsToBtc = (
     decimals?: number;
     suffix?: boolean;
     showZero?: boolean;
+    trimTrailingZeros?: boolean;
   }
 ): string => {
-  const { decimals = 8, suffix = true, showZero = true } = options ?? {};
+  const {
+    decimals = 8,
+    suffix = true,
+    showZero = true,
+    trimTrailingZeros = false,
+  } = options ?? {};
 
   // Handle null/undefined
   if (satoshi === null || satoshi === undefined) {
@@ -48,7 +54,17 @@ export const satsToBtc = (
 
   // Convert to BTC
   const btc = satoshi / SATS_PER_BTC;
-  const formatted = btc.toFixed(decimals);
+  const fixed = btc.toFixed(decimals);
+
+  const formatted = trimTrailingZeros
+    ? (() => {
+        const [intPart, fracPart = ""] = fixed.split(".");
+        if (!fracPart) return fixed;
+        const trimmedFrac = fracPart.replace(/0+$/, "");
+        return trimmedFrac ? `${intPart}.${trimmedFrac}` : intPart;
+      })()
+    : fixed;
+
   return suffix ? `${formatted} BTC` : formatted;
 };
 
@@ -200,7 +216,6 @@ export const formatDepositCountdown = (depositTimeoutAt: string): string => {
     .toString()
     .padStart(2, "0")}`;
 };
-
 
 export function formatRelativeTime(dateString: string): string {
   // 確保將服務器返回的 UTC 時間正確解析為 UTC
