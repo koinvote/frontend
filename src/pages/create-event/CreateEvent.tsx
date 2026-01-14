@@ -855,9 +855,9 @@ export default function CreateEvent() {
               value={creatorAddress}
               onChange={handleCreatorAddressChange}
               placeholder={t("createEvent.creatorAddressPlaceholder")}
-              autoComplete="off"
               autoCorrect="off"
               autoCapitalize="off"
+              autoComplete="new-password"
               spellCheck="false"
               className={`w-full rounded-xl border border-border bg-white px-3 py-2
     tx-14 lh-20 text-black placeholder:text-secondary

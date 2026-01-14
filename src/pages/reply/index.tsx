@@ -371,7 +371,7 @@ export default function ReplyPage() {
               value={btcAddress}
               onChange={(e) => setBtcAddress(e.target.value)}
               placeholder="Please enter your BTC address"
-              autoComplete="off"
+              autoComplete="new-password"
               autoCorrect="off"
               autoCapitalize="off"
               spellCheck="false"
