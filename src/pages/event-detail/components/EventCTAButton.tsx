@@ -3,6 +3,7 @@ import { Tooltip } from "antd";
 import { Button } from "@/components/base/Button";
 import { EventStatus } from "@/api/types";
 import type { EventRewardType } from "@/api/types";
+import RewardReportIcon from "@/assets/icons/rewardReport.svg?react";
 
 interface EventCTAButtonProps {
   status:
@@ -19,6 +20,7 @@ export function EventCTAButton({
   eventId,
 }: EventCTAButtonProps) {
   const navigate = useNavigate();
+  console.log(status);
 
   const isPreheat = status === EventStatus.PREHEAT;
   const isOngoing = status === EventStatus.ACTIVE;
@@ -64,10 +66,17 @@ export function EventCTAButton({
       appearance="solid"
       tone="primary"
       text="sm"
-      className="w-full md:w-[150px]"
+      className={`w-full md:w-auto whitespace-nowrap px-4 gap-2 ${
+        isCompleted && isRewarded
+          ? "bg-surface text-black hover:bg-surface/80 dark:bg-surface dark:text-white dark:hover:bg-surface/80"
+          : ""
+      }`}
       disabled={isDisabled}
       onClick={handleClick}
     >
+      {isRewarded && isCompleted && (
+        <RewardReportIcon className="w-4 h-4" />
+      )}
       {buttonText}
     </Button>
   );
