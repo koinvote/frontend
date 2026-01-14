@@ -256,9 +256,19 @@ function ReplyItem({ reply, onCopy, options, eventType }: ReplyItemProps) {
                 {balanceBtc} BTC
               </span>
               {reply.is_reply_valid ? (
-                <span className="text-green-500 text-xs">
-                  <ReplyValidateIcon className="w-4 h-4 text-current" />
-                </span>
+                <Tooltip
+                  title="Signature verification valid"
+                  placement={isDesktop ? "top" : "bottom"}
+                  color="white"
+                  {...tooltipProps}
+                  getPopupContainer={(triggerNode) =>
+                    triggerNode.parentElement || document.body
+                  }
+                >
+                  <span className="text-green-500 text-xs" {...triggerProps}>
+                    <ReplyValidateIcon className="w-4 h-4 text-current" />
+                  </span>
+                </Tooltip>
               ) : (
                 <Tooltip
                   title="This address submitted a new signature before the deadline; this signature is void."
