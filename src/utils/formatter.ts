@@ -200,3 +200,33 @@ export const formatDepositCountdown = (depositTimeoutAt: string): string => {
     .toString()
     .padStart(2, "0")}`;
 };
+
+
+export function formatRelativeTime(dateString: string): string {
+  // 確保將服務器返回的 UTC 時間正確解析為 UTC
+  const date = dayjs.utc(dateString);
+  const now = dayjs();
+
+  const diffSeconds = now.diff(date, "second");
+  if (diffSeconds < 60) {
+    return `${Math.max(1, diffSeconds)}s ago`;
+  }
+
+  const diffMinutes = now.diff(date, "minute");
+  if (diffMinutes < 60) {
+    return `${diffMinutes}m ago`;
+  }
+
+  const diffHours = now.diff(date, "hour");
+  if (diffHours < 24) {
+    return `${diffHours}h ago`;
+  }
+
+  const diffDays = now.diff(date, "day");
+  if (diffDays < 7) {
+    return `${diffDays}d ago`;
+  }
+
+  const weeks = Math.floor(diffDays / 7);
+  return `${weeks}w ago`;
+}

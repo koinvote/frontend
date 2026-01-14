@@ -20,6 +20,7 @@ import { Divider } from "./Divider";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
 import { Button } from "@/components/base/Button";
+import { formatRelativeTime } from "@/utils/formatter";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -33,22 +34,7 @@ interface ReplyListProps {
   eventType?: EventType;
 }
 
-function formatRelativeTime(dateString: string): string {
-  // 確保將服務器返回的 UTC 時間正確解析為 UTC
-  const date = dayjs.utc(dateString);
-  const now = dayjs();
-  const diffDays = now.diff(date, "day");
 
-  if (diffDays < 1) {
-    const hours = now.diff(date, "hour");
-    return `${hours}h ago`;
-  }
-  if (diffDays < 7) {
-    return `${diffDays}d ago`;
-  }
-  const weeks = Math.floor(diffDays / 7);
-  return `${weeks}w ago`;
-}
 
 function truncateAddress(
   address: string,
