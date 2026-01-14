@@ -60,7 +60,7 @@ export function EventList() {
       </div>
     );
   }
-
+  console.log("eventsList", events);
   return (
     <div className="mt-4 flex flex-col gap-4 md:gap-6">
       {events.map((event) => (

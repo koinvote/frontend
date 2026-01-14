@@ -1,5 +1,6 @@
 // src/pages/home/types.ts
 import type { EventStatus } from "@/api/types";
+import type { EventOption } from "@/api/response";
 
 export interface TopReply {
   id: string;
@@ -29,6 +30,8 @@ export interface EventSummary {
   total_stake_btc: string;
 
   top_replies: TopReply[];
+  event_type: "open" | "single_choice";
+  options: EventOption[] | string[];
 }
 
 // Home 狀態、排序（UI）

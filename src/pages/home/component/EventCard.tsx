@@ -1,11 +1,12 @@
 import { type EventSummary } from "@/pages/create-event/types/index";
+import { type EventOption } from "@/api/response";
 import { EventStatus } from "@/api/types";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
 import { useToast } from "@/components/base/Toast/useToast";
 import { Tooltip } from "antd";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { satsToBtc, formatOngoingCountdown } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
@@ -178,7 +179,6 @@ function ReplyItem({ reply }: ReplyItemProps) {
         {reply.body}
       </p>
       <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
-        {/* Weight and Amount - 手机版在下一行靠右，桌面版也靠右 */}
         <div className="flex items-center justify-end gap-2 md:gap-2">
           <span>Weight: {Number(reply.weight_percent.toFixed(2))}%</span>
           <span>
@@ -191,6 +191,85 @@ function ReplyItem({ reply }: ReplyItemProps) {
         </div>
       </div>
     </div>
+  );
+}
+
+function SingleChoiceOptions({
+  options,
+}: {
+  options: EventOption[] | string[];
+}) {
+  const sortedOptions = useMemo(() => {
+    const allObjects =
+      Array.isArray(options) &&
+      options.every((opt) => typeof opt === "object" && opt !== null);
+    if (!allObjects) return options;
+
+    return [...options].sort((a, b) => {
+      const wa = typeof a === "object" ? a.weight_percent : 0;
+      const wb = typeof b === "object" ? b.weight_percent : 0;
+      return wb - wa; // descending
+    });
+  }, [options]);
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const displayOptions = isExpanded ? sortedOptions : sortedOptions.slice(0, 2);
+  const hasMore = sortedOptions.length > 2;
+
+  const handleToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (hasMore) setIsExpanded((prev) => !prev);
+  };
+
+  return (
+    <section
+      data-options-list
+      className={`mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm bg-[rgba(var(--color-gray-450-rgb),0.5)] transition-colors ${
+        hasMore
+          ? "cursor-pointer dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)] md:hover:bg-gray-200"
+          : ""
+      }`}
+      onClick={handleToggle}
+    >
+      <div className="mb-1 text-[11px] md:text-xs text-secondary flex items-center justify-between">
+        <span>Options</span>
+        {hasMore && (
+          <span className="flex items-center gap-1">
+            {isExpanded ? "View less" : "View all"}
+          </span>
+        )}
+      </div>
+
+      {displayOptions.map((opt, index) => (
+        <div key={index}>
+          {index > 0 && <div className="my-1 border-t border-border" />}
+          <div className="py-1">
+            <p className="text-primary break-words line-clamp-1">
+              {typeof opt === "string" ? opt : opt.option_text}
+            </p>
+            <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
+              <div className="flex items-center justify-end gap-2 md:gap-2">
+                {typeof opt !== "string" && (
+                  <>
+                    <span>
+                      Weight: {Number(opt.weight_percent.toFixed(2))}%
+                    </span>
+                    <span>
+                      Amount:{" "}
+                      {satsToBtc(opt.total_stake_satoshi, {
+                        suffix: false,
+                      })}{" "}
+                      BTC
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
 
@@ -324,6 +403,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
     }
     onClick?.();
   };
+  console.log("event", event);
 
   return (
     <article
@@ -400,25 +480,31 @@ export function EventCard({ event, onClick }: EventCardProps) {
         )}
       </div>
 
-      {/* top replies */}
-      {(primaryReply || secondaryReply) && (
-        <section
-          data-top-replies
-          className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm bg-[rgba(var(--color-gray-450-rgb),0.5)]"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="mb-1 text-[11px] md:text-xs text-secondary">
-            Top reply
-          </div>
+      {/* top replies or options */}
+      {event.event_type === "single_choice" &&
+      event.options &&
+      event.options.length > 0 ? (
+        <SingleChoiceOptions options={event.options} />
+      ) : (
+        (primaryReply || secondaryReply) && (
+          <section
+            data-top-replies
+            className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm bg-[rgba(var(--color-gray-450-rgb),0.5)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-1 text-[11px] md:text-xs text-secondary">
+              Top reply
+            </div>
 
-          {primaryReply && <ReplyItem reply={primaryReply} />}
+            {primaryReply && <ReplyItem reply={primaryReply} />}
 
-          {primaryReply && secondaryReply && (
-            <div className="my-1 border-t border-border" />
-          )}
+            {primaryReply && secondaryReply && (
+              <div className="my-1 border-t border-border" />
+            )}
 
-          {secondaryReply && <ReplyItem reply={secondaryReply} />}
-        </section>
+            {secondaryReply && <ReplyItem reply={secondaryReply} />}
+          </section>
+        )
       )}
 
       {/* footer: participants + total stake + copy */}

@@ -2,7 +2,7 @@
 
 import {
   type EventSummary,
-  type ReplyPreview,
+  type TopReply,
 } from "@/pages/create-event/types/index";
 import type { EventListDataRes, TopReplyRes } from "@/api/response";
 
@@ -30,9 +30,9 @@ const mapApiStatusToEventStatus = (
 const mapHashtags = (tags: string[]): string[] =>
   tags.map((t) => (t.startsWith("#") ? t : `#${t}`));
 
-// Map API TopReplyRes to ReplyPreview
-const mapApiTopReply = (r: TopReplyRes): ReplyPreview => ({
-  reply_id: String(r.id),
+// Map API TopReplyRes to TopReply
+const mapApiTopReply = (r: TopReplyRes): TopReply => ({
+  id: String(r.id),
   body: r.body,
   weight_percent: r.weight_percent,
   amount_satoshi: String(r.amount_satoshi),
@@ -44,6 +44,7 @@ export const mapApiEventToEventSummary = (
 ): EventSummary => ({
   id: ev.id,
   event_id: ev.event_id,
+  event_type: ev.event_type,
   title: ev.title,
   description: ev.description,
   status: mapApiStatusToEventStatus(ev.status),
@@ -55,4 +56,5 @@ export const mapApiEventToEventSummary = (
   participants_count: ev.participants_count,
   total_stake_btc: satsToBtcString(ev.total_stake_satoshi),
   top_replies: ev.top_replies.map(mapApiTopReply),
+  options: ev.options ?? [],
 });
