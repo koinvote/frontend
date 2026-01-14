@@ -5,6 +5,8 @@ import SortAscIcon from "@/assets/icons/sort-asc.svg?react";
 import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
 import PlusIcon from "@/assets/icons/plus.svg?react";
 import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
+import OnChainIcon from "@/assets/icons/onChain.svg?react";
+import ClockIcon from "@/assets/icons/clock.svg?react";
 import { ReplySortBy, EventStatus } from "@/api/types";
 import { useDebouncedClick } from "@/utils/helper";
 import { Button } from "@/components/base/Button";
@@ -12,6 +14,8 @@ import { Button } from "@/components/base/Button";
 interface SearchAndFilterProps {
   eventId: string;
   eventStatus?: number;
+  balanceDisplayMode?: "snapshot" | "on_chain";
+  onBalanceDisplayModeChange?: (mode: "snapshot" | "on_chain") => void;
   onSearchChange?: (search: string) => void;
   onSortChange?: (
     sortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME,
@@ -21,6 +25,8 @@ interface SearchAndFilterProps {
 
 export function SearchAndFilter({
   eventStatus,
+  balanceDisplayMode,
+  onBalanceDisplayModeChange,
   onSearchChange,
   onSortChange,
 }: SearchAndFilterProps) {
@@ -82,6 +88,7 @@ export function SearchAndFilter({
   });
 
   const isActive = eventStatus === EventStatus.ACTIVE;
+  const isCompleted = eventStatus === EventStatus.COMPLETED;
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
@@ -189,8 +196,8 @@ export function SearchAndFilter({
           </div>
         </div>
 
-        {/* Reward Button (Active Only) */}
-        <div className={isActive ? "flex-1 md:flex-none" : ""}>
+        {/* Reward Button (Active Only) OR On-chain Button (Completed Only) */}
+        <div className={isActive || isCompleted ? "flex-1 md:flex-none" : ""}>
           {isActive && (
             <Button
               appearance="solid"
@@ -201,6 +208,31 @@ export function SearchAndFilter({
             >
               <PlusIcon className="w-3 h-3" />
               Reward
+            </Button>
+          )}
+          {isCompleted && (
+            <Button
+              appearance="solid"
+              tone="surface"
+              text="sm"
+              className="h-9 gap-1 w-full md:w-auto dark:hover:bg-gray-900"
+              onClick={() => {
+                onBalanceDisplayModeChange?.(
+                  balanceDisplayMode === "snapshot" ? "on_chain" : "snapshot"
+                );
+              }}
+            >
+              {balanceDisplayMode === "snapshot" ? (
+                <>
+                  <OnChainIcon className="w-3 h-3" />
+                  On-chain
+                </>
+              ) : (
+                <>
+                  <ClockIcon className="w-3 h-3" />
+                  Snapshot
+                </>
+              )}
             </Button>
           )}
         </div>

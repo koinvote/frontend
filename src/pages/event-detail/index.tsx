@@ -52,6 +52,10 @@ const EventDetail = () => {
     }
   }, []);
 
+  const [balanceDisplayMode, setBalanceDisplayMode] = useState<
+    "snapshot" | "on_chain"
+  >("snapshot");
+
   // Save scroll position on scroll
   useEffect(() => {
     if (!eventId) return;
@@ -184,6 +188,8 @@ const EventDetail = () => {
         <SearchAndFilter
           eventId={eventId!}
           eventStatus={eventDetail.status}
+          balanceDisplayMode={balanceDisplayMode}
+          onBalanceDisplayModeChange={setBalanceDisplayMode}
           onSearchChange={handleSearchChange}
           onSortChange={handleSortChange}
         />
@@ -193,6 +199,8 @@ const EventDetail = () => {
         {/* Third Section: Reply List */}
         <ReplyList
           eventId={eventId!}
+          eventStatus={eventDetail.status}
+          balanceDisplayMode={balanceDisplayMode}
           search={search}
           sortBy={sortBy}
           order={order}

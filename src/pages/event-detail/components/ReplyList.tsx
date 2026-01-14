@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { API, type ApiResponse } from "@/api";
-import { ReplySortBy, type EventType } from "@/api/types";
+import { ReplySortBy, type EventType, EventStatus } from "@/api/types";
 import type { Reply, GetListRepliesRes, EventOption } from "@/api/response";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
@@ -32,9 +32,9 @@ interface ReplyListProps {
   order?: "desc" | "asc";
   options?: EventOption[] | string[];
   eventType?: EventType;
+  eventStatus?: number;
+  balanceDisplayMode?: "snapshot" | "on_chain";
 }
-
-
 
 function truncateAddress(
   address: string,
@@ -61,6 +61,8 @@ export function ReplyList({
   order = "desc",
   options = [],
   eventType,
+  eventStatus,
+  balanceDisplayMode,
 }: ReplyListProps) {
   const { showToast } = useToast();
   const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
@@ -134,6 +136,8 @@ export function ReplyList({
           onCopy={handleCopy}
           options={options}
           eventType={eventType}
+          eventStatus={eventStatus}
+          balanceDisplayMode={balanceDisplayMode}
         />
       ))}
     </div>
@@ -146,9 +150,18 @@ interface ReplyItemProps {
   onCopy: any; // Using any for debounced function return type compatibility
   options: EventOption[] | string[];
   eventType?: EventType;
+  eventStatus?: number;
+  balanceDisplayMode?: "snapshot" | "on_chain";
 }
 
-function ReplyItem({ reply, onCopy, options, eventType }: ReplyItemProps) {
+function ReplyItem({
+  reply,
+  onCopy,
+  options,
+  eventType,
+  eventStatus,
+  balanceDisplayMode,
+}: ReplyItemProps) {
   const { isDesktop } = useHomeStore();
   const { showToast } = useToast();
   const { tooltipProps, triggerProps } = useTooltipWithClick({
@@ -156,7 +169,17 @@ function ReplyItem({ reply, onCopy, options, eventType }: ReplyItemProps) {
     singleLine: isDesktop,
   });
 
-  const balanceBtc = satsToBtc(reply.balance_at_reply_satoshi, {
+  const getDisplayBalance = () => {
+    if (eventStatus === EventStatus.COMPLETED) {
+      if (balanceDisplayMode === "on_chain") {
+        return reply.balance_at_current_satoshi;
+      }
+      return reply.balance_at_snapshot_satoshi;
+    }
+    return reply.balance_at_reply_satoshi;
+  };
+
+  const balanceBtc = satsToBtc(getDisplayBalance(), {
     suffix: false,
   });
   const timeAgo = formatRelativeTime(reply.created_at);
