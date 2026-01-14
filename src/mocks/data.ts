@@ -430,6 +430,48 @@ export const mockPayoutWinners: PayoutWinner[] = [
       "8j6g8i2j4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
     payout_at: "2026-01-16T16:05:00Z",
   },
+  {
+    winner_address: "bc1qprocessing123xyz456def789ghi012jkl345mno",
+    balance_at_snapshot_satoshi: 200000,
+    win_probability_percent: 8.0,
+    is_dust: false,
+    reward_satoshi: 23000,
+    payout_status: "processing",
+    payout_txid: "",
+    payout_at: "",
+  },
+  {
+    winner_address: "bc1qwinner09abc123def456ghi789jkl012mno345pqr",
+    balance_at_snapshot_satoshi: 180000,
+    win_probability_percent: 7.2,
+    is_dust: false,
+    reward_satoshi: 20700,
+    payout_status: "completed",
+    payout_txid:
+      "9a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
+    payout_at: "2026-01-16T16:06:00Z",
+  },
+  {
+    winner_address: "bc1qwinner10xyz789abc012def345ghi678jkl901mno",
+    balance_at_snapshot_satoshi: 160000,
+    win_probability_percent: 6.4,
+    is_dust: false,
+    reward_satoshi: 18400,
+    payout_status: "completed",
+    payout_txid:
+      "0b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c",
+    payout_at: "2026-01-16T16:07:00Z",
+  },
+  {
+    winner_address: "bc1qdust123abc456def789ghi012jkl345mno678pqr",
+    balance_at_snapshot_satoshi: 5000,
+    win_probability_percent: 0.2,
+    is_dust: true,
+    reward_satoshi: 500,
+    payout_status: "dust_redistributed",
+    payout_txid: "",
+    payout_at: "",
+  },
 ];
 
 export const mockAdditionalPayoutWinners: PayoutWinner[] = [
@@ -488,8 +530,12 @@ export const mockRewardDetails: RewardDetail[] = [
     platform_fee_satoshi: 7500,
     estimated_miner_fee_satoshi: 5000,
     distributable_satoshi: 287500,
-    winner_count: 6,
+    winner_count: 12,
     winners: mockPayoutWinners,
+    batch_transfer_txid:
+      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    csv_sha256:
+      "d2f4a8c1b3e5f7890123456789abcdef0123456789abcdef0123456789abcef39",
   },
   {
     reward_type: "additional",
@@ -501,6 +547,10 @@ export const mockRewardDetails: RewardDetail[] = [
     distributable_satoshi: 191500,
     winner_count: 4,
     winners: mockAdditionalPayoutWinners,
+    batch_transfer_txid:
+      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    csv_sha256:
+      "d2f4a8c1b3e5f7890123456789abcdef0123456789abcdef0123456789abcef39",
   },
 ];
 

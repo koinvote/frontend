@@ -1,37 +1,38 @@
 // router.tsx
-import { createBrowserRouter } from "react-router";
-import { Root } from "./Root";
 import { ErrorPage } from "@/error";
 import Layout from "@/layout/Layout";
-import Home from "@/pages/home";
 import About from "@/pages/about";
 import Chargesnrefunds from "@/pages/chargesnrefunds";
-import HelpnFaq from "@/pages/helpnFaq";
-import Privacy from "@/pages/privacy";
-import Terms from "@/pages/terms";
-import Subscribe from "@/pages/subscribe";
-import Support from "@/pages/support";
-import VerificaionTool from "@/pages/verificaionTool";
-import TermsOfRewardDistribution from "./pages/terms/TermsOfRewardDistribution";
-import ComingSoon from "./pages/comingSoon";
+import ConfirmPay from "@/pages/create-event/ConfirmPay";
+import ConfirmSign from "@/pages/create-event/ConfirmSign";
 import CreateEvent from "@/pages/create-event/CreateEvent";
 import PreviewEvent from "@/pages/create-event/PreviewEvent";
-import ConfirmSign from "@/pages/create-event/ConfirmSign";
-import ConfirmPay from "@/pages/create-event/ConfirmPay";
 import EventDetail from "@/pages/event-detail";
+import HelpnFaq from "@/pages/helpnFaq";
+import Home from "@/pages/home";
+import PayoutReport from "@/pages/payout-report";
+import Privacy from "@/pages/privacy";
 import ReplyPage from "@/pages/reply";
-import TestSafeArea from "@/pages/TestSafeArea";
 import RewardReport from "@/pages/rewardReport/index";
+import Subscribe from "@/pages/subscribe";
+import Support from "@/pages/support";
+import Terms from "@/pages/terms";
+import TestSafeArea from "@/pages/TestSafeArea";
+import VerificaionTool from "@/pages/verificaionTool";
+import { createBrowserRouter } from "react-router";
+import ComingSoon from "./pages/comingSoon";
+import TermsOfRewardDistribution from "./pages/terms/TermsOfRewardDistribution";
+import { Root } from "./Root";
 
 // Admin imports...
-import AdminLayout from "@/layout/AdminLayout";
-import AdminLoginPage from "@/admin/pages/login";
-import AdminRewardRulesPage from "@/admin/pages/rewardRules";
-import AdminFeesPage from "@/admin/pages/fee";
-import AdminRefundsPage from "@/admin/pages/refund";
-import AdminSystemSettingPage from "@/admin/pages/systemSetting";
 import AdminAnnouncementsPage from "@/admin/pages/announcement";
+import AdminFeesPage from "@/admin/pages/fee";
+import AdminLoginPage from "@/admin/pages/login";
+import AdminRefundsPage from "@/admin/pages/refund";
+import AdminRewardRulesPage from "@/admin/pages/rewardRules";
 import AdminSubscribersPage from "@/admin/pages/subscribe";
+import AdminSystemSettingPage from "@/admin/pages/systemSetting";
+import AdminLayout from "@/layout/AdminLayout";
 
 const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
 
@@ -62,6 +63,7 @@ const publicChildren = isComingSoonMode
       { path: "event/:eventId", element: <EventDetail /> },
       { path: "event/:eventId/reply", element: <ReplyPage /> },
       { path: "event/:eventId/reward-report", element: <RewardReport /> },
+      { path: "event/:eventId/report", element: <PayoutReport /> },
     ];
 
 export const router = createBrowserRouter([

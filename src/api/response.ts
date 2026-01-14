@@ -245,6 +245,8 @@ export interface RewardDetail {
   distributable_satoshi: number;
   winner_count: number;
   winners: PayoutWinner[];
+  batch_transfer_txid: string;
+  csv_sha256: string;
 }
 
 export interface PayoutReportRes {
