@@ -83,7 +83,6 @@ export function ReplyList({
         page,
         limit,
       })) as unknown as ApiResponse<GetListRepliesRes>;
-      console.log("response", response);
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch replies");
       }

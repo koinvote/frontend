@@ -403,7 +403,6 @@ export function EventCard({ event, onClick }: EventCardProps) {
     }
     onClick?.();
   };
-  console.log("event", event);
 
   return (
     <article
