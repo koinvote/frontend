@@ -394,7 +394,7 @@ export default function ConfirmPay() {
     depositStatus?.status?.toUpperCase() === "EXPIRED";
 
   return (
-    <div className="flex-col flex items-center justify-center w-full">
+    <div className="flex-col flex items-center justify-center w-full p-2 md:p-0">
       <div className="h-[50px] w-full relative">
         <button
           type="button"
