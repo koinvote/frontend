@@ -18,8 +18,6 @@ import type { TopReply } from "@/pages/create-event/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { TopReplyBar } from "./TopReplyBar";
 import { EventCTAButton } from "./EventCTAButton";
-import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
-import ArrowUpIcon from "@/assets/icons/arrowUp.svg?react";
 
 interface EventInfoProps {
   event: EventDetailDataRes;
@@ -166,7 +164,7 @@ export function EventInfo({ event }: EventInfoProps) {
   ]);
 
   // Prepare data for Top Reply/Options display
-  const { displayData, displayTitle, hasMore } = useMemo(() => {
+  const { displayData, displayTitle } = useMemo(() => {
     const isSingleChoice = event.event_type === "single_choice";
     const isOpen = event.event_type === "open";
 
@@ -196,7 +194,6 @@ export function EventInfo({ event }: EventInfoProps) {
       return {
         displayData: convertedData,
         displayTitle: title,
-        hasMore: convertedData.length > 2,
       };
     }
 
@@ -234,7 +231,6 @@ export function EventInfo({ event }: EventInfoProps) {
       return {
         displayData: convertedData,
         displayTitle: title,
-        hasMore: convertedData.length > 2,
       };
     }
 
@@ -261,11 +257,10 @@ export function EventInfo({ event }: EventInfoProps) {
       return {
         displayData: sortedReplies,
         displayTitle: "Top Reply",
-        hasMore: sortedReplies.length > 2,
       };
     }
 
-    return { displayData: [], displayTitle: "", hasMore: false };
+    return { displayData: [], displayTitle: "" };
   }, [
     event.event_type,
     event.options,
@@ -274,8 +269,6 @@ export function EventInfo({ event }: EventInfoProps) {
     isOngoing,
     isCompleted,
   ]);
-
-  const [isExpanded, setIsExpanded] = useState(false);
 
   // Build field list for mobile (ordered list)
   const mobileFields = useMemo(() => {
@@ -436,7 +429,6 @@ export function EventInfo({ event }: EventInfoProps) {
     event.event_id,
     event.creator_address,
     event.hashtags,
-    showToast,
     handleAddressClick,
     handleHashtagClick,
     handleCopyCreatorAddress,
@@ -625,31 +617,10 @@ export function EventInfo({ event }: EventInfoProps) {
             {displayTitle}
           </h2>
           <div className="space-y-2">
-            {(isExpanded ? displayData : displayData.slice(0, 2)).map(
-              (reply, index) => (
-                <TopReplyBar key={reply.id || index} reply={reply} />
-              )
-            )}
+            {displayData.map((reply, index) => (
+              <TopReplyBar key={reply.id || index} reply={reply} />
+            ))}
           </div>
-          {hasMore && (
-            <div className="text-center mt-2">
-              <button
-                type="button"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="mt-2 text-xs md:text-sm text-secondary 
-               hover:underline cursor-pointer"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  {isExpanded ? "Show less" : "Show more"}{" "}
-                  {isExpanded ? (
-                    <ArrowUpIcon className="w-3 h-3" />
-                  ) : (
-                    <ArrowDownIcon className="w-3 h-3" />
-                  )}
-                </span>
-              </button>
-            </div>
-          )}
         </div>
       )}
 
