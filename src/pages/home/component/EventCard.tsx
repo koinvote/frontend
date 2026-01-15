@@ -233,7 +233,7 @@ function SingleChoiceOptions({
       onClick={handleToggle}
     >
       <div className="mb-1 text-[11px] md:text-xs text-secondary flex items-center justify-between">
-        <span>Options</span>
+        <span>{sortedOptions.length > 1 ? "Options" : "Option"}</span>
         {hasMore && (
           <span className="flex items-center gap-1">
             {isExpanded ? "View less" : "View all"}
