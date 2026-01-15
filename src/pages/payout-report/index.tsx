@@ -41,7 +41,7 @@ const PayoutReport = () => {
     return <PageLoading />;
   }
 
-  if (error || !payoutReport) {
+  if (error) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
@@ -50,6 +50,18 @@ const PayoutReport = () => {
           </p>
           <p className="text-sm text-secondary">
             {error instanceof Error ? error.message : t("payoutReport.noData")}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!payoutReport || Object.keys(payoutReport).length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <p className="text-lg text-secondary">
+            {t("payoutReport.noData")}
           </p>
         </div>
       </div>
