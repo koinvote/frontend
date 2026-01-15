@@ -86,11 +86,16 @@ export function RewardDistributionSection({
         <h3 className="mb-6 text-base text-primary">{title}</h3>
 
         {/* Summary grid */}
-        <div className="px-4 pt-4 pb-6 bg-gray-200 dark:bg-transparent rounded-lg">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="px-4 pt-4 pb-6 bg-gray-100 dark:bg-transparent rounded-lg">
+          <div className="flex flex-wrap -mx-2">
             {summaryItems.map((item, idx) => (
-              <div key={idx}>
-                <p className="text-base text-gray-400 mb-1">{item.label}</p>
+              <div
+                key={idx}
+                className="w-1/2 md:w-1/5 px-2 mb-4 md:mb-0 flex flex-col"
+              >
+                <p className="text-base text-gray-400 mb-1 flex-1">
+                  {item.label}
+                </p>
                 <p
                   className={`text-base ${
                     item.highlight
