@@ -121,7 +121,7 @@ export function EventCTAButton({
         arrow={{ pointAtCenter: true }}
         styles={{
           container: {
-            maxWidth: isDesktop ? "300px" : "min(180px, 90vw)",
+            maxWidth: isDesktop ? "300px" : "min(250px, 90vw)",
             whiteSpace: "normal",
           },
         }}
