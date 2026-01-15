@@ -692,23 +692,17 @@ export default function CreateEvent() {
   ]);
 
   // -------- Hashtags handlers -------- *
+  const MAX_TAGS = 3;
+  const MAX_TAG_LENGTH = 20; // exclude leading '#'
   const addTag = (raw: string) => {
     const tag = normalizeTag(raw);
     if (!tag) return;
 
-    // 檢查總字符數是否超過限制
-    const MAX_TOTAL_HASHTAG_CHARS = 20;
     setHashtagList((prev) => {
+      // 最多 3 個
+      if (prev.length >= MAX_TAGS) return prev;
       // 如果標籤已存在，不添加
       if (prev.includes(tag)) return prev;
-
-      // 計算當前總字符數
-      const currentChars = prev.reduce((sum, t) => sum + t.length, 0);
-
-      // 如果添加新標籤後超過限制，不添加
-      if (currentChars + tag.length > MAX_TOTAL_HASHTAG_CHARS) {
-        return prev;
-      }
 
       return [...prev, tag];
     });
@@ -748,6 +742,13 @@ export default function CreateEvent() {
   };
 
   const handleHashtagChange = (v: string) => {
+    // 已達最大 chips 數量時，直接不再接受新的輸入（維持空值），需先刪除既有標籤
+    if (hashtagList.length >= MAX_TAGS) {
+      setHashtagInput("");
+      return;
+    }
+
+    // 已達最大 chips 數量時，仍允許輸入但新增時會被跳過
     // 如果用戶貼上「#a #b,#c 」這種，直接拆 chips
     if (/[,\s]/.test(v)) {
       commitByDelimiters(v);
@@ -755,48 +756,19 @@ export default function CreateEvent() {
       return;
     }
 
-    // 計算已有標籤的字符數
-    const existingChars = hashtagList.reduce((sum, tag) => sum + tag.length, 0);
-
     // 計算新輸入的字符數（清理後，排除 # 和非字母數字字符）
     const cleaned = v.replace(/^#+/g, "").replace(/[^\w]/g, "");
-    const newInputChars = cleaned.length;
-
-    // 如果總字符數超過限制，截斷輸入
-    const MAX_TOTAL_HASHTAG_CHARS = 20;
-    if (existingChars + newInputChars > MAX_TOTAL_HASHTAG_CHARS) {
-      const maxAllowedChars = Math.max(
-        0,
-        MAX_TOTAL_HASHTAG_CHARS - existingChars
-      );
-      // 截斷輸入，只保留允許的字符數
-      const truncated = cleaned.slice(0, maxAllowedChars);
-      // 如果原輸入有 #，保留 #
-      const prefix = v.startsWith("#") ? "#" : "";
-      setHashtagInput(prefix + truncated);
-      return;
-    }
-
-    setHashtagInput(v);
+    const truncated = cleaned.slice(0, MAX_TAG_LENGTH);
+    const prefix = v.startsWith("#") ? "#" : "";
+    setHashtagInput(prefix + truncated);
   };
 
-  // Calculate total hashtag characters (only letters, excluding #)
-  // Count all tags in hashtagList + current input
-  const totalHashtagChars = useMemo(() => {
-    // Count characters in existing tags (already normalized, no #)
-    const existingChars = hashtagList.reduce((sum, tag) => sum + tag.length, 0);
-
-    // Count characters in current input (excluding #)
-    if (!hashtagInput) return existingChars;
-    const cleaned = hashtagInput.replace(/^#+/g, "").replace(/[^\w]/g, "");
-    return existingChars + cleaned.length;
-  }, [hashtagList, hashtagInput]);
-
-  // Maximum total characters for all hashtags
-  const MAX_TOTAL_HASHTAG_CHARS = 20;
+  const currentInputCleaned = useMemo(() => {
+    return hashtagInput.replace(/^#+/g, "").replace(/[^\w]/g, "");
+  }, [hashtagInput]);
   const hashtagCharsLeft = useMemo(() => {
-    return Math.max(0, MAX_TOTAL_HASHTAG_CHARS - totalHashtagChars);
-  }, [totalHashtagChars]);
+    return Math.max(0, MAX_TAG_LENGTH - currentInputCleaned.length);
+  }, [currentInputCleaned]);
 
   return (
     <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
@@ -1000,14 +972,11 @@ export default function CreateEvent() {
             </div>
 
             <span
-              className={cn(
-                "tx-12 lh-18 block text-right",
-                totalHashtagChars >= MAX_TOTAL_HASHTAG_CHARS
-                  ? "text-red-500"
-                  : "text-secondary"
-              )}
+              className={cn("tx-12 lh-18 block text-right", "text-secondary")}
             >
-              {hashtagCharsLeft} {t("createEvent.characterLeft")}
+              {hashtagList.length >= MAX_TAGS
+                ? "Max 3 hashtags"
+                : `${hashtagCharsLeft} ${t("createEvent.characterLeft")}`}
             </span>
           </div>
 
