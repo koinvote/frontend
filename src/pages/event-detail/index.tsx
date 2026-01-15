@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, useLocation } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { API, type ApiResponse } from "@/api";
@@ -13,9 +13,11 @@ import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 
 const EventDetail = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { eventId } = useParams<{ eventId: string }>();
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
+  const fromPayment = location.state?.fromPayment;
 
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
@@ -170,7 +172,7 @@ const EventDetail = () => {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
+          onClick={() => (fromPayment ? navigate("/") : navigate(-1))}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>

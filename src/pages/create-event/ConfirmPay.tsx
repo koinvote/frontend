@@ -173,7 +173,7 @@ export default function ConfirmPay() {
         // Reset home page status to "ongoing" before navigating
         setStatus("ongoing");
         // Navigate to event detail page
-        navigate(`/event/${eventId}`);
+        navigate(`/event/${eventId}`, { state: { fromPayment: true } });
         return;
       }
 
