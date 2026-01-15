@@ -152,7 +152,7 @@ export function SearchAndFilter({
             <button
               type="button"
               onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              className="w-full h-full flex items-center justify-center gap-2 px-3 
+              className="w-[90px] h-full flex items-center justify-center gap-2 px-3 
               hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors rounded-r-lg"
             >
               <span className="text-sm font-medium text-primary capitalize">
@@ -216,7 +216,7 @@ export function SearchAndFilter({
               appearance="solid"
               tone="surface"
               text="sm"
-              className="h-9 gap-1 w-full md:w-auto dark:hover:bg-gray-900"
+              className="h-9 gap-1 w-full md:w-[120px] dark:hover:bg-gray-900"
               onClick={() => {
                 onBalanceDisplayModeChange?.(
                   balanceDisplayMode === "snapshot" ? "on_chain" : "snapshot"
@@ -230,7 +230,7 @@ export function SearchAndFilter({
                 </>
               ) : (
                 <>
-                  <ClockIcon className="w-3 h-3" />
+                  <OnChainIcon className="w-3 h-3" />
                   Snapshot
                 </>
               )}
