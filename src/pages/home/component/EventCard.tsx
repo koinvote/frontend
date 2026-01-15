@@ -32,18 +32,28 @@ function formatCountdown(event: EventSummary) {
   if (event.status === EventStatus.PREHEAT) {
     const now = dayjs();
     // 確保將服務器返回的 UTC 時間正確解析為 UTC
-    const deadline = dayjs.utc(event.deadline_at);
-    if (deadline.isBefore(now)) return "Starting soon";
-    const diffMs = deadline.diff(now);
+    // 預熱階段應倒數至 started_at（事件進入 Ongoing 的時間）
+    const startAt = event.started_at
+      ? dayjs.utc(event.started_at)
+      : dayjs.utc(event.deadline_at); // fallback 防呆
+    if (startAt.isBefore(now)) return "Starting soon";
+    const diffMs = startAt.diff(now);
     const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
     const days = Math.floor(totalSeconds / 86400);
     const hours = Math.floor((totalSeconds % 86400) / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
 
     if (days > 0) {
-      return `Starts in ${days}d ${hours}h`;
+      return `Starts in ${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
-    return `Starts in ${hours}h ${minutes}m`;
+    if (hours > 0) {
+      return `Starts in ${hours}h ${minutes}m ${seconds}s`;
+    }
+    if (minutes > 0) {
+      return `Starts in ${minutes}m ${seconds}s`;
+    }
+    return `Starts in ${seconds}s`;
   }
 
   // COMPLETED //
@@ -278,18 +288,20 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const [countdown, setCountdown] = useState(() => formatCountdown(event));
 
   useEffect(() => {
-    if (event.status !== EventStatus.ACTIVE) {
-      setCountdown(formatCountdown(event));
-      return;
-    }
-
     const updateCountdown = () => {
-      setCountdown(formatOngoingCountdown(event.deadline_at));
+      setCountdown(formatCountdown(event));
     };
 
     updateCountdown();
 
-    const interval = setInterval(updateCountdown, 1000);
+    // For ACTIVE / PREHEAT: tick every 1s; others can be slower
+    const interval = setInterval(
+      updateCountdown,
+      event.status === EventStatus.ACTIVE ||
+        event.status === EventStatus.PREHEAT
+        ? 1000
+        : 30_000
+    );
 
     return () => clearInterval(interval);
   }, [event]);

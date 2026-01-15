@@ -14,6 +14,7 @@ export interface EventSummary {
   event_id: string;
   title: string;
   description: string;
+  started_at?: string;
   status:
     | typeof EventStatus.ACTIVE
     | typeof EventStatus.PREHEAT

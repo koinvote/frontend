@@ -123,16 +123,12 @@ export const formatEventDuration = (
 };
 
 /**
- * Format preheat countdown: 從 started_at + preheat_hours 計算，最小單位是秒
+ * Format preheat countdown: 從 started_at 計算（預熱結束時即進入 ongoing），最小單位秒
  */
-export const formatPreheatCountdown = (
-  startedAt: string,
-  preheatHours: number
-): string => {
+export const formatPreheatCountdown = (startedAt: string): string => {
   const start = dayjs.utc(startedAt);
-  const preheatEnd = start.add(preheatHours, "hour");
   const now = dayjs();
-  const diffMs = preheatEnd.diff(now);
+  const diffMs = start.diff(now);
 
   if (diffMs <= 0) {
     return "0s";

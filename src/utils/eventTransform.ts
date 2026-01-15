@@ -47,6 +47,7 @@ export const mapApiEventToEventSummary = (
   event_type: ev.event_type,
   title: ev.title,
   description: ev.description,
+  started_at: ev.started_at,
   status: mapApiStatusToEventStatus(ev.status),
   hashtags: mapHashtags(ev.hashtags),
   created_at: ev.created_at,
