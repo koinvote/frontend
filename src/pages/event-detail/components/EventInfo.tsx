@@ -106,11 +106,12 @@ export function EventInfo({ event }: EventInfoProps) {
 
   // Duration calculations
   const eventDurationDisplay = useMemo(() => {
-    if (isOngoing || isCompleted) {
+    if (isOngoing || isCompleted || isPreheat) {
       return formatEventDuration(event.started_at, event.deadline_at);
     }
     return null;
-  }, [isOngoing, isCompleted, event.started_at, event.deadline_at]);
+  }, [isOngoing, isCompleted, isPreheat, event.started_at, event.deadline_at]);
+
 
   const preheatDurationDisplay = useMemo(() => {
     if (event.preheat_hours > 0) {
@@ -320,7 +321,7 @@ export function EventInfo({ event }: EventInfoProps) {
     });
 
     // Only show event duration in ongoing or completed state
-    if ((isOngoing || isCompleted) && eventDurationDisplay) {
+    if ((isOngoing || isCompleted || isPreheat) && eventDurationDisplay) {
       fields.push({
         key: "duration",
         label: "Duration of This Event:",
@@ -355,7 +356,7 @@ export function EventInfo({ event }: EventInfoProps) {
     });
 
     // Only show creator address in ongoing or completed state
-    if ((isOngoing || isCompleted) && event.creator_address) {
+    if ((isOngoing || isCompleted || isPreheat) && event.creator_address) {
       fields.push({
         key: "creator-address",
         label: "Creator address:",
@@ -418,6 +419,7 @@ export function EventInfo({ event }: EventInfoProps) {
   }, [
     isOngoing,
     isCompleted,
+    isPreheat,
     isRewarded,
     rewardAmountBtc,
     additionalRewardBtc,
@@ -505,8 +507,8 @@ export function EventInfo({ event }: EventInfoProps) {
             )}
           </div>
 
-          {/* Only show creator address in ongoing or completed state */}
-          {(isOngoing || isCompleted) && event.creator_address && (
+          {/* Show creator address in all states */}
+          {(isPreheat || isOngoing || isCompleted) && event.creator_address && (
             <div className="flex items-center gap-2">
               <span className="text-xs md:text-sm text-secondary">
                 Creator address:
@@ -542,7 +544,7 @@ export function EventInfo({ event }: EventInfoProps) {
         {/* Right Column */}
         <div className="flex flex-col gap-3">
           {/* Only show event duration in ongoing or completed state */}
-          {(isOngoing || isCompleted) && eventDurationDisplay && (
+          {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
                 Duration of This Event:

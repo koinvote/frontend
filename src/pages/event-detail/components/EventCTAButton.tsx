@@ -41,7 +41,7 @@ export function EventCTAButton({
     buttonText = isRewarded ? "Reply to win BTC" : "Reply";
     isDisabled = false;
   } else if (isCompleted) {
-    if (isRewarded) {
+    if (!isRewarded) {
       buttonText = "View Reward Report";
       isDisabled = false;
     } else {
@@ -51,7 +51,7 @@ export function EventCTAButton({
   }
 
   const handleClick = () => {
-    if (isCompleted && isRewarded) {
+    if (isCompleted && !isRewarded) {
       // TODO: Navigate to reward report page
       navigate(`/event/${eventId}/reward-report`);
     } else if (isOngoing) {
@@ -67,14 +67,14 @@ export function EventCTAButton({
       tone="primary"
       text="sm"
       className={`w-full md:w-auto whitespace-nowrap px-4 gap-2 ${
-        isCompleted && isRewarded
+        isCompleted && !isRewarded
           ? "bg-surface text-black hover:bg-surface/80 dark:bg-surface dark:text-white dark:hover:bg-surface/80"
           : ""
       }`}
       disabled={isDisabled}
       onClick={handleClick}
     >
-      {isRewarded && isCompleted && (
+      {!isRewarded && isCompleted && (
         <RewardReportIcon className="w-4 h-4" />
       )}
       {buttonText}

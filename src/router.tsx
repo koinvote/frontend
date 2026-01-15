@@ -21,6 +21,7 @@ import ConfirmPay from "@/pages/create-event/ConfirmPay";
 import EventDetail from "@/pages/event-detail";
 import ReplyPage from "@/pages/reply";
 import TestSafeArea from "@/pages/TestSafeArea";
+import RewardReport from "@/pages/rewardReport/index";
 
 // Admin imports...
 import AdminLayout from "@/layout/AdminLayout";
@@ -60,6 +61,7 @@ const publicChildren = isComingSoonMode
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
       { path: "event/:eventId", element: <EventDetail /> },
       { path: "event/:eventId/reply", element: <ReplyPage /> },
+      { path: "event/:eventId/reward-report", element: <RewardReport /> },
     ];
 
 export const router = createBrowserRouter([
