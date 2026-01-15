@@ -460,7 +460,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 <BTCIcon />
                 {event.total_reward_btc} BTC
               </span>
-              <span>{countdown}</span>
+              <span className="tabular-nums">{countdown}</span>
             </div>
           </Tooltip>
         </div>
