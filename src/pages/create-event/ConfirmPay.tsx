@@ -63,7 +63,10 @@ export default function ConfirmPay() {
     const satoshiPerHour = systemParams?.satoshi_per_duration_hour;
     if (!satoshiPerHour || satoshiPerHour <= 0)
       return MIN_REFUND_THRESHOLD.toString();
-    return satsToBtc(satoshiPerHour, { suffix: false, trimTrailingZeros: true });
+    return satsToBtc(satoshiPerHour, {
+      suffix: false,
+      trimTrailingZeros: true,
+    });
   }, [systemParams]);
 
   const [depositStatus, setDepositStatus] = useState<DepositStatusRes | null>(
@@ -156,6 +159,12 @@ export default function ConfirmPay() {
         }
       }
 
+      // UNCONFIRMED: show toast, wait for confirmation, keep polling
+      if (statusData.status === DepositStatus.UNCONFIRMED) {
+        showToast("success", "Payment received. Please wait for confirmation.");
+        return;
+      }
+
       if (statusData.status === DepositStatus.RECEIVED) {
         hasNavigatedRef.current = true;
         // Clear create event draft from sessionStorage
@@ -174,7 +183,7 @@ export default function ConfirmPay() {
     } finally {
       isCheckingStatusRef.current = false;
     }
-  }, [eventId, navigate, setStatus]);
+  }, [eventId, navigate, setStatus, showToast]);
 
   // Initialize countdown timer
   useEffect(() => {
@@ -392,6 +401,7 @@ export default function ConfirmPay() {
   const isExpired =
     depositStatus?.status === DepositStatus.EXPIRED ||
     depositStatus?.status?.toUpperCase() === "EXPIRED";
+  const isUnconfirmed = depositStatus?.status === DepositStatus.UNCONFIRMED;
 
   return (
     <div className="flex-col flex items-center justify-center w-full p-2 md:p-0">
@@ -410,7 +420,9 @@ export default function ConfirmPay() {
         </h1>
         {!isDonation && !isWaitForRefund && !isExpired && (
           <p className="mt-1 tx-14 lh-20 text-secondary">
-            Please complete your payment within{" "}
+            {isUnconfirmed
+              ? "Waiting for confirmation 0/1 "
+              : "Please complete your payment within "}
             <span className="text-(--color-orange-500) font-medium">
               {countdownDisplay}
             </span>
