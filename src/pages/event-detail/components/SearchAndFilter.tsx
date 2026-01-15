@@ -6,7 +6,6 @@ import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
 import PlusIcon from "@/assets/icons/plus.svg?react";
 import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
 import OnChainIcon from "@/assets/icons/onChain.svg?react";
-import ClockIcon from "@/assets/icons/clock.svg?react";
 import { ReplySortBy, EventStatus } from "@/api/types";
 import { useDebouncedClick } from "@/utils/helper";
 import { Button } from "@/components/base/Button";
@@ -148,12 +147,15 @@ export function SearchAndFilter({
           </button>
 
           {/* Sort Field Select */}
-          <div className="relative h-full flex-1" ref={sortDropdownRef}>
+          <div
+            className="relative h-full flex-1 md:text-center"
+            ref={sortDropdownRef}
+          >
             <button
               type="button"
               onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              className="w-[90px] h-full flex items-center justify-center gap-2 px-3 
-              hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors rounded-r-lg"
+              className="w-full md:w-[90px] h-full flex items-center justify-center gap-2 px-3 
+              hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors rounded-r-lg text-center"
             >
               <span className="text-sm font-medium text-primary capitalize">
                 {sortBy}
