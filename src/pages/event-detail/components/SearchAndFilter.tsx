@@ -89,6 +89,7 @@ export function SearchAndFilter({
 
   const isActive = eventStatus === EventStatus.ACTIVE;
   const isCompleted = eventStatus === EventStatus.COMPLETED;
+  const isPreheat = eventStatus === EventStatus.PREHEAT;
 
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
@@ -198,7 +199,7 @@ export function SearchAndFilter({
 
         {/* Reward Button (Active Only) OR On-chain Button (Completed Only) */}
         <div className={isActive || isCompleted ? "flex-1 md:flex-none" : ""}>
-          {isActive && (
+          {(isActive || isPreheat) && (
             <Button
               appearance="solid"
               tone="surface"
