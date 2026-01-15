@@ -1,5 +1,9 @@
-import { DownloadOutlined, ExportOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import {
+  DownloadOutlined,
+  ExportOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
+import { Button, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 
 interface VerificationInfoProps {
@@ -58,7 +62,18 @@ export function VerificationInfo({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
             <h4 className="text-sm text-primary mb-2">
-              {t("payoutReport.verificationPackage", "Verification package")}
+              <span className="mr-2">
+                {t("payoutReport.verificationPackage", "Verification package")}
+              </span>
+              <Tooltip
+                className="bg-white text-black"
+                title={t(
+                  "payoutReport.verificationPackageTooltip",
+                  "Use this checksum to verify that the verification package you downloaded is complete and has not been modified."
+                )}
+              >
+                <InfoCircleOutlined className="text-secondary cursor-pointer" />
+              </Tooltip>
             </h4>
             <p className="text-xs text-secondary break-all">
               SHA-256: {csvSha256}

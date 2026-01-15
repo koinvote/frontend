@@ -220,6 +220,7 @@
     "verificationInfo": "驗證資訊",
     "batchTransferTxid": "批次轉帳交易 ID",
     "verificationPackage": "驗證包",
+    "verificationPackageTooltip": "此校驗碼可用來驗證您下載的驗證包是否完整、未被修改。",
     "blockExplorer": "區塊瀏覽器",
     "downloadCsv": "CSV",
     "status": {
