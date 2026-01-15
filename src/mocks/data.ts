@@ -17,14 +17,18 @@ import { EventStatus, DepositStatus } from "@/api/types";
 
 // System Configuration Mock
 export const mockSystemConfig: SystemConfigRes = {
-  maintenance_mode: false,
-  min_reward_amount_satoshi: 10000,
-  satoshi_per_extra_winner: 5000,
-  dust_threshold_satoshi: 546,
-  satoshi_per_duration_hour: 1000,
+  min_reward_amount_satoshi: 50000,
+  satoshi_per_extra_winner: 50000,
+  satoshi_per_duration_hour: 50000,
+  dust_threshold_satoshi: 10000,
   free_hours: 24,
-  platform_fee_percentage: 5,
-  refund_service_fee_percentage: 2,
+  platform_fee_percentage: 2,
+  refund_service_fee_percentage: 0,
+  payout_fee_multiplier: 1.0,
+  refund_fee_multiplier: 1.0,
+  withdrawal_fee_multiplier: 1.0,
+  maintenance_mode: false,
+  required_confirmations: 3,
 };
 
 // Event List Mock Data
@@ -270,19 +274,18 @@ export const mockHotHashtags: GetHotHashtagsRes = [
 // Deposit Status Mock
 export const mockDepositStatus: DepositStatusRes = {
   event_id: "evt_001_mock",
-  deposit_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-  expected_amount_satoshi: 100000,
-  received_amount_satoshi: 100000,
-  status: DepositStatus.COMPLETED,
+  deposit_address:
+    "bc1qf35u6njdw57v3hyy5k2e8ss6z6qz7suj5tjnxx2gwzh0r0u6zrnq0dcd3n",
+  expected_amount_satoshi: 150000,
+  received_amount_satoshi: 150000,
+  status: DepositStatus.RECEIVED,
   confirmed_at: "2026-01-10T12:30:00Z",
   received_txid:
     "3e1b3d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5",
-  confirmations: 6,
-  initial_timeout_at: "2026-01-10T22:00:00Z",
-  extend_timeout_at: "2026-01-11T10:00:00Z",
+  deposit_timeout_at: "2026-01-10T22:00:00Z",
   first_seen_at: "2026-01-10T11:45:00Z",
-  block_height: 875432,
-  deposit_type: "initial",
+  block_height: 850000,
+  deposit_type: "event_creation",
 };
 
 // Replies Mock Data
@@ -338,16 +341,16 @@ export const mockGetListRepliesResponse: GetListRepliesRes = {
 
 // Admin System Parameters Mock
 export const mockAdminSystemParameters: AdminSystemParametersRes = {
-  min_reward_sats: 10000,
-  sats_per_extra_winner: 5000,
-  sats_per_duration_hour: 1000,
-  platform_fee_percent: 5,
-  min_payout_sats: 546,
+  min_reward_amount_satoshi: 50000,
+  satoshi_per_extra_winner: 10000,
+  satoshi_per_duration_hour: 10000,
+  dust_threshold_satoshi: 10000,
   free_hours: 24,
-  refund_service_fee_percentage: 2,
-  payout_fee_multiplier: 2,
-  refund_fee_multiplier: 1.5,
-  withdrawal_fee_multiplier: 1,
+  platform_fee_percentage: 2.5,
+  refund_service_fee_percentage: 0.5,
+  payout_fee_multiplier: 1.0,
+  refund_fee_multiplier: 1.0,
+  withdrawal_fee_multiplier: 1.0,
   maintenance_mode: false,
   required_confirmations: 3,
 };
