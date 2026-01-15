@@ -13,12 +13,14 @@ interface EventCTAButtonProps {
     | typeof EventStatus.COMPLETED;
   eventRewardType: EventRewardType;
   eventId: string;
+  totalRewardAmount: number;
 }
 
 export function EventCTAButton({
   status,
   eventRewardType,
   eventId,
+  totalRewardAmount,
 }: EventCTAButtonProps) {
   const navigate = useNavigate();
   const [isDesktop, setIsDesktop] = useState<boolean>(() =>
@@ -38,6 +40,7 @@ export function EventCTAButton({
   const isOngoing = status === EventStatus.ACTIVE;
   const isCompleted = status === EventStatus.COMPLETED;
   const isRewarded = eventRewardType === "rewarded";
+  const isAdditionalRewarded = totalRewardAmount > 0;
 
   // Determine button text and state
   let buttonText = "";
@@ -45,12 +48,14 @@ export function EventCTAButton({
   let tooltipText = "";
 
   if (isPreheat) {
-    buttonText = "Reply to win BTC";
+    buttonText =
+      isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
     isDisabled = true;
     tooltipText =
       "Preheat lets people see the event before replies open.\n\nDuring this time, the event is visible but replies are disabled.";
   } else if (isOngoing) {
-    buttonText = isRewarded ? "Reply to win BTC" : "Reply";
+    buttonText =
+      isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
     isDisabled = false;
   } else if (isCompleted) {
     if (!isRewarded) {
@@ -111,7 +116,7 @@ export function EventCTAButton({
             </div>
           </>
         }
-        placement={isDesktop ? "left" : "right"}
+        placement={isDesktop ? "left" : "bottom"}
         color="white"
         arrow={{ pointAtCenter: true }}
         styles={{
@@ -121,7 +126,9 @@ export function EventCTAButton({
           },
         }}
       >
-        <span style={{ display: "inline-block" }}>{button}</span>
+        <span className={isDesktop ? "inline-block" : "block w-full"}>
+          {button}
+        </span>
       </Tooltip>
     );
   }

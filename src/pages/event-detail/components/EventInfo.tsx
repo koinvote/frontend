@@ -629,6 +629,7 @@ export function EventInfo({ event }: EventInfoProps) {
           status={event.status}
           eventRewardType={event.event_reward_type}
           eventId={event.event_id}
+          totalRewardAmount={event.total_reward_satoshi}
         />
       </div>
     </div>
