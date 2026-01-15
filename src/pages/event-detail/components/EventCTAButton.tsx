@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
 import { Tooltip } from "antd";
 import { Button } from "@/components/base/Button";
 import { EventStatus } from "@/api/types";
 import type { EventRewardType } from "@/api/types";
 import RewardReportIcon from "@/assets/icons/rewardReport.svg?react";
+import { useHomeStore } from "@/stores/homeStore";
 
 interface EventCTAButtonProps {
   status:
@@ -23,18 +23,7 @@ export function EventCTAButton({
   totalRewardAmount,
 }: EventCTAButtonProps) {
   const navigate = useNavigate();
-  const [isDesktop, setIsDesktop] = useState<boolean>(() =>
-    typeof window !== "undefined" ? window.innerWidth >= 768 : true
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const listener = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
-    // Initial set
-    setIsDesktop(mq.matches);
-    mq.addEventListener("change", listener);
-    return () => mq.removeEventListener("change", listener);
-  }, []);
+  const isDesktop = useHomeStore((s) => s.isDesktop);
 
   const isPreheat = status === EventStatus.PREHEAT;
   const isOngoing = status === EventStatus.ACTIVE;
