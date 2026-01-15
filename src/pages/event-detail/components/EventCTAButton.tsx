@@ -72,7 +72,7 @@ export function EventCTAButton({
       appearance="solid"
       tone="primary"
       text="sm"
-      className={`w-full md:w-auto whitespace-nowrap px-4 gap-2 ${
+      className={`w-full md:w-auto whitespace-nowrap px-8 gap-2 ${
         isCompleted && !isRewarded
           ? "bg-surface text-black hover:bg-surface/80 dark:bg-surface dark:text-white dark:hover:bg-surface/80"
           : ""
