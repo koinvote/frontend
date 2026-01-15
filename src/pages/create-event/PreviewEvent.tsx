@@ -180,6 +180,13 @@ export default function PreviewEvent() {
     return satsToBtc(totalAmountSatoshi);
   }, [totalAmountSatoshi]);
 
+  const showLowTotalWarning = useMemo(() => {
+    if (totalAmountSatoshi === null || totalAmountSatoshi === undefined) {
+      return false;
+    }
+    return totalAmountSatoshi <= 1_000; // 0.00001 BTC in sats
+  }, [totalAmountSatoshi]);
+
   // ----- FREE / PAID 判斷 -----
   const { isFree, primaryButtonLabel, headerSubTitle } = useMemo(() => {
     const hasPreheat = enablePreheat && preheatHours > 0;
@@ -484,7 +491,17 @@ export default function PreviewEvent() {
             </>
           )}
           {/* Your Total */}
-          <Field label="Your Total">{totalFeeDisplay}</Field>
+          <Field label="Your Total">
+            <div className="flex flex-col gap-1">
+              <span>{totalFeeDisplay}</span>
+              {showLowTotalWarning && (
+                <span className="text-xs md:text-sm text-red-700 mt-1">
+                  Under 0.00001 BTC, your wallet may not be able to send this
+                  transaction.
+                </span>
+              )}
+            </div>
+          </Field>
         </div>
 
         {/* Terms */}
