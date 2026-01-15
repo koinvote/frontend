@@ -35,7 +35,7 @@ export function VerificationInfo({
       <div className="p-4 mb-4 border border-neutral-800 rounded-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm text-primary mb-2">
+            <h4 className="text-base text-primary mb-2">
               {t("payoutReport.batchTransferTxid", "Batch transfer txid")}
             </h4>
             <p className="text-xs text-gray-400 dark:text-secondary break-all">
@@ -45,7 +45,7 @@ export function VerificationInfo({
 
           <div className="sm:shrink-0">
             <Button
-              className="!bg-neutral-500 dark:!bg-neutral-800 text-white dark:!text-primary !border-none hover:!opacity-80"
+              className="bg-neutral-500! dark:bg-neutral-800! text-white dark:text-primary! border-none! hover:opacity-80!"
               color="default"
               variant="solid"
               icon={<ExportOutlined />}
@@ -61,7 +61,7 @@ export function VerificationInfo({
       <div className="p-4 border border-neutral-800 rounded-lg">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <h4 className="text-sm text-primary mb-2">
+            <h4 className="text-base text-primary mb-2">
               <span className="mr-2">
                 {t("payoutReport.verificationPackage", "Verification package")}
               </span>

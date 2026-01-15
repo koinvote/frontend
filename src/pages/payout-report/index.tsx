@@ -70,10 +70,10 @@ const PayoutReport = () => {
       </div>
 
       {/* Main content */}
-      <div className="w-full">
+      <div className="w-full p-6 md:p-0">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl md:text-2xl  font-medium text-primary dark:text-(--color-orange-500) mb-2">
+          <h1 className="text-xl md:text-2xl  font-medium text-(--color-orange-500) mb-2">
             {t("payoutReport.title", "Reward Distribution Report")}
           </h1>
           <p className="text-base text-gray-400">
@@ -89,7 +89,7 @@ const PayoutReport = () => {
 
         {/* Reward Distribution Detail */}
         <div className="mt-6">
-          <h2 className="text-lg text-primary mt-8 mb-6">
+          <h2 className="text-lg text-primary mt-8 mb-6 font-bold md:font-normal">
             {t("payoutReport.distributionDetail", "Reward Distribution Detail")}
           </h2>
           {payoutReport.reward_details.map((detail, index) => (
