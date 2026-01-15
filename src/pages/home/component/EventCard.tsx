@@ -428,7 +428,11 @@ export function EventCard({ event, onClick }: EventCardProps) {
         </h2>
         <div className="flex-shrink-0">
           <Tooltip
-            title="After the countdown, this reward will be distributed"
+            title={
+              event.status === EventStatus.PREHEAT
+                ? "Replies open after the countdown ends."
+                : "After the countdown, this reward will be distributed"
+            }
             placement={isDesktop ? "topRight" : "bottomLeft"}
             color="white"
             {...tooltipProps}
