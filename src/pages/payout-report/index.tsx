@@ -63,20 +63,20 @@ const PayoutReport = () => {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate(`/event/${eventId}`)}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>
       </div>
 
       {/* Main content */}
-      <div className="w-full  pb-16">
+      <div className="w-full">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl md:text-2xl  font-bold text-primary dark:text-(--color-orange-500) mb-2">
+          <h1 className="text-xl md:text-2xl  font-medium text-primary dark:text-(--color-orange-500) mb-2">
             {t("payoutReport.title", "Reward Distribution Report")}
           </h1>
-          <p className="text-base text-secondary">
+          <p className="text-base text-gray-400">
             {t(
               "payoutReport.subtitle",
               "View complete reward distribution details and verification information"

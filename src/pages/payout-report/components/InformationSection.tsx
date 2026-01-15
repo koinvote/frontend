@@ -64,7 +64,7 @@ export function InformationSection({ report }: InformationSectionProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {rewardItems.map((item, index) => (
           <div key={index}>
-            <p className="text-base text-secondary mb-1">{item.label}</p>
+            <p className="text-base text-gray-400 mb-1">{item.label}</p>
             <p
               className={`text-base text-primary ${
                 item.highlight ? "font-bold" : ""
@@ -79,7 +79,7 @@ export function InformationSection({ report }: InformationSectionProps) {
       {/* Reward threshold badge */}
       {params?.dust_threshold_satoshi && (
         <div className="mt-4 flex items-center gap-2">
-          <span className="text-base text-secondary">
+          <span className="text-base text-gray-400">
             {t("payoutReport.rewardThreshold")}:
           </span>
           <span className="px-2 py-0.5 text-white text-xs bg-neutral-800 rounded-2xl">

@@ -38,7 +38,7 @@ export function VerificationInfo({
             <h4 className="text-sm text-primary mb-2">
               {t("payoutReport.batchTransferTxid", "Batch transfer txid")}
             </h4>
-            <p className="text-xs text-secondary break-all">
+            <p className="text-xs text-gray-400 dark:text-secondary break-all">
               {batchTransferTxid}
             </p>
           </div>
@@ -67,6 +67,7 @@ export function VerificationInfo({
               </span>
               <Tooltip
                 className="bg-white text-black"
+                styles={{ root: { maxWidth: "min(700px, 90vw)" } }}
                 title={t(
                   "payoutReport.verificationPackageTooltip",
                   "Use this checksum to verify that the verification package you downloaded is complete and has not been modified."
@@ -75,7 +76,7 @@ export function VerificationInfo({
                 <InfoCircleOutlined className="text-secondary cursor-pointer" />
               </Tooltip>
             </h4>
-            <p className="text-xs text-secondary break-all">
+            <p className="text-xs text-gray-400 dark:text-secondary break-all">
               SHA-256: {csvSha256}
             </p>
           </div>
