@@ -37,6 +37,7 @@ export function SearchAndFilter({
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
+  const [isIconSpinning, setIsIconSpinning] = useState(false);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -220,6 +221,8 @@ export function SearchAndFilter({
               text="sm"
               className="h-9 gap-1 w-full md:w-[120px] dark:hover:bg-gray-900"
               onClick={() => {
+                setIsIconSpinning(true);
+                setTimeout(() => setIsIconSpinning(false), 600);
                 onBalanceDisplayModeChange?.(
                   balanceDisplayMode === "snapshot" ? "on_chain" : "snapshot"
                 );
@@ -227,12 +230,20 @@ export function SearchAndFilter({
             >
               {balanceDisplayMode === "snapshot" ? (
                 <>
-                  <OnChainIcon className="w-3 h-3" />
+                  <OnChainIcon
+                    className={`w-3 h-3 ${
+                      isIconSpinning ? "animate-spin" : ""
+                    }`}
+                  />
                   On-chain
                 </>
               ) : (
                 <>
-                  <OnChainIcon className="w-3 h-3" />
+                  <OnChainIcon
+                    className={`w-3 h-3 ${
+                      isIconSpinning ? "animate-spin" : ""
+                    }`}
+                  />
                   Snapshot
                 </>
               )}
