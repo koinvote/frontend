@@ -83,7 +83,7 @@ export function RewardDistributionSection({
     <div className="mb-6">
       <div className="p-0 md:p-6 md:rounded-2xl md:border border-neutral-800 overflow-hidden">
         {/* Header */}
-        <h3 className="mb-6 text-base text-primary">{title}</h3>
+        <h3 className="mt-6 md:mt-0 mb-6 text-base text-primary">{title}</h3>
 
         {/* Summary grid */}
         <div className="px-4 pt-4 pb-6 bg-gray-100 dark:bg-transparent rounded-lg">

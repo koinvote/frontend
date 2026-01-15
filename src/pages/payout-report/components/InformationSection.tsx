@@ -42,7 +42,7 @@ export function InformationSection({ report }: InformationSectionProps) {
 
   return (
     <div className="rounded-2xl md:border border-neutral-800 md:p-6">
-      <h2 className="text-base text-primary mt-12 mb-8 md:mb-4">
+      <h2 className="text-base text-primary mt-12 mb-8 md:mt-0 md:mb-4">
         {t("payoutReport.information", "Information")}
       </h2>
 

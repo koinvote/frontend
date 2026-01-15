@@ -89,7 +89,7 @@ const PayoutReport = () => {
 
         {/* Reward Distribution Detail */}
         <div className="mt-6">
-          <h2 className="text-lg text-primary mt-8 mb-6 font-bold md:font-normal">
+          <h2 className="text-lg text-primary mt-8 mb-0 md:mb-6 font-bold md:font-normal">
             {t("payoutReport.distributionDetail", "Reward Distribution Detail")}
           </h2>
           {payoutReport.reward_details.map((detail, index) => (
