@@ -496,7 +496,7 @@ export default function PreviewEvent() {
               <span>{totalFeeDisplay}</span>
               {showLowTotalWarning && (
                 <span className="text-xs md:text-sm text-red-700 mt-1">
-                  Under 0.00001 BTC, your wallet may not be able to send this
+                  Under 0.00002 BTC, your wallet may not be able to send this
                   transaction.
                 </span>
               )}
