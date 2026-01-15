@@ -168,6 +168,8 @@ function ReplyItem({
     singleLine: isDesktop,
   });
 
+  console.log("balanceDisplayMode", balanceDisplayMode);
+
   const getDisplayBalance = () => {
     if (eventStatus === EventStatus.COMPLETED) {
       if (balanceDisplayMode === "on_chain") {
@@ -177,6 +179,9 @@ function ReplyItem({
     }
     return reply.balance_at_reply_satoshi;
   };
+console.log("getDisplayBalance", getDisplayBalance);
+
+
 
   const balanceBtc = satsToBtc(getDisplayBalance(), {
     suffix: false,

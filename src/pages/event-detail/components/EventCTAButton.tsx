@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
 import { Tooltip } from "antd";
 import { Button } from "@/components/base/Button";
 import { EventStatus } from "@/api/types";
@@ -20,7 +21,18 @@ export function EventCTAButton({
   eventId,
 }: EventCTAButtonProps) {
   const navigate = useNavigate();
-  console.log(status);
+  const [isDesktop, setIsDesktop] = useState<boolean>(() =>
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 768px)");
+    const listener = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    // Initial set
+    setIsDesktop(mq.matches);
+    mq.addEventListener("change", listener);
+    return () => mq.removeEventListener("change", listener);
+  }, []);
 
   const isPreheat = status === EventStatus.PREHEAT;
   const isOngoing = status === EventStatus.ACTIVE;
@@ -33,7 +45,7 @@ export function EventCTAButton({
   let tooltipText = "";
 
   if (isPreheat) {
-    buttonText = "Reply";
+    buttonText = "Reply to win BTC";
     isDisabled = true;
     tooltipText =
       "Preheat lets people see the event before replies open.\n\nDuring this time, the event is visible but replies are disabled.";
@@ -74,9 +86,7 @@ export function EventCTAButton({
       disabled={isDisabled}
       onClick={handleClick}
     >
-      {!isRewarded && isCompleted && (
-        <RewardReportIcon className="w-4 h-4" />
-      )}
+      {!isRewarded && isCompleted && <RewardReportIcon className="w-4 h-4" />}
       {buttonText}
     </Button>
   );
@@ -84,17 +94,34 @@ export function EventCTAButton({
   if (isPreheat && tooltipText) {
     return (
       <Tooltip
-        title={tooltipText.split("\n\n").map((line, index) => (
-          <div key={index}>{line}</div>
-        ))}
-        placement="top"
+        title={
+          <>
+            {/* Desktop: split into two lines */}
+            <div className="hidden md:block">
+              <div>Preheat lets people see the event before replies open.</div>
+              <div>
+                During this time, the event is visible but replies are disabled.
+              </div>
+            </div>
+            {/* Mobile: original single block (auto wrapping) */}
+            <div className="block md:hidden">
+              {tooltipText.split("\n\n").map((line, index) => (
+                <div key={index}>{line}</div>
+              ))}
+            </div>
+          </>
+        }
+        placement={isDesktop ? "left" : "right"}
         color="white"
         arrow={{ pointAtCenter: true }}
-        overlayInnerStyle={{
-          maxWidth: "min(400px, calc(100vw - 32px))",
+        styles={{
+          container: {
+            maxWidth: isDesktop ? "300px" : "min(180px, 90vw)",
+            whiteSpace: "normal",
+          },
         }}
       >
-        {button}
+        <span style={{ display: "inline-block" }}>{button}</span>
       </Tooltip>
     );
   }
