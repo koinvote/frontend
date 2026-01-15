@@ -532,6 +532,8 @@ export const mockRewardDetails: RewardDetail[] = [
     distributable_satoshi: 287500,
     winner_count: 12,
     winners: mockPayoutWinners,
+    redistributed_address_count: 3,
+    redistributed_satoshi: 1532,
     batch_transfer_txid:
       "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
     csv_sha256:
@@ -547,6 +549,8 @@ export const mockRewardDetails: RewardDetail[] = [
     distributable_satoshi: 191500,
     winner_count: 4,
     winners: mockAdditionalPayoutWinners,
+    redistributed_address_count: 0,
+    redistributed_satoshi: 0,
     batch_transfer_txid:
       "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
     csv_sha256:

@@ -216,11 +216,11 @@ export interface AdminSystemParametersRes {
 
 // Payout Report Types
 export type PayoutStatus =
-  | "completed"             // 已完成派獎
-  | "processing"            // 派獎處理中
-  | "dust_redistributed"    // 低於 dust 門檻，獎金重分配給其他中獎者
-  | "failed"                // 派獎失敗
-  | "pending";              // 等待派獎
+  | "completed" // 已完成派獎
+  | "processing" // 派獎處理中
+  | "dust_redistributed" // 低於 dust 門檻，獎金重分配給其他中獎者
+  | "failed" // 派獎失敗
+  | "pending"; // 等待派獎
 
 export type RewardType = "initial" | "additional";
 
@@ -245,6 +245,8 @@ export interface RewardDetail {
   distributable_satoshi: number;
   winner_count: number;
   winners: PayoutWinner[];
+  redistributed_address_count: number;
+  redistributed_satoshi: number;
   batch_transfer_txid: string;
   csv_sha256: string;
 }

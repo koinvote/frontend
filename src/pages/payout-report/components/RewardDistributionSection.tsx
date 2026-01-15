@@ -119,6 +119,8 @@ export function RewardDistributionSection({
         <WinnerTable
           winners={detail.winners}
           winnerCount={detail.winner_count}
+          redistributedAddressCount={detail.redistributed_address_count}
+          redistributedSatoshi={detail.redistributed_satoshi}
           eventId={eventId}
         />
 

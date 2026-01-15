@@ -12,12 +12,19 @@ import { useTranslation } from "react-i18next";
 interface WinnerTableProps {
   winners: PayoutWinner[];
   winnerCount: number;
+  redistributedAddressCount: number;
+  redistributedSatoshi: number;
   eventId: string;
 }
 
 const DISPLAY_LIMIT = 10;
 
-export function WinnerTable({ winners, winnerCount }: WinnerTableProps) {
+export function WinnerTable({
+  winners,
+  winnerCount,
+  redistributedAddressCount,
+  redistributedSatoshi,
+}: WinnerTableProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const { params } = useSystemParametersStore();
@@ -32,15 +39,6 @@ export function WinnerTable({ winners, winnerCount }: WinnerTableProps) {
   const shouldShowRemaining = winnerCount > DISPLAY_LIMIT;
   const remainingCount = winnerCount - DISPLAY_LIMIT;
 
-  // Calculate redistribute stats
-  const redistributedWinners = winners.filter(
-    (w) => w.payout_status === "dust_redistributed"
-  );
-  const distributedAddrCount = redistributedWinners.length;
-  const distributedReward = redistributedWinners.reduce(
-    (sum, w) => sum + w.reward_satoshi,
-    0
-  );
   const dustThreshold = params?.dust_threshold_satoshi
     ? params.dust_threshold_satoshi.toLocaleString()
     : "--";
@@ -180,7 +178,11 @@ export function WinnerTable({ winners, winnerCount }: WinnerTableProps) {
                       <Tooltip
                         className="bg-white text-black"
                         styles={{ root: { maxWidth: "min(700px, 90vw)" } }}
-                        title={`${distributedAddrCount} addresses had bonuses below the minimum threshold (${dustThreshold} sats), for a total of ${distributedReward.toLocaleString()} sats redistributed to eligible addresses.`}
+                        title={t("payoutReport.dustRedistributedTooltip", {
+                          addressCount: redistributedAddressCount,
+                          threshold: dustThreshold,
+                          totalSats: redistributedSatoshi.toLocaleString(),
+                        })}
                       >
                         <InfoCircleOutlined className="text-gray-400 dark:text-primary cursor-pointer" />
                       </Tooltip>

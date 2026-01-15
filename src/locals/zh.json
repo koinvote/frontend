@@ -233,7 +233,8 @@
     },
     "loading": "載入派獎報告中...",
     "error": "載入派獎報告失敗",
-    "noData": "沒有可用的派獎報告"
+    "noData": "沒有可用的派獎報告",
+    "dustRedistributedTooltip": "共有 {{addressCount}} 個地址的獎金低於最低門檻（{{threshold}} sats），總計 {{totalSats}} sats 已重新分配給符合資格的地址。"
   },
   "rewardTerms": {
     "title": "獎勵分配條款",

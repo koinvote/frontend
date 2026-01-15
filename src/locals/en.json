@@ -243,7 +243,8 @@
     },
     "loading": "Loading payout report...",
     "error": "Failed to load payout report",
-    "noData": "No payout report available"
+    "noData": "No payout report available",
+    "dustRedistributedTooltip": "{{addressCount}} addresses had bonuses below the minimum threshold ({{threshold}} sats), for a total of {{totalSats}} sats redistributed to eligible addresses."
   },
   "rewardTerms": {
     "title": "Terms of Reward Distribution",
