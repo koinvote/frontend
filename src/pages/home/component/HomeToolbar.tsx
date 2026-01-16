@@ -139,7 +139,10 @@ export function HomeToolbar() {
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
             placeholder="Search by title, address, Event ID"
-            className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-base md:text-base outline-none w-full min-w-0"
+            className="flex-1 rounded-xl border border-border bg-surface pl-11 
+          pr-10 py-2 text-base md:text-base outline-none w-full min-w-0 
+          focus:ring-0.5 focus:ring-(--color-orange-500) 
+          focus:border-(--color-orange-500)"
           />
           {(isSearchFocused || search) && (
             <button
