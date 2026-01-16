@@ -1,13 +1,12 @@
 import { useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router";
-
-import { cn } from "@/utils/style";
-import { Button } from "../components/base/Button";
 
 import MenuIcon from "@/assets/icons/menu.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
-
-import { useTranslation } from "react-i18next";
+import { useHomeStore } from "@/stores/homeStore";
+import { cn } from "@/utils/style";
+import { Button } from "../components/base/Button";
 
 export default function Header({
   open,
@@ -23,6 +22,7 @@ export default function Header({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDesktop, setIsDesktop, collapsed, setCollapsed } = useHomeStore();
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
@@ -56,8 +56,9 @@ export default function Header({
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 w-full z-50 bg-white dark:bg-black md:border-b border-border px-2 text-(--color-primary)",
-        "transition-transform duration-300 ease-out"
+        "top-0 left-0 w-full z-50 bg-white dark:bg-black md:border-b border-border px-2 text-(--color-primary)",
+        "transition-transform duration-300 ease-out",
+        isDesktop && "fixed"
       )}
       style={{
         paddingTop: "env(safe-area-inset-top)",

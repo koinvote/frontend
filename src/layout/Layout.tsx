@@ -15,8 +15,7 @@ export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
   const [isClosing, setIsClosing] = useState(false); // 控制关闭动画
   const [isOpening, setIsOpening] = useState(false); // 控制打开动画
-  const [headerVisible, setHeaderVisible] = useState(true); // mobile header visibility
-  const lastScrollY = useRef(0);
+
   // desktop sidebar state persisted in store
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
@@ -32,33 +31,6 @@ export default function Layout() {
     window.addEventListener("resize", checkDesktop);
     return () => window.removeEventListener("resize", checkDesktop);
   }, [setIsDesktop]);
-
-  // Mobile header show/hide on scroll
-  useEffect(() => {
-    if (isDesktop) {
-      setHeaderVisible(true);
-      return;
-    }
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollDelta = currentScrollY - lastScrollY.current;
-
-      // Show header when scrolling up or at top
-      if (scrollDelta < -1 || currentScrollY < 10) {
-        setHeaderVisible(true);
-      }
-      // Hide header when scrolling down
-      else if (scrollDelta > 1 && currentScrollY > 60) {
-        setHeaderVisible(false);
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [isDesktop]);
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
@@ -114,17 +86,15 @@ export default function Layout() {
   return (
     // 1. Root Container
     <div className="w-full min-h-screen">
-      {headerVisible && (
-        <Header
-          open={open}
-          setOpen={setOpen}
-          setIsClosing={setIsClosing}
-          setIsOpening={setIsOpening}
-        />
-      )}
+      <Header
+        open={open}
+        setOpen={setOpen}
+        setIsClosing={setIsClosing}
+        setIsOpening={setIsOpening}
+      />
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-screen pt-14 md:pt-16">
+      <div className="relative flex w-full min-h-screen md:pt-16">
         {/* Sidebar (Desktop Only - Fixed) */}
         {isDesktop && (
           <aside
