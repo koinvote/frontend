@@ -49,11 +49,11 @@ export default function Layout() {
       const scrollDelta = currentScrollY - lastScrollY.current;
 
       // Show header when scrolling up or at top
-      if (scrollDelta < -5 || currentScrollY < 10) {
+      if (scrollDelta < -1 || currentScrollY < 10) {
         setHeaderVisible(true);
       }
       // Hide header when scrolling down
-      else if (scrollDelta > 5 && currentScrollY > 60) {
+      else if (scrollDelta > 1 && currentScrollY > 60) {
         setHeaderVisible(false);
       }
 
@@ -121,7 +121,7 @@ export default function Layout() {
       {/* 2. Header */}
       <header
         className={cn(
-          "fixed top-0 left-0 w-full z-50 bg-white dark:bg-black border-b border-border px-2 text-(--color-primary)",
+          "fixed top-0 left-0 w-full z-50 bg-white dark:bg-black md:border-b border-border px-2 text-(--color-primary)",
           "transition-transform duration-300 ease-out",
           !headerVisible && !isDesktop && "-translate-y-full"
         )}
