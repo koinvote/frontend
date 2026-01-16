@@ -5,15 +5,18 @@ const THEME_KEY = "PREFERRED_THEME";
 
 const applyTheme = (t: Theme) => {
   const el = document.documentElement;
-  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
   if (t === "dark") {
     el.classList.add("dark");
-    if (metaThemeColor) metaThemeColor.setAttribute("content", "#000000");
   } else {
     el.classList.remove("dark");
-    if (metaThemeColor) metaThemeColor.removeAttribute("content");
   }
+
+  // Update all theme-color meta tags for safe area coloring
+  const color = t === "dark" ? "#000000" : "#ffffff";
+  document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => {
+    meta.setAttribute("content", color);
+  });
 };
 
 interface ThemeState {
