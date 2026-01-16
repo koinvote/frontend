@@ -121,14 +121,11 @@ export default function Layout() {
       {/* 2. Header */}
       <header
         className={cn(
-          "fixed top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)",
+          "fixed top-0 left-0 w-full z-50 bg-white dark:bg-black border-b border-border px-2 text-(--color-primary)",
           "transition-transform duration-300 ease-out",
           !headerVisible && !isDesktop && "-translate-y-full"
         )}
         style={{
-          backgroundColor: "var(--header-bg)",
-          backdropFilter: "blur(12px)",
-          WebkitBackdropFilter: "blur(12px)",
           paddingTop: "env(safe-area-inset-top)",
         }}
       >
