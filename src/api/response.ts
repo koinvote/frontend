@@ -1,21 +1,25 @@
 // api/response.ts
 import type { TopReply } from "@/pages/create-event/types";
 import type {
-  EventType,
+  DepositStatus,
   EventRewardType,
   EventStatus,
-  DepositStatus,
+  EventType,
 } from "./types";
 
 export interface SystemConfigRes {
-  maintenance_mode: boolean; //維護模式
   min_reward_amount_satoshi: number; //最低發起金額
   satoshi_per_extra_winner: number; //中獎地址數/獎金金額比例
-  dust_threshold_satoshi: number; //最低派獎門檻（Dust Rule）
   satoshi_per_duration_hour: number; //活動最長存續時間/獎金金額比例
+  dust_threshold_satoshi: number; //最低派獎門檻（Dust Rule）
   free_hours: number; //免費時長
   platform_fee_percentage: number; //平台服務費比例
   refund_service_fee_percentage: number; //退款處理費比例
+  payout_fee_multiplier: number; //派獎手續費倍數
+  refund_fee_multiplier: number; //退款手續費倍數
+  withdrawal_fee_multiplier: number; //提款手續費倍數
+  maintenance_mode: boolean; //維護模式
+  required_confirmations: number; //所需確認數
 }
 
 export interface EventDataRes {
@@ -146,10 +150,7 @@ export interface DepositStatusRes {
     | typeof DepositStatus.FROZEN;
   confirmed_at: string;
   received_txid: string;
-  confirmations: number;
-  deposit_timeout_at?: string;
-  initial_timeout_at: string;
-  extend_timeout_at: string;
+  deposit_timeout_at: string;
   first_seen_at: string;
   block_height: number;
   deposit_type: string;
@@ -199,16 +200,61 @@ export interface AdminLoginRes {
 }
 
 export interface AdminSystemParametersRes {
-  min_reward_sats: number; // 最低發起獎金金額
-  sats_per_extra_winner: number; //中獎地址數 / 金額比例
-  sats_per_duration_hour: number; //活動最長存續時間 / 獎金金額比例 ( 多少BTC對應1小時)
-  platform_fee_percent: number; // 平台手續費百分比
-  min_payout_sats: number; //最低派獎門檻
+  min_reward_amount_satoshi: number; // 最低發起獎金金額
+  satoshi_per_extra_winner: number; //中獎地址數 / 金額比例
+  satoshi_per_duration_hour: number; //活動最長存續時間 / 獎金金額比例 ( 多少BTC對應1小時)
+  dust_threshold_satoshi: number; //最低派獎門檻
   free_hours: number; //免費時長
+  platform_fee_percentage: number; // 平台手續費百分比
   refund_service_fee_percentage: number; //退款服務費百分比
   payout_fee_multiplier: number; //派獎手續費倍數
   refund_fee_multiplier: number; //退款手續費倍數
   withdrawal_fee_multiplier: number; //提款手續費倍數
   maintenance_mode: boolean; //維護模式
   required_confirmations: number; //所需確認數
+}
+
+// Payout Report Types
+export type PayoutStatus =
+  | "completed"             // 已完成派獎
+  | "processing"            // 派獎處理中
+  | "dust_redistributed"    // 低於 dust 門檻，獎金重分配給其他中獎者
+  | "failed"                // 派獎失敗
+  | "pending";              // 等待派獎
+
+export type RewardType = "initial" | "additional";
+
+export interface PayoutWinner {
+  winner_address: string;
+  balance_at_snapshot_satoshi: number;
+  win_probability_percent: number;
+  is_dust: boolean;
+  reward_satoshi: number;
+  payout_status: PayoutStatus;
+  payout_txid: string;
+  payout_at: string;
+}
+
+export interface RewardDetail {
+  reward_type: RewardType;
+  deposit_id: number;
+  plan_id: number;
+  original_amount_satoshi: number;
+  platform_fee_satoshi: number;
+  estimated_miner_fee_satoshi: number;
+  distributable_satoshi: number;
+  winner_count: number;
+  winners: PayoutWinner[];
+}
+
+export interface PayoutReportRes {
+  event_id: string;
+  event_title: string;
+  completed_at: string;
+  snapshot_block_height: number;
+  initial_reward_satoshi: number;
+  additional_reward_1_satoshi: number;
+  additional_reward_2_satoshi: number;
+  total_reward_pool_satoshi: number;
+  reward_details: RewardDetail[];
 }
