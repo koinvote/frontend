@@ -12,7 +12,7 @@ const applyTheme = (t: Theme) => {
     if (metaThemeColor) metaThemeColor.setAttribute("content", "#000000");
   } else {
     el.classList.remove("dark");
-    if (metaThemeColor) metaThemeColor.setAttribute("content", "#ffffff");
+    if (metaThemeColor) metaThemeColor.removeAttribute("content");
   }
 };
 
