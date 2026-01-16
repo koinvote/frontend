@@ -5,17 +5,12 @@ import { cn } from "@/utils/style";
 import Menu from "../components/Menu";
 import { Button } from "../components/base/Button";
 
-import LanguagesEarth from "@/assets/icons/languages-earth.svg?react";
 import LeftArrow from "@/assets/icons/leftArrow.svg?react";
 import MenuIcon from "@/assets/icons/menu.svg?react";
-import ModeDark from "@/assets/icons/mode-dark.svg?react";
-import ModeLight from "@/assets/icons/mode-light.svg?react";
 import RightArrow from "@/assets/icons/rightArrow.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
 
 import { useHomeStore } from "@/stores/homeStore";
-import { useLanguagesStore } from "@/stores/languagesStore";
-import { useThemeStore } from "@/stores/themeStore";
 import { useTranslation } from "react-i18next";
 
 export default function Layout() {
@@ -30,10 +25,6 @@ export default function Layout() {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const { t } = useTranslation();
-  const theme = useThemeStore((state) => state.theme);
-  const toggle = useThemeStore((state) => state.toggle);
-  const { current, setLanguage } = useLanguagesStore();
-  const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -163,16 +154,6 @@ export default function Layout() {
           </div>
 
           <div className="ml-2 flex items-center gap-2">
-            <Button size="md" onClick={toggleLang} className="w-auto px-3">
-              <LanguagesEarth className="mr-2" />
-              <span className="tx-12">{current === "en" ? "EN" : "中文"}</span>
-            </Button>
-            <Button size="md" onClick={toggle} className="w-auto px-3">
-              {theme === "dark" ? <ModeLight /> : <ModeDark />}
-              <span className="tx-12">
-                {theme === "dark" ? "Light" : "Dark"}
-              </span>
-            </Button>
             <Button
               size="md"
               text="sm"
@@ -261,14 +242,16 @@ export default function Layout() {
           <div
             ref={drawerRef}
             className={cn(
-              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
+              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
               isClosing || isOpening ? "-translate-x-full" : "translate-x-0"
             )}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-base font-semibold">Menu</span>
+              <span className="text-base font-semibold">
+                {t("layout.menu", "Menu")}
+              </span>
               <button
                 ref={closeBtnRef}
                 onClick={handleClose}

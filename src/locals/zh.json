@@ -2,7 +2,8 @@
   "layout": {
     "title": "KoinVote",
     "createEvent": "建立活動",
-    "createEventFull": "建立活動"
+    "createEventFull": "建立活動",
+    "menu": "選單"
   },
   "menu": {
     "about": "關於 Koinvote",
@@ -13,7 +14,9 @@
     "privacy": "隱私",
     "charges": "費用和退款",
     "subscribe": "訂閱",
-    "help": "幫助 / 常見問題"
+    "help": "幫助 / 常見問題",
+    "light": "淺色模式",
+    "dark": "深色模式"
   },
   "createEvent": {
     "creatorAddressTooltip": "此地址也將用於退款。",
@@ -55,34 +58,34 @@
     "introductionText2": "無需信任平台，因為所有驗證輸入和源代碼都是公開可用的。",
     "eventResultTitle": "活動結果驗證",
 
-  "step1Title": "前往獎勵分配報告頁面下載驗證套件（CSV）。",
-  "step1_1": "前往你想驗證的活動頁面。",
-  "step1_2": "開啟該活動的獎勵分配報告（Reward Distribution Report）。",
-  "step1_3": "找到你想驗證的獎項並下載對應的驗證套件。",
+    "step1Title": "前往獎勵分配報告頁面下載驗證套件（CSV）。",
+    "step1_1": "前往你想驗證的活動頁面。",
+    "step1_2": "開啟該活動的獎勵分配報告（Reward Distribution Report）。",
+    "step1_3": "找到你想驗證的獎項並下載對應的驗證套件。",
 
-  "step2Title": "設定並執行 Event Verifier",
+    "step2Title": "設定並執行 Event Verifier",
 
-  "step2_1_title": "1. 檢視開源程式碼",
-  "step2_1_text_before": "前往我們的",
-  "step2_1_linkLabel": "GitHub 儲存庫",
-  "step2_1_text_after": "以檢視或下載驗證腳本。",
+    "step2_1_title": "1. 檢視開源程式碼",
+    "step2_1_text_before": "前往我們的",
+    "step2_1_linkLabel": "GitHub 儲存庫",
+    "step2_1_text_after": "以檢視或下載驗證腳本。",
 
-  "step2_2_title": "2. 安裝 Go",
-  "step2_2_text1": "要執行驗證程式，你需要先安裝 Go 程式語言（版本 1.20 或以上）。",
-  "step2_2_text2": "如果你已經安裝過 Go，可以跳過此步驟。",
+    "step2_2_title": "2. 安裝 Go",
+    "step2_2_text1": "要執行驗證程式，你需要先安裝 Go 程式語言（版本 1.20 或以上）。",
+    "step2_2_text2": "如果你已經安裝過 Go，可以跳過此步驟。",
 
-  "step2_3_title": "3. 下載並執行驗證程式",
-  "step2_3_text": "從 GitHub 下載開源驗證程式碼，並使用 Go 執行。",
+    "step2_3_title": "3. 下載並執行驗證程式",
+    "step2_3_text": "從 GitHub 下載開源驗證程式碼，並使用 Go 執行。",
 
-  "codeBlock_copy": "複製指令",
-  "codeBlock_content": "# 下載驗證程式\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# 編譯驗證程式\ngo build -o verify-event main.go\n\n# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案\n./verify-event --report <your-report-file.csv>",
-  "receiptSectionTitle": "回執驗證",
-  "receiptStep1Title": "提交回覆後下載回執檔案",
-  "receiptStep1Subtitle": "當你的回覆送出後，點擊「Download Receipt」下載並保存回執檔案。",
-  "receiptImageAlt": "顯示「Submission Successful」畫面並標示 Download Receipt 按鈕的截圖。",
-  "receiptStep2Title": "設定並執行 Receipt Verifier",
+    "codeBlock_copy": "複製指令",
+    "codeBlock_content": "# 下載驗證程式\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# 編譯驗證程式\ngo build -o verify-event main.go\n\n# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案\n./verify-event --report <your-report-file.csv>",
+    "receiptSectionTitle": "回執驗證",
+    "receiptStep1Title": "提交回覆後下載回執檔案",
+    "receiptStep1Subtitle": "當你的回覆送出後，點擊「Download Receipt」下載並保存回執檔案。",
+    "receiptImageAlt": "顯示「Submission Successful」畫面並標示 Download Receipt 按鈕的截圖。",
+    "receiptStep2Title": "設定並執行 Receipt Verifier",
 
-  "receiptCodeBlock_content": "# 下載驗證程式\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# 編譯並執行驗證程式\ngo build -o verify-receipt main.go\n\n# 執行驗證程式\n# 將 <your-receipt-file.json> 替換為你下載的實際回執檔案\n./verify-receipt --receipt <your-receipt-file.json>"
+    "receiptCodeBlock_content": "# 下載驗證程式\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# 編譯並執行驗證程式\ngo build -o verify-receipt main.go\n\n# 執行驗證程式\n# 將 <your-receipt-file.json> 替換為你下載的實際回執檔案\n./verify-receipt --receipt <your-receipt-file.json>"
   },
   "about": {
     "title": "關於 Koinvote",

@@ -1,5 +1,6 @@
 import { cn } from "@/utils/style";
-import { Tooltip } from "antd";
+import { GlobalOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { Button, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
@@ -11,6 +12,8 @@ import SubscribeIcon from "@/assets/icons/menu-subscribe.svg?react";
 import SupportIcon from "@/assets/icons/menu-support.svg?react";
 import TermsIcon from "@/assets/icons/menu-terms.svg?react";
 import VerificationIcon from "@/assets/icons/menu-verificationTool.svg?react";
+import { useLanguagesStore } from "@/stores/languagesStore";
+import { useThemeStore } from "@/stores/themeStore";
 
 interface MenuProps {
   onItemClick?: () => void;
@@ -54,6 +57,12 @@ const activeLink = "bg-surface text-primary";
 const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const { t } = useTranslation();
 
+  const theme = useThemeStore((state) => state.theme);
+  const toggle = useThemeStore((state) => state.toggle);
+
+  const { current, setLanguage } = useLanguagesStore();
+  const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
+
   return (
     <nav className="space-y-1">
       {items.map(({ to, key, Icon }) => (
@@ -71,7 +80,11 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           onClick={onItemClick}
         >
           {collapsed ? (
-            <Tooltip placement="right" title={t(key)}>
+            <Tooltip
+              placement="right"
+              title={t(key)}
+              color={theme === "dark" ? "#000" : "#fff"}
+            >
               <span
                 className={cn(
                   "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
@@ -104,6 +117,66 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
         </NavLink>
       ))}
+
+      <div className="absolute bottom-0 left-0 w-full">
+        <div className="p-4 border-t border-border">
+          {collapsed ? (
+            <div>
+              <Tooltip
+                placement="right"
+                title={current === "en" ? "EN" : "中文"}
+                color={theme === "dark" ? "#000" : "#fff"}
+              >
+                <Button
+                  type="link"
+                  size="middle"
+                  onClick={toggleLang}
+                  className="w-auto px-3"
+                  icon={<GlobalOutlined />}
+                ></Button>
+              </Tooltip>
+              <Tooltip
+                placement="right"
+                title={theme === "dark" ? "Light" : "Dark"}
+                color={theme === "dark" ? "#000" : "#fff"}
+              >
+                <Button
+                  type="link"
+                  size="middle"
+                  onClick={toggle}
+                  className="w-auto px-3"
+                  icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
+                ></Button>
+              </Tooltip>
+            </div>
+          ) : (
+            <div>
+              <Button
+                type="link"
+                size="middle"
+                onClick={toggleLang}
+                className="w-auto px-3"
+                icon={<GlobalOutlined />}
+              >
+                <span className="tx-12">
+                  {current === "en" ? "EN" : "中文"}
+                </span>
+              </Button>
+              <Button
+                type="link"
+                size="middle"
+                onClick={toggle}
+                className="w-auto px-3"
+                icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
+              >
+                <span className="tx-12">
+                  {theme === "dark" ? t("menu.light") : t("menu.dark")}
+                </span>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
     </nav>
   );
 };
