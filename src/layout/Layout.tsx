@@ -1,36 +1,30 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { Link, Outlet, useNavigate, useLocation } from "react-router";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 
+import { cn } from "@/utils/style";
 import Menu from "../components/Menu";
 import { Button } from "../components/base/Button";
-import { cn } from "@/utils/style";
 
-import Logo from "@/assets/logo/logo.svg?react";
-import LanguagesEarth from "@/assets/icons/languages-earth.svg?react";
-import RightArrow from "@/assets/icons/rightArrow.svg?react";
 import LeftArrow from "@/assets/icons/leftArrow.svg?react";
-import ModeLight from "@/assets/icons/mode-light.svg?react";
-import ModeDark from "@/assets/icons/mode-dark.svg?react";
 import MenuIcon from "@/assets/icons/menu.svg?react";
+import RightArrow from "@/assets/icons/rightArrow.svg?react";
+import Logo from "@/assets/logo/logo.svg?react";
 
-import { useTranslation } from "react-i18next";
-import { useTheme } from "@/hooks/useTheme";
-import { useLanguagesStore } from "@/stores/languagesStore";
 import { useHomeStore } from "@/stores/homeStore";
+import { useTranslation } from "react-i18next";
 
 export default function Layout() {
   const [open, setOpen] = useState(false); // mobile drawer
   const [isClosing, setIsClosing] = useState(false); // 控制关闭动画
   const [isOpening, setIsOpening] = useState(false); // 控制打开动画
+  const [headerVisible, setHeaderVisible] = useState(true); // mobile header visibility
+  const lastScrollY = useRef(0);
   // desktop sidebar state persisted in store
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLDivElement | null>(null);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const { t } = useTranslation();
-  const { theme, toggle } = useTheme();
-  const { current, setLanguage } = useLanguagesStore();
-  const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -42,6 +36,33 @@ export default function Layout() {
     window.addEventListener("resize", checkDesktop);
     return () => window.removeEventListener("resize", checkDesktop);
   }, [setIsDesktop]);
+
+  // Mobile header show/hide on scroll
+  useEffect(() => {
+    if (isDesktop) {
+      setHeaderVisible(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - lastScrollY.current;
+
+      // Show header when scrolling up or at top
+      if (scrollDelta < -5 || currentScrollY < 10) {
+        setHeaderVisible(true);
+      }
+      // Hide header when scrolling down
+      else if (scrollDelta > 5 && currentScrollY > 60) {
+        setHeaderVisible(false);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isDesktop]);
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
@@ -96,10 +117,14 @@ export default function Layout() {
 
   return (
     // 1. Root Container
-    <div className=" w-full min-h-screen">
+    <div className="w-full min-h-screen">
       {/* 2. Header */}
       <header
-        className="top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)"
+        className={cn(
+          "fixed top-0 left-0 w-full z-50 border-b border-border px-2 text-(--color-primary)",
+          "transition-transform duration-300 ease-out",
+          !headerVisible && !isDesktop && "-translate-y-full"
+        )}
         style={{
           backgroundColor: "var(--header-bg)",
           backdropFilter: "blur(12px)",
@@ -129,16 +154,6 @@ export default function Layout() {
           </div>
 
           <div className="ml-2 flex items-center gap-2">
-            <Button size="md" onClick={toggleLang} className="w-auto px-3">
-              <LanguagesEarth className="mr-2" />
-              <span className="tx-12">{current === "en" ? "EN" : "中文"}</span>
-            </Button>
-            <Button size="md" onClick={toggle} className="w-auto px-3">
-              {theme === "dark" ? <ModeLight /> : <ModeDark />}
-              <span className="tx-12">
-                {theme === "dark" ? "Light" : "Dark"}
-              </span>
-            </Button>
             <Button
               size="md"
               text="sm"
@@ -161,25 +176,13 @@ export default function Layout() {
       </header>
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-screen">
-        {/* Full-height divider line (Desktop Only) */}
-        {isDesktop && (
-          <div
-            className="absolute left-0 top-0 bottom-0 w-px bg-border pointer-events-none z-0"
-            style={{
-              left: collapsed ? "70px" : "280px",
-              transition: "left 200ms ease-out",
-            }}
-          />
-        )}
-
-        {/* Sidebar (Desktop Only - REMOVED FROM DOM ON MOBILE) */}
+      <div className="relative flex w-full min-h-screen pt-14 md:pt-16">
+        {/* Sidebar (Desktop Only - Fixed) */}
         {isDesktop && (
           <aside
             className={cn(
-              "shrink-0",
-              "sticky top-[calc(4rem+var(--sat))]",
-              "h-[calc(100dvh-4rem-var(--sat))]",
+              "fixed top-16 left-0 z-40",
+              "h-[calc(100dvh-4rem)]",
               "backdrop-blur",
               "transition-[width] duration-200 ease-out",
               "border-r border-border bg-(--color-bg)",
@@ -194,33 +197,34 @@ export default function Layout() {
             >
               <Menu collapsed={collapsed} onItemClick={handleClose} />
             </div>
+
+            {/* Sidebar Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setCollapsed(!collapsed)}
+              aria-label={
+                collapsed ? "Expand navigation" : "Collapse navigation"
+              }
+              className={cn(
+                "absolute -right-4 top-3",
+                "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
+                "border border-border bg-surface",
+                "shadow hover:bg-surface/80 transition-colors cursor-pointer"
+              )}
+            >
+              {collapsed ? <RightArrow /> : <LeftArrow />}
+            </button>
           </aside>
         )}
 
-        {/* Sidebar Toggle (Desktop Only) */}
-        {isDesktop && (
-          <div className="relative sticky top-[calc(4rem+var(--sat))] h-[calc(100dvh-4rem-var(--sat))] w-px z-10">
-              <button
-                type="button"
-                onClick={() => setCollapsed(!collapsed)}
-                aria-label={
-                  collapsed ? "Expand navigation" : "Collapse navigation"
-                }
-                className={cn(
-                  "absolute left-1/2 -translate-x-1/2 mt-3",
-                  "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
-                  "border border-border bg-surface",
-                  "shadow hover:bg-surface/80 transition-colors cursor-pointer"
-                )}
-              >
-                {collapsed ? <RightArrow /> : <LeftArrow />}
-              </button>
-          </div>
-        )}
-
         {/* Main Content Area */}
-        <main className="min-w-0 flex-1 ">
-          <div className=" py-4 md:px-6 md:py-6 lg:px-12 border-b border-border">
+        <main
+          className={cn(
+            "min-w-0 flex-1 transition-[margin] duration-200 ease-out",
+            isDesktop && (collapsed ? "ml-[70px]" : "ml-[280px]")
+          )}
+        >
+          <div className="py-4 md:px-6 md:py-6 lg:px-12 border-b border-border">
             <Outlet />
           </div>
         </main>
@@ -238,14 +242,16 @@ export default function Layout() {
           <div
             ref={drawerRef}
             className={cn(
-              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
+              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
               isClosing || isOpening ? "-translate-x-full" : "translate-x-0"
             )}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-base font-semibold">Menu</span>
+              <span className="text-base font-semibold">
+                {t("layout.menu", "Menu")}
+              </span>
               <button
                 ref={closeBtnRef}
                 onClick={handleClose}

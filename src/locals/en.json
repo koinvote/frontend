@@ -2,7 +2,8 @@
   "layout": {
     "title": "Koinvote",
     "createEvent": "Create",
-    "createEventFull": "Create Event"
+    "createEventFull": "Create Event",
+    "menu": "Menu"
   },
   "menu": {
     "about": "About Koinvote",
@@ -13,7 +14,9 @@
     "privacy": "Privacy",
     "charges": "Charges and Refunds",
     "subscribe": "Subscribe",
-    "help": "Help / FAQ"
+    "help": "Help / FAQ",
+    "light": "Light Theme",
+    "dark": "Dark Theme"
   },
   "createEvent": {
     "creatorAddressTooltip": "This address will also be used for refunds.",
