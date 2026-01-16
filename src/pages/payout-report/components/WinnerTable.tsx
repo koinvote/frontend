@@ -93,7 +93,7 @@ export function WinnerTable({
           <thead>
             <tr className="border-b border-neutral-800">
               <th
-                className={`sticky left-0 bg-white dark:bg-neutral-900 text-left py-3 px-2 text-xs font-medium z-10 transition-shadow ${
+                className={`sticky left-0 bg-white dark:bg-black text-left py-3 px-2 text-xs font-medium z-10 transition-shadow ${
                   isScrolled
                     ? "shadow-[inset_-4px_0_4px_-4px_rgba(0,0,0,0.3)] dark:shadow-[inset_-4px_0_4px_-4px_rgba(255,255,255,0.3)]"
                     : ""
@@ -128,7 +128,7 @@ export function WinnerTable({
                 className="group hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-neutral-800 last:border-0"
               >
                 <td
-                  className={`sticky left-0 bg-white dark:bg-neutral-900 group-hover:bg-gray-50 dark:group-hover:bg-gray-800 py-3 px-2 z-10 transition-shadow ${
+                  className={`sticky left-0 bg-white dark:bg-black group-hover:bg-gray-50 dark:group-hover:bg-gray-800 py-3 px-2 z-10 transition-shadow ${
                     isScrolled
                       ? "shadow-[inset_-4px_0_4px_-4px_rgba(0,0,0,0.3)] dark:shadow-[inset_-4px_0_4px_-4px_rgba(255,255,255,0.3)]"
                       : ""
@@ -178,11 +178,15 @@ export function WinnerTable({
                       <Tooltip
                         className="bg-white text-black"
                         styles={{ root: { maxWidth: "min(700px, 90vw)" } }}
-                        title={t("payoutReport.dustRedistributedTooltip", {
-                          addressCount: redistributedAddressCount,
-                          threshold: dustThreshold,
-                          totalSats: redistributedSatoshi.toLocaleString(),
-                        })}
+                        title={t(
+                          "payoutReport.dustRedistributedTooltip",
+                          "{{addressCount}} addresses had bonuses below the minimum threshold ({{threshold}} sats), for a total of {{totalSats}} sats redistributed to eligible addresses.",
+                          {
+                            addressCount: redistributedAddressCount,
+                            threshold: dustThreshold,
+                            totalSats: redistributedSatoshi.toLocaleString(),
+                          }
+                        )}
                       >
                         <InfoCircleOutlined className="text-gray-400 dark:text-primary cursor-pointer" />
                       </Tooltip>
@@ -195,11 +199,20 @@ export function WinnerTable({
             {shouldShowRemaining && (
               <tr className="my-4 text-center">
                 <td
-                  className="p-4 text-center text-sm text-gray-400 dark:text-primary"
+                  className="p-4 text-center text-sm text-gray-400"
                   colSpan={7}
                 >
-                  {t("payoutReport.moreAddresses", { count: remainingCount })}(
-                  {t("payoutReport.downloadVerification")})
+                  {t(
+                    "payoutReport.moreAddresses",
+                    "There are {{count}} more addresses...",
+                    { count: remainingCount }
+                  )}
+                  (
+                  {t(
+                    "payoutReport.downloadVerification",
+                    "Please download the verification package to view the full list"
+                  )}
+                  )
                 </td>
               </tr>
             )}
