@@ -1,14 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 
 import { cn } from "@/utils/style";
 import Menu from "../components/Menu";
-import { Button } from "../components/base/Button";
+import Header from "./Header";
 
 import LeftArrow from "@/assets/icons/leftArrow.svg?react";
-import MenuIcon from "@/assets/icons/menu.svg?react";
 import RightArrow from "@/assets/icons/rightArrow.svg?react";
-import Logo from "@/assets/logo/logo.svg?react";
 
 import { useHomeStore } from "@/stores/homeStore";
 import { useTranslation } from "react-i18next";
@@ -25,8 +23,6 @@ export default function Layout() {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
 
   const { isDesktop, setIsDesktop, collapsed, setCollapsed } = useHomeStore();
 
@@ -118,59 +114,14 @@ export default function Layout() {
   return (
     // 1. Root Container
     <div className="w-full min-h-screen">
-      {/* 2. Header */}
-      <header
-        className={cn(
-          "fixed top-0 left-0 w-full z-50 bg-white dark:bg-black md:border-b border-border px-2 text-(--color-primary)",
-          "transition-transform duration-300 ease-out",
-          !headerVisible && !isDesktop && "-translate-y-full"
-        )}
-        style={{
-          paddingTop: "env(safe-area-inset-top)",
-        }}
-      >
-        <div className="flex h-14 w-full items-center md:h-16 md:px-4">
-          <button
-            type="button"
-            aria-label="Open menu"
-            className="inline-flex items-center justify-center rounded-md md:hidden"
-            onClick={() => setOpen(true)}
-          >
-            <MenuIcon className="w-6 h-6" />
-          </button>
-
-          <div className="flex flex-1 items-center justify-start ml-2 md:ml-0">
-            <Link to="/" className="flex items-center gap-2">
-              <span>
-                <Logo />
-              </span>
-              <span className="text-lg font-semibold tracking-wide md:text-xl">
-                {t("layout.title")}
-              </span>
-            </Link>
-          </div>
-
-          <div className="ml-2 flex items-center gap-2">
-            <Button
-              size="md"
-              text="sm"
-              block={false}
-              className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
-              onClick={() => {
-                if (location.pathname === "/create-event") {
-                  return;
-                }
-                navigate("/create-event");
-              }}
-            >
-              <span className="md:hidden">{t("layout.createEvent")}</span>
-              <span className="hidden md:inline">
-                {t("layout.createEventFull")}
-              </span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      {headerVisible && (
+        <Header
+          open={open}
+          setOpen={setOpen}
+          setIsClosing={setIsClosing}
+          setIsOpening={setIsOpening}
+        />
+      )}
 
       {/* 3. Main Content Container */}
       <div className="relative flex w-full min-h-screen pt-14 md:pt-16">
