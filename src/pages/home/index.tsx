@@ -3,10 +3,15 @@ import { HomeToolbar } from "@/pages/home/component/HomeToolbar";
 import { EventList } from "@/pages/home/component/EventList";
 import { BackToTopButton } from "@/pages/home/component/BackToTopButton";
 import { useHomeStore } from "@/stores/homeStore";
+import { version } from "../../../package.json";
 
 export function HomePage() {
   const scrollY = useHomeStore((state) => state.scrollY);
   const setScrollY = useHomeStore((state) => state.setScrollY);
+
+  useEffect(() => {
+    console.log(`Koinvote v${version}`);
+  }, []);
 
   useEffect(() => {
     if (scrollY > 0) {
