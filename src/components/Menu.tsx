@@ -137,7 +137,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               </Tooltip>
               <Tooltip
                 placement="right"
-                title={theme === "dark" ? "Light" : "Dark"}
+                title={theme === "dark" ? t("menu.light") : t("menu.dark")}
                 color={theme === "dark" ? "#000" : "#fff"}
               >
                 <Button
@@ -158,9 +158,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 className="w-auto px-3"
                 icon={<GlobalOutlined />}
               >
-                <span className="tx-12">
-                  {current === "en" ? "EN" : "中文"}
-                </span>
+                {current === "en" ? "EN" : "中文"}
               </Button>
               <Button
                 type="link"
@@ -169,9 +167,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 className="w-auto px-3"
                 icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
               >
-                <span className="tx-12">
-                  {theme === "dark" ? t("menu.light") : t("menu.dark")}
-                </span>
+                {theme === "dark" ? t("menu.light") : t("menu.dark")}
               </Button>
             </div>
           )}
