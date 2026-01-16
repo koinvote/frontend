@@ -1,16 +1,16 @@
-import { NavLink } from "react-router";
-import { useTranslation } from "react-i18next";
 import { cn } from "@/utils/style";
 import { Tooltip } from "antd";
+import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router";
 
 import AboutIcon from "@/assets/icons/menu-about.svg?react";
+import ChargesnrefundsIcon from "@/assets/icons/menu-chargenrefund.svg?react";
+import PrivacyIcon from "@/assets/icons/menu-privacy.svg?react";
+import RewardIcon from "@/assets/icons/menu-reward.svg?react";
+import SubscribeIcon from "@/assets/icons/menu-subscribe.svg?react";
 import SupportIcon from "@/assets/icons/menu-support.svg?react";
 import TermsIcon from "@/assets/icons/menu-terms.svg?react";
-import PrivacyIcon from "@/assets/icons/menu-privacy.svg?react";
-import ChargesnrefundsIcon from "@/assets/icons/menu-chargenrefund.svg?react";
-import SubscribeIcon from "@/assets/icons/menu-subscribe.svg?react";
 import VerificationIcon from "@/assets/icons/menu-verificationTool.svg?react";
-import RewardIcon from "@/assets/icons/menu-reward.svg?react";
 
 interface MenuProps {
   onItemClick?: () => void;
@@ -79,8 +79,11 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 )}
               >
                 <Icon
-                  className="!h-5 !w-5"
-                  style={{ width: "1.25rem", height: "1.25rem" }}
+                  className="h-5! w-5! text-secondary"
+                  style={{
+                    width: "1.25rem",
+                    height: "1.25rem",
+                  }}
                 />
               </span>
             </Tooltip>
@@ -92,7 +95,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               )}
             >
               <Icon
-                className="!h-5 !w-5"
+                className="h-5! w-5! text-secondary"
                 style={{ width: "1.25rem", height: "1.25rem" }}
               />
             </span>
