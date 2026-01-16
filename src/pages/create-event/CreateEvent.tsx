@@ -183,7 +183,7 @@ export default function CreateEvent() {
       if (!ok) {
         setAddrStatus("invalid");
         setAddrInfo(null);
-        setAddrError(`Invalid Bitcoin address (${networkLabel}).`);
+        setAddrError(`Invalid Bitcoin address.`);
         return;
       }
 
