@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router";
 import { Tooltip } from "antd";
-import { Button } from "@/components/base/Button";
-import { EventStatus } from "@/api/types";
+import { useNavigate } from "react-router";
+
 import type { EventRewardType } from "@/api/types";
+import { EventStatus } from "@/api/types";
 import RewardReportIcon from "@/assets/icons/rewardReport.svg?react";
+import { Button } from "@/components/base/Button";
 import { useHomeStore } from "@/stores/homeStore";
 
 interface EventCTAButtonProps {
@@ -35,7 +36,6 @@ export function EventCTAButton({
   let buttonText = "";
   let isDisabled = false;
   let tooltipText = "";
-
   if (isPreheat) {
     buttonText =
       isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
@@ -47,7 +47,7 @@ export function EventCTAButton({
       isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
     isDisabled = false;
   } else if (isCompleted) {
-    if (!isRewarded) {
+    if (isRewarded) {
       buttonText = "View Reward Report";
       isDisabled = false;
     } else {
@@ -57,9 +57,8 @@ export function EventCTAButton({
   }
 
   const handleClick = () => {
-    if (isCompleted && !isRewarded) {
-      // TODO: Navigate to reward report page
-      navigate(`/event/${eventId}/reward-report`);
+    if (isCompleted && isRewarded) {
+      navigate(`/event/${eventId}/report`);
     } else if (isOngoing) {
       // TODO: Navigate to reply page
       navigate(`/event/${eventId}/reply`);
@@ -80,7 +79,7 @@ export function EventCTAButton({
       disabled={isDisabled}
       onClick={handleClick}
     >
-      {!isRewarded && isCompleted && <RewardReportIcon className="w-4 h-4" />}
+      {isRewarded && isCompleted && <RewardReportIcon className="w-4 h-4" />}
       {buttonText}
     </Button>
   );
