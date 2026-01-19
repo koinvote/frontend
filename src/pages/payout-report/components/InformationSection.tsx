@@ -20,18 +20,11 @@ export function InformationSection({ report }: InformationSectionProps) {
     },
   ];
 
+  // TODO: 追加獎金 addition_reward_satoshi
   const rewardItems = [
     {
       label: t("payoutReport.originalReward"),
       value: `${report.initial_reward_satoshi.toLocaleString()} sats`,
-    },
-    {
-      label: `${t("payoutReport.additionalReward")} #1`,
-      value: `${report.additional_reward_1_satoshi.toLocaleString()} sats`,
-    },
-    {
-      label: `${t("payoutReport.additionalReward")} #2`,
-      value: `${report.additional_reward_2_satoshi.toLocaleString()} sats`,
     },
     {
       label: t("payoutReport.totalReward"),
@@ -61,9 +54,9 @@ export function InformationSection({ report }: InformationSectionProps) {
       <Divider styles={{ root: { margin: "1rem 0" } }} />
 
       {/* Reward info grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="flex flex-wrap gap-4">
         {rewardItems.map((item, index) => (
-          <div key={index}>
+          <div key={index} className="flex-1">
             <p className="text-base text-gray-400 mb-1">{item.label}</p>
             <p
               className={`text-base text-primary ${

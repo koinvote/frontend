@@ -147,34 +147,32 @@ export function WinnerTable({
                   </div>
                 </td>
                 <td className="py-3 px-2 text-right text-xs text-gray-500 dark:text-primary whitespace-nowrap">
-                  {satsToBtc(winner.balance_at_snapshot_satoshi)} BTC
+                  {satsToBtc(winner.balance_at_snapshot_satoshi)}
                 </td>
                 <td className="py-3 px-2 text-right text-xs text-gray-500 dark:text-primary whitespace-nowrap">
                   {winner.win_probability_percent.toFixed(4)}%
                 </td>
                 <td className="py-3 px-2 text-right text-xs text-gray-500 dark:text-primary whitespace-nowrap">
-                  {winner.win_probability_percent.toFixed(4)}%
+                  {winner.distributable_rate.toFixed(4)}%
                 </td>
                 <td className="py-3 px-2 text-right text-xs font-bold text-gray-500 dark:text-primary whitespace-nowrap">
-                  {winner.reward_satoshi.toLocaleString()} sats
+                  {winner.original_reward_satoshi.toLocaleString()} sats
                 </td>
                 <td className="py-3 px-2 text-right text-xs font-bold text-gray-500 dark:text-primary whitespace-nowrap">
-                  {winner.reward_satoshi.toLocaleString()} sats
+                  {winner.final_reward_satoshi.toLocaleString()} sats
                 </td>
                 <td className="py-3 px-4 text-center">
                   <span className="inline-flex items-center gap-1">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs whitespace-nowrap ${getStatusBadgeColor(
-                        winner.payout_status
+                        winner.status
                       )} ${
-                        winner.payout_status === "dust_redistributed"
-                          ? "ml-4"
-                          : ""
+                        winner.status === "dust_redistributed" ? "ml-4" : ""
                       }`}
                     >
-                      {getStatusText(winner.payout_status)}
+                      {getStatusText(winner.status)}
                     </span>
-                    {winner.payout_status === "dust_redistributed" && (
+                    {winner.status === "dust_redistributed" && (
                       <Tooltip
                         className="bg-white text-black"
                         styles={{ root: { maxWidth: "min(700px, 90vw)" } }}

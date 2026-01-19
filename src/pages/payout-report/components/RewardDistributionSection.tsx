@@ -119,8 +119,8 @@ export function RewardDistributionSection({
         <WinnerTable
           winners={detail.winners}
           winnerCount={detail.winner_count}
-          redistributedAddressCount={detail.redistributed_address_count}
-          redistributedSatoshi={detail.redistributed_satoshi}
+          redistributedAddressCount={detail.dust_winner_count}
+          redistributedSatoshi={detail.dust_redistribute_amount_satoshi}
           eventId={eventId}
         />
 
@@ -128,7 +128,7 @@ export function RewardDistributionSection({
         <VerificationInfo
           eventId={eventId}
           planId={detail.plan_id}
-          batchTransferTxid={detail.batch_transfer_txid}
+          payout_txid={detail.payout_txid}
           csvSha256={detail.csv_sha256}
           isDownloading={isDownloading}
           onDownloadCsv={handleDownloadCsv}

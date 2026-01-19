@@ -225,36 +225,34 @@ export type PayoutStatus =
 export type RewardType = "initial" | "additional";
 
 export interface PayoutWinner {
-  winner_address: string;
   balance_at_snapshot_satoshi: number;
-  win_probability_percent: number;
+  distributable_rate: number;
+  final_reward_satoshi: number;
   is_dust: boolean;
-  reward_satoshi: number;
-  payout_status: PayoutStatus;
-  payout_txid: string;
-  payout_at: string;
+  original_reward_satoshi: number;
+  status: PayoutStatus;
+  winner_address: string;
+  win_probability_percent: number;
 }
 
 export interface RewardDetail {
-  reward_type: RewardType;
-  deposit_id: number;
-  plan_id: number;
-  original_amount_satoshi: number;
-  platform_fee_satoshi: number;
-  estimated_miner_fee_satoshi: number;
+  csv_sha256: string;
   distributable_satoshi: number;
+  dust_redistribute_amount_satoshi: number;
+  dust_winner_count: number;
+  estimated_miner_fee_satoshi: number;
+  original_amount_satoshi: number;
+  payout_txid: string;
+  plan_id: number;
+  platform_fee_satoshi: number;
+  reward_type: RewardType;
   winner_count: number;
   winners: PayoutWinner[];
-  redistributed_address_count: number;
-  redistributed_satoshi: number;
-  batch_transfer_txid: string;
-  csv_sha256: string;
 }
 
 export interface PayoutReportRes {
   event_id: string;
   event_title: string;
-  completed_at: string;
   snapshot_block_height: number;
   initial_reward_satoshi: number;
   additional_reward_1_satoshi: number;
