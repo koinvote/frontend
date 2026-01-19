@@ -22,7 +22,7 @@ export default function Header({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDesktop, setIsDesktop, collapsed, setCollapsed } = useHomeStore();
+  const { isDesktop, setScrollY } = useHomeStore();
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
@@ -53,6 +53,18 @@ export default function Header({
     }
   }, [open, setIsClosing, setIsOpening]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  const handleLogoClick = () => {
+    navigate("/");
+    setScrollY(0);
+    if (location.pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   return (
     <header
       className={cn(
@@ -75,7 +87,11 @@ export default function Header({
         </button>
 
         <div className="flex flex-1 items-center justify-start ml-2 md:ml-0">
-          <Link to="/" className="flex items-center gap-2">
+          <Link
+            to="/"
+            className="flex items-center gap-2"
+            onClick={handleLogoClick}
+          >
             <span>
               <Logo />
             </span>
