@@ -36,6 +36,12 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
   init: () => {
     const saved = localStorage.getItem(THEME_KEY) as Theme | null;
     const initial = saved ?? "dark";
+    if (location.href.includes("admin")) {
+      // admin 預設強制 light mode
+      set({ theme: "light" });
+      applyTheme("light");
+      return;
+    }
     set({ theme: initial });
     applyTheme(initial);
   },
