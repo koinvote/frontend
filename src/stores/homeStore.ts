@@ -1,11 +1,11 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
 import {
   type EventSummary,
   type HomeSortField,
   type HomeSortOrder,
   type HomeStatusFilter,
 } from "@/pages/create-event/types/index";
+import { create } from "zustand";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 interface HomeStoreState {
   // filters
@@ -62,137 +62,183 @@ interface HomeStoreState {
 }
 
 export const useHomeStore = create<HomeStoreState>()(
-  persist(
-    (set) => ({
-      status: "ongoing",
-      search: "",
-      debouncedSearch: "",
-      sortField: "time",
-      sortOrder: "asc",
-      activeHashtag: null,
+  devtools(
+    persist(
+      (set) => ({
+        status: "ongoing",
+        search: "",
+        debouncedSearch: "",
+        sortField: "time",
+        sortOrder: "asc",
+        activeHashtag: null,
 
-      events: [],
-      hasMore: true,
-      offset: 0,
-      limit: 20,
-      total: 0,
-      popularHashtags: [],
+        events: [],
+        hasMore: true,
+        offset: 0,
+        limit: 20,
+        total: 0,
+        popularHashtags: [],
 
-      isLoading: false,
-      isError: false,
-      scrollY: 0,
-      isDesktop: false,
-      collapsed:
-        typeof window !== "undefined"
-          ? localStorage.getItem("sidebarCollapsed") === "true"
-          : false,
+        isLoading: false,
+        isError: false,
+        scrollY: 0,
+        isDesktop: false,
+        collapsed:
+          typeof window !== "undefined"
+            ? localStorage.getItem("sidebarCollapsed") === "true"
+            : false,
 
-      setStatus: (status) =>
-        set(() => ({
-          status,
-          // 狀態切換時重置分頁和清空事件列表
-          offset: 0,
-          events: [],
-          hasMore: true,
-          total: 0,
-        })),
-      setSearch: (value) => set(() => ({ search: value })),
-      setDebouncedSearch: (value) =>
-        set(() => ({
-          debouncedSearch: value,
-          offset: 0,
-        })),
-      setSort: (field, order) =>
-        set(() => ({
-          sortField: field,
-          sortOrder: order,
-          offset: 0,
-        })),
-      setActiveHashtag: (tag) =>
-        set(() => ({
-          activeHashtag: tag,
-          // 同步到 search input 中显示
-          search: tag || "",
-          debouncedSearch: tag || "",
-          offset: 0,
-          // 保留 sortField 和 sortOrder，但重置事件列表
-          events: [],
-          hasMore: true,
-          total: 0,
-        })),
-      setCollapsed: (collapsed) =>
-        set(() => {
-          if (typeof window !== "undefined") {
-            try {
-              localStorage.setItem("sidebarCollapsed", String(collapsed));
-            } catch {
-              // ignore storage errors
-            }
-          }
-          return { collapsed };
-        }),
+        setStatus: (status) =>
+          set(
+            () => ({
+              status,
+              // 狀態切換時重置分頁和清空事件列表
+              offset: 0,
+              events: [],
+              hasMore: true,
+              total: 0,
+            }),
+            false,
+            "home/setStatus"
+          ),
+        setSearch: (value) =>
+          set(() => ({ search: value }), false, "home/setSearch"),
+        setDebouncedSearch: (value) =>
+          set(
+            () => ({
+              debouncedSearch: value,
+              offset: 0,
+            }),
+            false,
+            "home/setDebouncedSearch"
+          ),
+        setSort: (field, order) =>
+          set(
+            () => ({
+              sortField: field,
+              sortOrder: order,
+              offset: 0,
+            }),
+            false,
+            "home/setSort"
+          ),
+        setActiveHashtag: (tag) =>
+          set(
+            () => ({
+              activeHashtag: tag,
+              // 同步到 search input 中显示
+              search: tag || "",
+              debouncedSearch: tag || "",
+              offset: 0,
+              // 保留 sortField 和 sortOrder，但重置事件列表
+              events: [],
+              hasMore: true,
+              total: 0,
+            }),
+            false,
+            "home/setActiveHashtag"
+          ),
+        setCollapsed: (collapsed) =>
+          set(
+            () => {
+              if (typeof window !== "undefined") {
+                try {
+                  localStorage.setItem("sidebarCollapsed", String(collapsed));
+                } catch {
+                  // ignore storage errors
+                }
+              }
+              return { collapsed };
+            },
+            false,
+            "home/setCollapsed"
+          ),
 
-      setEvents: (events, total, hasMore, offset) =>
-        set(() => ({
-          events,
-          total,
-          hasMore,
-          offset,
-        })),
-      appendEvents: (events, hasMore, offset) =>
-        set((state) => ({
-          events: [...state.events, ...events],
-          hasMore,
-          offset,
-        })),
+        setEvents: (events, total, hasMore, offset) =>
+          set(
+            () => ({
+              events,
+              total,
+              hasMore,
+              offset,
+            }),
+            false,
+            "home/setEvents"
+          ),
+        appendEvents: (events, hasMore, offset) =>
+          set(
+            (state) => ({
+              events: [...state.events, ...events],
+              hasMore,
+              offset,
+            }),
+            false,
+            "home/appendEvents"
+          ),
 
-      setLoading: (isLoading) => set(() => ({ isLoading })),
-      setError: (isError) => set(() => ({ isError })),
+        setLoading: (isLoading) =>
+          set(() => ({ isLoading }), false, "home/setLoading"),
+        setError: (isError) => set(() => ({ isError }), false, "home/setError"),
 
-      setScrollY: (y) => set(() => ({ scrollY: y })),
-      setIsDesktop: (isDesktop) => set(() => ({ isDesktop })),
+        setScrollY: (y) =>
+          set(() => ({ scrollY: y }), false, "home/setScrollY"),
+        setIsDesktop: (isDesktop) =>
+          set(() => ({ isDesktop }), false, "home/setIsDesktop"),
+        resetFilters: () =>
+          set(
+            () => ({
+              search: "",
+              debouncedSearch: "",
+              activeHashtag: null,
+              sortField: "time",
+              sortOrder: "asc", // 升序：事件快结束的排第一
+              offset: 0,
+            }),
+            false,
+            "home/resetFilters"
+          ),
 
-      resetFilters: () =>
-        set(() => ({
-          search: "",
-          debouncedSearch: "",
-          activeHashtag: null,
-          sortField: "time",
-          sortOrder: "asc", // 升序：事件快结束的排第一
-          offset: 0,
-        })),
+        resetList: () =>
+          set(
+            () => ({
+              events: [],
+              hasMore: true,
+              offset: 0,
+              total: 0,
+            }),
+            false,
+            "home/resetList"
+          ),
 
-      resetList: () =>
-        set(() => ({
-          events: [],
-          hasMore: true,
-          offset: 0,
-          total: 0,
-        })),
-
-      setPopularHashtags: (hashtags) =>
-        set(() => ({
-          popularHashtags: hashtags,
-        })),
-    }),
-    {
-      name: "home-store",
-      storage: createJSONStorage(() => sessionStorage),
-      partialize: (state) => ({
-        status: state.status,
-        search: state.search,
-        debouncedSearch: state.debouncedSearch,
-        sortField: state.sortField,
-        sortOrder: state.sortOrder,
-        activeHashtag: state.activeHashtag,
-        scrollY: state.scrollY,
-        // Persist data to restore scroll position
-        events: state.events,
-        offset: state.offset,
-        hasMore: state.hasMore,
-        total: state.total,
-        popularHashtags: state.popularHashtags,
+        setPopularHashtags: (hashtags) =>
+          set(
+            () => ({
+              popularHashtags: hashtags,
+            }),
+            false,
+            "home/setPopularHashtags"
+          ),
       }),
-    }
+      {
+        name: "home-store",
+        storage: createJSONStorage(() => sessionStorage),
+        partialize: (state) => ({
+          status: state.status,
+          search: state.search,
+          debouncedSearch: state.debouncedSearch,
+          sortField: state.sortField,
+          sortOrder: state.sortOrder,
+          activeHashtag: state.activeHashtag,
+          scrollY: state.scrollY,
+          // Persist data to restore scroll position
+          events: state.events,
+          offset: state.offset,
+          hasMore: state.hasMore,
+          total: state.total,
+          popularHashtags: state.popularHashtags,
+        }),
+      }
+    ),
+    { name: "home-store" }
   )
 );
