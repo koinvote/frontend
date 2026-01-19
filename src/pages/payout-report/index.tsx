@@ -60,9 +60,7 @@ const PayoutReport = () => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <p className="text-lg text-secondary">
-            {t("payoutReport.noData")}
-          </p>
+          <p className="text-lg text-secondary">{t("payoutReport.noData")}</p>
         </div>
       </div>
     );
@@ -75,7 +73,7 @@ const PayoutReport = () => {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(`/event/${eventId}`)}
+          onClick={() => navigate(-1)}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>
