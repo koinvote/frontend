@@ -1,19 +1,19 @@
 // Mock data for API responses
 import type {
-  SystemConfigRes,
-  EventListDataRes,
+  AdminSystemParametersRes,
+  DepositStatusRes,
   EventDetailDataRes,
+  EventListDataRes,
   GetEventListRes,
   GetHotHashtagsRes,
-  DepositStatusRes,
   GetListRepliesRes,
-  Reply,
-  AdminSystemParametersRes,
   PayoutReportRes,
   PayoutWinner,
+  Reply,
   RewardDetail,
+  SystemConfigRes,
 } from "@/api/response";
-import { EventStatus, DepositStatus } from "@/api/types";
+import { DepositStatus, EventStatus } from "@/api/types";
 
 // System Configuration Mock
 export const mockSystemConfig: SystemConfigRes = {
@@ -154,7 +154,8 @@ export const mockEventList: EventListDataRes[] = [
     event_type: "single-choice",
     event_id: "evt_004_mock",
     title: "Bitcoin halving prediction: What will the price be in 2028?",
-    description: "Make your prediction for Bitcoin price after the 2028 halving",
+    description:
+      "Make your prediction for Bitcoin price after the 2028 halving",
     status: 3, // active
     hashtags: ["bitcoin", "halving", "price"],
     created_at: "2026-01-08T10:00:00Z",
@@ -247,7 +248,8 @@ export const mockEventDetail: EventDetailDataRes = {
     },
     {
       id: 3,
-      btc_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+      btc_address:
+        "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
       body: "RGB protocol shows great promise for client-side validation and privacy. It's the future of Bitcoin DeFi.",
       weight_percent: 22,
       amount_satoshi: 22000,
@@ -297,7 +299,8 @@ export const mockReplies: Reply[] = [
       "Lightning Network is the most mature solution with excellent tooling.",
     plaintext:
       "Koinvote Event Reply\nEvent ID: evt_001_mock\nAddress: bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq\nNonce: 1705123456\nRandom: abc123",
-    signature: "H8j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2",
+    signature:
+      "H8j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d2e3f4g5h6i7j8k9l0m1n2",
     balance_at_reply_satoshi: 1500000,
     balance_at_snapshot_satoshi: 1500000,
     balance_at_current_satoshi: 1600000,
@@ -311,7 +314,8 @@ export const mockReplies: Reply[] = [
       "Multiple L2 solutions are needed for different use cases and experimentation.",
     plaintext:
       "Koinvote Event Reply\nEvent ID: evt_001_mock\nAddress: bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4\nNonce: 1705123789\nRandom: xyz789",
-    signature: "I9j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3",
+    signature:
+      "I9j3k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3",
     balance_at_reply_satoshi: 1200000,
     balance_at_snapshot_satoshi: 1200000,
     balance_at_current_satoshi: 1250000,
@@ -320,11 +324,13 @@ export const mockReplies: Reply[] = [
   },
   {
     id: 3,
-    btc_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    btc_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
     content: "RGB protocol for client-side validation is revolutionary.",
     plaintext:
       "Koinvote Event Reply\nEvent ID: evt_001_mock\nAddress: bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej\nNonce: 1705124012\nRandom: rgb456",
-    signature: "J0k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4",
+    signature:
+      "J0k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4",
     balance_at_reply_satoshi: 950000,
     balance_at_snapshot_satoshi: 950000,
     balance_at_current_satoshi: 980000,
@@ -359,69 +365,104 @@ export const mockAdminSystemParameters: AdminSystemParametersRes = {
 export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-    balance_at_snapshot_satoshi: 500000,
+    balance_at_snapshot_satoshi: 1280086,
     win_probability_percent: 20.0,
     is_dust: false,
-    reward_satoshi: 57500,
-    payout_status: "completed",
-    payout_txid:
-      "3e1b3d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5",
-    payout_at: "2026-01-16T16:00:00Z",
+    original_reward_satoshi: 1668,
+    final_reward_satoshi: 1668,
+    distributable_rate: 19.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
     balance_at_snapshot_satoshi: 450000,
     win_probability_percent: 18.0,
     is_dust: false,
-    reward_satoshi: 51750,
-    payout_status: "completed",
-    payout_txid:
-      "4f2c4e8f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c",
-    payout_at: "2026-01-16T16:01:00Z",
+    original_reward_satoshi: 51750,
+    final_reward_satoshi: 51750,
+    distributable_rate: 17.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
     balance_at_snapshot_satoshi: 400000,
     win_probability_percent: 16.0,
     is_dust: false,
-    reward_satoshi: 46000,
-    payout_status: "completed",
-    payout_txid:
-      "5g3d5f9g1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d",
-    payout_at: "2026-01-16T16:02:00Z",
+    original_reward_satoshi: 46000,
+    final_reward_satoshi: 46000,
+    distributable_rate: 15.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qabc123xyz456def789ghi012jkl345mno678pqr",
     balance_at_snapshot_satoshi: 350000,
     win_probability_percent: 14.0,
     is_dust: false,
-    reward_satoshi: 40250,
-    payout_status: "completed",
-    payout_txid:
-      "6h4e6g0h2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e",
-    payout_at: "2026-01-16T16:03:00Z",
+    original_reward_satoshi: 40250,
+    final_reward_satoshi: 40000,
+    distributable_rate: 13.0,
+    status: "completed",
   },
   {
-    winner_address: "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    winner_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
     balance_at_snapshot_satoshi: 300000,
     win_probability_percent: 12.0,
     is_dust: false,
-    reward_satoshi: 34500,
-    payout_status: "completed",
-    payout_txid:
-      "7i5f7h1i3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f",
-    payout_at: "2026-01-16T16:04:00Z",
+    original_reward_satoshi: 34500,
+    final_reward_satoshi: 34250,
+    distributable_rate: 11.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qdef456uvw789xyz012abc345ghi678jkl901mno",
     balance_at_snapshot_satoshi: 250000,
     win_probability_percent: 10.0,
     is_dust: false,
-    reward_satoshi: 28750,
-    payout_status: "completed",
-    payout_txid:
-      "8j6g8i2j4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a",
-    payout_at: "2026-01-16T16:05:00Z",
+    original_reward_satoshi: 28750,
+    final_reward_satoshi: 28500,
+    distributable_rate: 9.0,
+    status: "completed",
+  },
+  {
+    winner_address: "bc1qprocessing123xyz456def789ghi012jkl345mno",
+    balance_at_snapshot_satoshi: 200000,
+    win_probability_percent: 8.0,
+    is_dust: false,
+    original_reward_satoshi: 23000,
+    final_reward_satoshi: 22500,
+    distributable_rate: 7.0,
+    status: "processing",
+  },
+  {
+    winner_address: "bc1qwinner09abc123def456ghi789jkl012mno345pqr",
+    balance_at_snapshot_satoshi: 180000,
+    win_probability_percent: 7.2,
+    is_dust: false,
+    original_reward_satoshi: 20700,
+    final_reward_satoshi: 20200,
+    distributable_rate: 6.4,
+    status: "completed",
+  },
+  {
+    winner_address: "bc1qwinner10xyz789abc012def345ghi678jkl901mno",
+    balance_at_snapshot_satoshi: 160000,
+    win_probability_percent: 6.4,
+    is_dust: false,
+    original_reward_satoshi: 18400,
+    final_reward_satoshi: 18000,
+    distributable_rate: 5.8,
+    status: "completed",
+  },
+  {
+    winner_address: "bc1qdust123abc456def789ghi012jkl345mno678pqr",
+    balance_at_snapshot_satoshi: 5000,
+    win_probability_percent: 0.2,
+    is_dust: true,
+    original_reward_satoshi: 500,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.0,
+    status: "dust_redistributed",
   },
 ];
 
@@ -431,62 +472,62 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
     balance_at_snapshot_satoshi: 800000,
     win_probability_percent: 32.0,
     is_dust: false,
-    reward_satoshi: 61280,
-    payout_status: "completed",
-    payout_txid:
-      "9k7h9j3k5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b",
-    payout_at: "2026-01-16T16:05:00Z",
+    original_reward_satoshi: 61280,
+    final_reward_satoshi: 61280,
+    distributable_rate: 32.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc",
     balance_at_snapshot_satoshi: 650000,
     win_probability_percent: 26.0,
     is_dust: false,
-    reward_satoshi: 49790,
-    payout_status: "completed",
-    payout_txid:
-      "al8i0k4l6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c",
-    payout_at: "2026-01-16T16:06:00Z",
+    original_reward_satoshi: 49790,
+    final_reward_satoshi: 49790,
+    distributable_rate: 26.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qmno345pqr678stu901vwx234yz567abc890def",
     balance_at_snapshot_satoshi: 550000,
     win_probability_percent: 22.0,
     is_dust: false,
-    reward_satoshi: 42130,
-    payout_status: "completed",
-    payout_txid:
-      "bm9j1l5m7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d",
-    payout_at: "2026-01-16T16:07:00Z",
+    original_reward_satoshi: 42130,
+    final_reward_satoshi: 42130,
+    distributable_rate: 22.0,
+    status: "completed",
   },
   {
     winner_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi",
     balance_at_snapshot_satoshi: 500000,
     win_probability_percent: 20.0,
     is_dust: false,
-    reward_satoshi: 38300,
-    payout_status: "completed",
-    payout_txid:
-      "cn0k2m6n8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e",
-    payout_at: "2026-01-16T16:08:00Z",
+    original_reward_satoshi: 38300,
+    final_reward_satoshi: 38300,
+    distributable_rate: 20.0,
+    status: "completed",
   },
 ];
 
 export const mockRewardDetails: RewardDetail[] = [
   {
     reward_type: "initial",
-    deposit_id: 123,
     plan_id: 456,
     original_amount_satoshi: 300000,
     platform_fee_satoshi: 7500,
     estimated_miner_fee_satoshi: 5000,
     distributable_satoshi: 287500,
-    winner_count: 6,
+    winner_count: 12,
     winners: mockPayoutWinners,
+    dust_winner_count: 3,
+    dust_redistribute_amount_satoshi: 1532,
+    payout_txid:
+      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    csv_sha256:
+      "d2f4a8c1b3e5f7890123456789abcdef0123456789abcdef0123456789abcef39",
   },
   {
     reward_type: "additional",
-    deposit_id: 124,
     plan_id: 457,
     original_amount_satoshi: 200000,
     platform_fee_satoshi: 5000,
@@ -494,19 +535,25 @@ export const mockRewardDetails: RewardDetail[] = [
     distributable_satoshi: 191500,
     winner_count: 4,
     winners: mockAdditionalPayoutWinners,
+    dust_winner_count: 0,
+    dust_redistribute_amount_satoshi: 0,
+    payout_txid:
+      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    csv_sha256:
+      "d2f4a8c1b3e5f7890123456789abcdef0123456789abcdef0123456789abcef39",
   },
 ];
 
 export const mockPayoutReport: PayoutReportRes = {
   event_id: "evt_001_mock",
   event_title: "What's the best Bitcoin scaling solution?",
-  completed_at: "2026-01-16T15:00:00Z",
-  snapshot_block_height: 850000,
   initial_reward_satoshi: 300000,
-  additional_reward_1_satoshi: 200000,
-  additional_reward_2_satoshi: 0,
+  snapshot_block_height: 850000,
   total_reward_pool_satoshi: 500000,
   reward_details: mockRewardDetails,
+  // TODO: 追加獎金 (下面key目前沒有)
+  additional_reward_1_satoshi: 200000,
+  additional_reward_2_satoshi: 0,
 };
 
 // Mock CSV data for verification

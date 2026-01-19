@@ -1,16 +1,16 @@
 // MSW handlers for API mocking
-import { http, HttpResponse } from "msw";
 import type { ApiResponse } from "@/api";
+import { http, HttpResponse } from "msw";
 import {
-  mockSystemConfig,
-  mockGetEventListResponse,
-  mockEventDetail,
-  mockHotHashtags,
-  mockDepositStatus,
-  mockGetListRepliesResponse,
   mockAdminSystemParameters,
+  mockDepositStatus,
+  mockEventDetail,
   mockEventList,
+  mockGetEventListResponse,
+  mockGetListRepliesResponse,
+  mockHotHashtags,
   mockPayoutReport,
+  mockSystemConfig,
   mockVerificationCsvContent,
 } from "./data";
 
@@ -317,6 +317,16 @@ export const handlers = [
   // GET /events/:eventId/payout-report - Get payout report
   http.get(`${API_BASE_URL}/events/:eventId/payout-report`, ({ params }) => {
     const { eventId } = params;
+
+    // Return empty data for events without payout report
+    if (eventId === "no-report") {
+      return HttpResponse.json({
+        code: "000000",
+        success: true,
+        message: null,
+        data: {},
+      });
+    }
 
     // Return payout report for the event
     return HttpResponse.json<ApiResponse<typeof mockPayoutReport>>({
