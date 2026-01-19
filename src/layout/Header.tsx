@@ -56,7 +56,7 @@ export default function Header({
   return (
     <header
       className={cn(
-        "top-0 left-0 w-full z-50 bg-white dark:bg-black md:border-b border-border px-2 text-(--color-primary)",
+        "top-0 left-0 w-full z-50 bg-(--color-bg) md:border-b border-border px-2 text-(--color-primary)",
         "transition-transform duration-300 ease-out",
         isDesktop && "fixed"
       )}
