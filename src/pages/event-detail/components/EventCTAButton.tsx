@@ -35,7 +35,7 @@ export function EventCTAButton({
   // Determine button text and state
   let buttonText = "";
   let isDisabled = false;
-  let tooltipText = "";
+  let tooltipText = null;
   if (isPreheat) {
     buttonText =
       isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
@@ -47,18 +47,21 @@ export function EventCTAButton({
       isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
     isDisabled = false;
   } else if (isCompleted) {
+    buttonText = "View Reward Report";
     if (isRewarded) {
-      buttonText = "View Reward Report";
       isDisabled = false;
     } else {
-      // No CTA for completed non-reward events
-      return null;
+      isDisabled = true;
+      tooltipText =
+        "This is a no-reward event. No payout report is generated. Provide an overview of the task and related details.";
     }
   }
 
   const handleClick = () => {
     if (isCompleted && isRewarded) {
       navigate(`/event/${eventId}/report`);
+    } else if (isCompleted && !isRewarded) {
+      return;
     } else if (isOngoing) {
       // TODO: Navigate to reply page
       navigate(`/event/${eventId}/reply`);
@@ -72,14 +75,14 @@ export function EventCTAButton({
       tone="primary"
       text="sm"
       className={`w-full md:w-auto whitespace-nowrap px-8 gap-2 ${
-        isCompleted && !isRewarded
-          ? "bg-surface text-black hover:bg-surface/80 dark:bg-surface dark:text-white dark:hover:bg-surface/80"
+        isCompleted
+          ? "bg-gray-500 dark:bg-gray-450 text-white hover:bg-gray-500/90 dark:hover:bg-gray-450/80"
           : ""
       }`}
       disabled={isDisabled}
       onClick={handleClick}
     >
-      {isRewarded && isCompleted && <RewardReportIcon className="w-4 h-4" />}
+      {isCompleted && <RewardReportIcon className="w-4 h-4" />}
       {buttonText}
     </Button>
   );
@@ -115,6 +118,19 @@ export function EventCTAButton({
         }}
       >
         <span className={isDesktop ? "inline-block" : "block w-full"}>
+          {button}
+        </span>
+      </Tooltip>
+    );
+  }
+
+  if (isCompleted && !isRewarded && tooltipText) {
+    return (
+      <Tooltip
+        title={tooltipText}
+        styles={{ root: { maxWidth: "min(500px, 90vw)" } }}
+      >
+        <span className="w-full md:w-auto inline-block cursor-not-allowed">
           {button}
         </span>
       </Tooltip>
