@@ -1,14 +1,14 @@
-import { useState, useEffect, useRef } from "react";
-import SearchIcon from "@/assets/icons/search.svg?react";
+import { EventStatus, ReplySortBy } from "@/api/types";
+import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
+import OnChainIcon from "@/assets/icons/onChain.svg?react";
+import PlusIcon from "@/assets/icons/plus.svg?react";
+import SearchIcon from "@/assets/icons/search.svg?react";
 import SortAscIcon from "@/assets/icons/sort-asc.svg?react";
 import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
-import PlusIcon from "@/assets/icons/plus.svg?react";
-import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
-import OnChainIcon from "@/assets/icons/onChain.svg?react";
-import { ReplySortBy, EventStatus } from "@/api/types";
-import { useDebouncedClick } from "@/utils/helper";
 import { Button } from "@/components/base/Button";
+import { useDebouncedClick } from "@/utils/helper";
+import { useEffect, useRef, useState } from "react";
 
 interface SearchAndFilterProps {
   eventId: string;
@@ -104,7 +104,7 @@ export function SearchAndFilter({
           onChange={(e) => handleSearchChange(e.target.value)}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
-          placeholder="Search by address, content or option"
+          placeholder="Search by address or content"
           className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-sm outline-none w-full min-w-0 focus:border-accent transition-colors"
         />
         {(isSearchFocused || search) && (
