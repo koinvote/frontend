@@ -287,6 +287,7 @@
     "replyToWinBTC": "Reply to win BTC",
     "viewRewardReport": "View Reward Report",
     "preheatTooltip": "Preheat lets people see the event before replies open.\nDuring this time, the event is visible but replies are disabled.",
-    "noRewardTooltip": "This is a no-reward event.\nNo payout report is generated."
+    "noRewardTooltip": "This is a no-reward event.\nNo payout report is generated.",
+    "eventEndedTooltip": "The event has ended.\nReward payouts are being processed."
   }
 }

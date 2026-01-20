@@ -73,7 +73,9 @@ export function EventInfo({ event }: EventInfoProps) {
 
   const isPreheat = event.status === EventStatus.PREHEAT;
   const isOngoing = event.status === EventStatus.ACTIVE;
-  const isCompleted = event.status === EventStatus.COMPLETED;
+  const isCompleted =
+    event.status === EventStatus.ENDED ||
+    event.status === EventStatus.COMPLETED;
   const isRewarded = event.event_reward_type === "rewarded";
 
   // Handle hashtag click - navigate to home with hashtag filter and keep current status tab
