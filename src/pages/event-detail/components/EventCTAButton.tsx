@@ -56,17 +56,16 @@ export function EventCTAButton({
         };
       case EventStatus.ENDED:
         return {
-          text: t("eventCTA.viewRewardReport", "View Reward Report"),
+          text: isRewarded
+            ? t("eventCTA.rewardProcessing", "Reward processing…")
+            : t("eventCTA.viewRewardReport", "View Reward Report"),
           disabled: true,
           tooltip: !isRewarded
             ? t(
                 "eventCTA.noRewardTooltip",
                 "This is a no-reward event.\nNo payout report is generated."
               )
-            : t(
-                "eventCTA.eventEndedTooltip",
-                "The event has ended. Reward payouts are being processed."
-              ),
+            : null,
         };
       case EventStatus.COMPLETED:
         return {
@@ -124,13 +123,8 @@ export function EventCTAButton({
     </Button>
   );
 
-  // No reward tooltip
-  if (
-    tooltipText &&
-    (status === EventStatus.PREHEAT ||
-      status === EventStatus.ENDED ||
-      (status === EventStatus.COMPLETED && !isRewarded))
-  ) {
+  // has tooltip
+  if (tooltipText) {
     return (
       <Tooltip
         title={tooltipText}

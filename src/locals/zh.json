@@ -275,6 +275,7 @@
   "eventCTA": {
     "reply": "回覆",
     "replyToWinBTC": "回覆贏取 BTC",
+    "rewardProcessing": "派獎處理中...",
     "viewRewardReport": "查看獎勵報告",
     "preheatTooltip": "預熱允許在回覆開放前查看活動。\n在此期間，活動可見但回覆不可見。",
     "preheatTooltipLine1": "預熱允許在回覆開放前查看活動。",
