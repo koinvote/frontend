@@ -275,7 +275,7 @@ export default function ReplyPage() {
       setEventCountdown(
         formatCompletedTime(
           event.deadline_at,
-          t("eventInfo.endedOn", "Ended on")
+          t("eventInfo.eventEndsIn", "Ended on")
         )
       );
       return;
