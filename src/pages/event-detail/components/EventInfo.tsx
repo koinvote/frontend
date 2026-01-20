@@ -1,29 +1,31 @@
-import { useMemo, useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router";
 import { useToast } from "@/components/base/Toast/useToast";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 // import { Button } from "@/components/base/Button";
-import {
-  satsToBtc,
-  formatPreheatDuration,
-  formatEventDuration,
-  formatPreheatCountdown,
-  formatOngoingCountdown,
-  formatCompletedTime,
-} from "@/utils/formatter";
-import { useDebouncedClick } from "@/utils/helper";
-import { useHomeStore } from "@/stores/homeStore";
 import type { EventDetailDataRes, EventOption } from "@/api/response";
 import { EventStatus } from "@/api/types";
-import type { TopReply } from "@/pages/create-event/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
-import { TopReplyBar } from "./TopReplyBar";
+import type { TopReply } from "@/pages/create-event/types";
+import { useHomeStore } from "@/stores/homeStore";
+import {
+  formatCompletedTime,
+  formatEventDuration,
+  formatOngoingCountdown,
+  formatPreheatCountdown,
+  formatPreheatDuration,
+  satsToBtc,
+} from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
 import { EventCTAButton } from "./EventCTAButton";
+import { TopReplyBar } from "./TopReplyBar";
 
 interface EventInfoProps {
   event: EventDetailDataRes;
 }
 
 export function EventInfo({ event }: EventInfoProps) {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const { setActiveHashtag, setStatus, setSearch, setDebouncedSearch } =
@@ -34,9 +36,9 @@ export function EventInfo({ event }: EventInfoProps) {
     if (event.creator_address) {
       try {
         await navigator.clipboard.writeText(event.creator_address);
-        showToast("success", "Address copied");
+        showToast("success", t("eventInfo.addressCopied", "Address copied"));
       } catch {
-        showToast("error", "Failed to copy");
+        showToast("error", t("eventInfo.failedToCopy", "Failed to copy"));
       }
     }
   });
@@ -73,7 +75,9 @@ export function EventInfo({ event }: EventInfoProps) {
 
   const isPreheat = event.status === EventStatus.PREHEAT;
   const isOngoing = event.status === EventStatus.ACTIVE;
-  const isCompleted = event.status === EventStatus.COMPLETED;
+  const isCompleted =
+    event.status === EventStatus.ENDED ||
+    event.status === EventStatus.COMPLETED;
   const isRewarded = event.event_reward_type === "rewarded";
 
   // Handle hashtag click - navigate to home with hashtag filter and keep current status tab
@@ -128,7 +132,10 @@ export function EventInfo({ event }: EventInfoProps) {
       return formatOngoingCountdown(event.deadline_at);
     }
     if (isCompleted) {
-      return formatCompletedTime(event.deadline_at);
+      return formatCompletedTime(
+        event.deadline_at,
+        t("eventInfo.eventEndsIn", "Ended on")
+      );
     }
     return "";
   });
@@ -136,7 +143,12 @@ export function EventInfo({ event }: EventInfoProps) {
   useEffect(() => {
     if (isCompleted) {
       // Completed state doesn't need countdown
-      setTimeRemaining(formatCompletedTime(event.deadline_at));
+      setTimeRemaining(
+        formatCompletedTime(
+          event.deadline_at,
+          t("eventInfo.eventEndsIn", "Ended on")
+        )
+      );
       return;
     }
 
@@ -153,6 +165,7 @@ export function EventInfo({ event }: EventInfoProps) {
 
     return () => clearInterval(interval);
   }, [
+    t,
     isPreheat,
     isOngoing,
     isCompleted,
@@ -188,7 +201,10 @@ export function EventInfo({ event }: EventInfoProps) {
         amount_satoshi: opt.total_stake_satoshi.toString(),
       }));
 
-      const title = validOptions.length > 1 ? "Options" : "Option";
+      const title =
+        validOptions.length > 1
+          ? t("eventInfo.options", "Options")
+          : t("eventInfo.option", "Option");
       return {
         displayData: convertedData,
         displayTitle: title,
@@ -225,7 +241,9 @@ export function EventInfo({ event }: EventInfoProps) {
         amount_satoshi: opt.total_stake_satoshi.toString(),
       }));
 
-      const title = hasReplies ? "Top Reply" : "Options";
+      const title = hasReplies
+        ? t("eventInfo.topReply", "Top Reply")
+        : t("eventInfo.options", "Options");
       return {
         displayData: convertedData,
         displayTitle: title,
@@ -254,12 +272,13 @@ export function EventInfo({ event }: EventInfoProps) {
 
       return {
         displayData: sortedReplies,
-        displayTitle: "Top Reply",
+        displayTitle: t("eventInfo.topReply", "Top Reply"),
       };
     }
 
     return { displayData: [], displayTitle: "" };
   }, [
+    t,
     event.event_type,
     event.options,
     event.top_replies,
@@ -280,11 +299,14 @@ export function EventInfo({ event }: EventInfoProps) {
     if ((isOngoing || isCompleted) && isRewarded && rewardAmountBtc) {
       fields.push({
         key: "reward-amount",
-        label: "Reward Amount:",
+        label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
           <span className="text-xs md:text-sm font-semibold text-primary">
             {rewardAmountBtc} BTC ({event.winner_count}{" "}
-            {event.winner_count === 1 ? "Address" : "Addresses"})
+            {event.winner_count === 1
+              ? t("eventInfo.address", "Address")
+              : t("eventInfo.addresses", "Addresses")}
+            )
           </span>
         ),
       });
@@ -293,11 +315,14 @@ export function EventInfo({ event }: EventInfoProps) {
     if ((isOngoing || isCompleted) && isRewarded && additionalRewardBtc) {
       fields.push({
         key: "additional-reward",
-        label: "Additional Reward:",
+        label: t("eventInfo.additionalReward", "Additional Reward:"),
         value: (
           <span className="text-xs md:text-sm text-primary">
             {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
-            {event.additional_winner_count === 1 ? "Address" : "Addresses"})
+            {event.additional_winner_count === 1
+              ? t("eventInfo.address", "Address")
+              : t("eventInfo.addresses", "Addresses")}
+            )
           </span>
         ),
       });
@@ -305,7 +330,7 @@ export function EventInfo({ event }: EventInfoProps) {
 
     fields.push({
       key: "time-remaining",
-      label: "Time Remaining:",
+      label: t("eventInfo.timeRemaining", "Time Remaining:"),
       value: isCompleted ? (
         <div className="text-xs md:text-sm font-semibold text-black dark:text-white mt-1">
           {timeRemaining}
@@ -321,7 +346,7 @@ export function EventInfo({ event }: EventInfoProps) {
     if ((isOngoing || isCompleted || isPreheat) && eventDurationDisplay) {
       fields.push({
         key: "duration",
-        label: "Duration of This Event:",
+        label: t("eventInfo.durationOfEvent", "Duration of This Event:"),
         value: (
           <span className="text-xs md:text-sm text-primary">
             {eventDurationDisplay}
@@ -333,7 +358,7 @@ export function EventInfo({ event }: EventInfoProps) {
     if (preheatDurationDisplay) {
       fields.push({
         key: "preheat-duration",
-        label: "Preheat Duration:",
+        label: t("eventInfo.preheatDuration", "Preheat Duration:"),
         value: (
           <span className="text-xs md:text-sm text-primary">
             {preheatDurationDisplay}
@@ -344,7 +369,7 @@ export function EventInfo({ event }: EventInfoProps) {
 
     fields.push({
       key: "event-id",
-      label: "Event-ID:",
+      label: t("eventInfo.eventId", "Event-ID:"),
       value: (
         <span className="text-xs md:text-sm text-primary">
           {event.event_id}
@@ -356,7 +381,7 @@ export function EventInfo({ event }: EventInfoProps) {
     if ((isOngoing || isCompleted || isPreheat) && event.creator_address) {
       fields.push({
         key: "creator-address",
-        label: "Creator address:",
+        label: t("eventInfo.creatorAddress", "Creator address:"),
         value: (
           <div className="flex items-center gap-2 mt-1">
             <button
@@ -365,7 +390,10 @@ export function EventInfo({ event }: EventInfoProps) {
               className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed 
               border-black dark:border-white hover:border-gray-500 dark:hover:border-gray-400 
               transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
-              aria-label="Search events by creator address"
+              aria-label={t(
+                "eventInfo.searchByCreatorAddress",
+                "Search events by creator address"
+              )}
             >
               {event.creator_address.length > 10
                 ? `${event.creator_address.slice(
@@ -378,7 +406,10 @@ export function EventInfo({ event }: EventInfoProps) {
               type="button"
               onClick={handleCopyCreatorAddress}
               className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
-              aria-label="Copy creator address"
+              aria-label={t(
+                "eventInfo.copyCreatorAddress",
+                "Copy creator address"
+              )}
             >
               <CopyIcon className="w-4 h-4 text-current" />
             </button>
@@ -390,7 +421,10 @@ export function EventInfo({ event }: EventInfoProps) {
     if (event.hashtags && event.hashtags.length > 0) {
       fields.push({
         key: "hashtags",
-        label: event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:",
+        label:
+          event.hashtags.length > 1
+            ? t("eventInfo.hashtags", "Hashtags:")
+            : t("eventInfo.hashtag", "Hashtag:"),
         value: (
           <div className="flex flex-wrap gap-2 mt-1">
             {event.hashtags.map((tag, index) => {
@@ -401,7 +435,13 @@ export function EventInfo({ event }: EventInfoProps) {
                   type="button"
                   onClick={() => handleHashtagClick(tag)}
                   className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
-                  aria-label={`Filter by ${hashtagWithPrefix}`}
+                  aria-label={t(
+                    "eventInfo.filterByHashtag",
+                    "Filter by {{hashtag}}",
+                    {
+                      hashtag: hashtagWithPrefix,
+                    }
+                  )}
                 >
                   {hashtagWithPrefix}
                 </button>
@@ -431,13 +471,14 @@ export function EventInfo({ event }: EventInfoProps) {
     handleAddressClick,
     handleHashtagClick,
     handleCopyCreatorAddress,
+    t,
   ]);
 
   return (
     <div className="flex flex-col gap-6">
       {/* Title and Copy Link */}
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-semibold text-primary flex-1 break-words min-w-0">
+        <h1 className="text-2xl md:text-3xl font-semibold text-primary flex-1 wrap-break-word min-w-0">
           {event.title}
         </h1>
         {/* <Button
@@ -455,7 +496,7 @@ export function EventInfo({ event }: EventInfoProps) {
 
       {/* Description */}
       {event.description && (
-        <p className="text-sm md:text-base text-secondary leading-relaxed break-words min-w-0">
+        <p className="text-sm md:text-base text-secondary leading-relaxed wrap-break-word min-w-0">
           {event.description}
         </p>
       )}
@@ -468,11 +509,14 @@ export function EventInfo({ event }: EventInfoProps) {
           {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
-                Reward Amount:
+                {t("eventInfo.rewardAmount", "Reward Amount:")}
               </span>
               <span className="text-xs md:text-sm font-semibold text-primary ml-2">
                 {rewardAmountBtc} BTC ({event.winner_count}{" "}
-                {event.winner_count === 1 ? "Address" : "Addresses"})
+                {event.winner_count === 1
+                  ? t("eventInfo.address", "Address")
+                  : t("eventInfo.addresses", "Addresses")}
+                )
               </span>
             </div>
           )}
@@ -480,18 +524,21 @@ export function EventInfo({ event }: EventInfoProps) {
           {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
-                Additional Reward:
+                {t("eventInfo.additionalReward", "Additional Reward:")}
               </span>
               <span className="text-xs md:text-sm text-primary ml-2">
                 {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
-                {event.additional_winner_count === 1 ? "Address" : "Addresses"})
+                {event.additional_winner_count === 1
+                  ? t("eventInfo.address", "Address")
+                  : t("eventInfo.addresses", "Addresses")}
+                )
               </span>
             </div>
           )}
 
           <div>
             <span className="text-xs md:text-sm text-secondary">
-              Time Remaining:
+              {t("eventInfo.timeRemaining", "Time Remaining:")}
             </span>
             {isCompleted ? (
               <div className="text-xs md:text-sm text-black dark:text-white mt-1">
@@ -508,15 +555,18 @@ export function EventInfo({ event }: EventInfoProps) {
           {(isPreheat || isOngoing || isCompleted) && event.creator_address && (
             <div className="flex items-center gap-2">
               <span className="text-xs md:text-sm text-secondary">
-                Creator address:
+                {t("eventInfo.creatorAddress", "Creator address:")}
               </span>
               <div className="flex items-center gap-2 mt-1">
                 <button
                   type="button"
                   onClick={handleAddressClick}
-                  className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed border-black 
+                  className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed border-black
                   dark:border-white hover:border-gray-500 dark:hover:border-gray-400 transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
-                  aria-label="Search events by creator address"
+                  aria-label={t(
+                    "eventInfo.searchByCreatorAddress",
+                    "Search events by creator address"
+                  )}
                 >
                   {event.creator_address.length > 10
                     ? `${event.creator_address.slice(
@@ -529,7 +579,10 @@ export function EventInfo({ event }: EventInfoProps) {
                   type="button"
                   onClick={handleCopyCreatorAddress}
                   className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
-                  aria-label="Copy creator address"
+                  aria-label={t(
+                    "eventInfo.copyCreatorAddress",
+                    "Copy creator address"
+                  )}
                 >
                   <CopyIcon className="w-4 h-4 text-current" />
                 </button>
@@ -544,7 +597,7 @@ export function EventInfo({ event }: EventInfoProps) {
           {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
-                Duration of This Event:
+                {t("eventInfo.durationOfEvent", "Duration of This Event:")}
               </span>
               <span className="text-xs md:text-sm text-primary ml-2">
                 {eventDurationDisplay}
@@ -556,7 +609,7 @@ export function EventInfo({ event }: EventInfoProps) {
           {preheatDurationDisplay && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
-                Preheat Duration:
+                {t("eventInfo.preheatDuration", "Preheat Duration:")}
               </span>
               <span className="text-xs md:text-sm text-primary ml-2">
                 {preheatDurationDisplay}
@@ -565,7 +618,9 @@ export function EventInfo({ event }: EventInfoProps) {
           )}
 
           <div>
-            <span className="text-xs md:text-sm text-secondary">Event-ID:</span>
+            <span className="text-xs md:text-sm text-secondary">
+              {t("eventInfo.eventId", "Event-ID:")}
+            </span>
             <span className="text-xs md:text-sm text-primary ml-2">
               {event.event_id}
             </span>
@@ -574,7 +629,9 @@ export function EventInfo({ event }: EventInfoProps) {
           {event.hashtags && event.hashtags.length > 0 && (
             <div>
               <span className="text-xs md:text-sm text-secondary">
-                {event.hashtags.length > 1 ? "Hashtags:" : "Hashtag:"}
+                {event.hashtags.length > 1
+                  ? t("eventInfo.hashtags", "Hashtags:")
+                  : t("eventInfo.hashtag", "Hashtag:")}
               </span>
               <div className="flex flex-wrap gap-2 mt-1">
                 {event.hashtags.map((tag, index) => {
@@ -587,7 +644,11 @@ export function EventInfo({ event }: EventInfoProps) {
                       type="button"
                       onClick={() => handleHashtagClick(tag)}
                       className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
-                      aria-label={`Filter by ${hashtagWithPrefix}`}
+                      aria-label={t(
+                        "eventInfo.filterByHashtag",
+                        "Filter by {{hashtag}}",
+                        { hashtag: hashtagWithPrefix }
+                      )}
                     >
                       {hashtagWithPrefix}
                     </button>

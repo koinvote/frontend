@@ -185,11 +185,14 @@ export const formatOngoingCountdown = (deadlineAt: string): string => {
 /**
  * Format completed time: "Ended on Jan 3, 2025 — 14:32 UTC"
  */
-export const formatCompletedTime = (deadlineAt: string): string => {
+export const formatCompletedTime = (
+  deadlineAt: string,
+  prefixText: string
+): string => {
   const deadline = dayjs.utc(deadlineAt);
   const dateStr = deadline.format("MMM D, YYYY");
   const timeStr = deadline.format("HH:mm");
-  return `Ended on ${dateStr} — ${timeStr} UTC`;
+  return `${prefixText} ${dateStr} — ${timeStr} UTC`;
 };
 
 /**

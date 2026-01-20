@@ -12,6 +12,7 @@ interface EventCTAButtonProps {
   status:
     | typeof EventStatus.PREHEAT
     | typeof EventStatus.ACTIVE
+    | typeof EventStatus.ENDED
     | typeof EventStatus.COMPLETED;
   eventRewardType: EventRewardType;
   eventId: string;
@@ -53,6 +54,20 @@ export function EventCTAButton({
           disabled: false,
           tooltip: null,
         };
+      case EventStatus.ENDED:
+        return {
+          text: t("eventCTA.viewRewardReport", "View Reward Report"),
+          disabled: true,
+          tooltip: !isRewarded
+            ? t(
+                "eventCTA.noRewardTooltip",
+                "This is a no-reward event.\nNo payout report is generated."
+              )
+            : t(
+                "eventCTA.eventEndedTooltip",
+                "The event has ended. Reward payouts are being processed."
+              ),
+        };
       case EventStatus.COMPLETED:
         return {
           text: t("eventCTA.viewRewardReport", "View Reward Report"),
@@ -71,7 +86,11 @@ export function EventCTAButton({
     text: buttonText,
     disabled: isDisabled,
     tooltip: tooltipText,
-  } = getButtonConfig();
+  } = getButtonConfig() ?? {
+    text: "",
+    disabled: false,
+    tooltip: null,
+  };
 
   const handleClick = () => {
     switch (status) {
@@ -109,6 +128,7 @@ export function EventCTAButton({
   if (
     tooltipText &&
     (status === EventStatus.PREHEAT ||
+      status === EventStatus.ENDED ||
       (status === EventStatus.COMPLETED && !isRewarded))
   ) {
     return (

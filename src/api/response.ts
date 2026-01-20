@@ -103,6 +103,7 @@ export interface EventDetailDataRes {
   status:
     | typeof EventStatus.ACTIVE
     | typeof EventStatus.PREHEAT
+    | typeof EventStatus.ENDED
     | typeof EventStatus.COMPLETED;
   initial_reward_satoshi: number; //事件建立時的初始獎金
   additional_reward_satoshi: number; //額外獎金

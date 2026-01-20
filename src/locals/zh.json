@@ -279,6 +279,46 @@
     "preheatTooltip": "預熱允許在回覆開放前查看活動。\n在此期間，活動可見但回覆不可見。",
     "preheatTooltipLine1": "預熱允許在回覆開放前查看活動。",
     "preheatTooltipLine2": "在此期間，活動可見但回覆不可見。",
-    "noRewardTooltip": "這是無獎勵活動，不會產生派獎報告。"
+    "noRewardTooltip": "這是無獎勵活動，不會產生派獎報告。",
+    "eventEndedTooltip": "活動已結束，獎勵發放正在處理中。"
+  },
+  "eventInfo": {
+    "addressCopied": "地址已複製",
+    "failedToCopy": "複製失敗",
+    "options": "選項",
+    "option": "選項",
+    "topReply": "熱門回覆",
+    "rewardAmount": "獎勵金額：",
+    "additionalReward": "額外獎勵：",
+    "timeRemaining": "剩餘時間：",
+    "eventEndsIn": "活動結束於",
+    "durationOfEvent": "活動時長：",
+    "preheatDuration": "預熱時長：",
+    "eventId": "活動 ID：",
+    "creatorAddress": "建立者地址：",
+    "searchByCreatorAddress": "依建立者地址搜尋活動",
+    "copyCreatorAddress": "複製建立者地址",
+    "hashtags": "標籤：",
+    "hashtag": "標籤：",
+    "filterByHashtag": "依 {{hashtag}} 篩選",
+    "address": "地址",
+    "addresses": "地址"
+  },
+  "replyList": {
+    "searchPlaceholder": "搜尋比特幣地址或回覆內容",
+    "copiedToClipboard": "{{label}} 已複製到剪貼簿",
+    "failedToCopy": "複製 {{label}} 失敗",
+    "failedToLoadReplies": "無法載入回覆",
+    "unknownError": "未知錯誤",
+    "noRepliesFound": "沒有找到回覆",
+    "hashCopiedToClipboard": "Hash 已複製到剪貼簿",
+    "failedToCopyHash": "複製 Hash 失敗",
+    "option": "選項 {{optionId}}",
+    "signatureVerificationValid": "簽章驗證有效",
+    "signatureVoid": "此地址在截止前已提交新簽章，此簽章已無效。",
+    "tapToCopyHash": "點擊複製 SHA-256 雜湊值",
+    "bitcoinAddress": "比特幣地址",
+    "bitcoinSignature": "比特幣簽章",
+    "plaintext": "明文"
   }
 }
