@@ -134,7 +134,7 @@ export function EventInfo({ event }: EventInfoProps) {
     if (isCompleted) {
       return formatCompletedTime(
         event.deadline_at,
-        t("eventInfo.eventEndsIn", "Ended on")
+        t("eventInfo.eventEndedOn", "Ended on")
       );
     }
     return "";
@@ -146,7 +146,7 @@ export function EventInfo({ event }: EventInfoProps) {
       setTimeRemaining(
         formatCompletedTime(
           event.deadline_at,
-          t("eventInfo.eventEndsIn", "Ended on")
+          t("eventInfo.eventEndedOn", "Ended on")
         )
       );
       return;
