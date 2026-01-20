@@ -299,7 +299,7 @@
     "rewardAmount": "Reward Amount:",
     "additionalReward": "Additional Reward:",
     "timeRemaining": "Time Remaining:",
-    "eventEndsIn": "Ended on",
+    "eventEndedOn": "Ended on",
     "durationOfEvent": "Duration of This Event:",
     "preheatDuration": "Preheat Duration:",
     "eventId": "Event-ID:",
