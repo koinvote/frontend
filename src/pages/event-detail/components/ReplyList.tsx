@@ -1,26 +1,27 @@
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { API, type ApiResponse } from "@/api";
-import { ReplySortBy, type EventType, EventStatus } from "@/api/types";
-import type { Reply, GetListRepliesRes, EventOption } from "@/api/response";
+import type { EventOption, GetListRepliesRes, Reply } from "@/api/response";
+import { EventStatus, ReplySortBy, type EventType } from "@/api/types";
+import CopyIcon from "@/assets/icons/copy.svg?react";
+import InvalidateIcon from "@/assets/icons/invalidate.svg?react";
+import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
+import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
+import { useToast } from "@/components/base/Toast/useToast";
+import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
+import { useQuery } from "@tanstack/react-query";
+import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
-import { Tooltip } from "antd";
-import CopyIcon from "@/assets/icons/copy.svg?react";
-import { useToast } from "@/components/base/Toast/useToast";
-import { PageLoading } from "@/components/PageLoading";
-import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
-import InvalidateIcon from "@/assets/icons/invalidate.svg?react";
-import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 // import ReportIcon from "@/assets/icons/report.svg?react";
-import { Divider } from "./Divider";
+import { Button } from "@/components/base/Button";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
-import { Button } from "@/components/base/Button";
 import { formatRelativeTime } from "@/utils/formatter";
+import { Divider } from "./Divider";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -64,6 +65,7 @@ export function ReplyList({
   eventStatus,
   balanceDisplayMode,
 }: ReplyListProps) {
+  const { t } = useTranslation();
   const { showToast } = useToast();
   const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
   const limit = 20;
@@ -94,10 +96,18 @@ export function ReplyList({
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showToast("success", `${label} copied to clipboard`);
+      showToast(
+        "success",
+        t("replyList.copiedToClipboard", "{{label}} copied to clipboard", {
+          label,
+        })
+      );
     } catch (error) {
       console.error(`Failed to copy ${label}:`, error);
-      showToast("error", `Failed to copy ${label}`);
+      showToast(
+        "error",
+        t("replyList.failedToCopy", "Failed to copy {{label}}", { label })
+      );
     }
   });
 
@@ -109,9 +119,13 @@ export function ReplyList({
     return (
       <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-center">
-          <p className="text-lg text-secondary mb-2">Failed to load replies</p>
+          <p className="text-lg text-secondary mb-2">
+            {t("replyList.failedToLoadReplies", "Failed to load replies")}
+          </p>
           <p className="text-sm text-secondary">
-            {error instanceof Error ? error.message : "Unknown error"}
+            {error instanceof Error
+              ? error.message
+              : t("replyList.unknownError", "Unknown error")}
           </p>
         </div>
       </div>
@@ -121,7 +135,9 @@ export function ReplyList({
   if (!repliesData || repliesData.replies.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-secondary">No replies found</p>
+        <p className="text-secondary">
+          {t("replyList.noRepliesFound", "No replies found")}
+        </p>
       </div>
     );
   }
@@ -161,6 +177,7 @@ function ReplyItem({
   eventStatus,
   balanceDisplayMode,
 }: ReplyItemProps) {
+  const { t } = useTranslation();
   const { isDesktop } = useHomeStore();
   const { showToast } = useToast();
   const { tooltipProps, triggerProps } = useTooltipWithClick({
@@ -182,9 +199,6 @@ function ReplyItem({
     }
     return reply.balance_at_reply_satoshi;
   };
-console.log("getDisplayBalance", getDisplayBalance);
-
-
 
   const balanceBtc = satsToBtc(getDisplayBalance(), {
     suffix: false,
@@ -201,10 +215,16 @@ console.log("getDisplayBalance", getDisplayBalance);
     if (!contentHash) return;
     try {
       await navigator.clipboard.writeText(contentHash);
-      showToast("success", "Hash copied to clipboard");
+      showToast(
+        "success",
+        t("replyList.hashCopiedToClipboard", "Hash copied to clipboard")
+      );
     } catch (error) {
       console.error("Failed to copy hash:", error);
-      showToast("error", "Failed to copy hash");
+      showToast(
+        "error",
+        t("replyList.failedToCopyHash", "Failed to copy hash")
+      );
     }
   });
 
@@ -234,7 +254,8 @@ console.log("getDisplayBalance", getDisplayBalance);
 
   // Helper to get option text
   const getOptionText = (optionId: number) => {
-    if (!options || options.length === 0) return `Option ${optionId}`;
+    if (!options || options.length === 0)
+      return t("replyList.option", "Option {{optionId}}", { optionId });
 
     // Handle EventOption[]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -247,10 +268,13 @@ console.log("getDisplayBalance", getDisplayBalance);
     // Fallback if options are strings or not found by ID (though with API they should be objects with IDs)
     // If it's a simple string array, we might assume 1-based index maps to array index
     if (typeof options[0] === "string") {
-      return options[optionId - 1] || `Option ${optionId}`;
+      return (
+        options[optionId - 1] ||
+        t("replyList.option", "Option {{optionId}}", { optionId })
+      );
     }
 
-    return `Option ${optionId}`;
+    return t("replyList.option", "Option {{optionId}}", { optionId });
   };
 
   const displayText =
@@ -273,7 +297,10 @@ console.log("getDisplayBalance", getDisplayBalance);
               </span>
               {reply.is_reply_valid ? (
                 <Tooltip
-                  title="Signature verification valid"
+                  title={t(
+                    "replyList.signatureVerificationValid",
+                    "Signature verification valid"
+                  )}
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
                   {...tooltipProps}
@@ -287,7 +314,10 @@ console.log("getDisplayBalance", getDisplayBalance);
                 </Tooltip>
               ) : (
                 <Tooltip
-                  title="This address submitted a new signature before the deadline; this signature is void."
+                  title={t(
+                    "replyList.signatureVoid",
+                    "This address submitted a new signature before the deadline; this signature is void."
+                  )}
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
                   {...tooltipProps}
@@ -302,7 +332,10 @@ console.log("getDisplayBalance", getDisplayBalance);
               )}
               {eventType === "open" && reply.content && contentHash && (
                 <Tooltip
-                  title="Tap to copy SHA-256 hash"
+                  title={t(
+                    "replyList.tapToCopyHash",
+                    "Tap to copy SHA-256 hash"
+                  )}
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
                   getPopupContainer={(triggerNode) =>
@@ -370,7 +403,9 @@ console.log("getDisplayBalance", getDisplayBalance);
           <div className="flex flex-col gap-4 w-full">
             {/* Bitcoin Address */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-secondary">Bitcoin Address</span>
+              <span className="text-xs text-secondary">
+                {t("replyList.bitcoinAddress", "Bitcoin Address")}
+              </span>
               <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
                 <span className="text-xs text-primary font-mono truncate">
                   {truncateAddress(reply.btc_address)}
@@ -389,7 +424,9 @@ console.log("getDisplayBalance", getDisplayBalance);
 
             {/* Bitcoin Signature */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-secondary">Bitcoin Signature</span>
+              <span className="text-xs text-secondary">
+                {t("replyList.bitcoinSignature", "Bitcoin Signature")}
+              </span>
               <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
                 <span className="text-xs text-primary font-mono truncate">
                   {truncateText(reply.signature, 20)}
@@ -408,7 +445,9 @@ console.log("getDisplayBalance", getDisplayBalance);
 
             {/* Plaintext */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-secondary">Plaintext</span>
+              <span className="text-xs text-secondary">
+                {t("replyList.plaintext", "Plaintext")}
+              </span>
               <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
                 <span className="text-xs text-primary font-mono truncate">
                   {truncateText(reply.plaintext, 20)}

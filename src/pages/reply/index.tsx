@@ -1,28 +1,29 @@
-import { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { validate, Network } from "bitcoin-address-validation";
+import { Network, validate } from "bitcoin-address-validation";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
-import { EventStatus } from "@/api/types";
 import type { EventDetailDataRes } from "@/api/response";
-import { Button } from "@/components/base/Button";
-import { Loading } from "@/components/base/Loading";
-import { useToast } from "@/components/base/Toast/useToast";
+import { EventStatus } from "@/api/types";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
-import { EventInfoBox } from "@/components/base/EventInfoBox";
-import { useDebouncedClick } from "@/utils/helper";
-import {
-  satsToBtc,
-  formatOngoingCountdown,
-  formatCompletedTime,
-} from "@/utils/formatter";
-import { cn } from "@/utils/style";
-import TrophyIcon from "@/assets/icons/trophy.svg?react";
-import HashIcon from "@/assets/icons/hash.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
+import HashIcon from "@/assets/icons/hash.svg?react";
+import TrophyIcon from "@/assets/icons/trophy.svg?react";
+import { Button } from "@/components/base/Button";
+import { EventInfoBox } from "@/components/base/EventInfoBox";
+import { Loading } from "@/components/base/Loading";
+import { useToast } from "@/components/base/Toast/useToast";
+import {
+  formatCompletedTime,
+  formatOngoingCountdown,
+  satsToBtc,
+} from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
+import { cn } from "@/utils/style";
 
 // Helper for checklist items
 const ChecklistItem = ({
@@ -56,6 +57,7 @@ export default function ReplyPage() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { t } = useTranslation();
 
   // Scroll to top on mount
   useEffect(() => {
@@ -270,7 +272,12 @@ export default function ReplyPage() {
     if (!event) return;
 
     if (event.status === EventStatus.COMPLETED) {
-      setEventCountdown(formatCompletedTime(event.deadline_at));
+      setEventCountdown(
+        formatCompletedTime(
+          event.deadline_at,
+          t("eventInfo.endedOn", "Ended on")
+        )
+      );
       return;
     }
 
@@ -282,7 +289,7 @@ export default function ReplyPage() {
     const interval = setInterval(updateEventCountdown, 1000);
 
     return () => clearInterval(interval);
-  }, [event]);
+  }, [event, t]);
 
   if (isLoadingEvent) return <Loading />;
   if (!event) return <div>Event not found</div>;

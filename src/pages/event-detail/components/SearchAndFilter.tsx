@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 import { EventStatus, ReplySortBy } from "@/api/types";
 import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
@@ -38,6 +40,7 @@ export function SearchAndFilter({
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
   const [isIconSpinning, setIsIconSpinning] = useState(false);
+  const { t } = useTranslation();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -104,7 +107,10 @@ export function SearchAndFilter({
           onChange={(e) => handleSearchChange(e.target.value)}
           onFocus={() => setIsSearchFocused(true)}
           onBlur={() => setIsSearchFocused(false)}
-          placeholder="Search by address or content"
+          placeholder={t(
+            "replyList.searchPlaceholder",
+            "Search by address or content"
+          )}
           className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-sm outline-none w-full min-w-0 focus:border-accent transition-colors"
         />
         {(isSearchFocused || search) && (
