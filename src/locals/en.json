@@ -281,5 +281,12 @@
     "ex1_block": "Total reward: 1 BTC\nNumber of winners: 2\nParticipants and holdings:\nA: 8 BTC, B: 1.5 BTC, C: 0.5 BTC\nSelection process:\nRound 1: A (80%), B (15%), C (5%) @ assume A wins\nRound 2 (A removed): B (75%), C (25%) @ assume B wins\nReward distribution:\nNet distributable reward = Total reward - Platform fee - Transaction fee\nA receives: (8/9.5) — Net reward\nB receives: (1.5/9.5) — Net reward",
     "ex2_title": "Example 2: With Dust",
     "ex2_block": "Total reward: 0.05 BTC = 5,000,000 sats\nPlatform fee (assume 2%): 100,000 sats\nTransaction fee (assume): 12,000 sats\nMinimum payout threshold (assume): 10,000 sats\nNet distributable reward: 5,000,000 - 100,000 - 12,000 = 4,888,000 sats\nWinners and holdings (assume):\nA: 8 BTC; B: 1.5 BTC; C: 0.001 BTC\n\nSteps:\n1. Calculate provisional rewards (proportional to holdings, rounded down; remainder handled in Step 3)\nA = 4,115,777 sats\nB = 771,708 sats\nC = 514 sats @ below the 10,000-sat threshold, treated as Dust\nTotal = 4,887,999 sats, remainder = 1 sat\n\n2. Redistribute Dust 514 sats (proportional to holdings, rounded down; remainder handled in Step 3):\nA receives 432 sats\nB receives 81 sats\nRemainder = 1 sat\n\n3. Redistribute remainders:\n1 sat from Dust + 1 sat from Step 1 @ total 2 sats\nAssigned to the largest holder (A)\n\n4. Final distribution:\nA = 4,115,777 + 432 + 2 = 4,116,211 sats\nB = 771,708 + 81 = 771,789 sats\nC = 0 sats"
+  },
+  "eventCTA": {
+    "reply": "Reply",
+    "replyToWinBTC": "Reply to win BTC",
+    "viewRewardReport": "View Reward Report",
+    "preheatTooltip": "Preheat lets people see the event before replies open.\nDuring this time, the event is visible but replies are disabled.",
+    "noRewardTooltip": "This is a no-reward event.\nNo payout report is generated."
   }
 }

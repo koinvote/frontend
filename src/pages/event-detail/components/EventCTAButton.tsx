@@ -1,4 +1,5 @@
 import { Tooltip } from "antd";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import type { EventRewardType } from "@/api/types";
@@ -23,48 +24,65 @@ export function EventCTAButton({
   eventId,
   totalRewardAmount,
 }: EventCTAButtonProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const isDesktop = useHomeStore((s) => s.isDesktop);
 
-  const isPreheat = status === EventStatus.PREHEAT;
-  const isOngoing = status === EventStatus.ACTIVE;
   const isCompleted = status === EventStatus.COMPLETED;
   const isRewarded = eventRewardType === "rewarded";
-  const isAdditionalRewarded = totalRewardAmount > 0;
+  const hasReward = isRewarded || totalRewardAmount > 0;
+  const replyText = hasReward
+    ? t("eventCTA.replyToWinBTC", "Reply to win BTC")
+    : t("eventCTA.reply", "Reply");
 
-  // Determine button text and state
-  let buttonText = "";
-  let isDisabled = false;
-  let tooltipText = null;
-  if (isPreheat) {
-    buttonText =
-      isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
-    isDisabled = true;
-    tooltipText =
-      "Preheat lets people see the event before replies open.\n\nDuring this time, the event is visible but replies are disabled.";
-  } else if (isOngoing) {
-    buttonText =
-      isRewarded || isAdditionalRewarded ? "Reply to win BTC" : "Reply";
-    isDisabled = false;
-  } else if (isCompleted) {
-    buttonText = "View Reward Report";
-    if (isRewarded) {
-      isDisabled = false;
-    } else {
-      isDisabled = true;
-      tooltipText =
-        "This is a no-reward event. No payout report is generated. Provide an overview of the task and related details.";
+  // Determine button config based on status
+  const getButtonConfig = () => {
+    switch (status) {
+      case EventStatus.PREHEAT:
+        return {
+          text: replyText,
+          disabled: true,
+          tooltip: t(
+            "eventCTA.preheatTooltip",
+            "Preheat lets people see the event before replies open.\nDuring this time, the event is visible but replies are disabled."
+          ),
+        };
+      case EventStatus.ACTIVE:
+        return {
+          text: replyText,
+          disabled: false,
+          tooltip: null,
+        };
+      case EventStatus.COMPLETED:
+        return {
+          text: t("eventCTA.viewRewardReport", "View Reward Report"),
+          disabled: !isRewarded,
+          tooltip: !isRewarded
+            ? t(
+                "eventCTA.noRewardTooltip",
+                "This is a no-reward event.\nNo payout report is generated."
+              )
+            : null,
+        };
     }
-  }
+  };
+
+  const {
+    text: buttonText,
+    disabled: isDisabled,
+    tooltip: tooltipText,
+  } = getButtonConfig();
 
   const handleClick = () => {
-    if (isCompleted && isRewarded) {
-      navigate(`/event/${eventId}/report`);
-    } else if (isCompleted && !isRewarded) {
-      return;
-    } else if (isOngoing) {
-      // TODO: Navigate to reply page
-      navigate(`/event/${eventId}/reply`);
+    switch (status) {
+      case EventStatus.ACTIVE:
+        navigate(`/event/${eventId}/reply`);
+        break;
+      case EventStatus.COMPLETED:
+        if (isRewarded) {
+          navigate(`/event/${eventId}/report`);
+        }
+        break;
     }
   };
 
@@ -87,48 +105,20 @@ export function EventCTAButton({
     </Button>
   );
 
-  if (isPreheat && tooltipText) {
-    return (
-      <Tooltip
-        title={
-          <>
-            {/* Desktop: split into two lines */}
-            <div className="hidden md:block">
-              <div>Preheat lets people see the event before replies open.</div>
-              <div>
-                During this time, the event is visible but replies are disabled.
-              </div>
-            </div>
-            {/* Mobile: original single block (auto wrapping) */}
-            <div className="block md:hidden">
-              {tooltipText.split("\n\n").map((line, index) => (
-                <div key={index}>{line}</div>
-              ))}
-            </div>
-          </>
-        }
-        placement={isDesktop ? "left" : "bottom"}
-        color="white"
-        arrow={{ pointAtCenter: true }}
-        styles={{
-          container: {
-            maxWidth: isDesktop ? "300px" : "min(250px, 90vw)",
-            whiteSpace: "normal",
-          },
-        }}
-      >
-        <span className={isDesktop ? "inline-block" : "block w-full"}>
-          {button}
-        </span>
-      </Tooltip>
-    );
-  }
-
-  if (isCompleted && !isRewarded && tooltipText) {
+  // No reward tooltip
+  if (
+    tooltipText &&
+    (status === EventStatus.PREHEAT ||
+      (status === EventStatus.COMPLETED && !isRewarded))
+  ) {
     return (
       <Tooltip
         title={tooltipText}
-        styles={{ root: { maxWidth: "min(500px, 90vw)" } }}
+        placement={isDesktop ? "left" : "bottom"}
+        arrow={{ pointAtCenter: true }}
+        styles={{
+          root: { maxWidth: "min(300px, 90vw)", whiteSpace: "pre-line" },
+        }}
       >
         <span className="w-full md:w-auto inline-block cursor-not-allowed">
           {button}
