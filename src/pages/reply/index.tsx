@@ -17,6 +17,7 @@ import { Button } from "@/components/base/Button";
 import { EventInfoBox } from "@/components/base/EventInfoBox";
 import { Loading } from "@/components/base/Loading";
 import { useToast } from "@/components/base/Toast/useToast";
+import { useBackOrFallback } from "@/hooks/useBack";
 import {
   formatCompletedTime,
   formatOngoingCountdown,
@@ -58,6 +59,7 @@ export default function ReplyPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { t } = useTranslation();
+  const goBack = useBackOrFallback(`/event/${eventId}`);
 
   // Scroll to top on mount
   useEffect(() => {
@@ -300,7 +302,7 @@ export default function ReplyPage() {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
+          onClick={goBack}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>
@@ -614,7 +616,7 @@ export default function ReplyPage() {
               appearance="outline"
               tone="white"
               className="flex-1"
-              onClick={() => navigate(-1)}
+              onClick={goBack}
             >
               Cancel
             </Button>

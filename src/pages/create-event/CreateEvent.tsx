@@ -1,20 +1,21 @@
-import { Link, useNavigate, useLocation } from "react-router";
+import { Tooltip } from "antd";
 import {
-  type FormEvent,
-  useState,
   useEffect,
-  type ChangeEvent,
   useMemo,
   useRef,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
 } from "react";
-import { Tooltip } from "antd";
+import { Link, useLocation, useNavigate } from "react-router";
 // import { useMutation } from '@tanstack/react-query'
 
-import { Button } from "@/components/base/Button";
-import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import MinusIcon from "@/assets/icons/minus.svg?react";
 import PlusIcon from "@/assets/icons/plus.svg?react";
+import { Button } from "@/components/base/Button";
+import { useBackIfInternal } from "@/hooks/useBack";
+import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { cn } from "@/utils/style";
 
 // import { API } from '@/api'
@@ -22,18 +23,18 @@ import { cn } from "@/utils/style";
 import type { EventType } from "@/api/types";
 
 import {
-  validate,
   getAddressInfo,
   Network,
+  validate,
   type AddressInfo,
 } from "bitcoin-address-validation";
 
 import type { AddressValidationStatus } from "./types/index";
 
-import { useTranslation } from "react-i18next";
-import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { useHomeStore } from "@/stores/homeStore";
+import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { satsToBtc } from "@/utils/formatter";
+import { useTranslation } from "react-i18next";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -104,6 +105,7 @@ export default function CreateEvent() {
   const navigate = useNavigate();
   const location = useLocation();
   const isFromCreateEventRef = useRef(false);
+  const goBack = useBackIfInternal("/");
 
   useEffect(() => {
     const fromCreateEvent = sessionStorage.getItem("fromCreateEvent");
@@ -776,14 +778,7 @@ export default function CreateEvent() {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => {
-            // 如果是从 CreateEvent 页面再次进入的，或者没有历史记录，就导航到首页
-            if (isFromCreateEventRef.current || window.history.length <= 1) {
-              navigate("/");
-            } else {
-              navigate(-1);
-            }
-          }}
+          onClick={goBack}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>
