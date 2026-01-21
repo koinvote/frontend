@@ -11,6 +11,7 @@ import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
 import { Button } from "@/components/base/Button";
 import { useDebouncedClick } from "@/utils/helper";
 import { useEffect, useRef, useState } from "react";
+import styles from "./SearchAndFilter.module.css";
 
 interface SearchAndFilterProps {
   eventId: string;
@@ -39,7 +40,7 @@ export function SearchAndFilter({
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);
-  const [isIconSpinning, setIsIconSpinning] = useState(false);
+  const [spinDeg, setSpinDeg] = useState(0);
   const { t } = useTranslation();
 
   // Close dropdown when clicking outside
@@ -228,8 +229,7 @@ export function SearchAndFilter({
               text="sm"
               className="h-9 gap-1 w-full md:w-[120px] dark:hover:bg-gray-900"
               onClick={() => {
-                setIsIconSpinning(true);
-                setTimeout(() => setIsIconSpinning(false), 600);
+                setSpinDeg((d) => d + 180);
                 onBalanceDisplayModeChange?.(
                   balanceDisplayMode === "snapshot" ? "on_chain" : "snapshot"
                 );
@@ -238,20 +238,18 @@ export function SearchAndFilter({
               {balanceDisplayMode === "snapshot" ? (
                 <>
                   <OnChainIcon
-                    className={`w-3 h-3 ${
-                      isIconSpinning ? "animate-spin" : ""
-                    }`}
+                    className={`w-3 h-3 ${styles["on-chain-icon"]}`}
+                    style={{ transform: `rotate(${spinDeg}deg)` }}
                   />
-                  On-chain
+                  <span className="w-16">On-chain</span>
                 </>
               ) : (
                 <>
                   <OnChainIcon
-                    className={`w-3 h-3 ${
-                      isIconSpinning ? "animate-spin" : ""
-                    }`}
+                    className={`w-3 h-3 ${styles["on-chain-icon"]}`}
+                    style={{ transform: `rotate(${spinDeg}deg)` }}
                   />
-                  Snapshot
+                  <span className="w-16">Snapshot</span>
                 </>
               )}
             </Button>
