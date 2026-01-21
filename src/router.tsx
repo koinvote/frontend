@@ -13,7 +13,6 @@ import Home from "@/pages/home";
 import PayoutReport from "@/pages/payout-report";
 import Privacy from "@/pages/privacy";
 import ReplyPage from "@/pages/reply";
-import RewardReport from "@/pages/rewardReport/index";
 import Subscribe from "@/pages/subscribe";
 import Support from "@/pages/support";
 import Terms from "@/pages/terms";
@@ -62,7 +61,6 @@ const publicChildren = isComingSoonMode
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay /> },
       { path: "event/:eventId", element: <EventDetail /> },
       { path: "event/:eventId/reply", element: <ReplyPage /> },
-      { path: "event/:eventId/reward-report", element: <RewardReport /> },
       { path: "event/:eventId/report", element: <PayoutReport /> },
     ];
 

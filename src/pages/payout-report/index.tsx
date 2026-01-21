@@ -1,18 +1,20 @@
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams } from "react-router";
+
 import { API, type ApiResponse } from "@/api";
 import type { PayoutReportRes } from "@/api/response";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import { PageLoading } from "@/components/PageLoading";
+import { useBackOrFallback } from "@/hooks/useBack";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router";
 import { InformationSection } from "./components/InformationSection";
 import { RewardDistributionSection } from "./components/RewardDistributionSection";
 
 const PayoutReport = () => {
-  const navigate = useNavigate();
   const { eventId } = useParams<{ eventId: string }>();
   const { t } = useTranslation();
+  const goBack = useBackOrFallback(`/event/${eventId}`);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -73,7 +75,7 @@ const PayoutReport = () => {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
+          onClick={goBack}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>

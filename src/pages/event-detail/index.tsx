@@ -1,23 +1,23 @@
-import { useParams, useNavigate, useLocation } from "react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router";
+
 import { API, type ApiResponse } from "@/api";
-import { ReplySortBy } from "@/api/types";
 import type { EventDetailDataRes } from "@/api/response";
-import { EventInfo } from "./components/EventInfo";
-import { Divider } from "./components/Divider";
-import { SearchAndFilter } from "./components/SearchAndFilter";
-import { ReplyList } from "./components/ReplyList";
-import { PageLoading } from "@/components/PageLoading";
+import { ReplySortBy } from "@/api/types";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import { PageLoading } from "@/components/PageLoading";
+import { useBackOrFallback } from "@/hooks/useBack";
+import { useQuery } from "@tanstack/react-query";
+import { Divider } from "./components/Divider";
+import { EventInfo } from "./components/EventInfo";
+import { ReplyList } from "./components/ReplyList";
+import { SearchAndFilter } from "./components/SearchAndFilter";
 
 const EventDetail = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { eventId } = useParams<{ eventId: string }>();
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
-  const fromPayment = location.state?.fromPayment;
+  const goBack = useBackOrFallback("/");
 
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
@@ -172,7 +172,7 @@ const EventDetail = () => {
         <button
           type="button"
           className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => (fromPayment ? navigate("/") : navigate(-1))}
+          onClick={goBack}
         >
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>

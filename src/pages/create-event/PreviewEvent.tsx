@@ -1,16 +1,17 @@
-import { useLocation, useNavigate, Link } from "react-router";
 import {
+  useCallback,
+  useEffect,
   useMemo,
   useState,
-  useEffect,
-  useCallback,
   type ReactNode,
 } from "react";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
-import { Button } from "@/components/base/Button";
-import type { EventType } from "@/api/types";
+import { Link, useLocation, useNavigate } from "react-router";
+
 import { API } from "@/api";
 import type { CreateEventReq } from "@/api/request";
+import type { EventType } from "@/api/types";
+import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { satsToBtc } from "@/utils/formatter";
@@ -181,7 +182,11 @@ export default function PreviewEvent() {
   }, [totalAmountSatoshi]);
 
   const showLowTotalWarning = useMemo(() => {
-    if (totalAmountSatoshi === null || totalAmountSatoshi === undefined) {
+    if (
+      totalAmountSatoshi === null ||
+      totalAmountSatoshi === undefined ||
+      totalAmountSatoshi <= 0
+    ) {
       return false;
     }
     return totalAmountSatoshi <= 1_000; // 0.00001 BTC in sats
