@@ -91,7 +91,8 @@ export function SearchAndFilter({
   });
 
   const isActive = eventStatus === EventStatus.ACTIVE;
-  const isCompleted = eventStatus === EventStatus.COMPLETED;
+  const isCompleted =
+    eventStatus === EventStatus.ENDED || eventStatus === EventStatus.COMPLETED;
   const isPreheat = eventStatus === EventStatus.PREHEAT;
 
   return (
