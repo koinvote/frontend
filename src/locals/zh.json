@@ -139,6 +139,10 @@
     "s5_1": "本政策可能會不定期更新，並於網站上公告。",
     "s5_2": "持續使用本平台即表示您同意更新後的政策。"
   },
+  "support": {
+    "copyEmailSuccess": "支援信箱地址已複製到剪貼簿：support@koinvote.com",
+    "failedToCopyText": "支援信箱地址複製失敗：support@koinvote.com"
+  },
   "terms": {
     "title": "服務條款",
     "section1Title": "1. 簡介",

@@ -149,6 +149,10 @@
     "s5_1": "This policy may be updated from time to time and will be announced on the website.",
     "s5_2": "Continued use of the platform constitutes acceptance of the updated policy."
   },
+  "support": {
+    "copyEmailSuccess": "Support email copied: support@koinvote.com",
+    "failedToCopyText": "Failed to copy support email: support@koinvote.com"
+  },
   "terms": {
     "title": "Terms of Service",
     "section1Title": "1. Introduction",
