@@ -70,3 +70,7 @@ export interface GenerateReplyPlaintextReq {
   option_id?: number; // For single-choice
   content?: string; // For open-ended
 }
+
+export interface SubscribeReq {
+  email: string;
+}

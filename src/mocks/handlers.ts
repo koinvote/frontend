@@ -367,4 +367,28 @@ export const handlers = [
       });
     }
   ),
+
+  // POST /subscribe - Subscribe to email notifications
+  http.post(`${API_BASE_URL}/subscribe`, async ({ request }) => {
+    const body = (await request.json()) as { email: string };
+    console.log("[Mock] Subscribe request:", body);
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!body.email || !emailRegex.test(body.email)) {
+      return HttpResponse.json<ApiResponse<void>>({
+        code: "400000",
+        success: false,
+        message: "Invalid email format",
+        data: undefined as unknown as void,
+      });
+    }
+
+    return HttpResponse.json<ApiResponse<void>>({
+      code: "000000",
+      success: true,
+      message: null,
+      data: undefined as unknown as void,
+    });
+  }),
 ];

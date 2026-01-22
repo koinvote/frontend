@@ -10,6 +10,7 @@ import type {
   VerifySignatureReq,
   SubmitReplyReq,
   GenerateReplyPlaintextReq,
+  SubscribeReq,
 } from "./request.ts";
 
 import type {
@@ -123,6 +124,9 @@ export const API = {
     get<Blob, { plan_id: number }>(
       `/events/${eventId}/verification-csv`
     )({ plan_id: planId }, { responseType: 'blob' }),
+
+  // Subscribe API
+  subscribe: post<ApiResponse<void>, SubscribeReq>("/subscribe"),
 };
 
 // Admin API (requires Bearer token authentication)
