@@ -83,9 +83,7 @@ export function VerificationInfo({
 
           <div className="sm:shrink-0">
             <Button
-              className="bg-amber-500! dark:bg-white! text-white dark:text-black! border-none! hover:opacity-80!"
-              color="default"
-              variant="solid"
+              type="primary"
               icon={<DownloadOutlined />}
               loading={isDownloading}
               onClick={onDownloadCsv}
