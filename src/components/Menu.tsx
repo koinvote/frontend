@@ -12,8 +12,11 @@ import SubscribeIcon from "@/assets/icons/menu-subscribe.svg?react";
 import SupportIcon from "@/assets/icons/menu-support.svg?react";
 import TermsIcon from "@/assets/icons/menu-terms.svg?react";
 import VerificationIcon from "@/assets/icons/menu-verificationTool.svg?react";
+import { useToast } from "@/components/base/Toast/useToast";
+import CONSTS from "@/consts";
 import { useLanguagesStore } from "@/stores/languagesStore";
 import { useThemeStore } from "@/stores/themeStore";
+import { useDebouncedClick } from "@/utils/helper";
 
 interface MenuProps {
   onItemClick?: () => void;
@@ -36,7 +39,7 @@ const items: Item[] = [
   },
   { to: "/charges-refunds", key: "menu.charges", Icon: ChargesnrefundsIcon },
 
-  { to: "/support", key: "menu.support", Icon: SupportIcon },
+  { to: "", key: "menu.support", Icon: SupportIcon },
   {
     to: "/terms-reward-distribution",
     key: "menu.termsOfRewardDistribution",
@@ -56,6 +59,7 @@ const activeLink = "bg-surface text-primary";
 
 const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
 
   const theme = useThemeStore((state) => state.theme);
   const toggle = useThemeStore((state) => state.toggle);
@@ -63,28 +67,69 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const { current, setLanguage } = useLanguagesStore();
   const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
 
+  const handleSupportClick = useDebouncedClick(async () => {
+    if (!CONSTS.SUPPORT_EMAIL) return;
+
+    try {
+      await navigator.clipboard.writeText(CONSTS.SUPPORT_EMAIL);
+      showToast(
+        "success",
+        t(
+          "support.copyEmailSuccess",
+          "Support email copied: support@koinvote.com"
+        )
+      );
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showToast(
+        "error",
+        t(
+          "common.failedToCopyText",
+          "Failed to copy support email: support@koinvote.com"
+        )
+      );
+    }
+  });
+
   return (
     <nav className="space-y-1">
-      {items.map(({ to, key, Icon }) => (
-        <NavLink
-          key={to}
-          to={to}
-          aria-label={t(key)}
-          className={({ isActive }) =>
-            cn(
-              baseLink,
-              isActive && activeLink,
-              collapsed ? "justify-center px-2" : "gap-3"
-            )
-          }
-          onClick={onItemClick}
-        >
-          {collapsed ? (
-            <Tooltip
-              placement="right"
-              title={t(key)}
-              color={theme === "dark" ? "#000" : "#fff"}
-            >
+      {items.map(({ to, key, Icon }) =>
+        to ? (
+          <NavLink
+            key={to}
+            to={to}
+            aria-label={t(key)}
+            className={({ isActive }) =>
+              cn(
+                baseLink,
+                isActive && activeLink,
+                collapsed ? "justify-center px-2" : "gap-3"
+              )
+            }
+            onClick={onItemClick}
+          >
+            {collapsed ? (
+              <Tooltip
+                placement="right"
+                title={t(key)}
+                color={theme === "dark" ? "#000" : "#fff"}
+              >
+                <span
+                  className={cn(
+                    "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                    "text-current"
+                  )}
+                >
+                  <Icon
+                    className="h-5! w-5! text-secondary"
+                    style={{
+                      width: "1.25rem",
+                      height: "1.25rem",
+                    }}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
               <span
                 className={cn(
                   "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
@@ -93,30 +138,60 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               >
                 <Icon
                   className="h-5! w-5! text-secondary"
-                  style={{
-                    width: "1.25rem",
-                    height: "1.25rem",
-                  }}
+                  style={{ width: "1.25rem", height: "1.25rem" }}
                 />
               </span>
-            </Tooltip>
-          ) : (
-            <span
-              className={cn(
-                "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
-                "text-current"
-              )}
-            >
-              <Icon
-                className="h-5! w-5! text-secondary"
-                style={{ width: "1.25rem", height: "1.25rem" }}
-              />
-            </span>
-          )}
-
-          <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
-        </NavLink>
-      ))}
+            )}
+            <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
+          </NavLink>
+        ) : (
+          <div
+            className={cn(
+              baseLink,
+              collapsed ? "justify-center px-2" : "gap-3",
+              `cursor-pointer`
+            )}
+            key={key}
+            onClick={handleSupportClick}
+          >
+            {collapsed ? (
+              <Tooltip
+                placement="right"
+                title={t(key)}
+                color={theme === "dark" ? "#000" : "#fff"}
+              >
+                <span
+                  className={cn(
+                    "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                    "text-current"
+                  )}
+                >
+                  <Icon
+                    className="h-5! w-5! text-secondary"
+                    style={{
+                      width: "1.25rem",
+                      height: "1.25rem",
+                    }}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
+              <span
+                className={cn(
+                  "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                  "text-current"
+                )}
+              >
+                <Icon
+                  className="h-5! w-5! text-secondary"
+                  style={{ width: "1.25rem", height: "1.25rem" }}
+                />
+              </span>
+            )}
+            <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
+          </div>
+        )
+      )}
 
       <div className="absolute bottom-0 left-0 w-full">
         <div className="p-4 border-t border-border">

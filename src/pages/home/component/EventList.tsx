@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
+
 import { useHomeEvents } from "@/hooks/useHomeEvents";
 import { EventCard } from "@/pages/home/component/EventCard";
 import { useHomeStore } from "@/stores/homeStore";
@@ -40,7 +41,7 @@ export function EventList() {
         <button
           type="button"
           onClick={reload}
-          className="rounded-full bg-accent px-4 py-1.5 text-xs text-accent-foreground"
+          className="rounded-full bg-accent px-4 py-1.5 text-xs text-accent-foreground text-primary"
         >
           Retry
         </button>

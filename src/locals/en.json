@@ -95,7 +95,14 @@
     "receiptStep1Subtitle": "Once your reply is submitted, click \"Download Receipt\" to save your receipt file.",
     "receiptImageAlt": "Screenshot of the submission success screen with the Download Receipt button highlighted.",
     "receiptStep2Title": "Set Up and Run the Receipt Verifier",
-    "receiptCodeBlock_content": "# Download the verifier\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# Compile and run the verifier\ngo build -o verify-receipt main.go\n\n# Run the verifier\n# Replace <your-receipt-file.json> with the actual receipt file you downloaded\n./verify-receipt --receipt <your-receipt-file.json>"
+    "receiptCodeBlock_content": "# Download the verifier\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# Compile and run the verifier\ngo build -o verify-receipt main.go\n\n# Run the verifier\n# Replace <your-receipt-file.json> with the actual receipt file you downloaded\n./verify-receipt --receipt <your-receipt-file.json>",
+    "faqTitle": "FAQ",
+    "faq1_question": "What is the difference between event verification and receipt verification?",
+    "faq1_answer": "Event verification ensures that the reward distribution for the entire event was fair, rule-based, and reproducible. Receipt verification confirms that your individual reply was properly recorded and cryptographically signed by the platform. These two mechanisms use different data sources and serve different purposes.",
+    "faq2_question": "What happens if I forget to download my receipt?",
+    "faq2_answer": "If you do not download your receipt after submitting your reply, you will not be able to independently verify your submission later. To preserve your right to verification, you should always download and securely store your receipt immediately after submission.",
+    "faq3_question": "How can I be sure the public key used for verification is the correct one?",
+    "faq3_answer": "The public key used for receipt verification is included in the open-source repository along with version information and its release date. You can verify its authenticity by checking the GitHub release page or commit history to ensure you are using the correct and officially published key version."
   },
   "about": {
     "title": "About Koinvote",
@@ -141,6 +148,10 @@
     "section5Title": "5. Policy Changes",
     "s5_1": "This policy may be updated from time to time and will be announced on the website.",
     "s5_2": "Continued use of the platform constitutes acceptance of the updated policy."
+  },
+  "support": {
+    "copyEmailSuccess": "Support email copied: support@koinvote.com",
+    "failedToCopyText": "Failed to copy support email: support@koinvote.com"
   },
   "terms": {
     "title": "Terms of Service",

@@ -501,6 +501,20 @@ export function EventInfo({ event }: EventInfoProps) {
         </p>
       )}
 
+      {/* Top Reply / Options */}
+      {displayData.length > 0 && displayTitle && (
+        <div>
+          <h2 className="text-sm md:text-base font-semibold text-primary mb-3">
+            {displayTitle}
+          </h2>
+          <div className="space-y-2">
+            {displayData.map((reply, index) => (
+              <TopReplyBar key={reply.id || index} reply={reply} />
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Desktop: Two Column Layout */}
       <div className="hidden md:grid grid-cols-2 gap-4 md:gap-6">
         {/* Left Column */}
@@ -669,20 +683,6 @@ export function EventInfo({ event }: EventInfoProps) {
           </div>
         ))}
       </div>
-
-      {/* Top Reply / Options */}
-      {displayData.length > 0 && displayTitle && (
-        <div>
-          <h2 className="text-sm md:text-base font-semibold text-primary mb-3">
-            {displayTitle}
-          </h2>
-          <div className="space-y-2">
-            {displayData.map((reply, index) => (
-              <TopReplyBar key={reply.id || index} reply={reply} />
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* CTA Button */}
       <div className="flex md:justify-end">
