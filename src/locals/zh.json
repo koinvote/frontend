@@ -85,7 +85,14 @@
     "receiptImageAlt": "顯示「Submission Successful」畫面並標示 Download Receipt 按鈕的截圖。",
     "receiptStep2Title": "設定並執行 Receipt Verifier",
 
-    "receiptCodeBlock_content": "# 下載驗證程式\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# 編譯並執行驗證程式\ngo build -o verify-receipt main.go\n\n# 執行驗證程式\n# 將 <your-receipt-file.json> 替換為你下載的實際回執檔案\n./verify-receipt --receipt <your-receipt-file.json>"
+    "receiptCodeBlock_content": "# 下載驗證程式\ngit clone https://github.com/koinvote/receipt-verifier.git\ncd receipt-verifier\n\n# 編譯並執行驗證程式\ngo build -o verify-receipt main.go\n\n# 執行驗證程式\n# 將 <your-receipt-file.json> 替換為你下載的實際回執檔案\n./verify-receipt --receipt <your-receipt-file.json>",
+    "faqTitle": "常見問題",
+    "faq1_question": "「活動驗證」與「收據驗證」有什麼區別？",
+    "faq1_answer": "活動驗證旨在確保整個活動的獎勵發放流程公平、符合規則且可被重複驗證。收據驗證則是確認您的個人回覆已被平台妥善記錄，並經過加密簽署。這兩種機制使用不同的數據來源，服務於不同的目的。",
+    "faq2_question": "如果我忘記下載收據會怎樣？",
+    "faq2_answer": "如果您在提交回覆後沒有下載收據，日後將無法進行獨立驗證。為了保障您的驗證權利，建議您在提交後務必立即下載並妥善保存收據。",
+    "faq3_question": "我如何確定用於驗證的公鑰（Public Key）是正確的？",
+    "faq3_answer": "用於收據驗證的公鑰已包含在開源專案庫中，並附有版本資訊與發佈日期。您可以透過查看 GitHub 的發佈頁面（Release page）或提交歷史（Commit history）來核對其真實性，確保您使用的是官方發佈的正確公鑰版本。"
   },
   "about": {
     "title": "關於 Koinvote",
