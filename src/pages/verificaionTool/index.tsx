@@ -327,7 +327,6 @@ const VerificaionTool = () => {
           </h2>
           <Collapse
             items={faqItems}
-            defaultActiveKey={["1"]}
             className="text-sm! md:text-base! lg:text-lg!"
             onChange={onChange}
             bordered={false}
