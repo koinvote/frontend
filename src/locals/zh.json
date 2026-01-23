@@ -50,6 +50,9 @@
     "rewardBtcPlaceholderEnabled": "輸入獎勵（最低 {{min}} ）",
     "optionPlaceholder": "選項 {{n}}"
   },
+  "confirmPay": {
+    "paymentReceived": "已收到付款，請等待確認。"
+  },
   "verificationTool": {
     "title": "驗證指南",
     "description": "如何使用開源工具獨立驗證活動和收據",
