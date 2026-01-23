@@ -194,7 +194,7 @@ export const handlers = [
         message: "Signature verified successfully",
         data: {
           event_id: eventId,
-          message: "Event activated",
+          message: "backendMessage.eventActivated",
           status: "activated",
         },
       });

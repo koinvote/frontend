@@ -218,8 +218,9 @@ export default function ConfirmSign() {
         setSignatureError("");
 
         // Show success message in green
+        // TODO: 示範 後端 message
         const successMessage =
-          verifyData.message || "Event successfully activated";
+          t(verifyData.message, "Event successfully activated");
 
         // Set success message (green)
         setSignatureSuccess(successMessage);

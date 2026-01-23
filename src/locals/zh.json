@@ -75,7 +75,28 @@
     "platformFee": "平台費用：",
     "preheatFee": "預熱費用：",
     "singleChoiceTooltip": "參與者從您建立的選項中選擇一個。",
-    "openEndedTooltip": "參與者可以提交自己的回覆。"
+    "openEndedTooltip": "參與者可以提交自己的回覆。",
+    "addressChecking": "檢查中…",
+    "addressValid": "有效 ({{type}})",
+    "addressInvalid": "無效的地址。",
+    "invalidBitcoinAddress": "無效的比特幣地址。",
+    "addressWrongNetwork": "地址屬於 {{network}}，而非 {{expected}}。",
+    "invalidBitcoinAddressNetwork": "無效的比特幣地址 ({{network}})。",
+    "alertInvalidAddress": "請輸入有效的比特幣地址 ({{network}})。",
+    "alertInvalidDuration": "請輸入有效的活動時長。",
+    "alertInvalidPreheatHours": "請輸入有效的預熱時數（1 至 720 小時）。",
+    "alertNoOptions": "請輸入至少一個選項。",
+    "errorEnterRewardAmount": "請輸入獎勵金額",
+    "errorInvalidRewardAmount": "請輸入有效的獎勵金額",
+    "errorMinimumReward": "最低 {{min}} BTC",
+    "errorEnterPreheatHours": "請輸入預熱時數",
+    "errorInvalidNumber": "請輸入有效的數字",
+    "errorMaxPreheatHours": "預熱時數最多 720 小時",
+    "errorMinPreheatHours": "預熱時數最少 1 小時",
+    "errorAtLeastOneOption": "至少需要一個選項",
+    "maxHashtags": "最多 3 個標籤",
+    "rewardDistributionText": "獎勵將分配給最多 {{count}} 個地址",
+    "rewardDistributionTextPlural": "獎勵將分配給最多 {{count}} 個地址"
   },
   "confirmPay": {
     "paymentReceived": "已收到付款，請等待確認。",
@@ -576,5 +597,8 @@
   "winnerTable": {
     "addressCopied": "地址已複製",
     "failedToCopy": "複製失敗"
+  },
+  "backendMessage": {
+    "eventActivated": "事件建立成功"
   }
 }

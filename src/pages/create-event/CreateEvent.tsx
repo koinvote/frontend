@@ -184,7 +184,9 @@ export default function CreateEvent() {
       if (!ok) {
         setAddrStatus("invalid");
         setAddrInfo(null);
-        setAddrError(`Invalid Bitcoin address.`);
+        setAddrError(
+          t("createEvent.invalidBitcoinAddress", "Invalid Bitcoin address."),
+        );
         return;
       }
 
@@ -194,7 +196,16 @@ export default function CreateEvent() {
         if (info.network !== ACTIVE_BTC_NETWORK) {
           setAddrStatus("invalid");
           setAddrInfo(null);
-          setAddrError(`Address is for ${info.network}, not ${networkLabel}.`);
+          setAddrError(
+            t(
+              "createEvent.addressWrongNetwork",
+              "Address is for {{network}}, not {{expected}}.",
+              {
+                network: info.network,
+                expected: networkLabel,
+              },
+            ),
+          );
           return;
         }
 
@@ -204,12 +215,20 @@ export default function CreateEvent() {
       } catch {
         setAddrStatus("invalid");
         setAddrInfo(null);
-        setAddrError(`Invalid Bitcoin address (${networkLabel}).`);
+        setAddrError(
+          t(
+            "createEvent.invalidBitcoinAddressNetwork",
+            "Invalid Bitcoin address ({{network}}).",
+            {
+              network: networkLabel,
+            },
+          ),
+        );
       }
     }, 500);
 
     return () => window.clearTimeout(timer);
-  }, [creatorAddress, ACTIVE_BTC_NETWORK, networkLabel]);
+  }, [creatorAddress, ACTIVE_BTC_NETWORK, networkLabel, t]);
 
   useEffect(() => {
     const saved = sessionStorage.getItem(CREATE_EVENT_DRAFT_KEY);
@@ -316,7 +335,13 @@ export default function CreateEvent() {
     e.preventDefault();
 
     if (addrStatus !== "valid") {
-      alert(`Please enter a valid Bitcoin address (${networkLabel}).`);
+      alert(
+        t(
+          "createEvent.alertInvalidAddress",
+          "Please enter a valid Bitcoin address ({{network}}).",
+          { network: networkLabel },
+        ),
+      );
       return;
     }
 
@@ -324,7 +349,9 @@ export default function CreateEvent() {
 
     const duration = Number(durationHours || 0);
     if (!duration || duration <= 0) {
-      alert("Please enter a valid duration.");
+      alert(
+        t("createEvent.alertInvalidDuration", "Please enter a valid duration."),
+      );
       return;
     }
 
@@ -333,7 +360,12 @@ export default function CreateEvent() {
     if (enablePreheat) {
       preheat = Number(preheatHours || 0);
       if (!preheat || preheat < 1 || preheat > 720) {
-        alert("Please enter a valid preheat hours (between 1 and 720 hours).");
+        alert(
+          t(
+            "createEvent.alertInvalidPreheatHours",
+            "Please enter a valid preheat hours (between 1 and 720 hours).",
+          ),
+        );
         return;
       }
     }
@@ -343,7 +375,12 @@ export default function CreateEvent() {
     if (eventType === "single_choice") {
       const list = options.map((o) => o.trim()).filter(Boolean);
       if (list.length === 0) {
-        alert("Please enter at least one option for single-choice events.");
+        alert(
+          t(
+            "createEvent.alertNoOptions",
+            "Please enter at least one option for single-choice events.",
+          ),
+        );
         return;
       }
       cleanedOptions = list;
@@ -470,10 +507,14 @@ export default function CreateEvent() {
 
   const rewardBtcPlaceholder =
     Number(durationHours) > 0
-      ? t("createEvent.rewardBtcPlaceholderEnabled", {
-          min: minRewardBtc.toFixed(8),
-        })
-      : t("createEvent.rewardBtcPlaceholder");
+      ? t(
+          "createEvent.rewardBtcPlaceholderEnabled",
+          "Enter reward (Min {{min}})",
+          {
+            min: minRewardBtc.toFixed(8),
+          },
+        )
+      : t("createEvent.rewardBtcPlaceholder", "Set Duration First");
 
   // Calculate max recipients for rewarded events
   // Formula: [用户输入的奖金金额] / [satoshi_per_extra_winner], 无条件舍去取整数
@@ -508,7 +549,10 @@ export default function CreateEvent() {
     if (!rewardBtc || rewardBtc.trim() === "") {
       return {
         isValid: false,
-        error: "Please enter reward amount",
+        error: t(
+          "createEvent.errorEnterRewardAmount",
+          "Please enter reward amount",
+        ),
       };
     }
 
@@ -516,7 +560,10 @@ export default function CreateEvent() {
     if (!Number.isFinite(rewardAmount) || rewardAmount <= 0) {
       return {
         isValid: false,
-        error: "Please enter a valid reward amount",
+        error: t(
+          "createEvent.errorInvalidRewardAmount",
+          "Please enter a valid reward amount",
+        ),
       };
     }
 
@@ -524,12 +571,14 @@ export default function CreateEvent() {
     if (rewardAmount < minRewardBtc) {
       return {
         isValid: false,
-        error: `Minimum ${minRewardBtc.toFixed(8)} BTC`,
+        error: t("createEvent.errorMinimumReward", "Minimum {{min}} BTC", {
+          min: minRewardBtc.toFixed(8),
+        }),
       };
     }
 
     return { isValid: true, error: null };
-  }, [isRewarded, rewardBtc, minRewardBtc, rewardBtcTouched]);
+  }, [isRewarded, rewardBtc, minRewardBtc, rewardBtcTouched, t]);
 
   // Calculate platform fee for non-reward events
   // Formula: [Duration - free_hours] × satoshi_per_duration_hour × platform_fee_percentage
@@ -620,7 +669,10 @@ export default function CreateEvent() {
     if (!preheatHours || preheatHours.trim() === "") {
       return {
         isValid: false,
-        error: "Please enter preheat hours",
+        error: t(
+          "createEvent.errorEnterPreheatHours",
+          "Please enter preheat hours",
+        ),
       };
     }
 
@@ -628,7 +680,10 @@ export default function CreateEvent() {
     if (!Number.isFinite(preheatHoursNum)) {
       return {
         isValid: false,
-        error: "Please enter a valid number",
+        error: t(
+          "createEvent.errorInvalidNumber",
+          "Please enter a valid number",
+        ),
       };
     }
 
@@ -636,7 +691,10 @@ export default function CreateEvent() {
     if (preheatHoursNum > 720) {
       return {
         isValid: false,
-        error: "Maximum preheat hours is 720",
+        error: t(
+          "createEvent.errorMaxPreheatHours",
+          "Maximum preheat hours is 720",
+        ),
       };
     }
 
@@ -644,12 +702,15 @@ export default function CreateEvent() {
     if (preheatHoursNum < 1) {
       return {
         isValid: false,
-        error: "Minimum preheat hours is 1",
+        error: t(
+          "createEvent.errorMinPreheatHours",
+          "Minimum preheat hours is 1",
+        ),
       };
     }
 
     return { isValid: true, error: null };
-  }, [enablePreheat, preheatHours]);
+  }, [enablePreheat, preheatHours, t]);
 
   // Validate options for single_choice events
   const optionsValidation = useMemo(() => {
@@ -666,12 +727,15 @@ export default function CreateEvent() {
     if (validOptions.length === 0) {
       return {
         isValid: false,
-        error: "At least one option is required",
+        error: t(
+          "createEvent.errorAtLeastOneOption",
+          "At least one option is required",
+        ),
       };
     }
 
     return { isValid: true, error: null };
-  }, [eventType, options, optionsTouched]);
+  }, [eventType, options, optionsTouched, t]);
 
   // Check if Preview button should be disabled
   const isPreviewDisabled = useMemo(() => {
@@ -834,16 +898,21 @@ export default function CreateEvent() {
             />
             <div className="mt-1 tx-12 lh-18">
               {addrStatus === "checking" && (
-                <span className="text-secondary">Checking…</span>
+                <span className="text-secondary">
+                  {t("createEvent.addressChecking", "Checking…")}
+                </span>
               )}
               {addrStatus === "valid" && addrInfo && (
                 <span className="text-green-600">
-                  Valid ({addrInfo.type.toUpperCase()})
+                  {t("createEvent.addressValid", "Valid ({{type}})", {
+                    type: addrInfo.type.toUpperCase(),
+                  })}
                 </span>
               )}
               {addrStatus === "invalid" && (
                 <span className="text-red-500">
-                  {addrError || "Invalid address."}
+                  {addrError ||
+                    t("createEvent.addressInvalid", "Invalid address.")}
                 </span>
               )}
             </div>
@@ -869,7 +938,8 @@ export default function CreateEvent() {
               className={`tx-12 lh-18  block text-right 
               ${title.length >= 120 ? "text-red-500" : "text-secondary"}`}
             >
-              {120 - title.length} {t("createEvent.characterLeft")}
+              {120 - title.length}{" "}
+              {t("createEvent.characterLeft", "characters left")}
             </span>
           </div>
 
@@ -902,14 +972,15 @@ export default function CreateEvent() {
               className={`tx-12 lh-18  block text-right 
               ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
             >
-              {500 - description.length} {t("createEvent.characterLeft")}
+              {500 - description.length}{" "}
+              {t("createEvent.characterLeft", "characters left")}
             </span>
           </div>
 
           {/* Hashtags */}
           <div>
             <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-              {t("createEvent.hashtags")}
+              {t("createEvent.hashtags", "Hashtags")}
             </label>
 
             <div
@@ -969,15 +1040,15 @@ export default function CreateEvent() {
               className={cn("tx-12 lh-18 block text-right", "text-secondary")}
             >
               {hashtagList.length >= MAX_TAGS
-                ? "Max 3 hashtags"
-                : `${hashtagCharsLeft} ${t("createEvent.characterLeft")}`}
+                ? t("createEvent.maxHashtags", "Max 3 hashtags")
+                : `${hashtagCharsLeft} ${t("createEvent.characterLeft", "characters left")}`}
             </span>
           </div>
 
           {/* Response type */}
           <div>
             <p className="tx-14 lh-20 fw-m text-primary mb-2">
-              {t("createEvent.responseType")}
+              {t("createEvent.responseType", "Response Type")}
               <span className="text-(--color-orange-500)">*</span>
             </p>
             <div className="space-y-2">
@@ -991,7 +1062,10 @@ export default function CreateEvent() {
                 />
                 <span>{t("createEvent.responseTypeOptions.1.label")}</span>
                 <Tooltip
-                  title={t("createEvent.singleChoiceTooltip", "Participants choose one option from a list you create.")}
+                  title={t(
+                    "createEvent.singleChoiceTooltip",
+                    "Participants choose one option from a list you create.",
+                  )}
                   placement="top"
                   color="white"
                   {...singleChoiceTooltip.tooltipProps}
@@ -1014,7 +1088,10 @@ export default function CreateEvent() {
                 />
                 <span>{t("createEvent.responseTypeOptions.0.label")}</span>
                 <Tooltip
-                  title={t("createEvent.openEndedTooltip", "Participants can submit their own responses.")}
+                  title={t(
+                    "createEvent.openEndedTooltip",
+                    "Participants can submit their own responses.",
+                  )}
                   placement="top"
                   color="white"
                   {...openEndedTooltip.tooltipProps}
@@ -1172,7 +1249,11 @@ export default function CreateEvent() {
               placeholder={
                 isRewarded
                   ? t("createEvent.enterHoursMin", "Enter hours (Min 1)")
-                  : t("createEvent.freeHours", "First {{hours}} hours are free", { hours: params?.free_hours })
+                  : t(
+                      "createEvent.freeHours",
+                      "First {{hours}} hours are free",
+                      { hours: params?.free_hours },
+                    )
               }
               className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
@@ -1262,9 +1343,17 @@ export default function CreateEvent() {
               </p>
               <p className="tx-12 lh-18 text-white">
                 {maxRecipients !== null && maxRecipients > 0
-                  ? `The reward will be distributed to up to ${maxRecipients} address${
-                      maxRecipients === 1 ? "" : "es"
-                    }`
+                  ? maxRecipients === 1
+                    ? t(
+                        "createEvent.rewardDistributionText",
+                        "The reward will be distributed to up to {{count}} address",
+                        { count: maxRecipients },
+                      )
+                    : t(
+                        "createEvent.rewardDistributionTextPlural",
+                        "The reward will be distributed to up to {{count}} addresses",
+                        { count: maxRecipients },
+                      )
                   : "--"}
               </p>
             </div>
@@ -1331,7 +1420,10 @@ export default function CreateEvent() {
                   setPreheatHours(numbersOnly);
                 }
               }}
-              placeholder={t("createEvent.enterHoursMax", "Enter hours (max 720)")}
+              placeholder={t(
+                "createEvent.enterHoursMax",
+                "Enter hours (max 720)",
+              )}
               className={cn(
                 "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
                 preheatHoursValidation.error
@@ -1349,7 +1441,9 @@ export default function CreateEvent() {
 
           {/* Preheat fee */}
           <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-1">{t("createEvent.preheatFee", "Preheat fee:")}</p>
+            <p className="tx-14 lh-20 fw-m text-primary mb-1">
+              {t("createEvent.preheatFee", "Preheat fee:")}
+            </p>
             <p className="tx-12 lh-18 dark:text-white text-black">
               {preheatFeeDisplay}
             </p>
@@ -1418,7 +1512,9 @@ export default function CreateEvent() {
               className="sm:w-[160px]"
               disabled={isPreviewDisabled}
             >
-              {isSubmitting ? t("createEvent.submitting", "Submitting…") : t("createEvent.preview", "Preview")}
+              {isSubmitting
+                ? t("createEvent.submitting", "Submitting…")
+                : t("createEvent.preview", "Preview")}
             </Button>
           </div>
         </form>

@@ -81,7 +81,28 @@
     "platformFee": "Platform fee:",
     "preheatFee": "Preheat fee:",
     "singleChoiceTooltip": "Participants choose one option from a list you create.",
-    "openEndedTooltip": "Participants can submit their own responses."
+    "openEndedTooltip": "Participants can submit their own responses.",
+    "addressChecking": "Checking…",
+    "addressValid": "Valid ({{type}})",
+    "addressInvalid": "Invalid address.",
+    "invalidBitcoinAddress": "Invalid Bitcoin address.",
+    "addressWrongNetwork": "Address is for {{network}}, not {{expected}}.",
+    "invalidBitcoinAddressNetwork": "Invalid Bitcoin address ({{network}}).",
+    "alertInvalidAddress": "Please enter a valid Bitcoin address ({{network}}).",
+    "alertInvalidDuration": "Please enter a valid duration.",
+    "alertInvalidPreheatHours": "Please enter a valid preheat hours (between 1 and 720 hours).",
+    "alertNoOptions": "Please enter at least one option for single-choice events.",
+    "errorEnterRewardAmount": "Please enter reward amount",
+    "errorInvalidRewardAmount": "Please enter a valid reward amount",
+    "errorMinimumReward": "Minimum {{min}} BTC",
+    "errorEnterPreheatHours": "Please enter preheat hours",
+    "errorInvalidNumber": "Please enter a valid number",
+    "errorMaxPreheatHours": "Maximum preheat hours is 720",
+    "errorMinPreheatHours": "Minimum preheat hours is 1",
+    "errorAtLeastOneOption": "At least one option is required",
+    "maxHashtags": "Max 3 hashtags",
+    "rewardDistributionText": "The reward will be distributed to up to {{count}} address",
+    "rewardDistributionTextPlural": "The reward will be distributed to up to {{count}} addresses"
   },
   "confirmPay": {
     "paymentReceived": "Payment received. Please wait for confirmation.",
@@ -575,5 +596,8 @@
   "winnerTable": {
     "addressCopied": "Address copied",
     "failedToCopy": "Failed to copy"
+  },
+  "backendMessage": {
+    "eventActivated": "Event successfully activated"
   }
 }

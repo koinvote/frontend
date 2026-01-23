@@ -145,7 +145,11 @@ export function SearchAndFilter({
             onClick={toggleOrder}
             className="flex items-center justify-center w-9 h-full border-r 
             border-border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer"
-            aria-label={order === "desc" ? t("searchFilter.sortDesc", "Sort descending") : t("searchFilter.sortAsc", "Sort ascending")}
+            aria-label={
+              order === "desc"
+                ? t("searchFilter.sortDesc", "Sort descending")
+                : t("searchFilter.sortAsc", "Sort ascending")
+            }
           >
             {order === "desc" ? (
               <SortDescIcon className="w-4 h-4" />
@@ -166,7 +170,9 @@ export function SearchAndFilter({
               hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors rounded-r-lg text-center"
             >
               <span className="text-sm font-medium text-primary capitalize">
-                {sortBy}
+                {sortBy === "balance"
+                  ? t("searchFilter.balance", "Balance")
+                  : t("searchFilter.time", "Time")}
               </span>
               <ArrowDownIcon
                 className={`w-2 h-2 text-secondary transition-transform duration-200 ${
@@ -241,7 +247,9 @@ export function SearchAndFilter({
                     className={`w-3 h-3 ${styles["on-chain-icon"]}`}
                     style={{ transform: `rotate(${spinDeg}deg)` }}
                   />
-                  <span className="w-16">{t("searchFilter.onChain", "On-chain")}</span>
+                  <span className="w-16">
+                    {t("searchFilter.onChain", "On-chain")}
+                  </span>
                 </>
               ) : (
                 <>
@@ -249,7 +257,9 @@ export function SearchAndFilter({
                     className={`w-3 h-3 ${styles["on-chain-icon"]}`}
                     style={{ transform: `rotate(${spinDeg}deg)` }}
                   />
-                  <span className="w-16">{t("searchFilter.snapshot", "Snapshot")}</span>
+                  <span className="w-16">
+                    {t("searchFilter.snapshot", "Snapshot")}
+                  </span>
                 </>
               )}
             </Button>
