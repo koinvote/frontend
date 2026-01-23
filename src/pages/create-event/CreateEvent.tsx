@@ -126,8 +126,7 @@ export default function CreateEvent() {
   });
   const enablePreheatTooltip = useTooltipWithClick();
 
-  const ACTIVE_BTC_NETWORK =
-    import.meta.env.MODE === "development" ? Network.mainnet : Network.testnet;
+  const ACTIVE_BTC_NETWORK = Network.mainnet;
 
   const networkLabel =
     ACTIVE_BTC_NETWORK === Network.mainnet ? "mainnet" : "testnet";
@@ -229,7 +228,7 @@ export default function CreateEvent() {
         (draft.hashtags ?? "")
           .split(/[,\s]+/g)
           .map((s) => s.trim())
-          .filter(Boolean)
+          .filter(Boolean),
       );
       setEventType(draft.eventType ?? "single_choice");
       setIsRewarded(draft.isRewarded ?? true);
@@ -917,7 +916,7 @@ export default function CreateEvent() {
               className={cn(
                 "w-full rounded-xl border border-border bg-white px-3 py-2",
                 "flex flex-wrap items-center gap-2",
-                "focus-within:ring-2 focus-within:ring-(--color-orange-500)"
+                "focus-within:ring-2 focus-within:ring-(--color-orange-500)",
               )}
               onMouseDown={(e) => {
                 // 點容器時讓 input focus（但不影響點 X）
@@ -925,7 +924,7 @@ export default function CreateEvent() {
                 if (target.closest("[data-chip-remove]")) return;
                 (
                   e.currentTarget.querySelector(
-                    "input"
+                    "input",
                   ) as HTMLInputElement | null
                 )?.focus();
               }}
@@ -936,7 +935,7 @@ export default function CreateEvent() {
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full",
                     "bg-surface text-primary border border-border",
-                    "px-3 py-1 tx-12 lh-18"
+                    "px-3 py-1 tx-12 lh-18",
                   )}
                 >
                   <span className="select-none">#{tag}</span>
@@ -961,7 +960,7 @@ export default function CreateEvent() {
                 className={cn(
                   "min-w-[120px] flex-1",
                   "bg-transparent outline-none",
-                  "tx-14 lh-20 text-black placeholder:text-secondary"
+                  "tx-14 lh-20 text-black placeholder:text-secondary",
                 )}
               />
             </div>
@@ -1075,7 +1074,7 @@ export default function CreateEvent() {
                       {canRemove && (
                         <div
                           className={cn(
-                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer"
+                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
                           )}
                           onClick={() => handleRemoveOption(index)}
                         >
@@ -1087,7 +1086,7 @@ export default function CreateEvent() {
                       {isLast && options.length < 5 && (
                         <div
                           className={cn(
-                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer"
+                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
                           )}
                           onClick={handleAddOption}
                         >
@@ -1229,7 +1228,7 @@ export default function CreateEvent() {
                     "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
                     rewardBtcValidation.error
                       ? "border-red-500 focus:ring-red-500"
-                      : "border-border focus:ring-(--color-orange-500)"
+                      : "border-border focus:ring-(--color-orange-500)",
                   )}
                 />
                 <Button
@@ -1337,7 +1336,7 @@ export default function CreateEvent() {
                 "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
                 preheatHoursValidation.error
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-(--color-orange-500)"
+                  : "border-border focus:ring-(--color-orange-500)",
               )}
               disabled={!enablePreheat}
             />
