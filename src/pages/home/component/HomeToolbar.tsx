@@ -44,16 +44,6 @@ export function HomeToolbar() {
     return () => clearTimeout(id);
   }, [search, setDebouncedSearch]);
 
-  const isPreheat = status === "preheat";
-  const isOngoing = status === "ongoing";
-  const isCompleted = status === "completed";
-
-  // const sortLabel = useMemo(
-  //   () =>
-  //     SORT_OPTIONS.find((opt) => opt.value === sortField)?.label ?? 'Time',
-  //   [sortField],
-  // )
-
   const toggleSortOrder = () => {
     const next: HomeSortOrder = sortOrder === "asc" ? "desc" : "asc";
     setSort(sortField, next);
@@ -68,6 +58,7 @@ export function HomeToolbar() {
     const fetchHotHashtags = async () => {
       try {
         const res = (await API.getHotHashtags({
+          tab: status,
           limit: 10,
         })) as unknown as ApiResponse<GetHotHashtagsRes>;
         if (res.success && res.data) {
@@ -82,7 +73,7 @@ export function HomeToolbar() {
       }
     };
     fetchHotHashtags();
-  }, []);
+  }, [status]);
 
   const handleHashtagClick = (tag: string) => {
     if (activeHashtag && activeHashtag.toLowerCase() === tag.toLowerCase()) {
@@ -97,7 +88,6 @@ export function HomeToolbar() {
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
         <Segmented<HomeStatusFilter>
           size="large"
-          className=""
           styles={{
             root: {
               border: "1px solid var(--color-border)",

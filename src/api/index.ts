@@ -2,31 +2,31 @@
 import http, { adminHttp, type RequestConf } from "./http.ts";
 
 import type {
+  AdminLoginReq,
   CreateEventReq,
+  GenerateReplyPlaintextReq,
   GetEventListReq,
   GetListRepliesReq,
-  AdminLoginReq,
+  SubmitReplyReq,
+  SubscribeReq,
   UpdateSystemParametersReq,
   VerifySignatureReq,
-  SubmitReplyReq,
-  GenerateReplyPlaintextReq,
-  SubscribeReq,
 } from "./request.ts";
 
 import type {
-  SystemConfigRes,
-  EventDataRes,
-  GetEventListRes,
-  EventDetailDataRes,
-  GetSignaturePlainTextRes,
-  VerifySignatureRes,
-  DepositStatusRes,
-  GetReplyPlainTextRes,
-  GetListRepliesRes,
-  GetHotHashtagsRes,
   AdminLoginRes,
   AdminSystemParametersRes,
+  DepositStatusRes,
+  EventDataRes,
+  EventDetailDataRes,
+  GetEventListRes,
+  GetHotHashtagsRes,
+  GetListRepliesRes,
+  GetReplyPlainTextRes,
+  GetSignaturePlainTextRes,
   PayoutReportRes,
+  SystemConfigRes,
+  VerifySignatureRes,
 } from "./response.ts";
 
 export function get<R = unknown, D = unknown>(path: string) {
@@ -84,7 +84,7 @@ export const API = {
   getEventDetail: (eventId: string) =>
     get<ApiResponse<EventDetailDataRes>, void>(`/events/${eventId}`),
 
-  getHotHashtags: get<ApiResponse<GetHotHashtagsRes>, { limit: number }>(
+  getHotHashtags: get<ApiResponse<GetHotHashtagsRes>, { limit: number, tab: string }>(
     "hot-hashtags"
   ),
 
