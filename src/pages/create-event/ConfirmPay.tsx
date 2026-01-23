@@ -1,22 +1,24 @@
-import { useLocation, useNavigate, useParams } from "react-router";
-import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import { Divider } from "antd";
-import { Button } from "@/components/base/Button";
-import { useToast } from "@/components/base/Toast/useToast";
-import type { EventType } from "@/api/types";
-import { DepositStatus } from "@/api/types";
-import { API } from "@/api";
-import type { ApiResponse } from "@/api";
-import type { DepositStatusRes } from "@/api/response";
-import CopyIcon from "@/assets/icons/copy.svg?react";
-import BTCIcon from "@/assets/icons/btc.svg?react";
-import { useSystemParametersStore } from "@/stores/systemParametersStore";
-import { useHomeStore } from "@/stores/homeStore";
-import { satsToBtc, formatDepositCountdown } from "@/utils/formatter";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
-import { useDebouncedClick } from "@/utils/helper";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate, useParams } from "react-router";
+
+import type { ApiResponse } from "@/api";
+import { API } from "@/api";
+import type { DepositStatusRes } from "@/api/response";
+import type { EventType } from "@/api/types";
+import { DepositStatus } from "@/api/types";
+import BTCIcon from "@/assets/icons/btc.svg?react";
+import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import CopyIcon from "@/assets/icons/copy.svg?react";
+import { Button } from "@/components/base/Button";
+import { useToast } from "@/components/base/Toast/useToast";
+import { useHomeStore } from "@/stores/homeStore";
+import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { formatDepositCountdown, satsToBtc } from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
 
 dayjs.extend(utc);
 
@@ -56,6 +58,7 @@ export default function ConfirmPay() {
   const state = location.state as PreviewEventState | undefined;
   const { showToast } = useToast();
   const { setStatus } = useHomeStore();
+  const { t } = useTranslation();
 
   const systemParams = useSystemParametersStore((s) => s.params);
 
@@ -70,7 +73,7 @@ export default function ConfirmPay() {
   }, [systemParams]);
 
   const [depositStatus, setDepositStatus] = useState<DepositStatusRes | null>(
-    null
+    null,
   );
 
   // console.log("ConfirmPay Render:", {
@@ -86,6 +89,7 @@ export default function ConfirmPay() {
   const hasNavigatedRef = useRef(false);
   const depositStatusRef = useRef<DepositStatusRes | null>(null);
   const hardcodedTimeoutRef = useRef<string | null>(null); // Store hardcoded timeout for checkDepositStatus
+  const hasShownUnconfirmedToastRef = useRef(false); // Track if unconfirmed toast has been shown
 
   // Update refs when state changes
   useEffect(() => {
@@ -137,7 +141,7 @@ export default function ConfirmPay() {
     try {
       isCheckingStatusRef.current = true;
       const response = (await API.getDepositStatus(
-        eventId
+        eventId,
       )()) as unknown as ApiResponse<DepositStatusRes>;
 
       if (!response.success || !response.data) {
@@ -159,9 +163,18 @@ export default function ConfirmPay() {
         }
       }
 
-      // UNCONFIRMED: show toast, wait for confirmation, keep polling
+      // UNCONFIRMED: show toast once, wait for confirmation, keep polling
       if (statusData.status === DepositStatus.UNCONFIRMED) {
-        showToast("success", "Payment received. Please wait for confirmation.");
+        if (!hasShownUnconfirmedToastRef.current) {
+          showToast(
+            "success",
+            t(
+              "confirmPay.paymentReceived",
+              "Payment received. Please wait for confirmation.",
+            ),
+          );
+          hasShownUnconfirmedToastRef.current = true;
+        }
         return;
       }
 

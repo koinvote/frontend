@@ -67,6 +67,9 @@
     "rewardBtcPlaceholderEnabled": "Enter reward (Min {{min}})",
     "optionPlaceholder": "Option {{n}}"
   },
+  "confirmPay": {
+    "paymentReceived": "Payment received. Please wait for confirmation."
+  },
   "verificationTool": {
     "title": "Verification Guide",
     "description": "How to independently verify events and receipts using open-source tools",

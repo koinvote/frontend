@@ -1,5 +1,6 @@
 // MSW handlers for API mocking
 import type { ApiResponse } from "@/api";
+import { DepositStatus } from "@/api/types";
 import { http, HttpResponse } from "msw";
 import {
   mockAdminSystemParameters,
@@ -15,6 +16,7 @@ import {
 } from "./data";
 
 const API_BASE_URL = "/api/v1";
+let DEPOSIT_STATUS_CALL_COUNT = 0;
 
 export const handlers = [
   // GET /system/parameters - Get system configuration
@@ -52,7 +54,7 @@ export const handlers = [
       filteredEvents = filteredEvents.filter(
         (e) =>
           e.title.toLowerCase().includes(search.toLowerCase()) ||
-          e.description.toLowerCase().includes(search.toLowerCase())
+          e.description.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
@@ -79,6 +81,9 @@ export const handlers = [
 
   // GET /events/:eventId - Get event detail
   http.get(`${API_BASE_URL}/events/:eventId`, ({ params }) => {
+    if (DEPOSIT_STATUS_CALL_COUNT >= 20) {
+      DEPOSIT_STATUS_CALL_COUNT = 0;
+    }
     const { eventId } = params;
 
     // Find matching event from list or return default detail
@@ -172,7 +177,7 @@ export const handlers = [
           timestamp: Date.now(),
         },
       });
-    }
+    },
   ),
 
   // POST /events/:eventId/verify-signature - Verify signature
@@ -193,11 +198,12 @@ export const handlers = [
           status: "activated",
         },
       });
-    }
+    },
   ),
 
   // GET /events/:eventId/deposit-status - Get deposit status
   http.get(`${API_BASE_URL}/events/:eventId/deposit-status`, ({ params }) => {
+    DEPOSIT_STATUS_CALL_COUNT += 1;
     const { eventId } = params;
 
     return HttpResponse.json<ApiResponse<typeof mockDepositStatus>>({
@@ -206,6 +212,12 @@ export const handlers = [
       message: null,
       data: {
         ...mockDepositStatus,
+        status:
+          DEPOSIT_STATUS_CALL_COUNT < 10
+            ? DepositStatus.PENDING
+            : DEPOSIT_STATUS_CALL_COUNT < 20
+              ? DepositStatus.UNCONFIRMED
+              : DepositStatus.RECEIVED,
         event_id: eventId as string,
       },
     });
@@ -226,19 +238,19 @@ export const handlers = [
       replies = replies.filter(
         (r) =>
           r.content?.toLowerCase().includes(search.toLowerCase()) ||
-          r.btc_address.toLowerCase().includes(search.toLowerCase())
+          r.btc_address.toLowerCase().includes(search.toLowerCase()),
       );
     }
 
     // Sort by balance or time
     if (sortBy === "balance") {
       replies.sort(
-        (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi
+        (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
       );
     } else if (sortBy === "time") {
       replies.sort(
         (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       );
     }
 
@@ -349,7 +361,7 @@ export const handlers = [
       const planId = url.searchParams.get("plan_id");
 
       console.log(
-        `[Mock] Generating verification CSV for event ${eventId}, plan ${planId}`
+        `[Mock] Generating verification CSV for event ${eventId}, plan ${planId}`,
       );
 
       // Create a Blob from CSV content
@@ -365,7 +377,7 @@ export const handlers = [
           "Content-Disposition": `attachment; filename="payout_verification_${eventId}.csv"`,
         },
       });
-    }
+    },
   ),
 
   // POST /subscribe - Subscribe to email notifications
