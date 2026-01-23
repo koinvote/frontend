@@ -340,5 +340,17 @@
     "bitcoinAddress": "Bitcoin Address",
     "bitcoinSignature": "Bitcoin Signature",
     "plaintext": "Plaintext"
+  },
+  "subscribe": {
+    "title": "Don't Miss Any Chance to Earn Bitcoin",
+    "description": "Enter your email and you'll be notified whenever a new reward event is created.",
+    "emailPlaceholder": "Enter your email address...",
+    "button": "Subscribe",
+    "subscribing": "Subscribing",
+    "errorEmpty": "Please enter your email address",
+    "errorInvalid": "Please enter a valid email address",
+    "errorFailed": "Subscription failed. Please try again.",
+    "successMessageTitle": "Subscription successful.",
+    "successMessageDescription": "You'll be notified when new reward events go live."
   }
 }
