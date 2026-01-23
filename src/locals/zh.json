@@ -396,7 +396,7 @@
     "failedToCopy": "複製 {{label}} 失敗",
     "failedToLoadReplies": "無法載入回覆",
     "unknownError": "未知錯誤",
-    "noRepliesFound": "沒有找到回覆",
+    "noRepliesYet": "尚未收到回覆",
     "hashCopiedToClipboard": "Hash 已複製到剪貼簿",
     "failedToCopyHash": "複製 Hash 失敗",
     "option": "選項 {{optionId}}",

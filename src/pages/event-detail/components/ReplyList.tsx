@@ -40,7 +40,7 @@ interface ReplyListProps {
 function truncateAddress(
   address: string,
   startLength = 6,
-  endLength = 4
+  endLength = 4,
 ): string {
   if (address.length <= startLength + endLength) {
     return address;
@@ -100,13 +100,13 @@ export function ReplyList({
         "success",
         t("replyList.copiedToClipboard", "{{label}} copied to clipboard", {
           label,
-        })
+        }),
       );
     } catch (error) {
       console.error(`Failed to copy ${label}:`, error);
       showToast(
         "error",
-        t("replyList.failedToCopy", "Failed to copy {{label}}", { label })
+        t("replyList.failedToCopy", "Failed to copy {{label}}", { label }),
       );
     }
   });
@@ -136,7 +136,7 @@ export function ReplyList({
     return (
       <div className="flex items-center justify-center min-h-[200px]">
         <p className="text-secondary">
-          {t("replyList.noRepliesFound", "No replies found")}
+          {t("replyList.noRepliesYet", "No replies yet")}
         </p>
       </div>
     );
@@ -217,13 +217,13 @@ function ReplyItem({
       await navigator.clipboard.writeText(contentHash);
       showToast(
         "success",
-        t("replyList.hashCopiedToClipboard", "Hash copied to clipboard")
+        t("replyList.hashCopiedToClipboard", "Hash copied to clipboard"),
       );
     } catch (error) {
       console.error("Failed to copy hash:", error);
       showToast(
         "error",
-        t("replyList.failedToCopyHash", "Failed to copy hash")
+        t("replyList.failedToCopyHash", "Failed to copy hash"),
       );
     }
   });
@@ -260,7 +260,7 @@ function ReplyItem({
     // Handle EventOption[]
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const foundOption = (options as any[]).find((opt) =>
-      typeof opt === "object" ? opt.id === optionId : false
+      typeof opt === "object" ? opt.id === optionId : false,
     );
 
     if (foundOption) return foundOption.option_text;
@@ -299,7 +299,7 @@ function ReplyItem({
                 <Tooltip
                   title={t(
                     "replyList.signatureVerificationValid",
-                    "Signature verification valid"
+                    "Signature verification valid",
                   )}
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
@@ -316,7 +316,7 @@ function ReplyItem({
                 <Tooltip
                   title={t(
                     "replyList.signatureVoid",
-                    "This address submitted a new signature before the deadline; this signature is void."
+                    "This address submitted a new signature before the deadline; this signature is void.",
                   )}
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
@@ -334,7 +334,7 @@ function ReplyItem({
                 <Tooltip
                   title={t(
                     "replyList.tapToCopyHash",
-                    "Tap to copy SHA-256 hash"
+                    "Tap to copy SHA-256 hash",
                   )}
                   placement={isDesktop ? "top" : "bottom"}
                   color="white"
