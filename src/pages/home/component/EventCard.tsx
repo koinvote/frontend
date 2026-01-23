@@ -7,6 +7,7 @@ import utc from "dayjs/plugin/utc";
 import { useToast } from "@/components/base/Toast/useToast";
 import { Tooltip } from "antd";
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { satsToBtc, formatOngoingCountdown } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
@@ -23,7 +24,10 @@ interface EventCardProps {
   onClick?: () => void;
 }
 
-function formatCountdown(event: EventSummary) {
+function formatCountdown(
+  event: EventSummary,
+  t: (key: string, defaultValue: string, options?: Record<string, unknown>) => string
+) {
   if (event.status === EventStatus.ACTIVE) {
     return formatOngoingCountdown(event.deadline_at);
   }
@@ -36,7 +40,7 @@ function formatCountdown(event: EventSummary) {
     const startAt = event.started_at
       ? dayjs.utc(event.started_at)
       : dayjs.utc(event.deadline_at); // fallback 防呆
-    if (startAt.isBefore(now)) return "Starting soon";
+    if (startAt.isBefore(now)) return t("eventCard.startingSoon", "Starting soon");
     const diffMs = startAt.diff(now);
     const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
     const days = Math.floor(totalSeconds / 86400);
@@ -45,15 +49,15 @@ function formatCountdown(event: EventSummary) {
     const seconds = totalSeconds % 60;
 
     if (days > 0) {
-      return `Starts in ${days}d ${hours}h ${minutes}m ${seconds}s`;
+      return t("eventCard.startsInDays", "Starts in {{days}}d {{hours}}h {{minutes}}m {{seconds}}s", { days, hours, minutes, seconds });
     }
     if (hours > 0) {
-      return `Starts in ${hours}h ${minutes}m ${seconds}s`;
+      return t("eventCard.startsInHours", "Starts in {{hours}}h {{minutes}}m {{seconds}}s", { hours, minutes, seconds });
     }
     if (minutes > 0) {
-      return `Starts in ${minutes}m ${seconds}s`;
+      return t("eventCard.startsInMinutes", "Starts in {{minutes}}m {{seconds}}s", { minutes, seconds });
     }
-    return `Starts in ${seconds}s`;
+    return t("eventCard.startsInSeconds", "Starts in {{seconds}}s", { seconds });
   }
 
   // COMPLETED //
@@ -66,13 +70,13 @@ function formatCountdown(event: EventSummary) {
 
       if (diffDays < 1) {
         const hours = now.diff(ended, "hour");
-        return `${hours}h ago`;
+        return t("eventCard.hoursAgo", "{{hours}}h ago", { hours });
       }
       if (diffDays < 7) {
-        return `${diffDays}d ago`;
+        return t("eventCard.daysAgo", "{{days}}d ago", { days: diffDays });
       }
       const weeks = Math.floor(diffDays / 7);
-      return `${weeks}w ago`;
+      return t("eventCard.weeksAgo", "{{weeks}}w ago", { weeks });
     }
     // If no ended_at, use deadline_at as fallback
     // 確保將服務器返回的 UTC 時間正確解析為 UTC
@@ -82,18 +86,18 @@ function formatCountdown(event: EventSummary) {
       const diffDays = now.diff(deadline, "day");
       if (diffDays < 1) {
         const hours = now.diff(deadline, "hour");
-        return `${hours}h ago`;
+        return t("eventCard.hoursAgo", "{{hours}}h ago", { hours });
       }
       if (diffDays < 7) {
-        return `${diffDays}d ago`;
+        return t("eventCard.daysAgo", "{{days}}d ago", { days: diffDays });
       }
       const weeks = Math.floor(diffDays / 7);
-      return `${weeks}w ago`;
+      return t("eventCard.weeksAgo", "{{weeks}}w ago", { weeks });
     }
-    return "Ended";
+    return t("eventCard.ended", "Ended");
   }
 
-  return "Ended";
+  return t("eventCard.ended", "Ended");
 }
 
 interface ReplyItemProps {
@@ -104,7 +108,7 @@ interface ReplyItemProps {
   };
 }
 
-function ReplyItem({ reply }: ReplyItemProps) {
+function ReplyItem({ reply, t }: ReplyItemProps & { t: (key: string, defaultValue: string) => string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showToggle, setShowToggle] = useState(false);
   const hasOverflowRef = useRef(false); // 使用 ref 记录是否曾经溢出，避免依赖问题
@@ -190,9 +194,9 @@ function ReplyItem({ reply }: ReplyItemProps) {
       </p>
       <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
         <div className="flex items-center justify-end gap-2 md:gap-2">
-          <span>Weight: {Number(reply.weight_percent.toFixed(2))}%</span>
+          <span>{t("eventCard.weight", "Weight:")} {Number(reply.weight_percent.toFixed(2))}%</span>
           <span>
-            Amount:{" "}
+            {t("eventCard.amount", "Amount:")}{" "}
             {satsToBtc(parseFloat(reply.amount_satoshi || "0"), {
               suffix: false,
             })}{" "}
@@ -206,8 +210,10 @@ function ReplyItem({ reply }: ReplyItemProps) {
 
 function SingleChoiceOptions({
   options,
+  t,
 }: {
   options: EventOption[] | string[];
+  t: (key: string, defaultValue: string) => string;
 }) {
   const sortedOptions = useMemo(() => {
     const allObjects =
@@ -243,10 +249,10 @@ function SingleChoiceOptions({
       onClick={handleToggle}
     >
       <div className="mb-1 text-[11px] md:text-xs text-secondary flex items-center justify-between">
-        <span>{sortedOptions.length > 1 ? "Options" : "Option"}</span>
+        <span>{sortedOptions.length > 1 ? t("eventCard.options", "Options") : t("eventCard.option", "Option")}</span>
         {hasMore && (
           <span className="flex items-center gap-1">
-            {isExpanded ? "View less" : "View all"}
+            {isExpanded ? t("eventCard.viewLess", "View less") : t("eventCard.viewAll", "View all")}
           </span>
         )}
       </div>
@@ -263,10 +269,10 @@ function SingleChoiceOptions({
                 {typeof opt !== "string" && (
                   <>
                     <span>
-                      Weight: {Number(opt.weight_percent.toFixed(2))}%
+                      {t("eventCard.weight", "Weight:")} {Number(opt.weight_percent.toFixed(2))}%
                     </span>
                     <span>
-                      Amount:{" "}
+                      {t("eventCard.amount", "Amount:")}{" "}
                       {satsToBtc(opt.total_stake_satoshi, {
                         suffix: false,
                       })}{" "}
@@ -285,11 +291,12 @@ function SingleChoiceOptions({
 
 export function EventCard({ event, onClick }: EventCardProps) {
   const { showToast } = useToast();
-  const [countdown, setCountdown] = useState(() => formatCountdown(event));
+  const { t } = useTranslation();
+  const [countdown, setCountdown] = useState(() => formatCountdown(event, t));
 
   useEffect(() => {
     const updateCountdown = () => {
-      setCountdown(formatCountdown(event));
+      setCountdown(formatCountdown(event, t));
     };
 
     updateCountdown();
@@ -304,7 +311,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
     );
 
     return () => clearInterval(interval);
-  }, [event]);
+  }, [event, t]);
 
   const { isDesktop } = useHomeStore();
 
@@ -395,10 +402,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
     const eventUrl = `${window.location.origin}/event/${event.event_id}`;
     try {
       await navigator.clipboard.writeText(eventUrl);
-      showToast("success", "Copied URL to clipboard");
+      showToast("success", t("eventCard.copiedUrl", "Copied URL to clipboard"));
     } catch (error) {
       console.error("Failed to copy URL:", error);
-      showToast("error", "Failed to copy URL");
+      showToast("error", t("eventCard.failedToCopy", "Failed to copy URL"));
     }
   });
 
@@ -430,8 +437,8 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <Tooltip
             title={
               event.status === EventStatus.PREHEAT
-                ? "Replies open after the countdown ends."
-                : "After the countdown, this reward will be distributed"
+                ? t("eventCard.repliesOpenTooltip", "Replies open after the countdown ends.")
+                : t("eventCard.rewardDistributionTooltip", "After the countdown, this reward will be distributed")
             }
             placement={isDesktop ? "topRight" : "bottomLeft"}
             color="white"
@@ -490,7 +497,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
             className="mt-1 text-xs md:text-sm cursor-pointer"
             onClick={handleDescriptionToggle}
           >
-            {isDescriptionExpanded ? "Show less" : "Show more"}
+            {isDescriptionExpanded ? t("eventCard.showLess", "Show less") : t("eventCard.showMore", "Show more")}
           </button>
         )}
       </div>
@@ -499,7 +506,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       {event.event_type === "single_choice" &&
       event.options &&
       event.options.length > 0 ? (
-        <SingleChoiceOptions options={event.options} />
+        <SingleChoiceOptions options={event.options} t={t} />
       ) : (
         (primaryReply || secondaryReply) && (
           <section
@@ -508,16 +515,16 @@ export function EventCard({ event, onClick }: EventCardProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-1 text-[11px] md:text-xs text-secondary">
-              Top reply
+              {t("eventCard.topReply", "Top reply")}
             </div>
 
-            {primaryReply && <ReplyItem reply={primaryReply} />}
+            {primaryReply && <ReplyItem reply={primaryReply} t={t} />}
 
             {primaryReply && secondaryReply && (
               <div className="my-1 border-t border-border" />
             )}
 
-            {secondaryReply && <ReplyItem reply={secondaryReply} />}
+            {secondaryReply && <ReplyItem reply={secondaryReply} t={t} />}
           </section>
         )
       )}
@@ -528,7 +535,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
           /* Mobile Layout: Three items distributed evenly */
           <div className="flex items-center justify-between">
             <Tooltip
-              title="Total participation addresses"
+              title={t("eventCard.totalAddresses", "Total participation addresses")}
               placement="topLeft"
               color="white"
               {...participantsTooltipProps}
@@ -551,7 +558,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
               </div>
             </Tooltip>
             <Tooltip
-              title="Total participation amount"
+              title={t("eventCard.totalAmount", "Total participation amount")}
               placement="top"
               color="white"
               {...amountTooltipProps}
@@ -575,7 +582,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Tooltip
-                title="Total participation addresses"
+                title={t("eventCard.totalAddresses", "Total participation addresses")}
                 placement="topLeft"
                 color="white"
                 {...participantsTooltipProps}
@@ -593,12 +600,12 @@ export function EventCard({ event, onClick }: EventCardProps) {
                   </span>
                   <span>
                     {event.participants_count}
-                    <span className="hidden md:inline"> participants</span>
+                    <span className="hidden md:inline"> {t("eventCard.participants", "participants")}</span>
                   </span>
                 </div>
               </Tooltip>
               <Tooltip
-                title="Total participation amount"
+                title={t("eventCard.totalAmount", "Total participation amount")}
                 placement="top"
                 color="white"
                 {...amountTooltipProps}
@@ -610,7 +617,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
                   <span>₿</span>
                   <span>
                     {event.total_stake_btc}
-                    <span className="hidden md:inline"> BTC total</span>
+                    <span className="hidden md:inline"> {t("eventCard.btcTotal", "BTC total")}</span>
                   </span>
                 </div>
               </Tooltip>

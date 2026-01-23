@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate, useParams } from "react-router";
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import { Button } from "@/components/base/Button";
 import { Loading } from "@/components/base/Loading";
@@ -37,6 +38,7 @@ function formatTimeRemaining(seconds: number): string {
 }
 
 export default function ConfirmSign() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { eventId: eventIdParam } = useParams<{ eventId: string }>();
@@ -158,28 +160,28 @@ export default function ConfirmSign() {
 
     try {
       navigator.clipboard.writeText(plaintext);
-      showToast("success", "Plaintext copied to clipboard");
+      showToast("success", t("confirmSign.plaintextCopied", "Plaintext copied to clipboard"));
     } catch (error) {
       console.error("Failed to copy:", error);
-      showToast("error", "Failed to copy plaintext");
+      showToast("error", t("confirmSign.failedToCopyPlaintext", "Failed to copy plaintext"));
     }
-  }, [plaintext, showToast]);
+  }, [plaintext, showToast, t]);
 
   const handleSubmit = useCallback(async () => {
     if (!signature.trim()) {
-      showToast("error", "Please enter a signature");
+      showToast("error", t("confirmSign.pleaseEnterSignature", "Please enter a signature"));
       return;
     }
 
     if (!eventId) {
-      showToast("error", "Event not initialized. Please refresh the page.");
+      showToast("error", t("confirmSign.eventNotInitialized", "Event not initialized. Please refresh the page."));
       return;
     }
 
     if (countdown <= 0) {
       showToast(
         "error",
-        "Plaintext has expired. Please go back and try again."
+        t("confirmSign.plaintextExpiredToast", "Plaintext has expired. Please go back and try again.")
       );
       return;
     }
@@ -257,7 +259,7 @@ export default function ConfirmSign() {
     } finally {
       setIsLoading(false);
     }
-  }, [signature, eventId, countdown, showToast, setStatus, navigate]);
+  }, [signature, eventId, countdown, showToast, setStatus, navigate, t]);
 
   // Handle Enter key to submit
   useEffect(() => {
@@ -313,11 +315,11 @@ export default function ConfirmSign() {
 
       <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
-          Confirm & Sign
+          {t("confirmSign.title", "Confirm & Sign")}
         </h1>
-        <p className="mt-1 tx-14 lh-20 text-white">Sign to submit your event</p>
+        <p className="mt-1 tx-14 lh-20 text-white">{t("confirmSign.subtitle", "Sign to submit your event")}</p>
         <p className="mt-1 tx-12 lh-18 text-secondary">
-          This step verifies you are a Bitcoiner
+          {t("confirmSign.verifyBitcoiner", "This step verifies you are a Bitcoiner")}
         </p>
 
         <div className="mt-6 space-y-6">
@@ -328,7 +330,7 @@ export default function ConfirmSign() {
                 <span className="tx-12 lh-18 fw-m text-black">1</span>
               </div>
               <h2 className="tx-16 lh-20 fw-m text-primary">
-                Your BTC Address
+                {t("confirmSign.yourBtcAddress", "Your BTC Address")}
               </h2>
             </div>
             <div className="space-y-2">
@@ -337,7 +339,7 @@ export default function ConfirmSign() {
                 value={btcAddress}
                 onChange={(e) => setBtcAddress(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 lh-20 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
-                placeholder="Enter your BTC address"
+                placeholder={t("confirmSign.enterBtcAddress", "Enter your BTC address")}
                 disabled={true}
               />
             </div>
@@ -350,7 +352,7 @@ export default function ConfirmSign() {
                 <span className="tx-12 lh-18 fw-m text-black">2</span>
               </div>
               <h2 className="tx-16 lh-20 fw-m text-primary">
-                Please Sign the Plaintext
+                {t("confirmSign.signPlaintext", "Please Sign the Plaintext")}
               </h2>
             </div>
 
@@ -358,7 +360,7 @@ export default function ConfirmSign() {
               <div className="flex items-center justify-center py-8">
                 <Loading size="md" />
                 <span className="ml-2 tx-14 text-secondary">
-                  Generating plaintext...
+                  {t("confirmSign.generatingPlaintext", "Generating plaintext...")}
                 </span>
               </div>
             ) : plaintext ? (
@@ -383,20 +385,20 @@ export default function ConfirmSign() {
                 {countdown > 0 ? (
                   <div className="flex items-center gap-2 text-green-500 tx-12 lh-18">
                     <ClockIcon className="w-4 h-4" />
-                    <span>Expired in {formatTimeRemaining(countdown)}</span>
+                    <span>{t("confirmSign.expiredIn", "Expired in {{time}}", { time: formatTimeRemaining(countdown) })}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-red-500 tx-12 lh-18">
                     <ClockIcon className="w-4 h-4" />
                     <span>
-                      This plaintext has expired. Please generate a new one.
+                      {t("confirmSign.plaintextExpired", "This plaintext has expired. Please generate a new one.")}
                     </span>
                   </div>
                 )}
               </div>
             ) : (
               <div className="tx-14 text-secondary">
-                Failed to generate plaintext. Please try again.
+                {t("confirmSign.failedPlaintext", "Failed to generate plaintext. Please try again.")}
               </div>
             )}
           </div>
@@ -407,10 +409,10 @@ export default function ConfirmSign() {
               <div className="w-6 h-6 rounded-full bg-admin-bg border border-border flex items-center justify-center shrink-0">
                 <span className="tx-12 lh-18 fw-m text-black">3</span>
               </div>
-              <h2 className="tx-16 lh-20 fw-m text-primary">Enter Signature</h2>
+              <h2 className="tx-16 lh-20 fw-m text-primary">{t("confirmSign.enterSignatureTitle", "Enter Signature")}</h2>
             </div>
             <div className="space-y-2">
-              <label className="tx-12 lh-18 text-secondary">Signature *</label>
+              <label className="tx-12 lh-18 text-secondary">{t("confirmSign.signatureLabel", "Signature")} *</label>
               <input
                 type="text"
                 value={signature}
@@ -424,9 +426,9 @@ export default function ConfirmSign() {
                     setSignatureSuccess("");
                   }
                 }}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 lh-20 
+                className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 lh-20
                 focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono"
-                placeholder="Enter your signature"
+                placeholder={t("confirmSign.enterSignature", "Enter your signature")}
                 disabled={!plaintext || countdown <= 0}
               />
               {signatureError && (
@@ -444,27 +446,27 @@ export default function ConfirmSign() {
         {/* Disclaimer */}
         <div className="mt-6 pt-4 border-t border-border">
           <p className="tx-12 lh-18 text-secondary">
-            By proceeding, you agree to the{" "}
+            {t("confirmSign.byProceeding", "By proceeding, you agree to the")}{" "}
             <Link to="/terms" className="text-(--color-orange-500) underline">
-              Terms of Service
+              {t("confirmSign.termsOfService", "Terms of Service")}
             </Link>
             ,{" "}
             <Link
               to="/terms-reward-distribution"
               className="text-(--color-orange-500) underline"
             >
-              Reward Distribution
+              {t("confirmSign.rewardDistribution", "Reward Distribution")}
             </Link>
             ,{" "}
             <Link to="/privacy" className="text-(--color-orange-500) underline">
-              Privacy Policy
+              {t("confirmSign.privacyPolicy", "Privacy Policy")}
             </Link>{" "}
-            and{" "}
+            {t("confirmSign.and", "and")}{" "}
             <Link
               to="/charges-refunds"
               className="text-(--color-orange-500) underline"
             >
-              Charges & Refunds
+              {t("confirmSign.chargesRefunds", "Charges & Refunds")}
             </Link>
             .
           </p>
@@ -481,7 +483,7 @@ export default function ConfirmSign() {
             onClick={() => navigate("/preview-event", { state })}
             disabled={isLoading}
           >
-            Back to Preview
+            {t("confirmSign.backToPreview", "Back to Preview")}
           </Button>
           <Button
             type="button"
@@ -501,10 +503,10 @@ export default function ConfirmSign() {
             {isLoading ? (
               <span className="flex items-center justify-center">
                 <Loading size="sm" className="mr-2" />
-                Submitting...
+                {t("confirmSign.submitting", "Submitting...")}
               </span>
             ) : (
-              "Submit Event"
+              t("confirmSign.submitEvent", "Submit Event")
             )}
           </Button>
         </div>

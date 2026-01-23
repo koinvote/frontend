@@ -145,7 +145,7 @@ export function SearchAndFilter({
             onClick={toggleOrder}
             className="flex items-center justify-center w-9 h-full border-r 
             border-border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer"
-            aria-label={order === "desc" ? "Sort descending" : "Sort ascending"}
+            aria-label={order === "desc" ? t("searchFilter.sortDesc", "Sort descending") : t("searchFilter.sortAsc", "Sort ascending")}
           >
             {order === "desc" ? (
               <SortDescIcon className="w-4 h-4" />
@@ -181,26 +181,26 @@ export function SearchAndFilter({
                 <button
                   type="button"
                   onClick={() => handleSortFieldChange(ReplySortBy.BALANCE)}
-                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50 
+                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50
                     dark:hover:bg-gray-900 transition-colors ${
                       sortBy === ReplySortBy.BALANCE
                         ? "text-accent font-medium bg-accent/5"
                         : "text-primary"
                     }`}
                 >
-                  Balance
+                  {t("searchFilter.balance", "Balance")}
                 </button>
                 <button
                   type="button"
                   onClick={() => handleSortFieldChange(ReplySortBy.TIME)}
-                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50 
+                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50
                     dark:hover:bg-gray-900 transition-colors ${
                       sortBy === ReplySortBy.TIME
                         ? "text-accent font-medium bg-accent/5"
                         : "text-primary"
                     }`}
                 >
-                  Time
+                  {t("searchFilter.time", "Time")}
                 </button>
               </div>
             )}
@@ -218,7 +218,7 @@ export function SearchAndFilter({
               onClick={handleRewardClick}
             >
               <PlusIcon className="w-3 h-3" />
-              Reward
+              {t("searchFilter.reward", "Reward")}
             </Button>
           )} */}
         {isCompleted && (
@@ -241,7 +241,7 @@ export function SearchAndFilter({
                     className={`w-3 h-3 ${styles["on-chain-icon"]}`}
                     style={{ transform: `rotate(${spinDeg}deg)` }}
                   />
-                  <span className="w-16">On-chain</span>
+                  <span className="w-16">{t("searchFilter.onChain", "On-chain")}</span>
                 </>
               ) : (
                 <>
@@ -249,7 +249,7 @@ export function SearchAndFilter({
                     className={`w-3 h-3 ${styles["on-chain-icon"]}`}
                     style={{ transform: `rotate(${spinDeg}deg)` }}
                   />
-                  <span className="w-16">Snapshot</span>
+                  <span className="w-16">{t("searchFilter.snapshot", "Snapshot")}</span>
                 </>
               )}
             </Button>

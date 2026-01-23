@@ -52,13 +52,13 @@ function formatBtcDisplay(btc: string): string {
 }
 
 export default function ConfirmPay() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { eventId } = useParams<{ eventId: string }>();
   const state = location.state as PreviewEventState | undefined;
   const { showToast } = useToast();
   const { setStatus } = useHomeStore();
-  const { t } = useTranslation();
 
   const systemParams = useSystemParametersStore((s) => s.params);
 
@@ -368,10 +368,16 @@ export default function ConfirmPay() {
     if (!address) return;
     try {
       await navigator.clipboard.writeText(address);
-      showToast("success", "Address copied to clipboard");
+      showToast(
+        "success",
+        t("confirmPay.addressCopied", "Address copied to clipboard"),
+      );
     } catch (error) {
       console.error("Failed to copy:", error);
-      showToast("error", "Failed to copy address");
+      showToast(
+        "error",
+        t("confirmPay.failedToCopy", "Failed to copy address"),
+      );
     }
   });
 
@@ -379,10 +385,19 @@ export default function ConfirmPay() {
     if (!amount) return;
     try {
       await navigator.clipboard.writeText(amount);
-      showToast("success", "Payment amount copied.");
+      showToast(
+        "success",
+        t("confirmPay.paymentAmountCopied", "Payment amount copied"),
+      );
     } catch (error) {
       console.error("Failed to copy:", error);
-      showToast("error", "Failed to copy payment amount");
+      showToast(
+        "error",
+        t(
+          "confirmPay.failedToCopyPaymentAmount",
+          "Failed to copy payment amount",
+        ),
+      );
     }
   });
 
@@ -440,13 +455,19 @@ export default function ConfirmPay() {
       </div>
       <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
-          Payment Instructions
+          {t("confirmPay.title", "Payment Instructions")}
         </h1>
         {!isDonation && !isWaitForRefund && !isExpired && (
           <p className="mt-1 tx-14 lh-20 text-secondary">
             {isUnconfirmed
-              ? "Waiting for confirmation 0/1 "
-              : "Please complete your payment within "}
+              ? t(
+                  "confirmPay.waitingConfirmation",
+                  "Waiting for confirmation 0/1 ",
+                )
+              : t(
+                  "confirmPay.completePaymentWithin",
+                  "Please complete your payment within ",
+                )}
             <span className="text-(--color-orange-500) font-medium">
               {countdownDisplay}
             </span>
@@ -457,15 +478,22 @@ export default function ConfirmPay() {
         {isExpired && (
           <div className="mt-6 space-y-4">
             <div className="tx-14 lh-20 text-primary">
-              This payment session has expired.
+              {t(
+                "confirmPay.sessionExpired",
+                "This payment session has expired.",
+              )}
             </div>
             <div className="tx-14 lh-20 text-primary">
-              Please return to Preview and submit again.
+              {t(
+                "confirmPay.returnToPreview",
+                "Please return to Preview and submit again.",
+              )}
             </div>
             <div className="tx-14 lh-20 text-primary">
-              If a payment is received after this session expires, it will be
-              automatically refunded to your refund address, minus applicable
-              network fees.
+              {t(
+                "confirmPay.expiredRefundNote",
+                "If a payment is received after this session expires, it will be automatically refunded to your refund address, minus applicable network fees.",
+              )}
             </div>
           </div>
         )}
@@ -474,22 +502,32 @@ export default function ConfirmPay() {
         {(isDonation || isWaitForRefund) && (
           <div className="mt-6 space-y-4">
             <div className="tx-14 lh-20 text-primary">
-              Thank you for your support.
+              {t("confirmPay.thankYou", "Thank you for your support.")}
               <br />
-              Your contribution has been successfully received on-chain.
+              {t(
+                "confirmPay.contributionReceived",
+                "Your contribution has been successfully received on-chain.",
+              )}
             </div>
             <div className="tx-14 lh-20 text-primary">
-              However, the amount does not meet the minimum requirement to
-              create this event.
+              {t(
+                "confirmPay.amountNotMeet",
+                "However, the amount does not meet the minimum requirement to create this event.",
+              )}
             </div>
             {isWaitForRefund && (
               <div className="tx-14 lh-20 text-primary">
-                Your payment will be refunded to your refund address after
-                network fees and applicable charges are deducted.
+                {t(
+                  "confirmPay.willBeRefunded",
+                  "Your payment will be refunded to your refund address after network fees and applicable charges are deducted.",
+                )}
               </div>
             )}
             <div className="tx-14 lh-20 text-primary">
-              If you have any questions, please contact{" "}
+              {t(
+                "confirmPay.contactSupport",
+                "If you have any questions, please contact",
+              )}{" "}
               <span className="flex items-center gap-1 inline-flex">
                 support@koinvote.com
                 <button
@@ -509,7 +547,9 @@ export default function ConfirmPay() {
             {/* Reward Amount (only if rewarded) */}
             {state.isRewarded && rewardAmountSatoshi > 0 && (
               <div className="space-y-1">
-                <div className="tx-12 lh-18 text-secondary">Reward Amount</div>
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("confirmPay.rewardAmount", "Reward Amount")}
+                </div>
                 <div className="tx-14 lh-20 text-primary">
                   {formatBtcDisplay(rewardAmountBtc)} BTC
                 </div>
@@ -521,7 +561,9 @@ export default function ConfirmPay() {
               preheatFeeSatoshi !== null &&
               preheatFeeSatoshi > 0 && (
                 <div className="space-y-1">
-                  <div className="tx-12 lh-18 text-secondary">Preheat Fee</div>
+                  <div className="tx-12 lh-18 text-secondary">
+                    {t("confirmPay.preheatFee", "Preheat Fee")}
+                  </div>
                   <div className="tx-14 lh-20 text-primary">
                     {formatBtcDisplay(preheatFeeBtc)} BTC
                   </div>
@@ -531,7 +573,9 @@ export default function ConfirmPay() {
             {/* Platform Fee (only for non-reward events with fees) */}
             {showPlatformFee && (
               <div className="space-y-1">
-                <div className="tx-12 lh-18 text-secondary">Platform Fee</div>
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("confirmPay.platformFee", "Platform Fee")}
+                </div>
                 <div className="tx-14 lh-20 text-primary">
                   {formatBtcDisplay(platformFeeBtc)} BTC
                 </div>
@@ -540,7 +584,9 @@ export default function ConfirmPay() {
 
             {/* Total Amount */}
             <div className="space-y-1">
-              <div className="tx-12 lh-18 text-secondary">Total Amount</div>
+              <div className="tx-12 lh-18 text-secondary">
+                {t("confirmPay.totalAmount", "Total Amount")}
+              </div>
               <div className="tx-14 lh-20 text-primary font-medium">
                 {formatBtcDisplay(totalAmountBtc)} BTC
               </div>
@@ -548,7 +594,9 @@ export default function ConfirmPay() {
 
             {/* Refund Address */}
             <div className="space-y-1">
-              <div className="tx-12 lh-18 text-secondary">Refund Address</div>
+              <div className="tx-12 lh-18 text-secondary">
+                {t("confirmPay.refundAddress", "Refund Address")}
+              </div>
               <div className="flex items-center gap-2">
                 <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
                   {refundAddress || "--"}
@@ -571,7 +619,9 @@ export default function ConfirmPay() {
             {/* Send exactly */}
             <div className="space-y-4">
               <div className="space-y-1">
-                <div className="tx-12 lh-18 text-secondary">Send exactly</div>
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("confirmPay.sendExactly", "Send exactly")}
+                </div>
                 <div className="tx-20 lh-24 fw-m text-primary">
                   {formatBtcDisplay(totalAmountBtc)} BTC
                   <button
@@ -595,15 +645,18 @@ export default function ConfirmPay() {
                   ⚠️
                 </span>
                 <span>
-                  Do NOT split your payment. Transactions below{" "}
-                  {refundThresholdBtc} BTC will NOT trigger a refund.
+                  {t(
+                    "confirmPay.warning",
+                    "Do NOT split your payment. Transactions below {{threshold}} BTC will NOT trigger a refund.",
+                    { threshold: refundThresholdBtc },
+                  )}
                 </span>
               </div>
 
               {/* To this address */}
               <div className="space-y-1">
                 <div className="tx-12 lh-18 text-secondary">
-                  To this address
+                  {t("confirmPay.toThisAddress", "To this address")}
                 </div>
                 <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-bg">
                   <div className="w-5 h-5 flex-shrink-0 rounded-full bg-secondary flex items-center justify-center">
@@ -641,7 +694,7 @@ export default function ConfirmPay() {
               className="sm:w-[160px]"
               onClick={handleBackToPreview}
             >
-              Back to Preview
+              {t("confirmPay.backToPreview", "Back to Preview")}
             </Button>
           ) : (
             <Button
@@ -652,7 +705,7 @@ export default function ConfirmPay() {
               className="sm:w-[160px]"
               onClick={handleCancel}
             >
-              Cancel
+              {t("confirmPay.cancel", "Cancel")}
             </Button>
           )}
         </div>

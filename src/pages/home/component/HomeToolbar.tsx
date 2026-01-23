@@ -1,5 +1,5 @@
 import { Segmented } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { API, type ApiResponse } from "@/api/index";
 import type { GetHotHashtagsRes } from "@/api/response";
@@ -11,14 +11,22 @@ import {
   type HomeStatusFilter,
 } from "@/pages/create-event/types/index";
 import { useHomeStore } from "@/stores/homeStore";
-
-const SORT_OPTIONS: { value: HomeSortField; label: string }[] = [
-  { value: "time", label: "Time" },
-  { value: "reward", label: "Reward" },
-  { value: "participation", label: "Participation" },
-];
+import { useTranslation } from "react-i18next";
 
 export function HomeToolbar() {
+  const { t } = useTranslation();
+
+  const SORT_OPTIONS: { value: HomeSortField; label: string }[] = useMemo(
+    () => [
+      { value: "time", label: t("homeToolbar.sortTime", "Time") },
+      { value: "reward", label: t("homeToolbar.sortReward", "Reward") },
+      {
+        value: "participation",
+        label: t("homeToolbar.sortParticipation", "Participation"),
+      },
+    ],
+    [t],
+  );
   const {
     status,
     search,
@@ -103,9 +111,12 @@ export function HomeToolbar() {
           }}
           defaultValue={status}
           options={[
-            { label: "Preheat", value: "preheat" },
-            { label: "Ongoing", value: "ongoing" },
-            { label: "Completed", value: "completed" },
+            { label: t("homeToolbar.preheat", "Preheat"), value: "preheat" },
+            { label: t("homeToolbar.ongoing", "Ongoing"), value: "ongoing" },
+            {
+              label: t("homeToolbar.completed", "Completed"),
+              value: "completed",
+            },
           ]}
           onChange={(value) => {
             setStatus(value);
@@ -128,7 +139,10 @@ export function HomeToolbar() {
             }}
             onFocus={() => setIsSearchFocused(true)}
             onBlur={() => setIsSearchFocused(false)}
-            placeholder="Search by title, address, Event ID"
+            placeholder={t(
+              "homeToolbar.searchPlaceholder",
+              "Search by title, address, Event ID",
+            )}
             className="flex-1 rounded-xl border border-border bg-surface pl-11 
           pr-10 py-2 text-base md:text-base outline-none w-full min-w-0 
           focus:ring-0.5 focus:ring-(--color-orange-500) 
@@ -214,7 +228,7 @@ export function HomeToolbar() {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <span className="text-xs md:text-sm text-secondary">
-              Popular hashtags
+              {t("homeToolbar.popularHashtags", "Popular hashtags")}
             </span>
             {/* {(search || activeHashtag) && (
               <button
