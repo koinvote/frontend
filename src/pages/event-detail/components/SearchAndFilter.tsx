@@ -4,7 +4,6 @@ import { EventStatus, ReplySortBy } from "@/api/types";
 import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
 import OnChainIcon from "@/assets/icons/onChain.svg?react";
-import PlusIcon from "@/assets/icons/plus.svg?react";
 import SearchIcon from "@/assets/icons/search.svg?react";
 import SortAscIcon from "@/assets/icons/sort-asc.svg?react";
 import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
@@ -21,7 +20,7 @@ interface SearchAndFilterProps {
   onSearchChange?: (search: string) => void;
   onSortChange?: (
     sortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME,
-    order: "desc" | "asc"
+    order: "desc" | "asc",
   ) => void;
 }
 
@@ -79,7 +78,7 @@ export function SearchAndFilter({
   };
 
   const handleSortFieldChange = (
-    newSortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
+    newSortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME,
   ) => {
     setSortBy(newSortBy);
     setIsSortDropdownOpen(false);
@@ -111,7 +110,7 @@ export function SearchAndFilter({
           onBlur={() => setIsSearchFocused(false)}
           placeholder={t(
             "replyList.searchPlaceholder",
-            "Search by address or content"
+            "Search by address or content",
           )}
           className="flex-1 rounded-xl border border-border bg-surface pl-11 pr-10 py-2 text-sm outline-none w-full min-w-0 focus:border-accent transition-colors"
         />
@@ -209,8 +208,8 @@ export function SearchAndFilter({
         </div>
 
         {/* Reward Button (Active Only) OR On-chain Button (Completed Only) */}
-        <div className={isActive || isCompleted ? "flex-1 md:flex-none" : ""}>
-          {(isActive || isPreheat) && (
+
+        {/* {(isActive || isPreheat) && (
             <Button
               appearance="solid"
               tone="surface"
@@ -221,8 +220,9 @@ export function SearchAndFilter({
               <PlusIcon className="w-3 h-3" />
               Reward
             </Button>
-          )}
-          {isCompleted && (
+          )} */}
+        {isCompleted && (
+          <div className="flex-1 md:flex-none">
             <Button
               appearance="solid"
               tone="surface"
@@ -231,7 +231,7 @@ export function SearchAndFilter({
               onClick={() => {
                 setSpinDeg((d) => d + 180);
                 onBalanceDisplayModeChange?.(
-                  balanceDisplayMode === "snapshot" ? "on_chain" : "snapshot"
+                  balanceDisplayMode === "snapshot" ? "on_chain" : "snapshot",
                 );
               }}
             >
@@ -253,8 +253,8 @@ export function SearchAndFilter({
                 </>
               )}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
