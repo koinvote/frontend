@@ -991,7 +991,7 @@ export default function CreateEvent() {
                 />
                 <span>{t("createEvent.responseTypeOptions.1.label")}</span>
                 <Tooltip
-                  title="Participants choose one option from a list you create."
+                  title={t("createEvent.singleChoiceTooltip", "Participants choose one option from a list you create.")}
                   placement="top"
                   color="white"
                   {...singleChoiceTooltip.tooltipProps}
@@ -1014,7 +1014,7 @@ export default function CreateEvent() {
                 />
                 <span>{t("createEvent.responseTypeOptions.0.label")}</span>
                 <Tooltip
-                  title="Participants can submit their own responses."
+                  title={t("createEvent.openEndedTooltip", "Participants can submit their own responses.")}
                   placement="top"
                   color="white"
                   {...openEndedTooltip.tooltipProps}
@@ -1171,8 +1171,8 @@ export default function CreateEvent() {
               }}
               placeholder={
                 isRewarded
-                  ? "Enter hours (Min 1)"
-                  : `First ${params?.free_hours} hours are free`
+                  ? t("createEvent.enterHoursMin", "Enter hours (Min 1)")
+                  : t("createEvent.freeHours", "First {{hours}} hours are free", { hours: params?.free_hours })
               }
               className="w-full rounded-xl border border-border bg-white px-3 py-2
                          tx-14 lh-20 text-black placeholder:text-secondary
@@ -1274,7 +1274,7 @@ export default function CreateEvent() {
           {!isRewarded && (
             <div>
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
-                Platform fee:
+                {t("createEvent.platformFee", "Platform fee:")}
               </p>
               <p className="tx-12 lh-18 dark:text-white text-black">
                 {platformFeeDisplay}
@@ -1331,7 +1331,7 @@ export default function CreateEvent() {
                   setPreheatHours(numbersOnly);
                 }
               }}
-              placeholder="Enter hours (max 720)"
+              placeholder={t("createEvent.enterHoursMax", "Enter hours (max 720)")}
               className={cn(
                 "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
                 preheatHoursValidation.error
@@ -1349,7 +1349,7 @@ export default function CreateEvent() {
 
           {/* Preheat fee */}
           <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-1">Preheat fee:</p>
+            <p className="tx-14 lh-20 fw-m text-primary mb-1">{t("createEvent.preheatFee", "Preheat fee:")}</p>
             <p className="tx-12 lh-18 dark:text-white text-black">
               {preheatFeeDisplay}
             </p>
@@ -1365,33 +1365,33 @@ export default function CreateEvent() {
                 onChange={(e) => setAgree(e.target.checked)}
               />
               <span>
-                I agree to the{" "}
+                {t("createEvent.agreeToThe", "I agree to the")}{" "}
                 <Link
                   to="/terms"
                   className="text-(--color-orange-500) underline"
                 >
-                  Terms of Service
+                  {t("createEvent.termsOfService", "Terms of Service")}
                 </Link>
                 ,{" "}
                 <Link
                   to="/terms-reward-distribution"
                   className="text-(--color-orange-500) underline"
                 >
-                  Reward Distribution
+                  {t("createEvent.rewardDistribution", "Reward Distribution")}
                 </Link>
                 ,{" "}
                 <Link
                   to="/privacy"
                   className="text-(--color-orange-500) underline"
                 >
-                  Privacy Policy
+                  {t("createEvent.privacyPolicy", "Privacy Policy")}
                 </Link>{" "}
-                and{" "}
+                {t("createEvent.and", "and")}{" "}
                 <Link
                   to="/charges-refunds"
                   className="text-(--color-orange-500) underline"
                 >
-                  Charges &amp; Refunds
+                  {t("createEvent.chargesRefunds", "Charges & Refunds")}
                 </Link>
                 .
               </span>
@@ -1408,7 +1408,7 @@ export default function CreateEvent() {
               className="sm:w-[160px]"
               onClick={handleClear}
             >
-              Clear
+              {t("createEvent.clear", "Clear")}
             </Button>
             <Button
               type="submit"
@@ -1418,7 +1418,7 @@ export default function CreateEvent() {
               className="sm:w-[160px]"
               disabled={isPreviewDisabled}
             >
-              {isSubmitting ? "Submitting…" : "Preview"}
+              {isSubmitting ? t("createEvent.submitting", "Submitting…") : t("createEvent.preview", "Preview")}
             </Button>
           </div>
         </form>

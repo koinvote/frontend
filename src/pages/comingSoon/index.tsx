@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import EmailIcon from '@/assets/icons/email.svg?react'
 import Logo from '@/assets/logo/logo.svg?react'
 
 const ComingSoon = () => {
+  const { t } = useTranslation()
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle')
   const [email, setEmail] = useState('')
 
@@ -27,7 +29,7 @@ const ComingSoon = () => {
 
         <div className="absolute left-1/2 top-6 -translate-x-1/2 flex items-center gap-2">
           <Logo className="h-8 w-auto" />
-          <span className="text-xl font-bold text-white">Koinvote</span>
+          <span className="text-xl font-bold text-white">{t("comingSoon.brandName", "Koinvote")}</span>
         </div>
         <iframe
           name="ml-subscribe-frame"
@@ -37,12 +39,12 @@ const ComingSoon = () => {
 
         <div className="w-full max-w-md rounded-xl bg-black px-6 py-8">
           <h1 className="mb-3 text-center text-3xl lg:tx-36 font-semibold text-white">
-            Coming Soon
+            {t("comingSoon.title", "Coming Soon")}
           </h1>
           <p className="text-center tx-16 lg:tx-20 leading-relaxed text-neutral-300">
-            <span className="whitespace-nowrap"> A forum powered by Bitcoin holders </span>
+            <span className="whitespace-nowrap"> {t("comingSoon.tagline1", "A forum powered by Bitcoin holders")} </span>
             <br />
-            <span className="whitespace-nowrap"> Your Bitcoin balance amplifies your voice </span>
+            <span className="whitespace-nowrap"> {t("comingSoon.tagline2", "Your Bitcoin balance amplifies your voice")} </span>
           </p>
 
           {!isSuccess ? (
@@ -63,7 +65,7 @@ const ComingSoon = () => {
                     name="fields[email]"
                     required
                     autoComplete="email"
-                    placeholder="Enter your email address..."
+                    placeholder={t("comingSoon.emailPlaceholder", "Enter your email address...")}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full rounded-lg border border-neutral-700 bg-neutral-900 pl-11 pr-4 py-3 text-base text-white placeholder:text-neutral-500 outline-none focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400"
@@ -76,20 +78,20 @@ const ComingSoon = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full rounded-lg bg-white px-6 py-3 text-base font-semibold 
+                  className="w-full rounded-lg bg-white px-6 py-3 text-base font-semibold
                 text-[#171717] transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-70"
                   style={{ letterSpacing: "-0.2px" }}
                 >
-                  {isSubmitting ? 'Subscribing…' : 'Subscribe'}
+                  {isSubmitting ? t("comingSoon.subscribing", "Subscribing…") : t("comingSoon.subscribe", "Subscribe")}
                 </button>
               </form>
 
             </>
           ) : (
             <div className="mt-6 text-center">
-              <h2 className="tx-20 font-semibold text-[#BBBBBB]"> ✓ Thank you! </h2>
+              <h2 className="tx-20 font-semibold text-[#BBBBBB]"> ✓ {t("comingSoon.thankYou", "Thank you!")} </h2>
               <p className="mt-2 tx-20 text-[#BBBBBB]">
-                We’ll let you know when Koinvote launches.
+                {t("comingSoon.notifyLaunch", "We'll let you know when Koinvote launches.")}
               </p>
             </div>
           )}

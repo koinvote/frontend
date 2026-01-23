@@ -5,6 +5,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import { API } from "@/api";
@@ -32,16 +33,17 @@ type PreviewEventState = {
   preheatHours?: number;
 };
 
-function formatDuration(hours: number): string {
+function formatDuration(hours: number, t: (key: string, defaultValue: string, options?: Record<string, unknown>) => string): string {
   if (!hours || hours <= 0) return "--";
   if (hours % 24 === 0) {
     const days = hours / 24;
-    return days === 1 ? "1 day" : `${days} days`;
+    return days === 1 ? t("common.oneDay", "1 day") : t("common.days", "{{days}} days", { days });
   }
-  return `${hours} hours`;
+  return t("common.hours", "{{hours}} hours", { hours });
 }
 
 export default function PreviewEvent() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const state = location.state as PreviewEventState | undefined;
@@ -203,17 +205,17 @@ export default function PreviewEvent() {
       !hasPreheat && // 沒預熱
       isDurationWithinFree; // 時數在免費時數內
 
-    const primaryLabel = free ? "Confirm & Sign" : "Confirm & Pay";
+    const primaryLabel = free ? t("preview.confirmSign", "Confirm & Sign") : t("preview.confirmPay", "Confirm & Pay");
     const subTitle = free
-      ? "Please review and confirm your event."
-      : "Please complete your payment";
+      ? t("preview.reviewConfirm", "Please review and confirm your event.")
+      : t("preview.completePayment", "Please complete your payment");
 
     return {
       isFree: free,
       primaryButtonLabel: primaryLabel,
       headerSubTitle: subTitle,
     };
-  }, [enablePreheat, preheatHours, isRewarded, durationHours, params]);
+  }, [enablePreheat, preheatHours, isRewarded, durationHours, params, t]);
 
   const {
     creatorAddress,
@@ -384,7 +386,7 @@ export default function PreviewEvent() {
         </div>
         <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
           <p className="tx-14 lh-20 text-primary">
-            No event data to preview. Please create an event first.
+            {t("preview.noEventData", "No event data to preview. Please create an event first.")}
           </p>
           <div className="mt-4">
             <Button
@@ -393,7 +395,7 @@ export default function PreviewEvent() {
               text="sm"
               onClick={() => navigate("/create-event")}
             >
-              Back to Create Event
+              {t("preview.backToCreate", "Back to Create Event")}
             </Button>
           </div>
         </div>
@@ -415,26 +417,26 @@ export default function PreviewEvent() {
 
       <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
-          Preview Your Event
+          {t("preview.title", "Preview Your Event")}
         </h1>
         <p className="mt-1 tx-14 lh-20 text-secondary">{headerSubTitle}</p>
 
         <div className="mt-6 space-y-4">
           {/* Creator address */}
-          <Field label="Creator address">{creatorAddress || "--"}</Field>
+          <Field label={t("preview.creatorAddress", "Creator address")}>{creatorAddress || "--"}</Field>
           {/* Title */}
-          <Field label="Title">{title || "--"}</Field>
+          <Field label={t("preview.titleLabel", "Title")}>{title || "--"}</Field>
 
           {/* Description */}
-          <Field label="Description">{description || "--"}</Field>
+          <Field label={t("preview.description", "Description")}>{description || "--"}</Field>
 
           {/* Response type */}
-          <Field label="Response type">
-            {eventType === "open" ? "Open-ended" : "Single choice"}
+          <Field label={t("preview.responseType", "Response type")}>
+            {eventType === "open" ? t("preview.openEnded", "Open-ended") : t("preview.singleChoice", "Single choice")}
           </Field>
 
           {/* Hashtag */}
-          <Field label="Hashtag">
+          <Field label={t("preview.hashtag", "Hashtag")}>
             {hashtag
               ? hashtag
                   .split(/[,\s]+/)
@@ -445,21 +447,21 @@ export default function PreviewEvent() {
           </Field>
 
           {/* Event type / Reward type */}
-          <Field label="Event type">
-            {isRewarded ? "Reward event" : "No reward"}
+          <Field label={t("preview.eventType", "Event type")}>
+            {isRewarded ? t("preview.rewardEvent", "Reward event") : t("preview.noReward", "No reward")}
           </Field>
 
           {/* Reward BTC & Max Recipient（有獎金時才顯示） */}
           {isRewarded && (
             <>
-              <Field label="Reward (BTC)">
+              <Field label={t("preview.rewardBtc", "Reward (BTC)")}>
                 {rewardBtc ? `${rewardBtc} BTC` : "--"}
               </Field>
-              <Field label="Max Recipient">
+              <Field label={t("preview.maxRecipient", "Max Recipient")}>
                 {maxRecipients !== null && maxRecipients > 0
                   ? maxRecipients === 1
-                    ? "1 Address"
-                    : `${maxRecipients} Addresses`
+                    ? t("preview.oneAddress", "1 Address")
+                    : t("preview.multipleAddresses", "{{count}} Addresses", { count: maxRecipients })
                   : "--"}
               </Field>
             </>
@@ -467,7 +469,7 @@ export default function PreviewEvent() {
 
           {/* Single choice options */}
           {eventType === "single_choice" && options.length > 0 && (
-            <Field label="Options">
+            <Field label={t("preview.options", "Options")}>
               <ol className="list-decimal pl-5 space-y-1">
                 {options.map((opt, idx) => (
                   <li key={idx} className="tx-14 lh-20 text-primary">
@@ -479,30 +481,29 @@ export default function PreviewEvent() {
           )}
 
           {/* Duration */}
-          <Field label="Duration of this event">
-            {formatDuration(durationHours)}
+          <Field label={t("preview.duration", "Duration of this event")}>
+            {formatDuration(durationHours, t)}
           </Field>
 
           {/* Platform fee（只有無獎金事件顯示） */}
           {!isRewarded && (
-            <Field label="Platform fee">{platformFeeDisplay}</Field>
+            <Field label={t("preview.platformFee", "Platform fee")}>{platformFeeDisplay}</Field>
           )}
 
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (
             <>
-              <Field label="Preheat">{`${preheatHours} hours`}</Field>
-              <Field label="Preheat fee">{preheatFeeDisplay}</Field>
+              <Field label={t("preview.preheat", "Preheat")}>{t("common.hours", "{{hours}} hours", { hours: preheatHours })}</Field>
+              <Field label={t("preview.preheatFee", "Preheat fee")}>{preheatFeeDisplay}</Field>
             </>
           )}
           {/* Your Total */}
-          <Field label="Your Total">
+          <Field label={t("preview.yourTotal", "Your Total")}>
             <div className="flex flex-col gap-1">
               <span>{totalFeeDisplay}</span>
               {showLowTotalWarning && (
                 <span className="text-xs md:text-sm text-red-700 mt-1">
-                  Under 0.00002 BTC, your wallet may not be able to send this
-                  transaction.
+                  {t("preview.lowAmountWarning", "Under 0.00002 BTC, your wallet may not be able to send this transaction.")}
                 </span>
               )}
             </div>
@@ -512,27 +513,27 @@ export default function PreviewEvent() {
         {/* Terms */}
         <div className="pt-2 border-t border-border mt-2">
           <p className="tx-12 lh-18 text-secondary">
-            By proceeding, you agree to the{" "}
+            {t("preview.byProceeding", "By proceeding, you agree to the")}{" "}
             <Link to="/terms" className="text-(--color-orange-500) underline">
-              Terms of Service
+              {t("preview.termsOfService", "Terms of Service")}
             </Link>
             ,{" "}
             <Link
               to="/terms-reward-distribution"
               className="text-(--color-orange-500) underline"
             >
-              Reward Distribution
+              {t("preview.rewardDistribution", "Reward Distribution")}
             </Link>
             ,{" "}
             <Link to="/privacy" className="text-(--color-orange-500) underline">
-              Privacy Policy
+              {t("preview.privacyPolicy", "Privacy Policy")}
             </Link>{" "}
-            and{" "}
+            {t("preview.and", "and")}{" "}
             <Link
               to="/charges-refunds"
               className="text-(--color-orange-500) underline"
             >
-              Charges &amp; Refunds
+              {t("preview.chargesRefunds", "Charges & Refunds")}
             </Link>
             .
           </p>
@@ -548,7 +549,7 @@ export default function PreviewEvent() {
             className="sm:w-[160px]"
             onClick={() => navigate("/create-event")}
           >
-            Edit Event
+            {t("preview.editEvent", "Edit Event")}
           </Button>
           <Button
             type="button"
@@ -559,7 +560,7 @@ export default function PreviewEvent() {
             disabled={isCreatingEvent}
             onClick={handlePrimaryClick}
           >
-            {isCreatingEvent ? "Creating..." : primaryButtonLabel}
+            {isCreatingEvent ? t("preview.creating", "Creating...") : primaryButtonLabel}
           </Button>
         </div>
       </div>

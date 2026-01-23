@@ -47,10 +47,10 @@ export function WinnerTable({
     try {
       await navigator.clipboard.writeText(address);
       setCopiedAddress(address);
-      showToast("success", "Address copied");
+      showToast("success", t("winnerTable.addressCopied", "Address copied"));
       setTimeout(() => setCopiedAddress(null), 2000);
     } catch {
-      showToast("error", "Failed to copy");
+      showToast("error", t("winnerTable.failedToCopy", "Failed to copy"));
     }
   };
 
