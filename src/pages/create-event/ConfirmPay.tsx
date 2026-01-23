@@ -375,6 +375,17 @@ export default function ConfirmPay() {
     }
   });
 
+  const handleCopyAmount = useDebouncedClick(async (amount: string) => {
+    if (!amount) return;
+    try {
+      await navigator.clipboard.writeText(amount);
+      showToast("success", "Payment amount copied.");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showToast("error", "Failed to copy payment amount");
+    }
+  });
+
   // Handle cancel - go back to create event
   const handleCancel = () => {
     navigate("/create-event");
@@ -563,6 +574,15 @@ export default function ConfirmPay() {
                 <div className="tx-12 lh-18 text-secondary">Send exactly</div>
                 <div className="tx-20 lh-24 fw-m text-primary">
                   {formatBtcDisplay(totalAmountBtc)} BTC
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCopyAmount(formatBtcDisplay(totalAmountBtc))
+                    }
+                    className="ml-2 p-1 hover:opacity-70 cursor-pointer"
+                  >
+                    <CopyIcon className="w-4 h-4 text-secondary" />
+                  </button>
                 </div>
               </div>
 
