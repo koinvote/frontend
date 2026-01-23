@@ -1,13 +1,16 @@
+import { Segmented } from "antd";
 import { useEffect, useState } from "react";
-import { useHomeStore } from "@/stores/homeStore";
+
+import { API, type ApiResponse } from "@/api/index";
+import type { GetHotHashtagsRes } from "@/api/response";
+import ClearIcon from "@/assets/icons/clear.svg?react";
+import SearchIcon from "@/assets/icons/search.svg?react";
 import {
   type HomeSortField,
   type HomeSortOrder,
+  type HomeStatusFilter,
 } from "@/pages/create-event/types/index";
-import { API, type ApiResponse } from "@/api/index";
-import type { GetHotHashtagsRes } from "@/api/response";
-import SearchIcon from "@/assets/icons/search.svg?react";
-import ClearIcon from "@/assets/icons/clear.svg?react";
+import { useHomeStore } from "@/stores/homeStore";
 
 const SORT_OPTIONS: { value: HomeSortField; label: string }[] = [
   { value: "time", label: "Time" },
@@ -70,7 +73,7 @@ export function HomeToolbar() {
         if (res.success && res.data) {
           // 确保标签有 # 前缀
           const hashtags = res.data.map((tag) =>
-            tag.startsWith("#") ? tag : `#${tag}`
+            tag.startsWith("#") ? tag : `#${tag}`,
           );
           useHomeStore.getState().setPopularHashtags(hashtags);
         }
@@ -92,35 +95,32 @@ export function HomeToolbar() {
   return (
     <div className="flex flex-col gap-3 md:gap-4">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
-        <div className="flex rounded-xl bg-surface border border-border p-1 w-full md:w-fit">
-          <button
-            type="button"
-            className={`cursor-pointer flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
-              isPreheat ? "bg-white text-black" : "text-secondary"
-            }`}
-            onClick={() => setStatus("preheat")}
-          >
-            Preheat
-          </button>
-          <button
-            type="button"
-            className={`cursor-pointer flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
-              isOngoing ? "bg-white text-black" : "text-secondary"
-            }`}
-            onClick={() => setStatus("ongoing")}
-          >
-            Ongoing
-          </button>
-          <button
-            type="button"
-            className={`cursor-pointer flex-1 px-4 py-1.5 rounded-xl text-sm md:text-base text-center transition-all duration-300 ease-in-out ${
-              isCompleted ? "bg-white text-black" : "text-secondary"
-            }`}
-            onClick={() => setStatus("completed")}
-          >
-            Completed
-          </button>
-        </div>
+        <Segmented<HomeStatusFilter>
+          size="large"
+          className=""
+          styles={{
+            root: {
+              border: "1px solid var(--color-border)",
+              borderRadius: 12,
+            },
+            item: {
+              paddingLeft: 6,
+              paddingRight: 6,
+              paddingTop: 0,
+              paddingBottom: 0,
+              borderRadius: 12,
+            },
+          }}
+          defaultValue={status}
+          options={[
+            { label: "Preheat", value: "preheat" },
+            { label: "Ongoing", value: "ongoing" },
+            { label: "Completed", value: "completed" },
+          ]}
+          onChange={(value) => {
+            setStatus(value);
+          }}
+        />
 
         {/* search */}
         <div className="relative flex flex-1 items-center min-w-0">

@@ -2,6 +2,9 @@
 import type { ThemeConfig } from "antd";
 import { theme } from "antd";
 
+type Components = NonNullable<ThemeConfig["components"]>;
+type ComponentKey = keyof Components;
+
 // CSS variable references
 const cssVar = {
   // Colors
@@ -14,6 +17,7 @@ const cssVar = {
   gray600: "var(--color-gray-600)", // #c0c0c0
   gray950: "var(--color-gray-950)", // #0a0a0a
   border: "var(--color-border)", // dark: #232428, light: #e6e6ea
+  surface: "var(--color-surface)", // dark: #111214, light #f3f3f5
   btnPrimaryBgHover: "var(--btn-primary-bg-hover)", // dark: #f3f3f5, light: #ff9c2b
 };
 
@@ -23,11 +27,20 @@ const sharedComponents: ThemeConfig["components"] = {
     activeBorderColor: cssVar.orange500,
     hoverBorderColor: cssVar.border,
   },
+  Segmented: {
+    trackPadding: 4,
+    trackBg: cssVar.surface,
+
+    ".ant-segmented-thumb": {
+      borderRadius: 12,
+    },
+  },
 };
 
 // Dark theme specific styles
 const darkComponents: ThemeConfig["components"] = {
   Button: {
+    // TODO: global token
     colorPrimary: cssVar.white,
     colorPrimaryBg: cssVar.white,
     colorPrimaryHover: cssVar.btnPrimaryBgHover,
@@ -36,14 +49,22 @@ const darkComponents: ThemeConfig["components"] = {
     colorLink: cssVar.gray400,
     colorLinkHover: cssVar.orange500,
     colorLinkActive: cssVar.orange500,
+    // design token
     primaryColor: cssVar.gray950,
   },
   Divider: {
+    // TODO: global token
     colorSplit: cssVar.gray450,
   },
   Tooltip: {
+    // TODO: global token
     colorBgSpotlight: cssVar.white,
     colorTextLightSolid: "#303133",
+  },
+  Segmented: {
+    itemSelectedBg: cssVar.white,
+    itemSelectedColor: cssVar.black,
+    itemHoverColor: cssVar.gray400,
   },
 };
 
@@ -69,11 +90,21 @@ const lightComponents: ThemeConfig["components"] = {
 
 // Merge shared and theme-specific components
 const mergeComponents = (
-  themeComponents: ThemeConfig["components"]
-): ThemeConfig["components"] => ({
-  ...themeComponents,
-  ...sharedComponents,
-});
+  themeComponents: ThemeConfig["components"],
+): ThemeConfig["components"] => {
+  const result: Components = { ...sharedComponents };
+
+  (Object.keys(themeComponents ?? {}) as ComponentKey[]).forEach(
+    (componentName) => {
+      result[componentName] = {
+        ...(sharedComponents?.[componentName] ?? {}),
+        ...(themeComponents?.[componentName] ?? {}),
+      };
+    },
+  );
+
+  return result;
+};
 
 // Export theme configurations
 export const darkThemeConfig: ThemeConfig = {

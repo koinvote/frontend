@@ -1,5 +1,6 @@
 import { createRoot } from 'react-dom/client'
 import './global.css'
+import './globalAntd.css'
 import App from './App.tsx'
 import { Suspense } from 'react'
 import './i18n.ts'
