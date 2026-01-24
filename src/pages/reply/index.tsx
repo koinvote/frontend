@@ -40,13 +40,17 @@ const ChecklistItem = ({
     <div
       className={cn(
         "w-2 h-2 rounded-full",
-        isValid ? "bg-green-500" : isError ? "bg-red-500" : "bg-white/20"
+        isValid ? "bg-green-500" : isError ? "bg-red-500" : "bg-white/20",
       )}
     />
     <span
       className={cn(
         "text-sm",
-        isValid ? "text-green-500" : isError ? "text-red-500" : "text-secondary"
+        isValid
+          ? "text-green-500"
+          : isError
+            ? "text-red-500"
+            : "text-secondary",
       )}
     >
       {label}
@@ -124,7 +128,7 @@ export default function ReplyPage() {
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
       const response = (await API.getEventDetail(
-        eventId
+        eventId,
       )()) as unknown as ApiResponse<EventDetailDataRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch event detail");
@@ -187,9 +191,19 @@ export default function ReplyPage() {
         setExpiredAt(now + 15 * 60);
         setCountdown(15 * 60);
 
-        showToast("success", t("reply.plaintextGenerated", "Plaintext generated"));
+        showToast(
+          "success",
+          t("reply.plaintextGenerated", "Plaintext generated"),
+        );
       } else {
-        showToast("error", res.message || t("reply.failedToGeneratePlaintext", "Failed to generate plaintext"));
+        showToast(
+          "error",
+          res.message ||
+            t(
+              "reply.failedToGeneratePlaintext",
+              "Failed to generate plaintext",
+            ),
+        );
       }
     } catch (error) {
       console.error(error);
@@ -199,7 +213,7 @@ export default function ReplyPage() {
         "error",
         err.response?.data?.message ||
           err.message ||
-          t("reply.failedToGeneratePlaintext", "Failed to generate plaintext")
+          t("reply.failedToGeneratePlaintext", "Failed to generate plaintext"),
       );
     } finally {
       setIsGeneratingPlaintext(false);
@@ -211,10 +225,16 @@ export default function ReplyPage() {
 
     try {
       await navigator.clipboard.writeText(plaintext);
-      showToast("success", t("reply.plaintextCopied", "Plaintext copied to clipboard"));
+      showToast(
+        "success",
+        t("reply.plaintextCopied", "Plaintext copied to clipboard"),
+      );
     } catch (error) {
       console.error("Failed to copy:", error);
-      showToast("error", t("reply.failedToCopyPlaintext", "Failed to copy plaintext"));
+      showToast(
+        "error",
+        t("reply.failedToCopyPlaintext", "Failed to copy plaintext"),
+      );
     }
   });
 
@@ -222,7 +242,13 @@ export default function ReplyPage() {
     if (!eventId || !canSubmit) return;
 
     if (countdown <= 0) {
-      showToast("error", t("reply.plaintextExpiredToast", "Plaintext has expired. Please generate a new one."));
+      showToast(
+        "error",
+        t(
+          "reply.plaintextExpiredToast",
+          "Plaintext has expired. Please generate a new one.",
+        ),
+      );
       return;
     }
 
@@ -243,11 +269,17 @@ export default function ReplyPage() {
       });
 
       if (res.success) {
-        showToast("success", t("reply.submitSuccess", "Reply submitted successfully"));
+        showToast(
+          "success",
+          t("reply.submitSuccess", "Reply submitted successfully"),
+        );
         // Navigate back to event detail
         navigate(`/event/${eventId}`);
       } else {
-        showToast("error", res.message || t("reply.submitFailed", "Failed to submit reply"));
+        showToast(
+          "error",
+          res.message || t("reply.submitFailed", "Failed to submit reply"),
+        );
       }
     } catch (error) {
       console.error(error);
@@ -255,7 +287,9 @@ export default function ReplyPage() {
       const err = error as any;
       showToast(
         "error",
-        err.response?.data?.message || err.message || t("reply.submitFailed", "Failed to submit reply")
+        err.response?.data?.message ||
+          err.message ||
+          t("reply.submitFailed", "Failed to submit reply"),
       );
     } finally {
       setIsSubmitting(false);
@@ -277,8 +311,8 @@ export default function ReplyPage() {
       setEventCountdown(
         formatCompletedTime(
           event.deadline_at,
-          t("eventInfo.eventEndedOn", "Ended on")
-        )
+          t("eventInfo.eventEndedOn", "Ended on"),
+        ),
       );
       return;
     }
@@ -309,9 +343,14 @@ export default function ReplyPage() {
       </div>
 
       <div className="w-full max-w-3xl rounded-3xl border border-gray-450 bg-bg px-6 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-primary">{t("reply.title", "Reply to Win BTC")} </h1>
+        <h1 className="tx-20 lh-24 fw-m text-primary">
+          {t("reply.title", "Reply to Win BTC")}{" "}
+        </h1>
         <p className="mt-1 tx-14 lh-20 text-secondary">
-          {t("reply.subtitle", "Complete the steps below to submit your reply and enter the draw.")}
+          {t(
+            "reply.subtitle",
+            "Complete the steps below to submit your reply and enter the draw.",
+          )}
         </p>
 
         {/* 1. Event Information */}
@@ -320,7 +359,9 @@ export default function ReplyPage() {
             <span className="text-accent text-lg">
               <TrophyIcon className="w-4 h-4" />
             </span>
-            <h2 className="tx-16 lh-20 fw-m text-primary">{t("reply.eventInfo", "Event information")}</h2>
+            <h2 className="tx-16 lh-20 fw-m text-primary">
+              {t("reply.eventInfo", "Event information")}
+            </h2>
           </div>
 
           <h3 className="tx-16 lh-24 fw-m text-primary mb-2">{event.title}</h3>
@@ -352,9 +393,13 @@ export default function ReplyPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="tx-14 text-secondary">{t("reply.type", "Type")} :</span>
+            <span className="tx-14 text-secondary">
+              {t("reply.type", "Type")} :
+            </span>
             <span className="px-3 py-1 rounded-full bg-white text-black text-xs font-medium border border-border">
-              {event.event_type === "open" ? t("reply.openEnded", "Open-ended") : t("reply.singleChoice", "Single-choice")}
+              {event.event_type === "open"
+                ? t("reply.openEnded", "Open-ended")
+                : t("reply.singleChoice", "Single-choice")}
             </span>
           </div>
         </div>
@@ -368,18 +413,24 @@ export default function ReplyPage() {
             >
               <span className="text-black tx-12 md:tx-14">1</span>
             </div>
-            <h2 className="tx-16 fw-m text-primary">{t("reply.enterBtcAddressTitle", "Enter BTC Address")}</h2>
+            <h2 className="tx-16 fw-m text-primary">
+              {t("reply.enterBtcAddressTitle", "Enter BTC Address")}
+            </h2>
           </div>
 
           <div className="space-y-2">
             <label className="tx-14 fw-m text-primary">
-              {t("reply.btcAddressLabel", "BTC Address")} <span className="text-accent">*</span>
+              {t("reply.btcAddressLabel", "BTC Address")}{" "}
+              <span className="text-accent">*</span>
             </label>
             <input
               type="text"
               value={btcAddress}
               onChange={(e) => setBtcAddress(e.target.value)}
-              placeholder={t("reply.enterBtcAddress", "Please enter your BTC address")}
+              placeholder={t(
+                "reply.enterBtcAddress",
+                "Please enter your BTC address",
+              )}
               autoComplete="new-password"
               autoCorrect="off"
               autoCapitalize="off"
@@ -388,11 +439,13 @@ export default function ReplyPage() {
                 "w-full px-3 py-2 rounded-lg border bg-bg text-primary tx-14 outline-none focus:ring-2 transition-all",
                 btcAddress && !isAddressValid
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-accent"
+                  : "border-border focus:ring-accent",
               )}
             />
             {btcAddress && !isAddressValid && (
-              <p className="text-red-500 text-xs">{t("reply.invalidBtcAddress", "Invalid BTC address")}</p>
+              <p className="text-red-500 text-xs">
+                {t("reply.invalidBtcAddress", "Invalid BTC address")}
+              </p>
             )}
           </div>
         </div>
@@ -413,7 +466,8 @@ export default function ReplyPage() {
           {event.event_type === "open" ? (
             <div className="space-y-2">
               <label className="tx-14 fw-m text-primary">
-                {t("reply.enterReplyMessage", "Enter your reply message")} <span className="text-accent">*</span>
+                {t("reply.enterReplyMessage", "Enter your reply message")}{" "}
+                <span className="text-accent">*</span>
               </label>
               <textarea
                 value={replyContent}
@@ -426,7 +480,7 @@ export default function ReplyPage() {
                 rows={4}
                 className={cn(
                   "w-full px-3 py-2 rounded-lg border bg-bg text-primary tx-14 outline-none focus:ring-2 transition-all resize-none",
-                  "border-border focus:ring-accent"
+                  "border-border focus:ring-accent",
                 )}
               />
               <div className="flex justify-end">
@@ -435,7 +489,7 @@ export default function ReplyPage() {
                     "text-xs",
                     replyContent.length >= 500
                       ? "text-red-500"
-                      : "text-secondary"
+                      : "text-secondary",
                   )}
                 >
                   {replyContent.length}/500
@@ -445,7 +499,8 @@ export default function ReplyPage() {
           ) : (
             <div className="space-y-2">
               <label className="tx-14 fw-m text-primary">
-                {t("reply.selectOneOption", "Please select one option")} <span className="text-accent">*</span>
+                {t("reply.selectOneOption", "Please select one option")}{" "}
+                <span className="text-accent">*</span>
               </label>
               <div className="flex flex-col gap-3">
                 {event.options?.map((option, index) => {
@@ -461,7 +516,7 @@ export default function ReplyPage() {
                         "flex items-center p-3 rounded-lg border cursor-pointer transition-all hover:bg-white/5",
                         selectedOptionId === optionId
                           ? "border-accent bg-accent/5"
-                          : "border-border bg-bg"
+                          : "border-border bg-bg",
                       )}
                     >
                       <input
@@ -497,7 +552,9 @@ export default function ReplyPage() {
             >
               <span className="text-black tx-12 md:tx-14">3</span>
             </div>
-            <h2 className="tx-16 fw-m text-primary">{t("reply.generatePlaintext", "Generate the Plaintext")}</h2>
+            <h2 className="tx-16 fw-m text-primary">
+              {t("reply.generatePlaintext", "Generate the Plaintext")}
+            </h2>
           </div>
 
           <Button
@@ -507,7 +564,9 @@ export default function ReplyPage() {
             onClick={handleGeneratePlaintext}
             className="w-full"
           >
-            {isGeneratingPlaintext ? t("reply.generating", "Generating...") : t("reply.generatePlaintextBtn", "Generate Plaintext")}
+            {isGeneratingPlaintext
+              ? t("reply.generating", "Generating...")
+              : t("reply.generatePlaintextBtn", "Generate Plaintext")}
           </Button>
 
           {plaintext && (
@@ -533,13 +592,20 @@ export default function ReplyPage() {
               {countdown > 0 ? (
                 <div className="flex items-center gap-2 text-green-500 text-xs">
                   <ClockIcon className="w-4 h-4" />
-                  <span>{t("reply.expiredIn", "Expired in {{time}}", { time: formatTimeRemaining(countdown) })}</span>
+                  <span>
+                    {t("reply.expiredIn", "Expired in {{time}}", {
+                      time: formatTimeRemaining(countdown),
+                    })}
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center gap-2 text-red-500 text-xs">
                   <ClockIcon className="w-4 h-4" />
                   <span>
-                    {t("reply.plaintextExpired", "This plaintext has expired. Please generate a new one.")}
+                    {t(
+                      "reply.plaintextExpired",
+                      "This plaintext has expired. Please generate a new one.",
+                    )}
                   </span>
                 </div>
               )}
@@ -556,18 +622,24 @@ export default function ReplyPage() {
             >
               <span className="text-black tx-12 md:tx-14">4</span>
             </div>
-            <h2 className="tx-16 fw-m text-primary">{t("reply.enterSignatureTitle", "Enter Signature")}</h2>
+            <h2 className="tx-16 fw-m text-primary">
+              {t("reply.enterSignatureTitle", "Enter Signature")}
+            </h2>
           </div>
 
           <div className="space-y-2">
             <label className="tx-14 fw-m text-primary">
-              {t("reply.signatureLabel", "Signature")} <span className="text-accent">*</span>
+              {t("reply.signatureLabel", "Signature")}{" "}
+              <span className="text-accent">*</span>
             </label>
             <input
               type="text"
               value={signature}
               onChange={(e) => setSignature(e.target.value)}
-              placeholder={t("reply.signaturePlaceholder", "Paste the signature generated by your BTC wallet for the plaintext here...")}
+              placeholder={t(
+                "reply.signaturePlaceholder",
+                "Paste the signature generated by your BTC wallet for the plaintext here...",
+              )}
               className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 outline-none focus:ring-2 focus:ring-accent font-mono transition-all"
             />
           </div>
@@ -582,7 +654,9 @@ export default function ReplyPage() {
             >
               <span className="text-black tx-12 md:tx-14">5</span>
             </div>
-            <h2 className="tx-16 fw-m text-primary">{t("reply.submitReply", "Submit Reply")}</h2>
+            <h2 className="tx-16 fw-m text-primary">
+              {t("reply.submitReply", "Submit Reply")}
+            </h2>
           </div>
 
           <div className="bg-bg rounded-xl p-4 mb-6">
@@ -591,16 +665,25 @@ export default function ReplyPage() {
             </div>
             <div className="space-y-2">
               <ChecklistItem
-                label={t("reply.checkBtcAddress", "BTC address format is valid")}
+                label={t(
+                  "reply.checkBtcAddress",
+                  "BTC address format is valid",
+                )}
                 isValid={isAddressValid}
                 isError={!!btcAddress && !isAddressValid}
               />
               <ChecklistItem
-                label={t("reply.checkReplyContent", "Reply content is filled in")}
+                label={t(
+                  "reply.checkReplyContent",
+                  "Reply content is filled in",
+                )}
                 isValid={isContentFilled}
               />
               <ChecklistItem
-                label={t("reply.checkPlaintext", "Plaintext has been generated")}
+                label={t(
+                  "reply.checkPlaintext",
+                  "Plaintext has been generated",
+                )}
                 isValid={isPlaintextGenerated}
               />
               <ChecklistItem
@@ -615,7 +698,7 @@ export default function ReplyPage() {
               type="button"
               appearance="outline"
               tone="white"
-              className="flex-1"
+              className="flex-1 text-black dark:text-white border-border dark:border-white hover:bg-white/5"
               onClick={goBack}
             >
               {t("reply.cancel", "Cancel")}
@@ -628,7 +711,9 @@ export default function ReplyPage() {
               disabled={!canSubmit || isSubmitting}
               onClick={handleSubmit}
             >
-              {isSubmitting ? t("reply.submitting", "Submitting...") : t("reply.submit", "Submit")}
+              {isSubmitting
+                ? t("reply.submitting", "Submitting...")
+                : t("reply.submit", "Submit")}
             </Button>
           </div>
         </div>
