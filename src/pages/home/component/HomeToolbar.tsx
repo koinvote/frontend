@@ -28,6 +28,7 @@ export function HomeToolbar() {
     [t],
   );
   const {
+    isDesktop,
     status,
     search,
     sortField,
@@ -95,6 +96,7 @@ export function HomeToolbar() {
     <div className="flex flex-col gap-3 md:gap-4">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
         <Segmented<HomeStatusFilter>
+          block={isDesktop ? false : true}
           size="large"
           styles={{
             root: {

@@ -1,9 +1,12 @@
-import { API } from "@/api";
-import { toast } from "@/components/base/Toast/toast";
-import { CheckOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Input } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import { CheckOutlined, MailOutlined } from "@ant-design/icons";
+
+import { API } from "@/api";
+import { toast } from "@/components/base/Toast/toast";
+import { useHomeStore } from "@/stores/homeStore";
 
 export default function Subscribe() {
   const { t } = useTranslation();
@@ -11,6 +14,7 @@ export default function Subscribe() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState("");
+  const isDesktop = useHomeStore((s) => s.isDesktop);
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,7 +31,7 @@ export default function Subscribe() {
 
     if (!validateEmail(email)) {
       setError(
-        t("subscribe.errorInvalid", "Please enter a valid email address")
+        t("subscribe.errorInvalid", "Please enter a valid email address"),
       );
       return;
     }
@@ -41,13 +45,16 @@ export default function Subscribe() {
         toast(
           "error",
           res.message ||
-            t("subscribe.errorFailed", "Subscription failed. Please try again.")
+            t(
+              "subscribe.errorFailed",
+              "Subscription failed. Please try again.",
+            ),
         );
       }
     } catch {
       toast(
         "error",
-        t("subscribe.errorFailed", "Subscription failed. Please try again.")
+        t("subscribe.errorFailed", "Subscription failed. Please try again."),
       );
     } finally {
       setIsLoading(false);
@@ -56,39 +63,39 @@ export default function Subscribe() {
 
   return (
     <div className="flex flex-col items-center max-w-3xl mx-auto space-y-6 px-2 md:px-0 text-center">
-      <h1 className="text-2xl md:text-3xl fw-m">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl fw-m">
         {t("subscribe.title", "Don't Miss Any Chance to Earn Bitcoin")}
       </h1>
 
       <p className="max-w-xl text-lg md:text-xl text-gray-400">
         {t(
           "subscribe.description",
-          "Enter your email and you'll be notified whenever a new reward event is created."
+          "Enter your email and you’ll be notified when new reward events are announced.",
         )}
       </p>
 
       {isSuccess ? (
-        <div className="flex flex-col gap-4 min-w-md mt-10 text-center">
-          <p className="max-w-xl text-lg md:text-xl text-primary">
+        <div className="flex flex-col gap-4 md:min-w-md mt-10 text-center">
+          <p className="text-lg md:text-xl text-primary">
             <CheckOutlined className="text-green-400! mr-2" />
             {t("subscribe.successMessageTitle", "Subscription successful.")}
           </p>
-          <p className="max-w-xl text-lg md:text-xl text-gray-400">
+          <p className="text-lg md:text-xl text-gray-400 wrap-break-word">
             {t(
               "subscribe.successMessageDescription",
-              "You'll be notified when new reward events go live."
+              "You'll be notified when new reward events go live.",
             )}
           </p>
         </div>
       ) : (
-        <div className="flex flex-col gap-4 min-w-md mt-10">
+        <div className="w-full flex flex-col gap-4 md:min-w-md mt-10">
           <Input
             className="p-4!"
-            size="large"
+            size={isDesktop ? "large" : "small"}
             prefix={<MailOutlined className="mr-2 text-gray-400!" />}
             placeholder={t(
               "subscribe.emailPlaceholder",
-              "Enter your email address..."
+              "Enter your email address...",
             )}
             value={email}
             onChange={(e) => {

@@ -104,13 +104,13 @@ export default function Layout() {
               "backdrop-blur",
               "transition-[width] duration-200 ease-out",
               "border-r border-border bg-(--color-bg)",
-              collapsed ? "w-[70px]" : "w-[280px]"
+              collapsed ? "w-[70px]" : "w-[280px]",
             )}
           >
             <div
               className={cn(
                 "h-full overflow-y-auto py-2",
-                collapsed ? "px-0" : "px-2"
+                collapsed ? "px-0" : "px-2",
               )}
             >
               <Menu collapsed={collapsed} onItemClick={handleClose} />
@@ -127,7 +127,7 @@ export default function Layout() {
                 "absolute -right-4 top-3",
                 "inline-flex h-8 w-8 items-center justify-center rounded-2xl",
                 "border border-border bg-surface",
-                "shadow hover:bg-surface/80 transition-colors cursor-pointer"
+                "shadow hover:bg-surface/80 transition-colors cursor-pointer",
               )}
             >
               {collapsed ? <RightArrow /> : <LeftArrow />}
@@ -139,10 +139,10 @@ export default function Layout() {
         <main
           className={cn(
             "min-w-0 flex-1 transition-[margin] duration-200 ease-out",
-            isDesktop && (collapsed ? "ml-[70px]" : "ml-[280px]")
+            isDesktop && (collapsed ? "ml-[70px]" : "ml-[280px]"),
           )}
         >
-          <div className="py-4 md:px-6 md:py-6 lg:px-12 border-b border-border">
+          <div className="py-4 md:px-6 md:py-6 lg:px-12">
             <Outlet />
           </div>
         </main>
@@ -161,7 +161,7 @@ export default function Layout() {
             ref={drawerRef}
             className={cn(
               "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
-              isClosing || isOpening ? "-translate-x-full" : "translate-x-0"
+              isClosing || isOpening ? "-translate-x-full" : "translate-x-0",
             )}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
