@@ -33,11 +33,20 @@ type PreviewEventState = {
   preheatHours?: number;
 };
 
-function formatDuration(hours: number, t: (key: string, defaultValue: string, options?: Record<string, unknown>) => string): string {
+function formatDuration(
+  hours: number,
+  t: (
+    key: string,
+    defaultValue: string,
+    options?: Record<string, unknown>,
+  ) => string,
+): string {
   if (!hours || hours <= 0) return "--";
   if (hours % 24 === 0) {
     const days = hours / 24;
-    return days === 1 ? t("common.oneDay", "1 day") : t("common.days", "{{days}} days", { days });
+    return days === 1
+      ? t("common.oneDay", "1 day")
+      : t("common.days", "{{days}} days", { days });
   }
   return t("common.hours", "{{hours}} hours", { hours });
 }
@@ -66,7 +75,7 @@ export default function PreviewEvent() {
     if (!isRewarded || !state?.rewardBtc) return null;
 
     const rewardAmountSatoshi = Math.round(
-      parseFloat(state.rewardBtc) * 100_000_000
+      parseFloat(state.rewardBtc) * 100_000_000,
     );
     if (!Number.isFinite(rewardAmountSatoshi) || rewardAmountSatoshi <= 0) {
       return null;
@@ -205,10 +214,12 @@ export default function PreviewEvent() {
       !hasPreheat && // 沒預熱
       isDurationWithinFree; // 時數在免費時數內
 
-    const primaryLabel = free ? t("preview.confirmSign", "Confirm & Sign") : t("preview.confirmPay", "Confirm & Pay");
+    const primaryLabel = free
+      ? t("preview.confirmSign", "Confirm & Sign")
+      : t("preview.confirmPay", "Confirm & Pay");
     const subTitle = free
       ? t("preview.reviewConfirm", "Please review and confirm your event.")
-      : t("preview.completePayment", "Please complete your payment");
+      : "";
 
     return {
       isFree: free,
@@ -386,7 +397,10 @@ export default function PreviewEvent() {
         </div>
         <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
           <p className="tx-14 lh-20 text-primary">
-            {t("preview.noEventData", "No event data to preview. Please create an event first.")}
+            {t(
+              "preview.noEventData",
+              "No event data to preview. Please create an event first.",
+            )}
           </p>
           <div className="mt-4">
             <Button
@@ -423,16 +437,24 @@ export default function PreviewEvent() {
 
         <div className="mt-6 space-y-4">
           {/* Creator address */}
-          <Field label={t("preview.creatorAddress", "Creator address")}>{creatorAddress || "--"}</Field>
+          <Field label={t("preview.creatorAddress", "Creator address")}>
+            {creatorAddress || "--"}
+          </Field>
           {/* Title */}
-          <Field label={t("preview.titleLabel", "Title")}>{title || "--"}</Field>
+          <Field label={t("preview.titleLabel", "Title")}>
+            {title || "--"}
+          </Field>
 
           {/* Description */}
-          <Field label={t("preview.description", "Description")}>{description || "--"}</Field>
+          <Field label={t("preview.description", "Description")}>
+            {description || "--"}
+          </Field>
 
           {/* Response type */}
           <Field label={t("preview.responseType", "Response type")}>
-            {eventType === "open" ? t("preview.openEnded", "Open-ended") : t("preview.singleChoice", "Single choice")}
+            {eventType === "open"
+              ? t("preview.openEnded", "Open-ended")
+              : t("preview.singleChoice", "Single choice")}
           </Field>
 
           {/* Hashtag */}
@@ -448,7 +470,9 @@ export default function PreviewEvent() {
 
           {/* Event type / Reward type */}
           <Field label={t("preview.eventType", "Event type")}>
-            {isRewarded ? t("preview.rewardEvent", "Reward event") : t("preview.noReward", "No reward")}
+            {isRewarded
+              ? t("preview.rewardEvent", "Reward event")
+              : t("preview.noReward", "No reward")}
           </Field>
 
           {/* Reward BTC & Max Recipient（有獎金時才顯示） */}
@@ -461,7 +485,9 @@ export default function PreviewEvent() {
                 {maxRecipients !== null && maxRecipients > 0
                   ? maxRecipients === 1
                     ? t("preview.oneAddress", "1 Address")
-                    : t("preview.multipleAddresses", "{{count}} Addresses", { count: maxRecipients })
+                    : t("preview.multipleAddresses", "{{count}} Addresses", {
+                        count: maxRecipients,
+                      })
                   : "--"}
               </Field>
             </>
@@ -487,14 +513,20 @@ export default function PreviewEvent() {
 
           {/* Platform fee（只有無獎金事件顯示） */}
           {!isRewarded && (
-            <Field label={t("preview.platformFee", "Platform fee")}>{platformFeeDisplay}</Field>
+            <Field label={t("preview.platformFee", "Platform fee")}>
+              {platformFeeDisplay}
+            </Field>
           )}
 
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (
             <>
-              <Field label={t("preview.preheat", "Preheat")}>{t("common.hours", "{{hours}} hours", { hours: preheatHours })}</Field>
-              <Field label={t("preview.preheatFee", "Preheat fee")}>{preheatFeeDisplay}</Field>
+              <Field label={t("preview.preheat", "Preheat")}>
+                {t("common.hours", "{{hours}} hours", { hours: preheatHours })}
+              </Field>
+              <Field label={t("preview.preheatFee", "Preheat fee")}>
+                {preheatFeeDisplay}
+              </Field>
             </>
           )}
           {/* Your Total */}
@@ -503,7 +535,10 @@ export default function PreviewEvent() {
               <span>{totalFeeDisplay}</span>
               {showLowTotalWarning && (
                 <span className="text-xs md:text-sm text-red-700 mt-1">
-                  {t("preview.lowAmountWarning", "Under 0.00002 BTC, your wallet may not be able to send this transaction.")}
+                  {t(
+                    "preview.lowAmountWarning",
+                    "Under 0.00002 BTC, your wallet may not be able to send this transaction.",
+                  )}
                 </span>
               )}
             </div>
@@ -546,7 +581,7 @@ export default function PreviewEvent() {
             appearance="outline"
             tone="primary"
             text="sm"
-            className="sm:w-[160px]"
+            className="sm:w-40"
             onClick={() => navigate("/create-event")}
           >
             {t("preview.editEvent", "Edit Event")}
@@ -556,11 +591,13 @@ export default function PreviewEvent() {
             appearance="solid"
             tone="primary"
             text="sm"
-            className="sm:w-[160px]"
+            className="sm:w-40"
             disabled={isCreatingEvent}
             onClick={handlePrimaryClick}
           >
-            {isCreatingEvent ? t("preview.creating", "Creating...") : primaryButtonLabel}
+            {isCreatingEvent
+              ? t("preview.creating", "Creating...")
+              : primaryButtonLabel}
           </Button>
         </div>
       </div>

@@ -504,7 +504,6 @@
     "confirmSign": "Confirm & Sign",
     "confirmPay": "Confirm & Pay",
     "reviewConfirm": "Please review and confirm your event.",
-    "completePayment": "Please complete your payment",
     "noEventData": "No event data to preview. Please create an event first.",
     "backToCreate": "Back to Create Event"
   },
