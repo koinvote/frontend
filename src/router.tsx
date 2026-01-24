@@ -1,4 +1,6 @@
 // router.tsx
+import { createBrowserRouter } from "react-router";
+
 import { ErrorPage } from "@/error";
 import Layout from "@/layout/Layout";
 import About from "@/pages/about";
@@ -18,7 +20,6 @@ import Support from "@/pages/support";
 import Terms from "@/pages/terms";
 import TestSafeArea from "@/pages/TestSafeArea";
 import VerificaionTool from "@/pages/verificaionTool";
-import { createBrowserRouter } from "react-router";
 import ComingSoon from "./pages/comingSoon";
 import TermsOfRewardDistribution from "./pages/terms/TermsOfRewardDistribution";
 import { Root } from "./Root";
@@ -62,6 +63,9 @@ const publicChildren = isComingSoonMode
       { path: "event/:eventId", element: <EventDetail /> },
       { path: "event/:eventId/reply", element: <ReplyPage /> },
       { path: "event/:eventId/report", element: <PayoutReport /> },
+
+      // TODO: test route, remove later
+      { path: "event-share/:eventId", element: <EventDetail /> },
     ];
 
 export const router = createBrowserRouter([
