@@ -408,7 +408,7 @@
   },
   "subscribe": {
     "title": "Don't Miss Any Chance to Earn Bitcoin",
-    "description": "Enter your email and you'll be notified whenever a new reward event is created.",
+    "description": "Enter your email and you'll be notified when new reward events are announced.",
     "emailPlaceholder": "Enter your email address...",
     "button": "Subscribe",
     "subscribing": "Subscribing",
