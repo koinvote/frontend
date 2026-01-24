@@ -232,6 +232,9 @@ export default function ConfirmSign() {
         const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
         sessionStorage.removeItem(CREATE_EVENT_DRAFT_KEY);
 
+        // Pre-generate OG image for sharing
+        API.preGenerateOgImage(eventId);
+
         // Reset home page status to "ongoing" before navigating
         setStatus("ongoing");
 

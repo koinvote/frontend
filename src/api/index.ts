@@ -127,6 +127,14 @@ export const API = {
 
   // Subscribe API
   subscribe: post<ApiResponse<void>, SubscribeReq>("/subscribe"),
+
+  // Pre-generate OG image (fire-and-forget, different base path)
+  preGenerateOgImage: (eventId: string) => {
+    // Fire-and-forget: we don't await or handle errors
+    fetch(`/render-meta/api/og-image/${eventId}`).catch(() => {
+      // Silently ignore errors - this is just a pre-warm cache call
+    });
+  },
 };
 
 // Admin API (requires Bearer token authentication)

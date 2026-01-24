@@ -1454,7 +1454,7 @@ export default function CreateEvent() {
             <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
               <input
                 type="checkbox"
-                className="mt-[2px] accent-(--color-orange-500)"
+                className="mt-0.5 accent-(--color-orange-500) cursor-pointer"
                 checked={agree}
                 onChange={(e) => setAgree(e.target.checked)}
               />
