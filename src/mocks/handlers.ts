@@ -270,20 +270,50 @@ export const handlers = [
     });
   }),
 
-  // GET /events/:eventId/reply-plaintext - Get reply plaintext
-  http.get(`${API_BASE_URL}/events/:eventId/reply-plaintext`, ({ params }) => {
-    const { eventId } = params;
-
+  // POST /replies/generate-plaintext - Get reply plaintext
+  http.post(`${API_BASE_URL}/replies/generate-plaintext`, () => {
     return HttpResponse.json<ApiResponse<any>>({
-      code: "200",
+      code: "000000",
       success: true,
-      message: null,
+      message: "Plaintext generated successfully",
       data: {
-        event_id: eventId,
-        btc_address: "bc1qmockaddress123",
-        plaintext: `Koinvote Event Reply\nEvent ID: ${eventId}\nTimestamp: ${Date.now()}`,
-        nonce_timestamp: Date.now(),
-        random_code: Math.random().toString(36).substring(7),
+        plaintext:
+          "koinvote.com | type:single | Option A | EVT_20241203_ABC123 | 1701612345 | 123456",
+        nonce_timestamp: "1701612345",
+        random_code: "123456",
+      },
+    });
+  }),
+
+  // POST /replies - Post reply plaintext
+  http.post(`${API_BASE_URL}/replies`, () => {
+    return HttpResponse.json<ApiResponse<any>>({
+      code: "000000",
+      success: true,
+      message: "Reply submitted successfully",
+      data: {
+        id: 123,
+        event_id: "EVT_20241203_ABC123",
+        btc_address: "tb1q...",
+        option_id: 1,
+        content: null,
+        content_hash: null,
+        plaintext:
+          "koinvote.com | type:single | Option A | EVT_20241203_ABC123 | 1701612345 | 123456",
+        signature: "H1234567890abcdef...",
+        nonce_timestamp: "1701612345",
+        random_code: "123456",
+        is_reply_valid: true,
+        balance_at_reply_satoshi: 100000,
+        balance_at_snapshot_satoshi: null,
+        balance_at_current_satoshi: null,
+        balance_last_updated_at: null,
+        is_hidden: false,
+        hidden_at: null,
+        hidden_by_admin_id: null,
+        created_at: "2024-12-03T10:15:30Z",
+        created_by_ip: "192.168.1.1",
+        updated_at: "2024-12-03T10:15:30Z",
       },
     });
   }),
