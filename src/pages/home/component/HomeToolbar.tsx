@@ -36,6 +36,7 @@ export function HomeToolbar() {
     sortOrder,
     activeHashtag,
     popularHashtags,
+    isLoading,
     setStatus,
     setSearch,
     setDebouncedSearch,
@@ -125,6 +126,7 @@ export function HomeToolbar() {
             },
           ]}
           onChange={(value) => {
+            if (isLoading) return;
             setStatus(value);
           }}
         />
@@ -236,15 +238,6 @@ export function HomeToolbar() {
             <span className="text-xs md:text-sm text-secondary">
               {t("homeToolbar.popularHashtags", "Popular hashtags")}
             </span>
-            {/* {(search || activeHashtag) && (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="text-xs md:text-sm text-accent underline"
-              >
-                Clear filters
-              </button>
-            )} */}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {popularHashtags.map((tag) => {
