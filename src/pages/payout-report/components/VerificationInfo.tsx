@@ -50,6 +50,7 @@ export function VerificationInfo({
               variant="solid"
               icon={<ExportOutlined />}
               onClick={() => window.open(blockExplorerUrl, "_blank")}
+              autoInsertSpace={false}
             >
               {t("payoutReport.blockExplorer", "Block Explorer")}
             </Button>
@@ -70,7 +71,7 @@ export function VerificationInfo({
                 styles={{ root: { maxWidth: "min(700px, 90vw)" } }}
                 title={t(
                   "payoutReport.verificationPackageTooltip",
-                  "Use this checksum to verify that the verification package you downloaded is complete and has not been modified."
+                  "Use this checksum to verify that the verification package you downloaded is complete and has not been modified.",
                 )}
               >
                 <InfoCircleOutlined className="text-secondary cursor-pointer" />
@@ -87,6 +88,7 @@ export function VerificationInfo({
               icon={<DownloadOutlined />}
               loading={isDownloading}
               onClick={onDownloadCsv}
+              autoInsertSpace={false}
             >
               {t("payoutReport.csv", "CSV")}
             </Button>
