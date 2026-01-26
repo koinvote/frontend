@@ -1,5 +1,6 @@
 import { Segmented } from "antd";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { API, type ApiResponse } from "@/api/index";
 import type { GetHotHashtagsRes } from "@/api/response";
@@ -11,7 +12,7 @@ import {
   type HomeStatusFilter,
 } from "@/pages/create-event/types/index";
 import { useHomeStore } from "@/stores/homeStore";
-import { useTranslation } from "react-i18next";
+import styles from "./HomeToolbar.module.css";
 
 export function HomeToolbar() {
   const { t } = useTranslation();
@@ -98,6 +99,9 @@ export function HomeToolbar() {
         <Segmented<HomeStatusFilter>
           block={isDesktop ? false : true}
           size="large"
+          classNames={{
+            label: styles["segmented-label"],
+          }}
           styles={{
             root: {
               border: "1px solid var(--color-border)",
