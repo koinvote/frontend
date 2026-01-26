@@ -689,7 +689,7 @@ export default function ConfirmPay() {
 
         {/* Action buttons */}
         <div className="mt-6 flex justify-center">
-          {isExpired ? (
+          {isExpired && (
             <Button
               type="button"
               appearance="solid"
@@ -699,17 +699,6 @@ export default function ConfirmPay() {
               onClick={handleBackToPreview}
             >
               {t("confirmPay.backToPreview", "Back to Preview")}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              appearance="outline"
-              tone="primary"
-              text="sm"
-              className="sm:w-[160px]"
-              onClick={handleCancel}
-            >
-              {t("confirmPay.cancel", "Cancel")}
             </Button>
           )}
         </div>
