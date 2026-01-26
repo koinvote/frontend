@@ -76,8 +76,8 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
         "success",
         t(
           "support.copyEmailSuccess",
-          "Support email copied: support@koinvote.com"
-        )
+          "Support email copied: support@koinvote.com",
+        ),
       );
     } catch (error) {
       console.error("Failed to copy:", error);
@@ -85,8 +85,8 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
         "error",
         t(
           "common.failedToCopyText",
-          "Failed to copy support email: support@koinvote.com"
-        )
+          "Failed to copy support email: support@koinvote.com",
+        ),
       );
     }
   });
@@ -103,7 +103,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               cn(
                 baseLink,
                 isActive && activeLink,
-                collapsed ? "justify-center px-2" : "gap-3"
+                collapsed ? "justify-center px-2" : "gap-3",
               )
             }
             onClick={onItemClick}
@@ -117,7 +117,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 <span
                   className={cn(
                     "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
-                    "text-current"
+                    "text-current",
                   )}
                 >
                   <Icon
@@ -133,7 +133,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               <span
                 className={cn(
                   "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
-                  "text-current"
+                  "text-current",
                 )}
               >
                 <Icon
@@ -149,7 +149,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
             className={cn(
               baseLink,
               collapsed ? "justify-center px-2" : "gap-3",
-              `cursor-pointer`
+              `cursor-pointer`,
             )}
             key={key}
             onClick={handleSupportClick}
@@ -163,7 +163,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 <span
                   className={cn(
                     "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
-                    "text-current"
+                    "text-current",
                   )}
                 >
                   <Icon
@@ -179,7 +179,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               <span
                 className={cn(
                   "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
-                  "text-current"
+                  "text-current",
                 )}
               >
                 <Icon
@@ -190,7 +190,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
             )}
             <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
           </div>
-        )
+        ),
       )}
 
       <div className="absolute bottom-0 left-0 w-full">
@@ -208,6 +208,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                   onClick={toggleLang}
                   className="w-auto px-3"
                   icon={<GlobalOutlined />}
+                  autoInsertSpace={false}
                 ></Button>
               </Tooltip>
               <Tooltip
@@ -221,6 +222,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                   onClick={toggle}
                   className="w-auto px-3"
                   icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
+                  autoInsertSpace={false}
                 ></Button>
               </Tooltip>
             </div>
@@ -232,6 +234,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 onClick={toggleLang}
                 className="w-auto px-3"
                 icon={<GlobalOutlined />}
+                autoInsertSpace={false}
               >
                 {current === "en" ? "EN" : "中文"}
               </Button>
@@ -241,6 +244,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 onClick={toggle}
                 className="w-auto px-3"
                 icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
+                autoInsertSpace={false}
               >
                 {theme === "dark" ? t("menu.light") : t("menu.dark")}
               </Button>

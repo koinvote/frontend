@@ -217,9 +217,10 @@ export default function PreviewEvent() {
     const primaryLabel = free
       ? t("preview.confirmSign", "Confirm & Sign")
       : t("preview.confirmPay", "Confirm & Pay");
-    const subTitle = free
-      ? t("preview.reviewConfirm", "Please review and confirm your event.")
-      : "";
+    const subTitle = t(
+      "preview.reviewConfirm",
+      "Please review and confirm your event details.",
+    );
 
     return {
       isFree: free,

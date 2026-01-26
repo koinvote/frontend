@@ -115,6 +115,7 @@ export default function Subscribe() {
             onClick={handleSubmit}
             loading={isLoading}
             disabled={isLoading}
+            autoInsertSpace={false}
           >
             {isLoading
               ? t("subscribe.subscribing", "Subscribing")
