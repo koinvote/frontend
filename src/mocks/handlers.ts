@@ -1,5 +1,5 @@
 // MSW handlers for API mocking
-import type { ApiResponse } from "@/api";
+import type { ApiResponse, ReplyReceiptData } from "@/api";
 import { DepositStatus } from "@/api/types";
 import { http, HttpResponse } from "msw";
 import {
@@ -314,6 +314,28 @@ export const handlers = [
         created_at: "2024-12-03T10:15:30Z",
         created_by_ip: "192.168.1.1",
         updated_at: "2024-12-03T10:15:30Z",
+      },
+    });
+  }),
+
+  // GET /replies/:id/receipt - download reply receipt
+  http.get(`${API_BASE_URL}/replies/:id/receipt`, () => {
+    return HttpResponse.json<ReplyReceiptData>({
+      version: "1.0",
+      receipt_id: "rpt_01KFGXZ3PMACAKBFE67W1EVZFJ",
+      event_id: "01KFFEBMQFJTV3SSKE0PZZM9C6",
+      addr: "bc1pwkt0d3nq8f28008acaq5temmwdd7k0mf5hpv94ez7f2tqh866vzs823f7x",
+      plaintext:
+        "koinvote.com | type:single | hamburger | 01KFFEBMQFJTV3SSKE0PZZM9C6 | 1769021042 | b018923297",
+      user_sig:
+        "II56oF7Tj+kn0NYebyC0rc8xaH5Tq1JiMwgPKnE3jQz3f7c44/TzwxnemDWo8fePcDOR1LpUmLQe2jpF1OEMoKk=",
+      timestamp: "2026-01-21T18:44:43Z",
+      kid: "yzWe2Pq/uzm1epINIy7sd5cS2qaXWTecfKLep5Ki+ZI=",
+      server_sig: {
+        alg: "ed25519",
+        sig: "NJ8wSIxqEo1HTzfsPg8T8ifrpWQlusgKXpZjNn5Pv24YCWgg+sBL7B5HPsyuQXD+mfziTCMkaUXKxd4uxVesAQ==",
+        payload:
+          "version=1.0|receipt_id=...|event_id=...|addr=...|plaintext=...|user_sig=...|timestamp=...|kid=...",
       },
     });
   }),

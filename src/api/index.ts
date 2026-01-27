@@ -71,10 +71,25 @@ export interface ApiResponse<T> {
   message: string | null;
   data: T;
 }
+export interface ReplyReceiptData {
+  version: string;
+  receipt_id: string;
+  event_id: string;
+  addr: string;
+  plaintext: string;
+  user_sig: string;
+  timestamp: string;
+  kid: string;
+  server_sig: {
+    alg: string;
+    sig: string;
+    payload: string;
+  };
+}
 
 export const API = {
   getSystemConfig: get<ApiResponse<SystemConfigRes>, void>(
-    "/system/parameters"
+    "/system/parameters",
   ),
 
   createEvent: post<ApiResponse<EventDataRes>, CreateEventReq>("/events"),
@@ -84,46 +99,51 @@ export const API = {
   getEventDetail: (eventId: string) =>
     get<ApiResponse<EventDetailDataRes>, void>(`/events/${eventId}`),
 
-  getHotHashtags: get<ApiResponse<GetHotHashtagsRes>, { limit: number, tab: string }>(
-    "hot-hashtags"
-  ),
+  getHotHashtags: get<
+    ApiResponse<GetHotHashtagsRes>,
+    { limit: number; tab: string }
+  >("hot-hashtags"),
 
   getSignaturePlainText: (eventId: string) =>
     get<ApiResponse<GetSignaturePlainTextRes>, void>(
-      `/events/${eventId}/signature-plaintext`
+      `/events/${eventId}/signature-plaintext`,
     ),
 
   verifySignature: (eventId: string) =>
     post<ApiResponse<VerifySignatureRes>, VerifySignatureReq>(
-      `/events/${eventId}/verify-signature`
+      `/events/${eventId}/verify-signature`,
     ),
 
   getDepositStatus: (eventId: string) =>
     get<ApiResponse<DepositStatusRes>, void>(
-      `/events/${eventId}/deposit-status`
+      `/events/${eventId}/deposit-status`,
     ),
 
   generateReplyPlaintext: () =>
     post<ApiResponse<GetReplyPlainTextRes>, GenerateReplyPlaintextReq>(
-      "/replies/generate-plaintext"
+      "/replies/generate-plaintext",
     ),
   // GET /api/v1/replies?event_id={event_id}
   getListReplies: () =>
     get<ApiResponse<GetListRepliesRes>, GetListRepliesReq>("/replies"),
 
-  submitReply: () => post<ApiResponse<void>, SubmitReplyReq>("/replies"),
+  submitReply: () =>
+    post<ApiResponse<{ id: number }>, SubmitReplyReq>("/replies"),
+
+  // Get reply receipt - returns JSON file as blob
+  getReplyReceipt: (replyId: number) =>
+    get<Blob, void>(`/replies/${replyId}/receipt`)({}, { responseType: "blob" }),
 
   // Payout Report API
   getPayoutReport: (eventId: string) =>
-    get<ApiResponse<PayoutReportRes>, void>(
-      `/events/${eventId}/payout-report`
-    ),
+    get<ApiResponse<PayoutReportRes>, void>(`/events/${eventId}/payout-report`),
 
   // Verification CSV API - Returns CSV file as blob
   getVerificationCsv: (eventId: string, planId: number) =>
-    get<Blob, { plan_id: number }>(
-      `/events/${eventId}/verification-csv`
-    )({ plan_id: planId }, { responseType: 'blob' }),
+    get<Blob, { plan_id: number }>(`/events/${eventId}/verification-csv`)(
+      { plan_id: planId },
+      { responseType: "blob" },
+    ),
 
   // Subscribe API
   subscribe: post<ApiResponse<void>, SubscribeReq>("/subscribe"),
@@ -144,7 +164,7 @@ export const AdminAPI = {
   login: post<ApiResponse<AdminLoginRes>, AdminLoginReq>("/admin/login"),
   // Admin system parameters (requires token - uses adminHttp)
   getSystemParameters: adminGet<ApiResponse<AdminSystemParametersRes>, void>(
-    "/admin/system-parameters"
+    "/admin/system-parameters",
   ),
   updateSystemParameters: adminPut<
     ApiResponse<void>,
