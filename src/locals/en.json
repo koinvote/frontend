@@ -396,6 +396,7 @@
     "failedToLoadReplies": "Failed to load replies",
     "unknownError": "Unknown error",
     "noRepliesYet": "No replies yet",
+    "noReplies": "No replies",
     "hashCopiedToClipboard": "Hash copied to clipboard",
     "failedToCopyHash": "Failed to copy hash",
     "option": "Option {{optionId}}",
