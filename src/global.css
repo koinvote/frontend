@@ -306,6 +306,33 @@
   white-space: normal !important;
 }
 
+/* border 只閃 ring 效果 */
+.border-flash {
+  border-radius: 0.375rem;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--color-bg);
+  animation: borderFlash 1.5s ease-in-out;
+}
+
+@keyframes borderFlash {
+  0% {
+    border-color: var(--color-bg);
+  }
+  25% {
+    border-color: var(--color-orange-500);
+  }
+  50% {
+    border-color: var(--color-bg);
+  }
+  75% {
+    border-color: var(--color-orange-500);
+  }
+  100% {
+    border-color: var(--color-bg);
+  }
+}
+
 @media (min-width: 768px) {
   .event-card-tooltip .ant-tooltip-inner,
   .event-card-tooltip .ant-tooltip-inner * {

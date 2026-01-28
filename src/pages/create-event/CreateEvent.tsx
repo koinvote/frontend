@@ -1,5 +1,6 @@
 import { Tooltip } from "antd";
 import {
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -105,17 +106,9 @@ export default function CreateEvent() {
   const navigate = useNavigate();
   const location = useLocation();
   const isFromCreateEventRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const isProgrammaticRef = useRef(false);
   const goBack = useBackIfInternal("/");
-
-  useEffect(() => {
-    const fromCreateEvent = sessionStorage.getItem("fromCreateEvent");
-    if (fromCreateEvent === "true") {
-      isFromCreateEventRef.current = true;
-      sessionStorage.removeItem("fromCreateEvent");
-    } else {
-      isFromCreateEventRef.current = false;
-    }
-  }, [location.pathname]);
 
   const { isDesktop } = useHomeStore();
 
@@ -172,6 +165,67 @@ export default function CreateEvent() {
 
   // 回填資料後再次確認是否可預覽
   const [checkPreview, setCheckPreview] = useState(false);
+  // 最後一個互動欄位
+  const [lastField, setLastField] = useState<string>(
+    sessionStorage.getItem("create-event-last-field") || "",
+  );
+
+  useEffect(() => {
+    const fromCreateEvent = sessionStorage.getItem("fromCreateEvent");
+    if (fromCreateEvent === "true") {
+      isFromCreateEventRef.current = true;
+      sessionStorage.removeItem("fromCreateEvent");
+    } else {
+      isFromCreateEventRef.current = false;
+    }
+  }, [location.pathname]);
+
+  const highlightLastField = useCallback(() => {
+    const lastField = sessionStorage.getItem("create-event-last-field");
+    if (lastField && formRef.current) {
+      const el = formRef.current.querySelector<
+        | HTMLInputElement
+        | HTMLSelectElement
+        | HTMLTextAreaElement
+        | HTMLButtonElement
+      >(`[name="${CSS.escape(lastField)}"]`);
+
+      if (!el) return;
+      // radio / checkbox → highlight label
+      if (
+        el instanceof HTMLInputElement &&
+        (el.type === "radio" || el.type === "checkbox")
+      ) {
+        let highLightEl: HTMLElement | null = el.closest("label");
+
+        if (lastField === "responseType" || lastField === "rewardType") {
+          highLightEl = formRef.current.querySelector<HTMLElement>(
+            `#${CSS.escape(lastField)}Title`,
+          );
+        }
+
+        if (!highLightEl) return;
+
+        highLightEl.classList.add("border-flash", "py-2");
+
+        const timer = setTimeout(() => {
+          highLightEl.classList.remove("border-flash", "py-2");
+        }, 3000);
+
+        return () => clearTimeout(timer);
+      }
+
+      // 其他 el → focus
+      // workaround to focus disabled input
+      setTimeout(() => {
+        el.focus();
+      }, 0);
+    }
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem("create-event-last-field", lastField);
+  }, [lastField]);
 
   useEffect(() => {
     const raw = creatorAddress.trim();
@@ -238,10 +292,12 @@ export default function CreateEvent() {
     return () => window.clearTimeout(timer);
   }, [creatorAddress, ACTIVE_BTC_NETWORK, networkLabel, t]);
 
+  // 回寫表單
   useEffect(() => {
     const saved = sessionStorage.getItem(CREATE_EVENT_DRAFT_KEY);
     if (!saved) return;
 
+    isProgrammaticRef.current = true;
     try {
       const draft: CreateEventDraft = JSON.parse(saved);
 
@@ -271,10 +327,14 @@ export default function CreateEvent() {
         setRewardBtcTouched(true);
       }
       setCheckPreview(true);
+
+      highlightLastField();
+
+      isProgrammaticRef.current = false;
     } catch (e) {
       console.error("Failed to parse create-event draft", e);
     }
-  }, []);
+  }, [highlightLastField]);
 
   // Clear preheat hours when preheat is disabled
   // Use a ref to track if we're restoring from sessionStorage to avoid clearing during restore
@@ -349,6 +409,7 @@ export default function CreateEvent() {
     setDurationHours("");
     setEnablePreheat(false);
     setPreheatHours("");
+    setLastField("");
   };
 
   /** -------- Submit handler -------- */
@@ -446,7 +507,6 @@ export default function CreateEvent() {
       eventType,
       isRewarded,
       rewardBtc: isRewarded ? rewardBtc : undefined,
-      maxRecipient: undefined, // TODO: 之後由後端 or 前端計算
       durationHours: duration,
       options: cleanedOptions,
       enablePreheat,
@@ -458,6 +518,7 @@ export default function CreateEvent() {
 
   const isSubmitting = false;
 
+  // 暫存表單
   useEffect(() => {
     const draft: CreateEventDraft = {
       creatorAddress,
@@ -778,6 +839,8 @@ export default function CreateEvent() {
       !optionsValidation.isValid ||
       !agree
     );
+    // checkPreview: need to check when user come from other page
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     agree,
     isSubmitting,
@@ -871,6 +934,23 @@ export default function CreateEvent() {
     return Math.max(0, MAX_TAG_LENGTH - currentInputCleaned.length);
   }, [currentInputCleaned]);
 
+  const handleFormItemFocus = (e: React.FocusEvent<HTMLFormElement>) => {
+    if (isProgrammaticRef.current) {
+      return;
+    }
+    const target = e.target;
+    // button 額外各自處理
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement
+    ) {
+      const name = target.name;
+      if (!name) return;
+      setLastField(name);
+    }
+  };
+
   return (
     <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
       <div className="h-[50px] w-full relative">
@@ -889,7 +969,13 @@ export default function CreateEvent() {
         </h1>
 
         {/* onSubmit 綁定 handleSubmit */}
-        <form className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
+        <form
+          ref={formRef}
+          className="space-y-6"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+          onFocus={handleFormItemFocus}
+        >
           {/* Creator address */}
           <div>
             <div className="flex items-center gap-1 mb-1">
@@ -963,6 +1049,7 @@ export default function CreateEvent() {
               <span className="text-(--color-orange-500)">*</span>
             </label>
             <input
+              name="title"
               ref={titleRef}
               type="text"
               value={title}
@@ -1001,6 +1088,7 @@ export default function CreateEvent() {
               {t("createEvent.description")}
             </label>
             <textarea
+              name="description"
               maxLength={500}
               rows={3}
               value={description}
@@ -1067,7 +1155,10 @@ export default function CreateEvent() {
                     data-chip-remove
                     aria-label={`Remove ${tag}`}
                     className="inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-white/10"
-                    onClick={() => removeTag(tag)}
+                    onClick={() => {
+                      removeTag(tag);
+                      setLastField("hashtags");
+                    }}
                   >
                     ×
                   </button>
@@ -1075,6 +1166,7 @@ export default function CreateEvent() {
               ))}
 
               <input
+                name="hashtags"
                 type="text"
                 value={hashtagInput}
                 onChange={(e) => handleHashtagChange(e.target.value)}
@@ -1099,7 +1191,10 @@ export default function CreateEvent() {
 
           {/* Response type */}
           <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-2">
+            <p
+              id="responseTypeTitle"
+              className="tx-14 lh-20 fw-m text-primary mb-2"
+            >
               {t("createEvent.responseType", "Response Type")}
               <span className="text-(--color-orange-500)">*</span>
             </p>
@@ -1108,8 +1203,8 @@ export default function CreateEvent() {
                 <div className="flex items-center gap-2 cursor-pointer">
                   {" "}
                   <input
-                    type="radio"
                     name="responseType"
+                    type="radio"
                     className="radio-orange"
                     checked={eventType === "single_choice"}
                     onChange={() => setEventType("single_choice")}
@@ -1141,9 +1236,9 @@ export default function CreateEvent() {
               <label className="flex tx-14 lh-20 text-primary">
                 <div className="flex items-center gap-2 cursor-pointer">
                   <input
-                    className="radio-orange"
-                    type="radio"
                     name="responseType"
+                    type="radio"
+                    className="radio-orange"
                     checked={eventType === "open"}
                     onChange={() => setEventType("open")}
                   />
@@ -1188,6 +1283,7 @@ export default function CreateEvent() {
                     <div key={index} className="flex items-center gap-2">
                       <div className="relative w-full">
                         <input
+                          name="options"
                           ref={(el) => {
                             optionRefs.current[index] = el;
                           }}
@@ -1255,7 +1351,10 @@ export default function CreateEvent() {
 
           {/* Reward type */}
           <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-2">
+            <p
+              id="rewardTypeTitle"
+              className="tx-14 lh-20 fw-m text-primary mb-2"
+            >
               {t("createEvent.rewardType")}
               <span className="text-(--color-orange-500)">*</span>
             </p>
@@ -1263,8 +1362,8 @@ export default function CreateEvent() {
               <label className="flex tx-14 lh-20 text-primary">
                 <div className="flex items-center gap-2 cursor-pointer">
                   <input
-                    type="radio"
                     name="rewardType"
+                    type="radio"
                     className="radio-orange"
                     checked={isRewarded}
                     onChange={() => setIsRewarded(true)}
@@ -1275,8 +1374,8 @@ export default function CreateEvent() {
               <label className="flex tx-14 lh-20 text-primary">
                 <div className="flex items-center gap-2 cursor-pointer">
                   <input
-                    type="radio"
                     name="rewardType"
+                    type="radio"
                     className="radio-orange"
                     checked={!isRewarded}
                     onChange={() => setIsRewarded(false)}
@@ -1296,6 +1395,7 @@ export default function CreateEvent() {
               </label>
             </div>
             <input
+              name="durationHours"
               ref={durationRef}
               type="text"
               inputMode="numeric"
@@ -1355,6 +1455,7 @@ export default function CreateEvent() {
               </label>
               <div className="flex items-center gap-2">
                 <input
+                  name="rewardBtc"
                   ref={rewardBtcRef}
                   disabled={Number(durationHours) <= 0}
                   type="text"
@@ -1404,10 +1505,11 @@ export default function CreateEvent() {
                   appearance="solid"
                   tone="white"
                   text="sm"
-                  className="w-[100px]"
+                  className="w-[100px] border-border rounded-xl"
                   onClick={() => {
                     setRewardBtc(minRewardBtc.toString());
                     setRewardBtcTouched(true); // Mark as touched when user clicks Minimum button
+                    setLastField("rewardBtc");
                   }}
                 >
                   {t("createEvent.minimum")}
@@ -1462,6 +1564,7 @@ export default function CreateEvent() {
             <div className="flex items-center gap-2 tx-14 lh-20 text-primary">
               <input
                 id="enable-preheat"
+                name="enablePreheat"
                 type="checkbox"
                 // check box color change to white
                 className="accent-(--color-orange-500)"
@@ -1490,6 +1593,7 @@ export default function CreateEvent() {
               </Tooltip>
             </div>
             <input
+              name="preheatHours"
               ref={preheatHoursRef}
               type="text"
               inputMode="numeric"
@@ -1545,6 +1649,7 @@ export default function CreateEvent() {
           >
             <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
               <input
+                name="agreeTerms"
                 ref={agreeRef}
                 type="checkbox"
                 className="mt-0.5 accent-(--color-orange-500) cursor-pointer"
@@ -1594,22 +1699,24 @@ export default function CreateEvent() {
           {/* Actions */}
           <div className="pt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Button
+              name="clearButton"
               type="button"
               appearance="outline"
               tone="primary"
               text="sm"
-              className="sm:w-[160px]"
+              className="sm:w-40"
               onClick={handleClear}
             >
               {t("createEvent.clear", "Clear")}
             </Button>
             <Button
+              name="previewButton"
               type="submit"
               appearance="solid"
               tone="primary"
               text="sm"
               className={cn(
-                "sm:w-[160px]",
+                "sm:w-40",
                 isPreviewDisabled && !isSubmitting && "opacity-50",
               )}
               disabled={isSubmitting}
