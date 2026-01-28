@@ -1505,7 +1505,7 @@ export default function CreateEvent() {
                   appearance="solid"
                   tone="white"
                   text="sm"
-                  className="w-[100px] border-border rounded-xl"
+                  className="w-[125px] border-border rounded-xl"
                   onClick={() => {
                     setRewardBtc(minRewardBtc.toString());
                     setRewardBtcTouched(true); // Mark as touched when user clicks Minimum button
