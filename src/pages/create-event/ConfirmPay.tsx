@@ -466,13 +466,13 @@ export default function ConfirmPay() {
             {isUnconfirmed
               ? t(
                   "confirmPay.waitingConfirmation",
-                  "Waiting for confirmation 0/1 ",
+                  "Payment received · Waiting for confirmation (0/1)",
                 )
               : t(
                   "confirmPay.completePaymentWithin",
-                  "Please complete your payment within ",
+                  "Please complete your payment within",
                 )}
-            <span className="text-(--color-orange-500) font-medium">
+            <span className="text-(--color-orange-500) font-medium ml-2">
               {countdownDisplay}
             </span>
           </p>
