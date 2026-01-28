@@ -74,6 +74,11 @@ export function SubmissionSuccessDialog({
             className="bg-neutral-500! hover:bg-neutral-500/80! text-white! font-medium!"
             block
             onClick={onViewResult}
+            styles={{
+              root: {
+                boxShadow: "none",
+              },
+            }}
           >
             {t("reply.viewResult", "View Result")}
           </Button>
