@@ -889,7 +889,7 @@ export default function CreateEvent() {
         </h1>
 
         {/* onSubmit 綁定 handleSubmit */}
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
           {/* Creator address */}
           <div>
             <div className="flex items-center gap-1 mb-1">
@@ -918,6 +918,9 @@ export default function CreateEvent() {
             <input
               ref={creatorAddressRef}
               type="text"
+              // avoid browser auto-fill
+              name="field_7x9abtca"
+              id="field_7x9abtca"
               value={creatorAddress}
               onChange={handleCreatorAddressChange}
               placeholder={t("createEvent.creatorAddressPlaceholder")}
