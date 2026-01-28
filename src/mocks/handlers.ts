@@ -1,5 +1,5 @@
 // MSW handlers for API mocking
-import type { ApiResponse } from "@/api";
+import type { ApiResponse, ReplyReceiptData } from "@/api";
 import { DepositStatus } from "@/api/types";
 import { http, HttpResponse } from "msw";
 import {
@@ -270,20 +270,72 @@ export const handlers = [
     });
   }),
 
-  // GET /events/:eventId/reply-plaintext - Get reply plaintext
-  http.get(`${API_BASE_URL}/events/:eventId/reply-plaintext`, ({ params }) => {
-    const { eventId } = params;
-
+  // POST /replies/generate-plaintext - Get reply plaintext
+  http.post(`${API_BASE_URL}/replies/generate-plaintext`, () => {
     return HttpResponse.json<ApiResponse<any>>({
-      code: "200",
+      code: "000000",
       success: true,
-      message: null,
+      message: "Plaintext generated successfully",
       data: {
-        event_id: eventId,
-        btc_address: "bc1qmockaddress123",
-        plaintext: `Koinvote Event Reply\nEvent ID: ${eventId}\nTimestamp: ${Date.now()}`,
-        nonce_timestamp: Date.now(),
-        random_code: Math.random().toString(36).substring(7),
+        plaintext:
+          "koinvote.com | type:single | Option A | EVT_20241203_ABC123 | 1701612345 | 123456",
+        nonce_timestamp: "1701612345",
+        random_code: "123456",
+      },
+    });
+  }),
+
+  // POST /replies - Post reply plaintext
+  http.post(`${API_BASE_URL}/replies`, () => {
+    return HttpResponse.json<ApiResponse<any>>({
+      code: "000000",
+      success: true,
+      message: "Reply submitted successfully",
+      data: {
+        id: 123,
+        event_id: "EVT_20241203_ABC123",
+        btc_address: "tb1q...",
+        option_id: 1,
+        content: null,
+        content_hash: null,
+        plaintext:
+          "koinvote.com | type:single | Option A | EVT_20241203_ABC123 | 1701612345 | 123456",
+        signature: "H1234567890abcdef...",
+        nonce_timestamp: "1701612345",
+        random_code: "123456",
+        is_reply_valid: true,
+        balance_at_reply_satoshi: 100000,
+        balance_at_snapshot_satoshi: null,
+        balance_at_current_satoshi: null,
+        balance_last_updated_at: null,
+        is_hidden: false,
+        hidden_at: null,
+        hidden_by_admin_id: null,
+        created_at: "2024-12-03T10:15:30Z",
+        created_by_ip: "192.168.1.1",
+        updated_at: "2024-12-03T10:15:30Z",
+      },
+    });
+  }),
+
+  // GET /replies/:id/receipt - download reply receipt
+  http.get(`${API_BASE_URL}/replies/:id/receipt`, () => {
+    return HttpResponse.json<ReplyReceiptData>({
+      version: "1.0",
+      receipt_id: "rpt_01KFGXZ3PMACAKBFE67W1EVZFJ",
+      event_id: "01KFFEBMQFJTV3SSKE0PZZM9C6",
+      addr: "bc1pwkt0d3nq8f28008acaq5temmwdd7k0mf5hpv94ez7f2tqh866vzs823f7x",
+      plaintext:
+        "koinvote.com | type:single | hamburger | 01KFFEBMQFJTV3SSKE0PZZM9C6 | 1769021042 | b018923297",
+      user_sig:
+        "II56oF7Tj+kn0NYebyC0rc8xaH5Tq1JiMwgPKnE3jQz3f7c44/TzwxnemDWo8fePcDOR1LpUmLQe2jpF1OEMoKk=",
+      timestamp: "2026-01-21T18:44:43Z",
+      kid: "yzWe2Pq/uzm1epINIy7sd5cS2qaXWTecfKLep5Ki+ZI=",
+      server_sig: {
+        alg: "ed25519",
+        sig: "NJ8wSIxqEo1HTzfsPg8T8ifrpWQlusgKXpZjNn5Pv24YCWgg+sBL7B5HPsyuQXD+mfziTCMkaUXKxd4uxVesAQ==",
+        payload:
+          "version=1.0|receipt_id=...|event_id=...|addr=...|plaintext=...|user_sig=...|timestamp=...|kid=...",
       },
     });
   }),

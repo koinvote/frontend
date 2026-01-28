@@ -23,8 +23,9 @@ import {
   formatOngoingCountdown,
   satsToBtc,
 } from "@/utils/formatter";
-import { useDebouncedClick } from "@/utils/helper";
+import { downloadBlob, useDebouncedClick } from "@/utils/helper";
 import { cn } from "@/utils/style";
+import { SubmissionSuccessDialog } from "./SubmissionSuccessDialog";
 
 // Helper for checklist items
 const ChecklistItem = ({
@@ -82,6 +83,9 @@ export default function ReplyPage() {
   const [signature, setSignature] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGeneratingPlaintext, setIsGeneratingPlaintext] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [submittedReplyId, setSubmittedReplyId] = useState<number | null>(null);
+  const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
 
   // --- Validation States ---
   const isAddressValid = useMemo(() => {
@@ -269,12 +273,11 @@ export default function ReplyPage() {
       });
 
       if (res.success) {
-        showToast(
-          "success",
-          t("reply.submitSuccess", "Reply submitted successfully"),
-        );
-        // Navigate back to event detail
-        navigate(`/event/${eventId}`);
+        // Store the reply ID and show success dialog
+        if (res.data?.id) {
+          setSubmittedReplyId(res.data.id);
+        }
+        setShowSuccessDialog(true);
       } else {
         showToast(
           "error",
@@ -300,6 +303,43 @@ export default function ReplyPage() {
     event?.event_reward_type === "rewarded"
       ? `${satsToBtc(event.initial_reward_satoshi, { suffix: false })}`
       : "None";
+
+  const handleDownloadReceipt = async () => {
+    if (!event || !submittedReplyId) {
+      showToast(
+        "error",
+        t("reply.receiptNotAvailable", "Receipt not available"),
+      );
+      return;
+    }
+
+    setIsDownloadingReceipt(true);
+    try {
+      const blob = await API.getReplyReceipt(submittedReplyId);
+      downloadBlob(blob, `koinvote-receipt-${event.event_id}.json`);
+
+      showToast(
+        "success",
+        t("reply.receiptDownloaded", "Receipt downloaded successfully"),
+      );
+
+      setTimeout(() => {
+        navigate(`/event/${eventId}`);
+      }, 720);
+    } catch (error) {
+      console.error("Failed to download receipt:", error);
+      showToast(
+        "error",
+        t("reply.failedToDownloadReceipt", "Failed to download receipt"),
+      );
+    } finally {
+      setIsDownloadingReceipt(false);
+    }
+  };
+
+  const handleViewResult = () => {
+    navigate(`/event/${eventId}`);
+  };
 
   // Event Countdown logic
   const [eventCountdown, setEventCountdown] = useState("");
@@ -718,6 +758,14 @@ export default function ReplyPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <SubmissionSuccessDialog
+        open={showSuccessDialog}
+        onDownloadReceipt={handleDownloadReceipt}
+        onViewResult={handleViewResult}
+        isDownloading={isDownloadingReceipt}
+      />
     </div>
   );
 }

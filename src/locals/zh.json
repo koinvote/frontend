@@ -397,6 +397,7 @@
     "failedToLoadReplies": "無法載入回覆",
     "unknownError": "未知錯誤",
     "noRepliesYet": "尚未收到回覆",
+    "noReplies": "未收到回覆",
     "hashCopiedToClipboard": "Hash 已複製到剪貼簿",
     "failedToCopyHash": "複製 Hash 失敗",
     "option": "選項 {{optionId}}",
@@ -580,7 +581,15 @@
     "failedToCopyPlaintext": "複製明文失敗",
     "plaintextExpiredToast": "明文已過期。請生成新的明文。",
     "submitSuccess": "回覆提交成功",
-    "submitFailed": "提交回覆失敗"
+    "submitFailed": "提交回覆失敗",
+    "submissionSuccessful": "提交成功",
+    "submissionSuccessMessage": "您的回覆已成功提交",
+    "downloadReceipt": "下載收據",
+    "viewResult": "查看結果",
+    "receiptNotAvailable": "收據不可用",
+    "failedToDownloadReceipt": "收據下載失敗",
+    "downloading": "下載中...",
+    "receiptDownloaded": "收據下載成功"
   },
   "comingSoon": {
     "brandName": "Koinvote",

@@ -1,6 +1,27 @@
 import { useRef, useCallback } from "react";
 
 /**
+ * Download a Blob as a file
+ *
+ * @param blob - The Blob to download
+ * @param filename - The filename for the downloaded file
+ *
+ * @example
+ * const blob = await API.getReplyReceipt(replyId);
+ * downloadBlob(blob, `receipt-${eventId}.json`);
+ */
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
  * Custom hook for debounced click functionality
  * Prevents multiple click actions within a specified time window
  *

@@ -34,7 +34,7 @@ const EventDetail = () => {
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
       const response = (await API.getEventDetail(
-        eventId
+        eventId,
       )()) as unknown as ApiResponse<EventDetailDataRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch event detail");
@@ -143,7 +143,7 @@ const EventDetail = () => {
 
   const handleSortChange = (
     newSortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME,
-    newOrder: "desc" | "asc"
+    newOrder: "desc" | "asc",
   ) => {
     setSortBy(newSortBy);
     setOrder(newOrder);
