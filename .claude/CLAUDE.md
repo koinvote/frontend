@@ -94,6 +94,14 @@ src/
 - Translation files: `src/locals/en.json` and `src/locals/zh.json`
 - Default language: English
 - Access translations via `useTranslation()` hook from react-i18next
+- **IMPORTANT**: Always provide a default fallback string when using `t()` function:
+  ```typescript
+  // ✅ Correct - always include fallback
+  t("createEvent.alertTitleRequired", "Please enter a title.")
+
+  // ❌ Wrong - never omit fallback
+  t("createEvent.alertTitleRequired")
+  ```
 
 #### Toast Notifications
 - Custom toast system in `src/components/base/Toast/`
