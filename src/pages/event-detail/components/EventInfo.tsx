@@ -94,13 +94,13 @@ export function EventInfo({ event }: EventInfoProps) {
       setActiveHashtag(hashtagWithPrefix);
       navigate("/");
     },
-    [isPreheat, isOngoing, isCompleted, setStatus, setActiveHashtag, navigate]
+    [isPreheat, isOngoing, isCompleted, setStatus, setActiveHashtag, navigate],
   );
 
   // Reward calculations
   const rewardAmountBtc = useMemo(
     () => satsToBtc(event.initial_reward_satoshi, { suffix: false }),
-    [event.initial_reward_satoshi]
+    [event.initial_reward_satoshi],
   );
 
   const additionalRewardBtc = useMemo(() => {
@@ -134,7 +134,7 @@ export function EventInfo({ event }: EventInfoProps) {
     if (isCompleted) {
       return formatCompletedTime(
         event.deadline_at,
-        t("eventInfo.eventEndedOn", "Ended on")
+        t("eventInfo.eventEndedOn", "Ended on"),
       );
     }
     return "";
@@ -146,8 +146,8 @@ export function EventInfo({ event }: EventInfoProps) {
       setTimeRemaining(
         formatCompletedTime(
           event.deadline_at,
-          t("eventInfo.eventEndedOn", "Ended on")
-        )
+          t("eventInfo.eventEndedOn", "Ended on"),
+        ),
       );
       return;
     }
@@ -187,7 +187,7 @@ export function EventInfo({ event }: EventInfoProps) {
 
       // Filter out string options, only use EventOption objects
       const validOptions = (event.options as (EventOption | string)[]).filter(
-        (opt): opt is EventOption => typeof opt === "object" && "id" in opt
+        (opt): opt is EventOption => typeof opt === "object" && "id" in opt,
       );
 
       // Sort by order
@@ -218,7 +218,7 @@ export function EventInfo({ event }: EventInfoProps) {
       }
 
       const validOptions = (event.options as (EventOption | string)[]).filter(
-        (opt): opt is EventOption => typeof opt === "object" && "id" in opt
+        (opt): opt is EventOption => typeof opt === "object" && "id" in opt,
       );
 
       const hasReplies = validOptions.some((opt) => opt.weight_percent > 0);
@@ -392,13 +392,13 @@ export function EventInfo({ event }: EventInfoProps) {
               transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
               aria-label={t(
                 "eventInfo.searchByCreatorAddress",
-                "Search events by creator address"
+                "Search events by creator address",
               )}
             >
               {event.creator_address.length > 10
                 ? `${event.creator_address.slice(
                     0,
-                    6
+                    6,
                   )}...${event.creator_address.slice(-4)}`
                 : event.creator_address}
             </button>
@@ -408,7 +408,7 @@ export function EventInfo({ event }: EventInfoProps) {
               className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
               aria-label={t(
                 "eventInfo.copyCreatorAddress",
-                "Copy creator address"
+                "Copy creator address",
               )}
             >
               <CopyIcon className="w-4 h-4 text-current" />
@@ -417,6 +417,18 @@ export function EventInfo({ event }: EventInfoProps) {
         ),
       });
     }
+
+    fields.push({
+      key: "response-type",
+      label: t("eventInfo.eventType", "Response type:"),
+      value: (
+        <span className="text-xs">
+          {event.event_type === "open"
+            ? t("reply.openEnded", "Open-ended")
+            : t("reply.singleChoice", "Multiple choice")}
+        </span>
+      ),
+    });
 
     if (event.hashtags && event.hashtags.length > 0) {
       fields.push({
@@ -440,7 +452,7 @@ export function EventInfo({ event }: EventInfoProps) {
                     "Filter by {{hashtag}}",
                     {
                       hashtag: hashtagWithPrefix,
-                    }
+                    },
                   )}
                 >
                   {hashtagWithPrefix}
@@ -467,6 +479,7 @@ export function EventInfo({ event }: EventInfoProps) {
     preheatDurationDisplay,
     event.event_id,
     event.creator_address,
+    event.event_type,
     event.hashtags,
     handleAddressClick,
     handleHashtagClick,
@@ -579,23 +592,23 @@ export function EventInfo({ event }: EventInfoProps) {
                   dark:border-white hover:border-gray-500 dark:hover:border-gray-400 transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
                   aria-label={t(
                     "eventInfo.searchByCreatorAddress",
-                    "Search events by creator address"
+                    "Search events by creator address",
                   )}
                 >
                   {event.creator_address.length > 10
                     ? `${event.creator_address.slice(
                         0,
-                        6
+                        6,
                       )}...${event.creator_address.slice(-4)}`
                     : event.creator_address}
                 </button>
                 <button
                   type="button"
                   onClick={handleCopyCreatorAddress}
-                  className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
+                  className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary cursor-pointer!"
                   aria-label={t(
                     "eventInfo.copyCreatorAddress",
-                    "Copy creator address"
+                    "Copy creator address",
                   )}
                 >
                   <CopyIcon className="w-4 h-4 text-current" />
@@ -603,6 +616,17 @@ export function EventInfo({ event }: EventInfoProps) {
               </div>
             </div>
           )}
+
+          <div>
+            <span className="text-xs md:text-sm text-secondary">
+              {t("eventInfo.eventType", "Event Type:")}
+            </span>
+            <span className="text-xs md:text-sm text-black dark:text-white ml-2">
+              {event.event_type === "open"
+                ? t("reply.openEnded", "Open-ended")
+                : t("reply.singleChoice", "Multiple choice")}
+            </span>
+          </div>
         </div>
 
         {/* Right Column */}
@@ -661,7 +685,7 @@ export function EventInfo({ event }: EventInfoProps) {
                       aria-label={t(
                         "eventInfo.filterByHashtag",
                         "Filter by {{hashtag}}",
-                        { hashtag: hashtagWithPrefix }
+                        { hashtag: hashtagWithPrefix },
                       )}
                     >
                       {hashtagWithPrefix}

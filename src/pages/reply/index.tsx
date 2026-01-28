@@ -400,7 +400,7 @@ export default function ReplyPage() {
               <TrophyIcon className="w-4 h-4" />
             </span>
             <h2 className="tx-16 lh-20 fw-m text-primary">
-              {t("reply.eventInfo", "Event information")}
+              {t("reply.eventInfo", "Event Information")}
             </h2>
           </div>
 
@@ -434,7 +434,7 @@ export default function ReplyPage() {
 
           <div className="flex items-center gap-2">
             <span className="tx-14 text-secondary">
-              {t("reply.type", "Type")} :
+              {t("reply.eventType", "Response type")}:
             </span>
             <span className="px-3 py-1 rounded-full bg-white text-black text-xs font-medium border border-border">
               {event.event_type === "open"
