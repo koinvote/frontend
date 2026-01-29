@@ -483,7 +483,7 @@
     "openEnded": "開放式",
     "singleChoice": "單選",
     "hashtag": "標籤",
-    "eventType": "活動類型",
+    "rewardType": "活動類型",
     "rewardEvent": "有獎勵活動",
     "noReward": "無獎勵",
     "rewardBtc": "獎勵 (BTC)",

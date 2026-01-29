@@ -482,7 +482,7 @@
     "openEnded": "Open-ended",
     "singleChoice": "Single choice",
     "hashtag": "Hashtag",
-    "eventType": "Event type",
+    "rewardType": "Reward type",
     "rewardEvent": "Reward event",
     "noReward": "No reward",
     "rewardBtc": "Reward (BTC)",

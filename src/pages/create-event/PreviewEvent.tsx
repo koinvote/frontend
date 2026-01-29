@@ -470,7 +470,7 @@ export default function PreviewEvent() {
           </Field>
 
           {/* Event type / Reward type */}
-          <Field label={t("preview.eventType", "Event type")}>
+          <Field label={t("preview.rewardType", "Reward type")}>
             {isRewarded
               ? t("preview.rewardEvent", "Reward event")
               : t("preview.noReward", "No reward")}
