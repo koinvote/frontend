@@ -94,7 +94,7 @@ export default function Layout() {
       />
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-screen md:pt-16">
+      <div className="relative flex w-full min-h-[calc(100dvh-4rem)] md:pt-16">
         {/* Sidebar (Desktop Only - Fixed) */}
         {isDesktop && (
           <aside

@@ -62,7 +62,7 @@ export default function Subscribe() {
   };
 
   return (
-    <div className="flex flex-col items-center  max-w-3xl mx-auto space-y-6 px-2 md:px-0 text-center [@media(max-height:799px)]:justify-center [@media(max-height:799px)]:h-[calc(100dvh-7rem)] [@media(min-height:800px)]:mt-[300px]">
+    <div className="flex flex-col items-center max-w-3xl mx-auto space-y-6 px-2 md:px-0 text-center [@media(min-height:933px)]:mt-[300px] [@media(max-height:932px)]:justify-center [@media(max-height:932px)]:h-[calc(100dvh-7rem)]">
       <h1 className="text-xl sm:text-2xl lg:text-3xl fw-m">
         {t("subscribe.title", "Don't Miss Any Chance to Earn Bitcoin")}
       </h1>
