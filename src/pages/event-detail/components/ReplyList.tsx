@@ -205,7 +205,7 @@ function ReplyItem({
   const balanceBtc = satsToBtc(getDisplayBalance(), {
     suffix: false,
   });
-  const timeAgo = formatRelativeTime(reply.created_at);
+  const timeAgo = formatRelativeTime(reply.created_at, t);
 
   // Calculate SHA-256 hash of reply content
   const [contentHash, setContentHash] = useState<string | null>(null);
@@ -377,7 +377,7 @@ function ReplyItem({
           </div>
           {displayText && (
             <p
-              className={`text-sm md:text-base text-primary break-words ${
+              className={`text-sm md:text-base text-primary wrap-break-word ${
                 !reply.is_reply_valid ? "line-through" : ""
               }`}
             >
@@ -415,7 +415,7 @@ function ReplyItem({
                 <button
                   type="button"
                   onClick={() => onCopy(reply.btc_address, "Bitcoin Address")}
-                  className="flex-shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
+                  className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
                 >
                   <CopyIcon className="w-4 h-4" />
                 </button>
@@ -436,7 +436,7 @@ function ReplyItem({
                 <button
                   type="button"
                   onClick={() => onCopy(reply.signature, "Bitcoin Signature")}
-                  className="flex-shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
+                  className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
                 >
                   <CopyIcon className="w-4 h-4" />
                 </button>
@@ -457,7 +457,7 @@ function ReplyItem({
                 <button
                   type="button"
                   onClick={() => onCopy(reply.plaintext, "Plaintext")}
-                  className="flex-shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
+                  className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors"
                 >
                   <CopyIcon className="w-4 h-4" />
                 </button>

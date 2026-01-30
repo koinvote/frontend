@@ -358,7 +358,7 @@ export default function ReplyPage() {
     }
 
     const updateEventCountdown = () => {
-      setEventCountdown(formatOngoingCountdown(event.deadline_at));
+      setEventCountdown(formatOngoingCountdown(event.deadline_at, t));
     };
 
     updateEventCountdown(); // Initial update

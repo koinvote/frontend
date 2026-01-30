@@ -5,6 +5,12 @@ dayjs.extend(utc);
 
 const SATS_PER_BTC = 100_000_000;
 
+type TranslateFunction = (
+  key: string,
+  defaultValue: string,
+  options?: Record<string, unknown>,
+) => string;
+
 /** BTC -> sats*/
 export const btcToSats = (value: string) => {
   const num = Number(value);
@@ -71,8 +77,14 @@ export const satsToBtc = (
 /**
  * Format preheat duration: 一律進位，最大單位 w，最小單位 hr
  */
-export const formatPreheatDuration = (hours: number): string => {
-  if (hours <= 0) return "0hr";
+export const formatPreheatDuration = (
+  hours: number,
+  t?: TranslateFunction,
+): string => {
+  const w = t ? t("formatter.w", "w") : "w";
+  const hr = t ? t("formatter.hr", "hr") : "hr";
+
+  if (hours <= 0) return `0${hr}`;
 
   // 一律進位（向上取整）
   const roundedHours = Math.ceil(hours);
@@ -82,12 +94,12 @@ export const formatPreheatDuration = (hours: number): string => {
   const remainingHours = roundedHours % 168;
 
   if (weeks > 0 && remainingHours === 0) {
-    return `${weeks}w`;
+    return `${weeks}${w}`;
   }
   if (weeks > 0) {
-    return `${weeks}w ${remainingHours}hr`;
+    return `${weeks}${w} ${remainingHours}${hr}`;
   }
-  return `${remainingHours}hr`;
+  return `${remainingHours}${hr}`;
 };
 
 /**
@@ -95,13 +107,18 @@ export const formatPreheatDuration = (hours: number): string => {
  */
 export const formatEventDuration = (
   startedAt: string,
-  deadlineAt: string
+  deadlineAt: string,
+  t?: TranslateFunction,
 ): string => {
+  const w = t ? t("formatter.w", "w") : "w";
+  const d = t ? t("formatter.d", "d") : "d";
+  const h = t ? t("formatter.h", "h") : "h";
+
   const start = dayjs.utc(startedAt);
   const deadline = dayjs.utc(deadlineAt);
   const diffHours = deadline.diff(start, "hour");
 
-  if (diffHours <= 0) return "0hr";
+  if (diffHours <= 0) return `0${h}`;
 
   const weeks = Math.floor(diffHours / (24 * 7));
   const remainingAfterWeeks = diffHours % (24 * 7);
@@ -110,13 +127,13 @@ export const formatEventDuration = (
 
   const parts: string[] = [];
   if (weeks > 0) {
-    parts.push(`${weeks}w`);
+    parts.push(`${weeks}${w}`);
   }
   if (days > 0) {
-    parts.push(`${days}d`);
+    parts.push(`${days}${d}`);
   }
   if (hours > 0 || parts.length === 0) {
-    parts.push(`${hours}h`);
+    parts.push(`${hours}${h}`);
   }
 
   return parts.join(" ");
@@ -125,13 +142,21 @@ export const formatEventDuration = (
 /**
  * Format preheat countdown: 從 started_at 計算（預熱結束時即進入 ongoing），最小單位秒
  */
-export const formatPreheatCountdown = (startedAt: string): string => {
+export const formatPreheatCountdown = (
+  startedAt: string,
+  t?: TranslateFunction,
+): string => {
+  const d = t ? t("formatter.d", "d") : "d";
+  const h = t ? t("formatter.h", "h") : "h";
+  const m = t ? t("formatter.m", "m") : "m";
+  const s = t ? t("formatter.s", "s") : "s";
+
   const start = dayjs.utc(startedAt);
   const now = dayjs();
   const diffMs = start.diff(now);
 
   if (diffMs <= 0) {
-    return "0s";
+    return `0${s}`;
   }
 
   const totalSeconds = Math.floor(diffMs / 1000);
@@ -141,27 +166,35 @@ export const formatPreheatCountdown = (startedAt: string): string => {
   const seconds = totalSeconds % 60;
 
   if (days > 0) {
-    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    return `${days}${d} ${hours}${h} ${minutes}${m} ${seconds}${s}`;
   }
   if (hours > 0) {
-    return `${hours}h ${minutes}m ${seconds}s`;
+    return `${hours}${h} ${minutes}${m} ${seconds}${s}`;
   }
   if (minutes > 0) {
-    return `${minutes}m ${seconds}s`;
+    return `${minutes}${m} ${seconds}${s}`;
   }
-  return `${seconds}s`;
+  return `${seconds}${s}`;
 };
 
 /**
  * Format ongoing countdown: 從 deadline_at 計算，最小單位是秒
  */
-export const formatOngoingCountdown = (deadlineAt: string): string => {
+export const formatOngoingCountdown = (
+  deadlineAt: string,
+  t?: TranslateFunction,
+): string => {
+  const d = t ? t("formatter.d", "d") : "d";
+  const h = t ? t("formatter.h", "h") : "h";
+  const m = t ? t("formatter.m", "m") : "m";
+  const s = t ? t("formatter.s", "s") : "s";
+
   const deadline = dayjs.utc(deadlineAt);
   const now = dayjs();
   const diffMs = deadline.diff(now);
 
   if (diffMs <= 0) {
-    return "0s";
+    return `0${s}`;
   }
 
   const totalSeconds = Math.floor(diffMs / 1000);
@@ -171,15 +204,15 @@ export const formatOngoingCountdown = (deadlineAt: string): string => {
   const seconds = totalSeconds % 60;
 
   if (days > 0) {
-    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+    return `${days}${d} ${hours}${h} ${minutes}${m} ${seconds}${s}`;
   }
   if (hours > 0) {
-    return `${hours}h ${minutes}m ${seconds}s`;
+    return `${hours}${h} ${minutes}${m} ${seconds}${s}`;
   }
   if (minutes > 0) {
-    return `${minutes}m ${seconds}s`;
+    return `${minutes}${m} ${seconds}${s}`;
   }
-  return `${seconds}s`;
+  return `${seconds}${s}`;
 };
 
 /**
@@ -216,31 +249,45 @@ export const formatDepositCountdown = (depositTimeoutAt: string): string => {
     .padStart(2, "0")}`;
 };
 
-export function formatRelativeTime(dateString: string): string {
+export function formatRelativeTime(
+  dateString: string,
+  t?: TranslateFunction,
+): string {
   // 確保將服務器返回的 UTC 時間正確解析為 UTC
   const date = dayjs.utc(dateString);
   const now = dayjs();
 
   const diffSeconds = now.diff(date, "second");
   if (diffSeconds < 60) {
-    return `${Math.max(1, diffSeconds)}s ago`;
+    const seconds = Math.max(1, diffSeconds);
+    return t
+      ? t("formatter.secondsAgo", "{{seconds}}s ago", { seconds })
+      : `${seconds}s ago`;
   }
 
   const diffMinutes = now.diff(date, "minute");
   if (diffMinutes < 60) {
-    return `${diffMinutes}m ago`;
+    return t
+      ? t("formatter.minutesAgo", "{{minutes}}m ago", { minutes: diffMinutes })
+      : `${diffMinutes}m ago`;
   }
 
   const diffHours = now.diff(date, "hour");
   if (diffHours < 24) {
-    return `${diffHours}h ago`;
+    return t
+      ? t("formatter.hoursAgo", "{{hours}}h ago", { hours: diffHours })
+      : `${diffHours}h ago`;
   }
 
   const diffDays = now.diff(date, "day");
   if (diffDays < 7) {
-    return `${diffDays}d ago`;
+    return t
+      ? t("formatter.daysAgo", "{{days}}d ago", { days: diffDays })
+      : `${diffDays}d ago`;
   }
 
   const weeks = Math.floor(diffDays / 7);
-  return `${weeks}w ago`;
+  return t
+    ? t("formatter.weeksAgo", "{{weeks}}w ago", { weeks })
+    : `${weeks}w ago`;
 }

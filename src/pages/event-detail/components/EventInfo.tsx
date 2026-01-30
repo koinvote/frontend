@@ -111,25 +111,32 @@ export function EventInfo({ event }: EventInfoProps) {
   // Duration calculations
   const eventDurationDisplay = useMemo(() => {
     if (isOngoing || isCompleted || isPreheat) {
-      return formatEventDuration(event.started_at, event.deadline_at);
+      return formatEventDuration(event.started_at, event.deadline_at, t);
     }
     return null;
-  }, [isOngoing, isCompleted, isPreheat, event.started_at, event.deadline_at]);
+  }, [
+    isOngoing,
+    isCompleted,
+    isPreheat,
+    event.started_at,
+    event.deadline_at,
+    t,
+  ]);
 
   const preheatDurationDisplay = useMemo(() => {
     if (event.preheat_hours > 0) {
-      return formatPreheatDuration(event.preheat_hours);
+      return formatPreheatDuration(event.preheat_hours, t);
     }
     return null;
-  }, [event.preheat_hours]);
+  }, [event.preheat_hours, t]);
 
   // Time remaining with real-time updates
   const [timeRemaining, setTimeRemaining] = useState(() => {
     if (isPreheat) {
-      return formatPreheatCountdown(event.started_at);
+      return formatPreheatCountdown(event.started_at, t);
     }
     if (isOngoing) {
-      return formatOngoingCountdown(event.deadline_at);
+      return formatOngoingCountdown(event.deadline_at, t);
     }
     if (isCompleted) {
       return formatCompletedTime(
@@ -154,9 +161,9 @@ export function EventInfo({ event }: EventInfoProps) {
 
     const updateTimeRemaining = () => {
       if (isPreheat) {
-        setTimeRemaining(formatPreheatCountdown(event.started_at));
+        setTimeRemaining(formatPreheatCountdown(event.started_at, t));
       } else if (isOngoing) {
-        setTimeRemaining(formatOngoingCountdown(event.deadline_at));
+        setTimeRemaining(formatOngoingCountdown(event.deadline_at, t));
       }
     };
 

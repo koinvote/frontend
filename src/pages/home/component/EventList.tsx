@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import { useHomeEvents } from "@/hooks/useHomeEvents";
@@ -6,6 +7,7 @@ import { EventCard } from "@/pages/home/component/EventCard";
 import { useHomeStore } from "@/stores/homeStore";
 
 export function EventList() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   // Optimize selector to avoid re-rendering on every scroll update
   const setScrollY = useHomeStore((state) => state.setScrollY);
@@ -37,13 +39,13 @@ export function EventList() {
   if (isError) {
     return (
       <div className="mt-8 flex flex-col items-center gap-2 text-sm text-secondary">
-        <span>Failed to load events.</span>
+        <span>{t("eventList.loadError", "Failed to load events.")}</span>
         <button
           type="button"
           onClick={reload}
           className="rounded-full bg-accent px-4 py-1.5 text-xs text-accent-foreground text-primary"
         >
-          Retry
+          {t("eventList.retry", "Retry")}
         </button>
       </div>
     );
@@ -54,9 +56,9 @@ export function EventList() {
   if (isEmpty) {
     return (
       <div className="mt-8 flex flex-col items-center gap-2 text-sm text-secondary">
-        <span>No events found for current filters.</span>
+        <span>{t("eventList.noEvents", "No events found for current filters.")}</span>
         <span className="text-xs">
-          Try clearing search or selecting a different status.
+          {t("eventList.noEventsHint", "Try clearing search or selecting a different status.")}
         </span>
       </div>
     );
@@ -79,12 +81,12 @@ export function EventList() {
       <div ref={sentinelRef} className="h-10 w-full">
         {isLoading && (
           <div className="flex h-full items-center justify-center text-xs text-secondary">
-            Loading...
+            {t("eventList.loading", "Loading...")}
           </div>
         )}
         {!hasMore && !isLoading && events.length > 0 && (
           <div className="flex h-full items-center justify-center text-[11px] text-secondary">
-            No more events
+            {t("eventList.noMoreEvents", "No more events")}
           </div>
         )}
       </div>

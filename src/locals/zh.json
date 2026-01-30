@@ -104,9 +104,9 @@
     "title": "付款說明",
     "waitingConfirmation": "已收到付款，等待確認中 (0/1)",
     "completePaymentWithin": "請在以下時間內完成付款：",
-    "sessionExpired": "此付款會話已過期。",
+    "sessionExpired": "此付款請求已過期。",
     "returnToPreview": "請返回預覽頁面並重新提交。",
-    "expiredRefundNote": "如果在會話過期後收到付款，將自動退款至您的退款地址，並扣除適用的網路費用。",
+    "expiredRefundNote": "如果在請求過期後收到付款，將自動退款至您的退款地址，並扣除對應的網路費用。",
     "thankYou": "感謝您的支持。",
     "contributionReceived": "您的付款已成功在鏈上收到。",
     "amountNotMeet": "但是，金額不符合建立此活動的最低要求。",
@@ -437,15 +437,23 @@
     "searchPlaceholder": "搜尋標題、地址、活動 ID",
     "popularHashtags": "熱門標籤"
   },
+  "eventList": {
+    "loadError": "載入活動失敗",
+    "retry": "重試",
+    "noEvents": "目前篩選條件下沒有活動",
+    "noEventsHint": "請嘗試清除搜尋或選擇其他狀態",
+    "loading": "載入中...",
+    "noMoreEvents": "沒有更多活動了"
+  },
   "eventCard": {
     "startingSoon": "即將開始",
-    "startsInDays": "{{days}}天 {{hours}}時 {{minutes}}分 {{seconds}}秒後開始",
-    "startsInHours": "{{hours}}時 {{minutes}}分 {{seconds}}秒後開始",
-    "startsInMinutes": "{{minutes}}分 {{seconds}}秒後開始",
-    "startsInSeconds": "{{seconds}}秒後開始",
-    "hoursAgo": "{{hours}}小時前",
-    "daysAgo": "{{days}}天前",
-    "weeksAgo": "{{weeks}}週前",
+    "startsInDays": "{{days}} 天 {{hours}} 時 {{minutes}} 分 {{seconds}} 秒後開始",
+    "startsInHours": "{{hours}} 時 {{minutes}} 分 {{seconds}} 秒後開始",
+    "startsInMinutes": "{{minutes}} 分 {{seconds}} 秒後開始",
+    "startsInSeconds": "{{seconds}} 秒後開始",
+    "hoursAgo": "{{hours}} 小時前",
+    "daysAgo": "{{days}} 天前",
+    "weeksAgo": "{{weeks}} 週前",
     "ended": "已結束",
     "weight": "權重：",
     "amount": "金額：",
@@ -610,5 +618,18 @@
   },
   "backendMessage": {
     "eventActivated": "事件建立成功"
+  },
+  "formatter": {
+    "w": " 週",
+    "d": " 天",
+    "h": " 時",
+    "m": " 分",
+    "s": " 秒",
+    "hr": " 小時",
+    "secondsAgo": "{{seconds}} 秒前",
+    "minutesAgo": "{{minutes}} 分鐘前",
+    "hoursAgo": "{{hours}} 小時前",
+    "daysAgo": "{{days}} 天前",
+    "weeksAgo": "{{weeks}} 週前"
   }
 }

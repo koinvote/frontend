@@ -436,6 +436,14 @@
     "searchPlaceholder": "Search by title, address, Event ID",
     "popularHashtags": "Popular hashtags"
   },
+  "eventList": {
+    "loadError": "Failed to load events.",
+    "retry": "Retry",
+    "noEvents": "No events found for current filters.",
+    "noEventsHint": "Try clearing search or selecting a different status.",
+    "loading": "Loading...",
+    "noMoreEvents": "No more events"
+  },
   "eventCard": {
     "startingSoon": "Starting soon",
     "startsInDays": "Starts in {{days}}d {{hours}}h {{minutes}}m {{seconds}}s",
@@ -609,5 +617,18 @@
   },
   "backendMessage": {
     "eventActivated": "Event successfully activated"
+  },
+  "formatter": {
+    "w": "w",
+    "d": "d",
+    "h": "h",
+    "m": "m",
+    "s": "s",
+    "hr": "hr",
+    "secondsAgo": "{{seconds}}s ago",
+    "minutesAgo": "{{minutes}}m ago",
+    "hoursAgo": "{{hours}}h ago",
+    "daysAgo": "{{days}}d ago",
+    "weeksAgo": "{{weeks}}w ago"
   }
 }

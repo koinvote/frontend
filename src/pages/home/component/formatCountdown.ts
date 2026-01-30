@@ -17,7 +17,7 @@ type TranslateFunction = (
 
 export function formatCountdown(event: EventSummary, t: TranslateFunction) {
   if (event.status === EventStatus.ACTIVE) {
-    return formatOngoingCountdown(event.deadline_at);
+    return formatOngoingCountdown(event.deadline_at, t);
   }
 
   // PREHEAT
