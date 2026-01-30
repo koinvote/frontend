@@ -62,7 +62,7 @@ export default function Subscribe() {
   };
 
   return (
-    <div className="flex flex-col items-center max-w-3xl mx-auto space-y-6 px-2 md:px-0 text-center">
+    <div className="flex flex-col items-center  max-w-3xl mx-auto space-y-6 px-2 md:px-0 text-center [@media(max-height:799px)]:justify-center [@media(max-height:799px)]:h-[calc(100dvh-7rem)] [@media(min-height:800px)]:mt-[300px]">
       <h1 className="text-xl sm:text-2xl lg:text-3xl fw-m">
         {t("subscribe.title", "Don't Miss Any Chance to Earn Bitcoin")}
       </h1>
@@ -102,6 +102,7 @@ export default function Subscribe() {
               setEmail(e.target.value);
               if (error) setError("");
             }}
+            onPressEnter={handleSubmit}
             status={error ? "error" : undefined}
             disabled={isLoading}
           />
