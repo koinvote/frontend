@@ -1,21 +1,23 @@
-import { type EventSummary } from "@/pages/create-event/types/index";
-import { type EventOption } from "@/api/response";
-import { EventStatus } from "@/api/types";
+import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
-import { useToast } from "@/components/base/Toast/useToast";
-import { Tooltip } from "antd";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { satsToBtc, formatOngoingCountdown } from "@/utils/formatter";
-import { useDebouncedClick } from "@/utils/helper";
+
+import { type EventOption } from "@/api/response";
+import { EventStatus } from "@/api/types";
+import { useToast } from "@/components/base/Toast/useToast";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
+import { type EventSummary } from "@/pages/create-event/types/index";
 import { useHomeStore } from "@/stores/homeStore";
+import { formatOngoingCountdown, satsToBtc } from "@/utils/formatter";
+import { useDebouncedClick } from "@/utils/helper";
 
 import BTCIcon from "@/assets/icons/btc.svg?react";
-import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
+
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
@@ -26,7 +28,11 @@ interface EventCardProps {
 
 function formatCountdown(
   event: EventSummary,
-  t: (key: string, defaultValue: string, options?: Record<string, unknown>) => string
+  t: (
+    key: string,
+    defaultValue: string,
+    options?: Record<string, unknown>,
+  ) => string,
 ) {
   if (event.status === EventStatus.ACTIVE) {
     return formatOngoingCountdown(event.deadline_at);
@@ -40,7 +46,8 @@ function formatCountdown(
     const startAt = event.started_at
       ? dayjs.utc(event.started_at)
       : dayjs.utc(event.deadline_at); // fallback 防呆
-    if (startAt.isBefore(now)) return t("eventCard.startingSoon", "Starting soon");
+    if (startAt.isBefore(now))
+      return t("eventCard.startingSoon", "Starting soon");
     const diffMs = startAt.diff(now);
     const totalSeconds = Math.max(0, Math.floor(diffMs / 1000));
     const days = Math.floor(totalSeconds / 86400);
@@ -49,15 +56,29 @@ function formatCountdown(
     const seconds = totalSeconds % 60;
 
     if (days > 0) {
-      return t("eventCard.startsInDays", "Starts in {{days}}d {{hours}}h {{minutes}}m {{seconds}}s", { days, hours, minutes, seconds });
+      return t(
+        "eventCard.startsInDays",
+        "Starts in {{days}}d {{hours}}h {{minutes}}m {{seconds}}s",
+        { days, hours, minutes, seconds },
+      );
     }
     if (hours > 0) {
-      return t("eventCard.startsInHours", "Starts in {{hours}}h {{minutes}}m {{seconds}}s", { hours, minutes, seconds });
+      return t(
+        "eventCard.startsInHours",
+        "Starts in {{hours}}h {{minutes}}m {{seconds}}s",
+        { hours, minutes, seconds },
+      );
     }
     if (minutes > 0) {
-      return t("eventCard.startsInMinutes", "Starts in {{minutes}}m {{seconds}}s", { minutes, seconds });
+      return t(
+        "eventCard.startsInMinutes",
+        "Starts in {{minutes}}m {{seconds}}s",
+        { minutes, seconds },
+      );
     }
-    return t("eventCard.startsInSeconds", "Starts in {{seconds}}s", { seconds });
+    return t("eventCard.startsInSeconds", "Starts in {{seconds}}s", {
+      seconds,
+    });
   }
 
   // COMPLETED //
@@ -108,7 +129,10 @@ interface ReplyItemProps {
   };
 }
 
-function ReplyItem({ reply, t }: ReplyItemProps & { t: (key: string, defaultValue: string) => string }) {
+function ReplyItem({
+  reply,
+  t,
+}: ReplyItemProps & { t: (key: string, defaultValue: string) => string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showToggle, setShowToggle] = useState(false);
   const hasOverflowRef = useRef(false); // 使用 ref 记录是否曾经溢出，避免依赖问题
@@ -194,7 +218,10 @@ function ReplyItem({ reply, t }: ReplyItemProps & { t: (key: string, defaultValu
       </p>
       <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
         <div className="flex items-center justify-end gap-2 md:gap-2">
-          <span>{t("eventCard.weight", "Weight:")} {Number(reply.weight_percent.toFixed(2))}%</span>
+          <span>
+            {t("eventCard.weight", "Weight:")}{" "}
+            {Number(reply.weight_percent.toFixed(2))}%
+          </span>
           <span>
             {t("eventCard.amount", "Amount:")}{" "}
             {satsToBtc(parseFloat(reply.amount_satoshi || "0"), {
@@ -249,10 +276,16 @@ function SingleChoiceOptions({
       onClick={handleToggle}
     >
       <div className="mb-1 text-[11px] md:text-xs text-secondary flex items-center justify-between">
-        <span>{sortedOptions.length > 1 ? t("eventCard.options", "Options") : t("eventCard.option", "Option")}</span>
+        <span>
+          {sortedOptions.length > 1
+            ? t("eventCard.options", "Options")
+            : t("eventCard.option", "Option")}
+        </span>
         {hasMore && (
           <span className="flex items-center gap-1">
-            {isExpanded ? t("eventCard.viewLess", "View less") : t("eventCard.viewAll", "View all")}
+            {isExpanded
+              ? t("eventCard.viewLess", "View less")
+              : t("eventCard.viewAll", "View all")}
           </span>
         )}
       </div>
@@ -269,7 +302,8 @@ function SingleChoiceOptions({
                 {typeof opt !== "string" && (
                   <>
                     <span>
-                      {t("eventCard.weight", "Weight:")} {Number(opt.weight_percent.toFixed(2))}%
+                      {t("eventCard.weight", "Weight:")}{" "}
+                      {Number(opt.weight_percent.toFixed(2))}%
                     </span>
                     <span>
                       {t("eventCard.amount", "Amount:")}{" "}
@@ -286,6 +320,81 @@ function SingleChoiceOptions({
         </div>
       ))}
     </section>
+  );
+}
+
+interface RewardCountdownProps {
+  totalRewardBtc: string;
+  countdown: string;
+  triggerProps?: React.HTMLAttributes<HTMLDivElement>;
+}
+
+function RewardCountdown({
+  totalRewardBtc,
+  countdown,
+  triggerProps,
+}: RewardCountdownProps) {
+  return (
+    <div
+      {...triggerProps}
+      className="flex flex-row md:flex-col items-center md:items-end
+          gap-4 md:gap-1 text-xs md:text-sm text-secondary"
+    >
+      <span className="font-semibold text-accent flex items-center gap-1 ">
+        <BTCIcon />
+        {totalRewardBtc} BTC
+      </span>
+      <span className="tabular-nums">{countdown}</span>
+    </div>
+  );
+}
+
+interface RewardCountdownWithTooltipProps {
+  tooltipText: string;
+  totalRewardBtc: string;
+  countdown: string;
+  isDesktop: boolean;
+  tooltipProps: Record<string, unknown>;
+  triggerProps: React.HTMLAttributes<HTMLDivElement>;
+}
+
+function RewardCountdownWithTooltip({
+  tooltipText,
+  totalRewardBtc,
+  countdown,
+  isDesktop,
+  tooltipProps,
+  triggerProps,
+}: RewardCountdownWithTooltipProps) {
+  return (
+    <Tooltip
+      title={tooltipText}
+      placement={isDesktop ? "topRight" : "bottomLeft"}
+      color="white"
+      {...tooltipProps}
+      getPopupContainer={(triggerNode) =>
+        triggerNode.parentElement || document.body
+      }
+      autoAdjustOverflow={false}
+      styles={{
+        container: {
+          maxWidth: isDesktop
+            ? "max-content"
+            : "min(300px, calc(100vw - 32px))",
+          whiteSpace: isDesktop ? "nowrap" : "normal",
+          width: isDesktop ? "max-content" : undefined,
+        },
+      }}
+      className="event-card-tooltip"
+    >
+      <span>
+        <RewardCountdown
+          totalRewardBtc={totalRewardBtc}
+          countdown={countdown}
+          triggerProps={triggerProps}
+        />
+      </span>
+    </Tooltip>
   );
 }
 
@@ -307,7 +416,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       event.status === EventStatus.ACTIVE ||
         event.status === EventStatus.PREHEAT
         ? 1000
-        : 30_000
+        : 30_000,
     );
 
     return () => clearInterval(interval);
@@ -355,7 +464,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       const clone = descriptionRef.current.cloneNode(true) as HTMLElement;
       clone.className = descriptionRef.current.className.replace(
         "line-clamp-2",
-        ""
+        "",
       );
       clone.style.position = "absolute";
       clone.style.visibility = "hidden";
@@ -433,46 +542,44 @@ export function EventCard({ event, onClick }: EventCardProps) {
         <h2 className="text-base md:text-lg font-semibold text-primary w-full md:min-w-0 md:flex-1 md:flex-shrink break-words">
           {event.title}
         </h2>
-        <div className="flex-shrink-0">
-          <Tooltip
-            title={
-              event.status === EventStatus.PREHEAT
-                ? t("eventCard.repliesOpenTooltip", "Replies open after the countdown ends.")
-                : t("eventCard.rewardDistributionTooltip", "After the countdown, this reward will be distributed")
-            }
-            placement={isDesktop ? "topRight" : "bottomLeft"}
-            color="white"
-            {...tooltipProps}
-            getPopupContainer={(triggerNode) =>
-              triggerNode.parentElement || document.body
-            }
-            autoAdjustOverflow={false}
-            styles={{
-              container: {
-                maxWidth: isDesktop
-                  ? "max-content"
-                  : "min(300px, calc(100vw - 32px))",
-                whiteSpace: isDesktop ? "nowrap" : "normal",
-                width: isDesktop ? "max-content" : undefined,
-              },
-            }}
-            overlayClassName="event-card-tooltip"
-          >
-            <div
-              {...triggerProps}
-              className="flex flex-row md:flex-col items-center md:items-end 
-          gap-4 md:gap-1 text-xs md:text-sm text-secondary"
-            >
-              <span className="font-semibold text-accent flex items-center gap-1 ">
-                <BTCIcon />
-                {event.total_reward_btc} BTC
-              </span>
-              <span className="tabular-nums">{countdown}</span>
-            </div>
-          </Tooltip>
+        <div className="shrink-0">
+          {event.status === EventStatus.PREHEAT && (
+            <RewardCountdownWithTooltip
+              tooltipText={t(
+                "eventCard.repliesOpenTooltip",
+                "Replies open after the countdown ends.",
+              )}
+              totalRewardBtc={event.total_reward_btc}
+              countdown={countdown}
+              isDesktop={isDesktop}
+              tooltipProps={tooltipProps}
+              triggerProps={triggerProps}
+            />
+          )}
+          {event.status !== EventStatus.PREHEAT &&
+            event.event_reward_type === "rewarded" && (
+              <RewardCountdownWithTooltip
+                tooltipText={t(
+                  "eventCard.rewardDistributionTooltip",
+                  "After the countdown, this reward will be distributed",
+                )}
+                totalRewardBtc={event.total_reward_btc}
+                countdown={countdown}
+                isDesktop={isDesktop}
+                tooltipProps={tooltipProps}
+                triggerProps={triggerProps}
+              />
+            )}
+          {event.status !== EventStatus.PREHEAT &&
+            event.event_reward_type === "non_reward" && (
+              <RewardCountdown
+                totalRewardBtc={event.total_reward_btc}
+                countdown={countdown}
+                triggerProps={triggerProps}
+              />
+            )}
         </div>
       </div>
-
       {/* Description section - full width clickable area */}
       <div
         data-description-area
@@ -497,7 +604,9 @@ export function EventCard({ event, onClick }: EventCardProps) {
             className="mt-1 text-xs md:text-sm cursor-pointer"
             onClick={handleDescriptionToggle}
           >
-            {isDescriptionExpanded ? t("eventCard.showLess", "Show less") : t("eventCard.showMore", "Show more")}
+            {isDescriptionExpanded
+              ? t("eventCard.showLess", "Show less")
+              : t("eventCard.showMore", "Show more")}
           </button>
         )}
       </div>
@@ -535,7 +644,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
           /* Mobile Layout: Three items distributed evenly */
           <div className="flex items-center justify-between">
             <Tooltip
-              title={t("eventCard.totalAddresses", "Total participation addresses")}
+              title={t(
+                "eventCard.totalAddresses",
+                "Total participation addresses",
+              )}
               placement="topLeft"
               color="white"
               {...participantsTooltipProps}
@@ -582,7 +694,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Tooltip
-                title={t("eventCard.totalAddresses", "Total participation addresses")}
+                title={t(
+                  "eventCard.totalAddresses",
+                  "Total participation addresses",
+                )}
                 placement="topLeft"
                 color="white"
                 {...participantsTooltipProps}
@@ -600,7 +715,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
                   </span>
                   <span>
                     {event.participants_count}
-                    <span className="hidden md:inline"> {t("eventCard.participants", "participants")}</span>
+                    <span className="hidden md:inline">
+                      {" "}
+                      {t("eventCard.participants", "participants")}
+                    </span>
                   </span>
                 </div>
               </Tooltip>
@@ -617,7 +735,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
                   <span>₿</span>
                   <span>
                     {event.total_stake_btc}
-                    <span className="hidden md:inline"> {t("eventCard.btcTotal", "BTC total")}</span>
+                    <span className="hidden md:inline">
+                      {" "}
+                      {t("eventCard.btcTotal", "BTC total")}
+                    </span>
                   </span>
                 </div>
               </Tooltip>

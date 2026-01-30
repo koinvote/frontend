@@ -60,6 +60,7 @@ export interface TopReplyRes {
 
 export interface EventListDataRes {
   id: number;
+  event_reward_type: EventRewardType;
   event_type: EventType;
   event_id: string;
   title: string;

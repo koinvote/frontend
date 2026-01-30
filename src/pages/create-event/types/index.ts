@@ -1,6 +1,6 @@
 // src/pages/home/types.ts
-import type { EventStatus } from "@/api/types";
 import type { EventOption } from "@/api/response";
+import type { EventRewardType, EventStatus } from "@/api/types";
 
 export interface TopReply {
   id: string;
@@ -32,6 +32,7 @@ export interface EventSummary {
 
   top_replies: TopReply[];
   event_type: "open" | "single_choice";
+  event_reward_type: EventRewardType;
   options: EventOption[] | string[];
 }
 

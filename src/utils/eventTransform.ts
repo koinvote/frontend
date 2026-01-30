@@ -1,10 +1,10 @@
 // src/pages/home/utils/eventTransform.ts
 
+import type { EventListDataRes, TopReplyRes } from "@/api/response";
 import {
   type EventSummary,
   type TopReply,
 } from "@/pages/create-event/types/index";
-import type { EventListDataRes, TopReplyRes } from "@/api/response";
 
 import { EventStatus } from "@/api/types";
 import { satsToBtc } from "@/utils/formatter";
@@ -16,7 +16,7 @@ const satsToBtcString = (sats: number): string =>
 // Map backend API status to EventStatus
 // 1=pending, 2=preheat, 3=active, 4=ended, 5=completed, 6=cancelled, 7=refunded, 8=expired
 const mapApiStatusToEventStatus = (
-  status: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  status: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
 ):
   | typeof EventStatus.ACTIVE
   | typeof EventStatus.PREHEAT
@@ -40,10 +40,11 @@ const mapApiTopReply = (r: TopReplyRes): TopReply => ({
 
 // New function to map API response to EventSummary
 export const mapApiEventToEventSummary = (
-  ev: EventListDataRes
+  ev: EventListDataRes,
 ): EventSummary => ({
   id: ev.id,
   event_id: ev.event_id,
+  event_reward_type: ev.event_reward_type,
   event_type: ev.event_type,
   title: ev.title,
   description: ev.description,
