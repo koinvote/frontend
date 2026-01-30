@@ -1012,7 +1012,7 @@ export default function CreateEvent() {
               placeholder={t("createEvent.creatorAddressPlaceholder")}
               autoCorrect="off"
               autoCapitalize="off"
-              autoComplete="new-password"
+              autoComplete="one-time-code"
               spellCheck="false"
               className={`w-full rounded-xl border border-border bg-white px-3 py-2
     tx-14 lh-20 text-black placeholder:text-secondary
@@ -1050,6 +1050,7 @@ export default function CreateEvent() {
             </label>
             <input
               name="title"
+              autoComplete="one-time-code"
               ref={titleRef}
               type="text"
               value={title}
@@ -1167,6 +1168,7 @@ export default function CreateEvent() {
 
               <input
                 name="hashtags"
+                autoComplete="one-time-code"
                 type="text"
                 value={hashtagInput}
                 onChange={(e) => handleHashtagChange(e.target.value)}
@@ -1284,6 +1286,7 @@ export default function CreateEvent() {
                       <div className="relative w-full">
                         <input
                           name="options"
+                          autoComplete="one-time-code"
                           ref={(el) => {
                             optionRefs.current[index] = el;
                           }}
