@@ -5,8 +5,9 @@ export function useBackOrFallback(previousPath: string) {
 
   const goBack = () => {
     if (document.referrer) {
-      const referrerPath = new URL(document.referrer).pathname;
-      if (referrerPath === previousPath) {
+      const referrerUrl = new URL(document.referrer);
+      const isSameHost = referrerUrl.host === window.location.host;
+      if (isSameHost && referrerUrl.pathname === previousPath) {
         navigate(-1);
         return;
       }
