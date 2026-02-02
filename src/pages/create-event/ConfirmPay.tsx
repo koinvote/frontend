@@ -605,15 +605,6 @@ export default function ConfirmPay() {
                 <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
                   {refundAddress || "--"}
                 </div>
-                {refundAddress && (
-                  <button
-                    type="button"
-                    onClick={() => handleCopyAddress(refundAddress)}
-                    className="p-1 hover:opacity-70 cursor-pointer"
-                  >
-                    <CopyIcon className="w-4 h-4 text-secondary" />
-                  </button>
-                )}
               </div>
             </div>
 
