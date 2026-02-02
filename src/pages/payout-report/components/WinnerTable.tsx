@@ -72,11 +72,9 @@ export function WinnerTable({
     switch (status) {
       case "completed":
         return t("payoutReport.status.completed", "Completed");
-      case "dust_redistributed":
+      case "redistribute":
         return t("payoutReport.status.redistribute", "Redistribute");
       case "processing":
-      case "failed":
-      case "pending":
       default:
         return t("payoutReport.status.processing", "Processing");
     }
@@ -165,7 +163,7 @@ export function WinnerTable({
                   <span className="inline-flex items-center gap-1">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs whitespace-nowrap ${getStatusBadgeColor(
-                        winner.status
+                        winner.status,
                       )} ${
                         winner.status === "dust_redistributed" ? "ml-4" : ""
                       }`}
@@ -183,7 +181,7 @@ export function WinnerTable({
                             addressCount: redistributedAddressCount,
                             threshold: dustThreshold,
                             totalSats: redistributedSatoshi.toLocaleString(),
-                          }
+                          },
                         )}
                       >
                         <InfoCircleOutlined className="text-gray-400 dark:text-primary cursor-pointer" />
@@ -203,12 +201,12 @@ export function WinnerTable({
                   {t(
                     "payoutReport.moreAddresses",
                     "There are {{count}} more addresses...",
-                    { count: remainingCount }
+                    { count: remainingCount },
                   )}
                   (
                   {t(
                     "payoutReport.downloadVerification",
-                    "Please download the verification package to view the full list"
+                    "Please download the verification package to view the full list",
                   )}
                   )
                 </td>
