@@ -58,11 +58,9 @@ export function WinnerTable({
     switch (status) {
       case "completed":
         return "bg-amber-500 text-white"; // #FF8904
-      case "dust_redistributed":
+      case "redistribute":
         return "bg-neutral-800 text-white"; // #262626
       case "processing":
-      case "failed":
-      case "pending":
       default:
         return "bg-emerald-400 text-white"; // #05DF72
     }
@@ -164,13 +162,11 @@ export function WinnerTable({
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs whitespace-nowrap ${getStatusBadgeColor(
                         winner.status,
-                      )} ${
-                        winner.status === "dust_redistributed" ? "ml-4" : ""
-                      }`}
+                      )} ${winner.status === "redistribute" ? "ml-4" : ""}`}
                     >
                       {getStatusText(winner.status)}
                     </span>
-                    {winner.status === "dust_redistributed" && (
+                    {winner.status === "redistribute" && (
                       <Tooltip
                         className="bg-white text-black"
                         styles={{ root: { maxWidth: "min(700px, 90vw)" } }}
