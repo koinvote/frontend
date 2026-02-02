@@ -19,6 +19,7 @@ import type {
   DepositStatusRes,
   EventDataRes,
   EventDetailDataRes,
+  GetCompletedTopRepliesRes,
   GetEventListRes,
   GetHotHashtagsRes,
   GetListRepliesRes,
@@ -132,11 +133,18 @@ export const API = {
 
   // Get reply receipt - returns JSON file as blob
   getReplyReceipt: (replyId: number) =>
-    get<Blob, void>(`/replies/${replyId}/receipt`)({}, { responseType: "blob" }),
+    get<Blob, void>(`/replies/${replyId}/receipt`)(undefined, { responseType: "blob" }),
 
   // Payout Report API
   getPayoutReport: (eventId: string) =>
     get<ApiResponse<PayoutReportRes>, void>(`/events/${eventId}/payout-report`),
+
+  // Get top replies for completed events (with balance type filter)
+  getCompletedTopReplies: (eventId: string) =>
+    get<
+      ApiResponse<GetCompletedTopRepliesRes>,
+      { balance_type?: "snapshot" | "current" }
+    >(`/events/${eventId}/completed/top-replies`),
 
   // Verification CSV API - Returns CSV file as blob
   getVerificationCsv: (eventId: string, planId: number) =>

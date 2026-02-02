@@ -378,6 +378,44 @@ export const handlers = [
     });
   }),
 
+  // GET /events/:eventId/completed/top-replies - Get top replies for completed events
+  http.get(
+    `${API_BASE_URL}/events/:eventId/completed/top-replies`,
+    ({ params, request }) => {
+      const { eventId } = params;
+      const url = new URL(request.url);
+      const balanceType = url.searchParams.get("balance_type") || "snapshot";
+
+      // Find event from list to get options
+      const eventFromList = mockEventList.find((e) => e.event_id === eventId);
+
+      // Generate different weight percentages based on balance type
+      const isSnapshot = balanceType === "snapshot";
+
+      // Generate different weight percentages for top_replies based on balance type
+      const topReplies = eventFromList?.top_replies?.map((reply, index) => ({
+        ...reply,
+        weight_percent: isSnapshot
+          ? reply.weight_percent
+          : Math.max(0, reply.weight_percent + (index % 2 === 0 ? 15 : -15)),
+        amount_satoshi: isSnapshot
+          ? reply.amount_satoshi
+          : reply.amount_satoshi + (index % 2 === 0 ? 30000 : -30000),
+      }));
+
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: {
+          event_id: eventId,
+          balance_type: balanceType,
+          top_replies: topReplies || [],
+        },
+      });
+    },
+  ),
+
   // GET /events/:eventId/payout-report - Get payout report
   http.get(`${API_BASE_URL}/events/:eventId/payout-report`, ({ params }) => {
     const { eventId } = params;

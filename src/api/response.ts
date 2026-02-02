@@ -260,3 +260,9 @@ export interface PayoutReportRes {
   total_reward_pool_satoshi: number;
   reward_details: RewardDetail[];
 }
+
+export interface GetCompletedTopRepliesRes {
+  event_id: string;
+  balance_type: "snapshot" | "current";
+  top_replies: TopReplyRes[];
+}

@@ -22,9 +22,10 @@ import { TopReplyBar } from "./TopReplyBar";
 
 interface EventInfoProps {
   event: EventDetailDataRes;
+  topReplies?: TopReply[];
 }
 
-export function EventInfo({ event }: EventInfoProps) {
+export function EventInfo({ event, topReplies }: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -252,7 +253,8 @@ export function EventInfo({ event }: EventInfoProps) {
         ? t("eventInfo.topReply", "Top Reply")
         : t("eventInfo.options", "Options");
       return {
-        displayData: convertedData,
+        displayData:
+          topReplies && topReplies.length > 0 ? topReplies : convertedData,
         displayTitle: title,
       };
     }
@@ -269,7 +271,9 @@ export function EventInfo({ event }: EventInfoProps) {
       }
 
       // Sort by weight_percent descending, limit to 5
-      const sortedReplies = [...event.top_replies]
+      const replies =
+        topReplies && topReplies.length > 0 ? topReplies : event.top_replies;
+      const sortedReplies = [...replies]
         .sort((a, b) => {
           const weightA = a.weight_percent || 0;
           const weightB = b.weight_percent || 0;
@@ -292,6 +296,7 @@ export function EventInfo({ event }: EventInfoProps) {
     isPreheat,
     isOngoing,
     isCompleted,
+    topReplies,
   ]);
 
   // Build field list for mobile (ordered list)
@@ -412,7 +417,7 @@ export function EventInfo({ event }: EventInfoProps) {
             <button
               type="button"
               onClick={handleCopyCreatorAddress}
-              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary !cursor-pointer"
+              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary cursor-pointer!"
               aria-label={t(
                 "eventInfo.copyCreatorAddress",
                 "Copy creator address",

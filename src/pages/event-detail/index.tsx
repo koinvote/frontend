@@ -2,8 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
-import type { EventDetailDataRes } from "@/api/response";
-import { ReplySortBy } from "@/api/types";
+import { mapApiTopReply } from "@/utils/eventTransform";
+import type {
+  EventDetailDataRes,
+  GetCompletedTopRepliesRes,
+} from "@/api/response";
+import { EventStatus, ReplySortBy } from "@/api/types";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
@@ -57,6 +61,38 @@ const EventDetail = () => {
   const [balanceDisplayMode, setBalanceDisplayMode] = useState<
     "snapshot" | "on_chain"
   >("snapshot");
+
+  // Fetch top replies/options when balance display mode changes for completed/ended events
+  const { data: topRepliesData } = useQuery({
+    queryKey: [
+      "completedTopReplies",
+      eventId,
+      balanceDisplayMode === "on_chain" ? "current" : "snapshot",
+    ],
+    queryFn: async () => {
+      if (!eventId) throw new Error("Event ID is required");
+      const balanceType =
+        balanceDisplayMode === "on_chain" ? "current" : "snapshot";
+      const response = (await API.getCompletedTopReplies(eventId)({
+        balance_type: balanceType,
+      })) as unknown as ApiResponse<GetCompletedTopRepliesRes>;
+      if (!response.success) {
+        throw new Error(response.message || "Failed to fetch top replies");
+      }
+      return response.data;
+    },
+    enabled:
+      !!eventId &&
+      !!eventDetail &&
+      (eventDetail.status === EventStatus.COMPLETED ||
+        eventDetail.status === EventStatus.ENDED),
+  });
+
+  // Merge data from top replies API with event detail
+  // Convert TopReplyRes to TopReply format using mapApiTopReply
+  const displayTopReplies = topRepliesData?.top_replies
+    ? topRepliesData.top_replies.map(mapApiTopReply)
+    : (eventDetail?.top_replies ?? []);
 
   // Save scroll position on scroll
   useEffect(() => {
@@ -179,8 +215,7 @@ const EventDetail = () => {
       </div>
       <div className="w-full max-w-3xl rounded-3xl border border-gray-450 bg-bg px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}
-        <EventInfo event={eventDetail} />
-
+        <EventInfo event={eventDetail} topReplies={displayTopReplies} />
         {/* Divider */}
         <div className="my-6 md:my-8">
           <Divider />

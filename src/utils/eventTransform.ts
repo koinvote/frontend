@@ -31,7 +31,7 @@ const mapHashtags = (tags: string[]): string[] =>
   tags.map((t) => (t.startsWith("#") ? t : `#${t}`));
 
 // Map API TopReplyRes to TopReply
-const mapApiTopReply = (r: TopReplyRes): TopReply => ({
+export const mapApiTopReply = (r: TopReplyRes): TopReply => ({
   id: String(r.id),
   body: r.body,
   weight_percent: r.weight_percent,

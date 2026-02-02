@@ -1,5 +1,5 @@
-import { satsToBtc } from "@/utils/formatter";
 import type { TopReply } from "@/pages/create-event/types";
+import { satsToBtc } from "@/utils/formatter";
 
 interface TopReplyBarProps {
   reply: TopReply;
@@ -26,6 +26,7 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
         style={{
           width: barWidth,
           backgroundColor: "var(--color-orange-btc)",
+          transition: "width 0.5s ease-in-out",
         }}
       />
 
