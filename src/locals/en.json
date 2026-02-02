@@ -99,6 +99,7 @@
     "errorMaxPreheatHours": "Maximum preheat hours is 720",
     "errorMinPreheatHours": "Minimum preheat hours is 1",
     "errorAtLeastOneOption": "At least one option is required",
+    "errorDuplicateOption": "Duplicate option already exists",
     "maxHashtags": "Max 3 hashtags",
     "rewardDistributionText": "The reward will be distributed to up to {{count}} address",
     "rewardDistributionTextPlural": "The reward will be distributed to up to {{count}} addresses"

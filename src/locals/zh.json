@@ -93,6 +93,7 @@
     "errorMaxPreheatHours": "預熱時數最多 720 小時",
     "errorMinPreheatHours": "預熱時數最少 1 小時",
     "errorAtLeastOneOption": "至少需要一個選項",
+    "errorDuplicateOption": "已存在相同的選項",
     "maxHashtags": "最多 3 個標籤",
     "rewardDistributionText": "獎勵將分配給最多 {{count}} 個地址",
     "rewardDistributionTextPlural": "獎勵將分配給最多 {{count}} 個地址"

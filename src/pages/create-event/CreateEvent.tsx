@@ -456,6 +456,17 @@ export default function CreateEvent() {
         });
         return;
       }
+      // Check for duplicate options
+      const uniqueOptions = new Set(list);
+      if (uniqueOptions.size !== list.length) {
+        setOptionsTouched(true);
+        optionRefs.current[0]?.focus();
+        optionRefs.current[0]?.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+        return;
+      }
       cleanedOptions = list;
     }
 
@@ -818,6 +829,18 @@ export default function CreateEvent() {
               "At least one option is required",
             )
           : null,
+      };
+    }
+
+    // Check for duplicate options
+    const uniqueOptions = new Set(validOptions);
+    if (uniqueOptions.size !== validOptions.length) {
+      return {
+        isValid: false,
+        error: t(
+          "createEvent.errorDuplicateOption",
+          "Duplicate option already exists",
+        ),
       };
     }
 
