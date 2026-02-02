@@ -14,6 +14,7 @@ interface HomeStoreState {
   debouncedSearch: string;
   sortField: HomeSortField;
   sortOrder: HomeSortOrder;
+  isSortActive: boolean;
   activeHashtag: string | null;
 
   // data
@@ -36,6 +37,7 @@ interface HomeStoreState {
   setSearch: (value: string) => void;
   setDebouncedSearch: (value: string) => void;
   setSort: (field: HomeSortField, order: HomeSortOrder) => void;
+  setIsSortActive: (active: boolean) => void;
   setActiveHashtag: (tag: string | null) => void;
   setCollapsed: (collapsed: boolean) => void;
 
@@ -43,12 +45,12 @@ interface HomeStoreState {
     events: EventSummary[],
     total: number,
     hasMore: boolean,
-    offset: number
+    offset: number,
   ) => void;
   appendEvents: (
     events: EventSummary[],
     hasMore: boolean,
-    offset: number
+    offset: number,
   ) => void;
 
   setLoading: (loading: boolean) => void;
@@ -70,6 +72,7 @@ export const useHomeStore = create<HomeStoreState>()(
         debouncedSearch: "",
         sortField: "time",
         sortOrder: "asc",
+        isSortActive: false,
         activeHashtag: null,
 
         events: [],
@@ -99,7 +102,7 @@ export const useHomeStore = create<HomeStoreState>()(
               total: 0,
             }),
             false,
-            "home/setStatus"
+            "home/setStatus",
           ),
         setSearch: (value) =>
           set(() => ({ search: value }), false, "home/setSearch"),
@@ -110,7 +113,7 @@ export const useHomeStore = create<HomeStoreState>()(
               offset: 0,
             }),
             false,
-            "home/setDebouncedSearch"
+            "home/setDebouncedSearch",
           ),
         setSort: (field, order) =>
           set(
@@ -120,8 +123,10 @@ export const useHomeStore = create<HomeStoreState>()(
               offset: 0,
             }),
             false,
-            "home/setSort"
+            "home/setSort",
           ),
+        setIsSortActive: (active) =>
+          set(() => ({ isSortActive: active }), false, "home/setIsSortActive"),
         setActiveHashtag: (tag) =>
           set(
             () => ({
@@ -136,7 +141,7 @@ export const useHomeStore = create<HomeStoreState>()(
               total: 0,
             }),
             false,
-            "home/setActiveHashtag"
+            "home/setActiveHashtag",
           ),
         setCollapsed: (collapsed) =>
           set(
@@ -151,7 +156,7 @@ export const useHomeStore = create<HomeStoreState>()(
               return { collapsed };
             },
             false,
-            "home/setCollapsed"
+            "home/setCollapsed",
           ),
 
         setEvents: (events, total, hasMore, offset) =>
@@ -163,7 +168,7 @@ export const useHomeStore = create<HomeStoreState>()(
               offset,
             }),
             false,
-            "home/setEvents"
+            "home/setEvents",
           ),
         appendEvents: (events, hasMore, offset) =>
           set(
@@ -173,7 +178,7 @@ export const useHomeStore = create<HomeStoreState>()(
               offset,
             }),
             false,
-            "home/appendEvents"
+            "home/appendEvents",
           ),
 
         setLoading: (isLoading) =>
@@ -195,7 +200,7 @@ export const useHomeStore = create<HomeStoreState>()(
               offset: 0,
             }),
             false,
-            "home/resetFilters"
+            "home/resetFilters",
           ),
 
         resetList: () =>
@@ -207,7 +212,7 @@ export const useHomeStore = create<HomeStoreState>()(
               total: 0,
             }),
             false,
-            "home/resetList"
+            "home/resetList",
           ),
 
         setPopularHashtags: (hashtags) =>
@@ -216,7 +221,7 @@ export const useHomeStore = create<HomeStoreState>()(
               popularHashtags: hashtags,
             }),
             false,
-            "home/setPopularHashtags"
+            "home/setPopularHashtags",
           ),
       }),
       {
@@ -228,6 +233,7 @@ export const useHomeStore = create<HomeStoreState>()(
           debouncedSearch: state.debouncedSearch,
           sortField: state.sortField,
           sortOrder: state.sortOrder,
+          isSortActive: state.isSortActive,
           activeHashtag: state.activeHashtag,
           scrollY: state.scrollY,
           // Persist data to restore scroll position
@@ -237,8 +243,8 @@ export const useHomeStore = create<HomeStoreState>()(
           total: state.total,
           popularHashtags: state.popularHashtags,
         }),
-      }
+      },
     ),
-    { name: "home-store" }
-  )
+    { name: "home-store" },
+  ),
 );

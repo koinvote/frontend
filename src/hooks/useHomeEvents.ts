@@ -1,19 +1,20 @@
-import { useEffect, useCallback, useRef } from "react";
-import { useHomeStore } from "@/stores/homeStore";
+import { useCallback, useEffect, useRef } from "react";
+
 import { API, type ApiResponse } from "@/api/index";
-import { mapApiEventToEventSummary } from "@/utils/eventTransform";
 import type { GetEventListRes } from "@/api/response";
+import { useHomeStore } from "@/stores/homeStore";
+import { mapApiEventToEventSummary } from "@/utils/eventTransform";
 
 // Map frontend status filter to backend tab parameter
 const mapStatusToTab = (
-  status: "preheat" | "ongoing" | "completed"
+  status: "preheat" | "ongoing" | "completed",
 ): "preheat" | "ongoing" | "completed" => {
   return status;
 };
 
 // Map frontend sortField to backend sortBy
 const mapSortFieldToSortBy = (
-  sortField: "time" | "reward" | "participation"
+  sortField: "time" | "reward" | "participation",
 ): "time" | "reward" | "participation" => {
   if (sortField === "reward") return "reward";
   return sortField;
@@ -86,7 +87,7 @@ export function useHomeEvents() {
 
       if (res.success && res.data) {
         const transformedEvents = res.data.events.map(
-          mapApiEventToEventSummary
+          mapApiEventToEventSummary,
         );
         const total = res.data.events.length; // Backend doesn't return total, use current page length
         const hasMoreData = res.data.events.length === limit;
@@ -160,7 +161,7 @@ export function useHomeEvents() {
 
       if (res.success && res.data) {
         const transformedEvents = res.data.events.map(
-          mapApiEventToEventSummary
+          mapApiEventToEventSummary,
         );
         const hasMoreData = res.data.events.length === limit;
         const newOffset = offset + transformedEvents.length;

@@ -34,6 +34,7 @@ export function HomeToolbar() {
     search,
     sortField,
     sortOrder,
+    isSortActive,
     activeHashtag,
     popularHashtags,
     isLoading,
@@ -41,6 +42,7 @@ export function HomeToolbar() {
     setSearch,
     setDebouncedSearch,
     setSort,
+    setIsSortActive,
     setActiveHashtag,
     // resetFilters,
   } = useHomeStore();
@@ -57,10 +59,12 @@ export function HomeToolbar() {
 
   const toggleSortOrder = () => {
     const next: HomeSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setIsSortActive(true);
     setSort(sortField, next);
   };
 
   const handleSortChange = (field: HomeSortField) => {
+    setIsSortActive(true);
     setSort(field, sortOrder);
   };
 
@@ -85,6 +89,18 @@ export function HomeToolbar() {
     };
     fetchHotHashtags();
   }, [status]);
+
+  const handleTabChange = (value: HomeStatusFilter) => {
+    setStatus(value);
+    // 預設排序
+    if (!isSortActive) {
+      if (value === "completed") {
+        setSort("time", "desc");
+      } else {
+        setSort("time", "asc");
+      }
+    }
+  };
 
   const handleHashtagClick = (tag: string) => {
     if (activeHashtag && activeHashtag.toLowerCase() === tag.toLowerCase()) {
@@ -126,9 +142,7 @@ export function HomeToolbar() {
               value: "completed",
             },
           ]}
-          onChange={(value) => {
-            setStatus(value);
-          }}
+          onChange={handleTabChange}
         />
 
         {/* search */}
