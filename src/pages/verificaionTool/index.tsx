@@ -10,11 +10,15 @@ import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
 import ReceiptSamplePng from "@/assets/img/receipt_sample.png";
 import ReceiptVerificationPng from "@/assets/img/receipt_verification.png";
 import BackButton from "@/components/base/BackButton";
+import { useToast } from "@/components/base/Toast/useToast";
 import { useBackIfInternal } from "@/hooks/useBack";
 
 const VerificationTool = () => {
   const { t } = useTranslation();
+  const { showToast } = useToast();
+
   const goBack = useBackIfInternal("/");
+
   const [receiptPubKeys, setReceiptPubKeys] = useState<
     Array<{
       kid: string;
@@ -35,15 +39,26 @@ const VerificationTool = () => {
 
   const eventCode = t("verificationTool.codeBlockContent");
 
-  const handleCopy = useCallback((text: string) => {
-    try {
-      if (navigator && navigator.clipboard) {
-        navigator.clipboard.writeText(text);
+  const handleCopy = useCallback(
+    (text: string) => {
+      try {
+        if (navigator && navigator.clipboard) {
+          navigator.clipboard.writeText(text);
+          showToast(
+            "success",
+            t("verificationTool.codeBlockCopied", "Code copied to clipboard"),
+          );
+        }
+      } catch (e) {
+        console.error("Failed to copy", e);
+        showToast(
+          "error",
+          t("verificationTool.codeBlockCopyFailed", "Failed to copy code"),
+        );
       }
-    } catch (e) {
-      console.error("Failed to copy", e);
-    }
-  }, []);
+    },
+    [t, showToast],
+  );
 
   const faqItems: CollapseProps["items"] = [
     {

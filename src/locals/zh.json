@@ -101,7 +101,7 @@
   "confirmPay": {
     "paymentReceived": "已收到付款，請等待確認。",
     "addressCopied": "地址已複製到剪貼簿",
-    "failedToCopy": "複製地址失敗",
+    "failedToCopy": "地址複製失敗",
     "title": "付款說明",
     "waitingConfirmation": "已收到付款，等待確認中 (0/1)",
     "completePaymentWithin": "請在以下時間內完成付款：",
@@ -119,7 +119,7 @@
     "totalAmount": "總金額",
     "refundAddress": "退款地址",
     "sendExactly": "請支付",
-    "paymentAmountCopied": "付款金額已複製",
+    "paymentAmountCopied": "付款金額已複製到剪貼簿",
     "failedToCopyPaymentAmount": "付款金額複製失敗",
     "warning": "請勿分拆付款。低於 {{threshold}} BTC 的交易將不會觸發退款。",
     "toThisAddress": "至此地址",
@@ -155,23 +155,31 @@
 
     "codeBlockCopy": "複製指令",
     "codeBlockContent": "# 下載驗證程式\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# 編譯驗證程式\ngo build -o verify-event main.go\n\n# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案\n./verify-event --report <your-report-file.csv>",
+    "codeBlockCopied": "指令已複製到剪貼簿",
+    "codeBlockCopyFailed": "指令複製失敗",
+
     "receiptSectionTitle": "收據驗證",
     "receiptStep1Title": "提交回覆後下載收據檔案",
     "receiptStep1Subtitle": "當你的回覆送出後，點擊「下載收據」下載並保存收據檔案。",
     "receiptImageAlt": "顯示「Submission Successful」畫面並標示 Download Receipt 按鈕的截圖。",
+
     "receiptStep2Title": "辨識 kid 對應的公鑰",
     "receiptStep2Description1": "開啟收據檔案並找到 kid 欄位。\n將 kid 值對應到下方列出的相應公鑰。",
     "receiptStep2Description2": "注意：\nkid 欄位是金鑰識別碼，並非公鑰本身。\n驗證時請務必使用對應 kid 的公鑰。",
     "receiptSampleImageTitle": "收據檔案範例：",
     "receiptSampleImageAlt": "顯示收據檔案中 kid 欄位的截圖。",
+
     "receiptStep3Title": "驗證收據簽名",
     "receiptStep3Description1": "前往以下外部驗證工具：",
     "receiptStep3Description2": "點擊 Verify 完成驗證。",
+
     "faqTitle": "常見問題",
     "faq1_question": "「活動驗證」與「收據驗證」有什麼區別？",
     "faq1_answer": "活動驗證旨在確保整個活動的獎勵發放流程公平、符合規則且可被重複驗證。收據驗證則是確認您的個人回覆已被平台妥善記錄，並經過加密簽署。這兩種機制使用不同的數據來源，服務於不同的目的。",
+
     "faq2_question": "如果我忘記下載收據會怎樣？",
     "faq2_answer": "如果您在提交回覆後沒有下載收據，日後將無法進行獨立驗證。為了保障您的驗證權利，建議您在提交後務必立即下載並妥善保存收據。",
+
     "faq3_question": "我如何確定用於驗證的公鑰（Public Key）是正確的？",
     "faq3_answer": "用於收據驗證的公鑰已包含在開源專案庫中，並附有版本資訊與發佈日期。您可以透過查看 GitHub 的發佈頁面（Release page）或提交歷史（Commit history）來核對其真實性，確保您使用的是官方發佈的正確公鑰版本。"
   },
@@ -373,7 +381,7 @@
     "eventEndedTooltip": "活動已結束，獎勵發放正在處理中。"
   },
   "eventInfo": {
-    "addressCopied": "地址已複製",
+    "addressCopied": "地址已複製到剪貼簿",
     "failedToCopy": "複製失敗",
     "options": "選項",
     "option": "選項",
@@ -400,13 +408,13 @@
   "replyList": {
     "searchPlaceholder": "搜尋比特幣地址或回覆內容",
     "copiedToClipboard": "{{label}} 已複製到剪貼簿",
-    "failedToCopy": "複製 {{label}} 失敗",
+    "failedToCopy": "{{label}} 複製失敗",
     "failedToLoadReplies": "無法載入回覆",
     "unknownError": "未知錯誤",
     "noRepliesYet": "尚未收到回覆",
     "noReplies": "未收到回覆",
     "hashCopiedToClipboard": "Hash 已複製到剪貼簿",
-    "failedToCopyHash": "複製 Hash 失敗",
+    "failedToCopyHash": "Hash 複製失敗",
     "option": "選項 {{optionId}}",
     "signatureVerificationValid": "簽章驗證有效",
     "signatureVoid": "此地址在截止前已提交新簽章，此簽章已無效。",
@@ -469,7 +477,7 @@
     "showLess": "顯示較少",
     "showMore": "顯示更多",
     "copiedUrl": "已複製網址到剪貼簿",
-    "failedToCopy": "複製網址失敗",
+    "failedToCopy": "網址複製失敗",
     "repliesOpenTooltip": "倒數結束後開放回覆。",
     "rewardDistributionTooltip": "倒數結束後將發放此獎勵",
     "topReply": "熱門回覆",
@@ -548,7 +556,7 @@
     "submitting": "提交中...",
     "submitEvent": "提交活動",
     "plaintextCopied": "明文已複製到剪貼簿",
-    "failedToCopyPlaintext": "複製明文失敗",
+    "failedToCopyPlaintext": "明文複製失敗",
     "pleaseEnterSignature": "請輸入簽名",
     "eventNotInitialized": "活動未初始化。請重新整理頁面。",
     "plaintextExpiredToast": "明文已過期。請返回並重試。"
@@ -593,7 +601,7 @@
     "plaintextGenerated": "明文已生成",
     "failedToGeneratePlaintext": "生成明文失敗",
     "plaintextCopied": "明文已複製到剪貼簿",
-    "failedToCopyPlaintext": "複製明文失敗",
+    "failedToCopyPlaintext": "明文複製失敗",
     "plaintextExpiredToast": "明文已過期。請生成新的明文。",
     "submitSuccess": "回覆提交成功",
     "submitFailed": "提交回覆失敗",
@@ -618,8 +626,8 @@
     "notifyLaunch": "Koinvote 上線時我們會通知您。"
   },
   "winnerTable": {
-    "addressCopied": "地址已複製",
-    "failedToCopy": "複製失敗"
+    "addressCopied": "地址已複製到剪貼簿",
+    "failedToCopy": "地址複製失敗"
   },
   "backendMessage": {
     "eventActivated": "事件建立成功"
