@@ -63,7 +63,7 @@ export default function ConfirmPay() {
   const systemParams = useSystemParametersStore((s) => s.params);
 
   const refundThresholdBtc = useMemo(() => {
-    const satoshiPerHour = systemParams?.satoshi_per_duration_hour;
+    const satoshiPerHour = systemParams?.min_reward_amount_satoshi;
     if (!satoshiPerHour || satoshiPerHour <= 0)
       return MIN_REFUND_THRESHOLD.toString();
     return satsToBtc(satoshiPerHour, {
