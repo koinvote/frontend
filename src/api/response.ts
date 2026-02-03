@@ -266,3 +266,11 @@ export interface GetCompletedTopRepliesRes {
   balance_type: "snapshot" | "current";
   top_replies: TopReplyRes[];
 }
+
+export interface GetReceiptVerifyPubKeysRes {
+  kid: string;
+  public_key: string;
+  alg: string;
+  active: boolean;
+  created_at: string;
+}

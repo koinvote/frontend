@@ -23,6 +23,7 @@ import type {
   GetEventListRes,
   GetHotHashtagsRes,
   GetListRepliesRes,
+  GetReceiptVerifyPubKeysRes,
   GetReplyPlainTextRes,
   GetSignaturePlainTextRes,
   PayoutReportRes,
@@ -133,7 +134,9 @@ export const API = {
 
   // Get reply receipt - returns JSON file as blob
   getReplyReceipt: (replyId: number) =>
-    get<Blob, void>(`/replies/${replyId}/receipt`)(undefined, { responseType: "blob" }),
+    get<Blob, void>(`/replies/${replyId}/receipt`)(undefined, {
+      responseType: "blob",
+    }),
 
   // Payout Report API
   getPayoutReport: (eventId: string) =>
@@ -163,6 +166,11 @@ export const API = {
       // Silently ignore errors - this is just a pre-warm cache call
     });
   },
+
+  // get receipt verification public keys
+  getReceiptVerifyPubKeys: get<ApiResponse<GetReceiptVerifyPubKeysRes[]>, void>(
+    "/receipt/pub-keys",
+  ),
 };
 
 // Admin API (requires Bearer token authentication)

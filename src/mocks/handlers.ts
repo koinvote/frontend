@@ -9,6 +9,7 @@ import {
   mockEventList,
   mockGetEventListResponse,
   mockGetListRepliesResponse,
+  mockGetReceiptVerifyPubKeysRes,
   mockHotHashtags,
   mockPayoutReport,
   mockSystemConfig,
@@ -491,6 +492,17 @@ export const handlers = [
       success: true,
       message: null,
       data: undefined as unknown as void,
+    });
+  }),
+
+  http.get(`${API_BASE_URL}/receipt/pub-keys`, () => {
+    return HttpResponse.json<
+      ApiResponse<typeof mockGetReceiptVerifyPubKeysRes>
+    >({
+      code: "000000",
+      success: true,
+      message: null,
+      data: [...mockGetReceiptVerifyPubKeysRes],
     });
   }),
 ];

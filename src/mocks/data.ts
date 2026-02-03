@@ -7,6 +7,7 @@ import type {
   GetEventListRes,
   GetHotHashtagsRes,
   GetListRepliesRes,
+  GetReceiptVerifyPubKeysRes,
   PayoutReportRes,
   PayoutWinner,
   Reply,
@@ -564,3 +565,20 @@ export const mockVerificationCsvContent = `plan_id,deposit_id,event_id,winner_ad
 456,123,evt_001_mock,bc1qabc123xyz456def789ghi012jkl345mno678pqr,350000,0.14,40250,0,40250,6h4e6g0h2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
 456,123,evt_001_mock,bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej,300000,0.12,34500,0,34500,7i5f7h1i3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567
 456,123,evt_001_mock,bc1qdef456uvw789xyz012abc345ghi678jkl901mno,250000,0.10,28750,0,28750,8j6g8i2j4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a,completed,d4f8e7c2a1b3456789abcdef0123456789abcdef0123456789abcdef01234567`;
+
+export const mockGetReceiptVerifyPubKeysRes: GetReceiptVerifyPubKeysRes[] = [
+  {
+    kid: "kvpub_1",
+    public_key: "ED/kBYrzVcJp07jrGCMvRMvgSeJjdgidkiLF1TWVMyo=",
+    alg: "ed25519",
+    active: true,
+    created_at: "2026-02-01T08:29:22Z",
+  },
+  {
+    kid: "kvpub_2",
+    public_key: "MCowBQYDK2VwAyEAAU6pF7U4/pJ9DW",
+    alg: "ed25519",
+    active: true,
+    created_at: "2024-12-01T12:00:00Z",
+  },
+];
