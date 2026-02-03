@@ -72,8 +72,9 @@ const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
 const normalizeTag = (raw: string) => {
   const v = raw.trim();
   if (!v) return null;
+  const lowerCased = v.toLowerCase();
 
-  const noHash = v.replace(/^#+/, "");
+  const noHash = lowerCased.replace(/^#+/, "");
 
   const cleaned = noHash.replace(/[^\w]/g, "");
 
