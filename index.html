@@ -1,62 +1,63 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/logo/logo.svg" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
-    />
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="alternate icon" type="image/png" href="/logo.png" />
+  <link rel="apple-touch-icon" href="/logo.png" />
 
-    <title>Koinvote</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
 
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+  <title>Koinvote</title>
 
-    <meta name="description" content="A forum for Bitcoiners" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Koinvote" />
-    <meta property="og:description" content="A forum for Bitcoiners" />
-    <meta property="og:url" content="https://koinvote.com" />
+  <meta name="description" content="A forum for Bitcoiners" />
 
-    <meta property="og:image" content="https://koinvote.com/og-imagev3.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Koinvote" />
+  <meta property="og:description" content="A forum for Bitcoiners" />
+  <meta property="og:url" content="https://koinvote.com" />
 
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Koinvote" />
-    <meta name="twitter:description" content="A forum for Bitcoiners" />
-    <meta name="twitter:image" content="https://koinvote.com/og-imagev3.png" />
-    <meta name="twitter:image:alt" content="Koinvote - A forum for Bitcoiners" />
-    <meta property="og:image:type" content="image/png" />
+  <meta property="og:image" content="https://koinvote.com/og-imagev3.png" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Koinvote" />
+  <meta name="twitter:description" content="A forum for Bitcoiners" />
+  <meta name="twitter:image" content="https://koinvote.com/og-imagev3.png" />
+  <meta name="twitter:image:alt" content="Koinvote - A forum for Bitcoiners" />
+  <meta property="og:image:type" content="image/png" />
 
 
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
 
-    <link href="/src/global.css" rel="stylesheet" />
+  <link href="/src/global.css" rel="stylesheet" />
 
-    <script>
-      (function () {
-        const THEME_KEY = 'PREFERRED_THEME'
-        const saved = localStorage.getItem(THEME_KEY)
+  <script>
+    (function () {
+      const THEME_KEY = 'PREFERRED_THEME'
+      const saved = localStorage.getItem(THEME_KEY)
 
-        // 如果有保存的主题偏好，使用保存的值；否则默认使用深色模式
-        const initial =
-          saved === 'light' || saved === 'dark'
-            ? saved
-            : 'dark'
-      })()
-    </script>
-    <script src="https://kit.fontawesome.com/916299e405.js" crossorigin="anonymous"></script>
-  </head>
+      // 如果有保存的主题偏好，使用保存的值；否则默认使用深色模式
+      const initial =
+        saved === 'light' || saved === 'dark'
+          ? saved
+          : 'dark'
+    })()
+  </script>
+  <script src="https://kit.fontawesome.com/916299e405.js" crossorigin="anonymous"></script>
+</head>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
