@@ -312,10 +312,9 @@
     "status": {
       "completed": "completed",
       "processing": "processing",
-      "redistribute": "redistribute",
+      "redistribute": "redistributed",
       "failed": "failed",
-      "pending": "pending",
-      "dust_redistributed": "redistributed"
+      "pending": "pending"
     },
     "loading": "Loading payout report...",
     "error": "Failed to load payout report",

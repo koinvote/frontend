@@ -462,7 +462,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
     original_reward_satoshi: 500,
     final_reward_satoshi: 0,
     distributable_rate: 0.0,
-    status: "dust_redistributed",
+    status: "redistribute",
   },
 ];
 

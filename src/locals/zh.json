@@ -315,8 +315,7 @@
       "processing": "處理中",
       "redistribute": "重新分配",
       "failed": "失敗",
-      "pending": "等待中",
-      "dust_redistributed": "已重新分配"
+      "pending": "等待中"
     },
     "loading": "載入派獎報告中...",
     "error": "載入派獎報告失敗",
