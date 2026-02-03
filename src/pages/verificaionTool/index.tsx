@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 import VerificationIcon from "@/assets/icons/verification.svg?react";
 import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
+import ReceiptVerificationPNG from "@/assets/img/receiptVerification.png";
 import BackButton from "@/components/base/BackButton";
 import { useBackIfInternal } from "@/hooks/useBack";
 
@@ -201,6 +202,117 @@ const VerificaionTool = () => {
                whitespace-pre-wrap wrap-break-word"
                   >
                     {eventCode}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Receipt Verification */}
+        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16 lg:tx-18 lg:lh-27">
+          <h2 className="fw-m md:tx-18 lg:tx-20">
+            {t("verificationTool.receiptSectionTitle")}
+          </h2>
+
+          <div className="border-b border-border w-full" />
+
+          {/* Step 1 + image */}
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <div
+                className="flex h-7 w-7 shrink-0 items-center justify-center
+              rounded-full border border-border fw-m bg-primary-lightModeGray
+              md:w-10 md:h-10"
+              >
+                <span className="text-black">1</span>
+              </div>
+              <div className="space-y-1">
+                <h3 className="fw-m">
+                  {t("verificationTool.receiptStep1Title")}
+                </h3>
+                <p className="text-secondary">
+                  {t("verificationTool.receiptStep1Subtitle")}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <img
+                src={ReceiptVerificationPNG}
+                alt={t("verificationTool.receiptImageAlt")}
+                className="max-w-xs md:max-w-sm border border-accent rounded-xl"
+              />
+            </div>
+          </div>
+
+          <div className="border-b border-border w-full" />
+
+          {/* Step 2 + terminal */}
+          <div className="flex gap-4">
+            <div
+              className="flex h-7 w-7 shrink-0 items-center justify-center
+            rounded-full border border-border fw-m bg-primary-lightModeGray
+            md:w-10 md:h-10"
+            >
+              <span className="text-black">2</span>
+            </div>
+            <div className="space-y-4 w-full">
+              <h3 className="fw-m">
+                {t("verificationTool.receiptStep2Title")}
+              </h3>
+
+              {/* 2.1 View the open-source code */}
+              <div className="space-y-1">
+                <p className="fw-m">{t("verificationTool.step2_1_title")}</p>
+                <p className="text-secondary leading-relaxed">
+                  {t("verificationTool.step2_1_text_before")}{" "}
+                  <a
+                    href="https://github.com/koinvote/receipt-verifier"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-accent underline"
+                  >
+                    {t("verificationTool.step2_1_linkLabel")}
+                  </a>{" "}
+                  {t("verificationTool.step2_1_text_after")}
+                </p>
+              </div>
+
+              {/* 2.2 Install Go */}
+              <div className="space-y-1">
+                <p className="fw-m">{t("verificationTool.step2_2_title")}</p>
+                <p className="text-secondary leading-relaxed">
+                  {t("verificationTool.step2_2_text1")}
+                </p>
+                <p className="text-secondary leading-relaxed">
+                  {t("verificationTool.step2_2_text2")}
+                </p>
+              </div>
+
+              {/* 2.3 Clone and Run */}
+              <div className="space-y-1">
+                <p className="fw-m">{t("verificationTool.step2_3_title")}</p>
+                <p className="text-secondary leading-relaxed">
+                  {t("verificationTool.step2_3_text")}
+                </p>
+
+                {/* Terminal-like code block */}
+                <div className="relative mt-2 w-full rounded-xl border border-border bg-surface">
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(receiptCode)}
+                    className="absolute right-3 top-3 tx-12 px-3 py-1 
+               rounded-lg border border-border bg-[--color-bg] text-secondary hover:bg-border"
+                  >
+                    {t("verificationTool.codeBlock_copy")}
+                  </button>
+
+                  <pre
+                    className="m-0 p-4 pt-9 text-secondary tx-12 md:tx-14 font-mono
+               whitespace-pre-wrap wrap-break-word"
+                  >
+                    {receiptCode}
                   </pre>
                 </div>
               </div>
