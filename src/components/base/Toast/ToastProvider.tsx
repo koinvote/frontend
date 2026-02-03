@@ -1,36 +1,38 @@
-// src/components/base/toast/ToastProvider.tsx
-import { useCallback, useState, type ReactNode } from "react";
-import { Toast, type ToastItem, type ToastType } from "./Toast.tsx";
-import { ToastContext } from "./ToastContext";
+// src/components/base/Toast/ToastProvider.tsx
+import { message } from "antd";
+import { useCallback, type ReactNode } from "react";
 
-let toastId = 0;
+import { ToastContext, type ToastType } from "./ToastContext";
 
 export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const showToast = useCallback(
-    (type: ToastType, message: string, duration?: number) => {
-      const id = ++toastId;
-      setToasts((prev) => [...prev, { id, type, message, duration }]);
+    (type: ToastType, msg: string, duration?: number) => {
+      const durationInSeconds = duration ? duration / 1000 : 3;
+
+      switch (type) {
+        case "success":
+          messageApi.success(msg, durationInSeconds);
+          break;
+        case "fail":
+        case "error":
+          messageApi.error(msg, durationInSeconds);
+          break;
+        case "warn":
+          messageApi.warning(msg, durationInSeconds);
+          break;
+        default:
+          messageApi.info(msg, durationInSeconds);
+      }
     },
-    []
+    [messageApi],
   );
 
-  const removeToast = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
-
   return (
-    <>
-      <ToastContext.Provider value={{ showToast }}>
-        {children}
-      </ToastContext.Provider>
-
-      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-3 items-center">
-        {toasts.map((toast) => (
-          <Toast key={toast.id} toast={toast} onClose={removeToast} />
-        ))}
-      </div>
-    </>
+    <ToastContext.Provider value={{ showToast }}>
+      {contextHolder}
+      {children}
+    </ToastContext.Provider>
   );
 }

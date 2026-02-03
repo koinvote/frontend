@@ -1,5 +1,5 @@
-// src/components/base/toast/toast.ts
-import type { ToastType } from "./Toast.tsx";
+// src/components/base/Toast/toast.ts
+import type { ToastType } from "./ToastContext";
 
 type ToastHandler = (
   type: ToastType,
