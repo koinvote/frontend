@@ -154,7 +154,10 @@
     "step2_3_text": "從 GitHub 下載開源驗證程式碼，並使用 Go 執行。",
 
     "codeBlockCopy": "複製指令",
-    "codeBlockContent": "# 下載驗證程式\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# 編譯驗證程式\ngo build -o verify-event main.go\n\n# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案\n./verify-event --report <your-report-file.csv>",
+    "codeBlockContentForCopy": "# 下載驗證程式\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\n\n# 編譯驗證程式\ngo build -o verify-event main.go\n\n# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案\n./verify-event --report <your-report-file.csv>",
+    "codeBlockAlt1": "# 下載驗證程式",
+    "codeBlockAlt2": "# 編譯驗證程式",
+    "codeBlockAlt3": "# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案",
     "codeBlockCopied": "指令已複製到剪貼簿",
     "codeBlockCopyFailed": "指令複製失敗",
 

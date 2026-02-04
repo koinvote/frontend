@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { API } from "@/api/index";
+import CopyIcon from "@/assets/icons/copy.svg?react";
 import VerificationIcon from "@/assets/icons/verification.svg?react";
 import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
 import ReceiptSamplePng from "@/assets/img/receipt_sample.png";
@@ -37,7 +38,7 @@ const VerificationTool = () => {
     fetchPubKeys();
   }, []);
 
-  const eventCode = t("verificationTool.codeBlockContent");
+  const eventCode = t("verificationTool.codeBlockContentForCopy");
 
   const handleCopy = useCallback(
     (text: string) => {
@@ -118,10 +119,10 @@ const VerificationTool = () => {
             <VerificationIcon />
           </span>
           <div className="flex flex-col items-start justify-center">
-            <h1 className="text-2xl lg:text-3xl fw-m text-accent">
+            <h1 className="text-2xl fw-m text-accent">
               {t("verificationTool.title", "Verification Guide")}
             </h1>
-            <p className="text-secondary leading-relaxed md:tx-16 lg:tx-18 lg:lh-27">
+            <p className="text-secondary leading-relaxed md:tx-16">
               {t(
                 "verificationTool.description",
                 "How to independently verify events and receipts using open-source tools",
@@ -131,7 +132,7 @@ const VerificationTool = () => {
         </div>
 
         {/* Intro note box */}
-        <div className="flex flex-col items-start justify-start gap-2 border border-border p-4 rounded-xl md:tx-16 lg:tx-18 lg:lh-27 w-full">
+        <div className="flex flex-col items-start justify-start gap-2 border border-border p-4 rounded-xl md:tx-16 w-full">
           <div className="flex flex-row items-center justify-start gap-2">
             <VerificationWhiteIcon className="w-6 h-6" />
             <span className="text-primary">
@@ -156,8 +157,8 @@ const VerificationTool = () => {
         </div>
 
         {/* Event Result Verification */}
-        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16 lg:tx-18 lg:lh-27">
-          <h2 className="fw-m md:tx-18 lg:tx-20">
+        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16">
+          <h2 className="fw-m md:tx-18">
             {t(
               "verificationTool.eventResultTitle",
               "Event Result Verification",
@@ -182,7 +183,7 @@ const VerificationTool = () => {
                   "Go to the Reward Distribution Report to download the verification package (CSV).",
                 )}
               </h3>
-              <ul className="pl-6 list-disc text-secondary md:tx-14 lg:tx-16 lg:lh-24">
+              <ul className="pl-6 list-disc text-secondary">
                 <li>
                   {t(
                     "verificationTool.step1_1",
@@ -290,29 +291,57 @@ const VerificationTool = () => {
           </div>
           {/* Terminal-like code block */}
           <div className="md:ml-14">
-            <div className="relative mt-2 w-full rounded-xl border border-border bg-surface">
+            <div className="relative mt-2 w-full rounded-xl border border-border bg-surface border-t-38 border-t-neutral-200 dark:border-t-neutral-700">
               <button
                 type="button"
                 onClick={() => handleCopy(eventCode)}
-                className="absolute right-3 top-3 tx-12 px-3 py-1 
-               rounded-lg border border-border bg-[--color-bg] text-secondary hover:bg-border"
+                className="absolute right-3 -top-8 tx-12 px-3 py-1 
+               rounded-lg bg-[--color-bg] text-secondary hover:bg-border cursor-pointer"
               >
+                <CopyIcon className="w-4 h-4 text-current inline-block mr-1" />
                 {t("verificationTool.codeBlockCopy", "Copy code")}
               </button>
 
               <pre
-                className="m-0 p-4 pt-9 text-secondary tx-12 md:tx-14 font-mono
+                className="m-0 p-4 text-secondary tx-12 md:tx-14 font-mono
                whitespace-pre-wrap wrap-break-word"
               >
-                {eventCode}
+                {/* 有顏色的版本, 註釋拆出來 for i18n */}
+                {t("verificationTool.codeBlockAlt1", "# Download the verifier")}
+                <br />
+                <span className="text-primary">
+                  git <span className="text-orange-500">clone</span>{" "}
+                  https://github.com/koinvote/event-verifier.git
+                </span>
+                <br />
+                <span className="text-primary">
+                  <span className="text-orange-500">cd</span> event-verifier
+                </span>
+                <br />
+                <br />
+                {t("verificationTool.codeBlockAlt2", "# Compile the verifier")}
+                <br />
+                <span className="text-primary">
+                  go build -o verify-event main.go
+                </span>
+                <br />
+                <br />
+                {t(
+                  "verificationTool.codeBlockAlt3",
+                  "# Run the verifier\n# Replace <your-report-file.csv> with the actual report file you downloaded",
+                )}
+                <br />
+                <span className="text-primary">
+                  ./verify-event --report &lt;your-report-file.csv&gt;
+                </span>
               </pre>
             </div>
           </div>
         </section>
 
         {/* Receipt Verification */}
-        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16 lg:tx-18 lg:lh-27">
-          <h2 className="fw-m md:tx-18 lg:tx-20">
+        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16">
+          <h2 className="fw-m md:tx-18">
             {t("verificationTool.receiptSectionTitle", "Receipt Verification")}
           </h2>
 
@@ -479,13 +508,13 @@ const VerificationTool = () => {
         </section>
 
         {/* FAQ */}
-        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16 lg:tx-18 lg:lh-27">
-          <h2 className="fw-m md:tx-18 lg:tx-20">
+        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16">
+          <h2 className="fw-m md:tx-18">
             {t("verificationTool.faqTitle", "FAQ")}
           </h2>
           <Collapse
             items={faqItems}
-            className="text-sm! md:text-base! lg:text-lg!"
+            className="text-sm! md:text-base!"
             onChange={onChange}
             bordered={false}
             expandIcon={({ isActive }) => (
