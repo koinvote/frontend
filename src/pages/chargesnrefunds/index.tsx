@@ -34,10 +34,10 @@ export default function ChargesnRefunds() {
               <h3 className="font-bold">
                 {t("charges.s1_1_title", "Platform Service Fee")}
               </h3>
-              <ol className="list-[lower-alpha] pl-4">
+              <ol className="list-[lower-alpha] pl-4 text-secondary marker:text-secondary">
                 <li className="space-y-1">
-                  <p className="font-bold">{t("charges.s1_1_1_title")}</p>
-                  <p className="text-secondary">
+                  <p className=" font-bold">{t("charges.s1_1_1_title")}</p>
+                  <p>
                     <Trans
                       i18nKey="charges.s1_1_1_text"
                       values={{ platformFeePercentage }}
@@ -47,7 +47,7 @@ export default function ChargesnRefunds() {
                 </li>
                 <li className="space-y-1">
                   <p className="font-bold">{t("charges.s1_1_2_title")}</p>
-                  <p className="text-secondary">
+                  <p>
                     <Trans
                       i18nKey="charges.s1_1_2_text"
                       values={{ freeHours, btcPerDurationHour }}
@@ -94,28 +94,29 @@ export default function ChargesnRefunds() {
               <p className="text-secondary">
                 <Trans i18nKey="charges.s2_1_text" components={{ bold }} />
               </p>
-              <ol className="list-[lower-alpha] pl-4">
+              <ol className="list-[lower-alpha] pl-4 text-secondary marker:text-secondary">
                 <li className="space-y-1">
                   <p className="font-bold">{t("charges.s2_1_1_title")}</p>
-                  <p className="text-secondary">
-                    {t("charges.s2_1_1_text")}
-                  </p>
+                  <p>{t("charges.s2_1_1_text")}</p>
                 </li>
                 <li className="space-y-1">
                   <p className="font-bold">{t("charges.s2_1_2_title")}</p>
-                  <p className="text-secondary">
-                    <Trans i18nKey="charges.s2_1_2_text" components={{ bold }} />
+                  <p>
+                    <Trans
+                      i18nKey="charges.s2_1_2_text"
+                      components={{ bold }}
+                    />
                   </p>
                 </li>
                 <li className="space-y-1">
                   <p className="font-bold">{t("charges.s2_1_3_title")}</p>
-                  <p className="text-secondary">
+                  <p>
                     <Trans
                       i18nKey="charges.s2_1_3_text1"
                       components={{ bold }}
                     />
                   </p>
-                  <p className="text-secondary">
+                  <p>
                     <Trans
                       i18nKey="charges.s2_1_3_text2"
                       components={{ bold }}
