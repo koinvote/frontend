@@ -322,10 +322,6 @@ export default function ReplyPage() {
         "success",
         t("reply.receiptDownloaded", "Receipt downloaded successfully"),
       );
-
-      setTimeout(() => {
-        navigate(`/event/${eventId}`);
-      }, 720);
     } catch (error) {
       console.error("Failed to download receipt:", error);
       showToast(
