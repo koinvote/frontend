@@ -7,8 +7,6 @@ import './i18n.ts'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Loading } from '@/components/base/Loading.tsx'
-import { useLanguagesStore } from './stores/languagesStore.ts'
-import i18n from "i18next";
 
 // Start MSW in development mode if VITE_USE_MOCK is enabled
 async function enableMocking() {
@@ -25,10 +23,6 @@ async function enableMocking() {
     console.log('[MSW] Mocking enabled - using fake data')
   })
 }
-
-i18n.on("initialized", () => {
-    useLanguagesStore.getState().initLanguage();
-  });
 
 const queryClient = new QueryClient()
 

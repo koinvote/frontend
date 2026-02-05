@@ -10,8 +10,13 @@ interface LanguageState {
   initLanguage: () => void;
 }
 
+const getInitialLanguage = (): AppLanguage => {
+  const saved = localStorage.getItem(LANGUAGE_KEY);
+  return saved === "zh" ? "zh" : "en";
+};
+
 export const useLanguagesStore = create<LanguageState>((set) => ({
-  current: "en",
+  current: getInitialLanguage(),
 
   setLanguage: (lang) => {
     i18n.changeLanguage(lang);
