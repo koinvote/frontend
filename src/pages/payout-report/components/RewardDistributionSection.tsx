@@ -37,7 +37,7 @@ export function RewardDistributionSection({
       value: `${detail.original_amount_satoshi.toLocaleString()} sats`,
     },
     {
-      label: `${t("payoutReport.serviceFee", "Service fee")} (2%)`,
+      label: `${t("payoutReport.serviceFee", "Service fee")}`,
       value: `-${detail.platform_fee_satoshi.toLocaleString()} sats`,
       negative: true,
     },
@@ -54,7 +54,7 @@ export function RewardDistributionSection({
     {
       label: t(
         "payoutReport.numberOfWinningAddress",
-        "Number of winning addresses"
+        "Number of winning addresses",
       ),
       value: detail.winner_count.toString(),
     },
@@ -101,8 +101,8 @@ export function RewardDistributionSection({
                     item.highlight
                       ? "text-emerald-500 font-bold"
                       : item.negative
-                      ? "text-red-900"
-                      : "text-gray-700 dark:text-gray-300"
+                        ? "text-red-900"
+                        : "text-gray-700 dark:text-gray-300"
                   }`}
                 >
                   {item.value}
