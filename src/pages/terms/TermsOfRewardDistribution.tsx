@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { setupAnchorFlash } from "@/utils/anchorFlash";
 
 export default function TermsOfRewardDistribution() {
   const { t } = useTranslation();
@@ -13,6 +15,11 @@ export default function TermsOfRewardDistribution() {
   // Scroll to top on mount
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    const cleanups = [setupAnchorFlash({ hash: "anchor1" })];
+    return () => cleanups.forEach((fn) => fn());
   }, []);
 
   return (
@@ -72,12 +79,32 @@ export default function TermsOfRewardDistribution() {
               <p className="text-secondary">
                 <Trans i18nKey="rewardTerms.s4_0" components={{ bold }} />
               </p>
-              <ol className="list-decimal pl-6 marker:font-bold space-y-1 text-secondary">
+              <ol className="list-decimal pl-6 marker:font-bold space-y-1 text-secondary marker:text-orange-500">
                 <li>
-                  <Trans i18nKey="rewardTerms.s4_fee_1" components={{ bold }} />
+                  <Link
+                    to="/charges-refunds#anchor1"
+                    className="text-orange-500"
+                    target="_blank"
+                  >
+                    <Trans
+                      i18nKey="rewardTerms.s4_fee_1"
+                      components={{ bold }}
+                      default="<bold>Platform Service Fee</bold>"
+                    />
+                  </Link>
                 </li>
                 <li>
-                  <Trans i18nKey="rewardTerms.s4_fee_2" components={{ bold }} />
+                  <Link
+                    to="/charges-refunds#anchor3"
+                    className="text-orange-500"
+                    target="_blank"
+                  >
+                    <Trans
+                      i18nKey="rewardTerms.s4_fee_2"
+                      components={{ bold }}
+                      default="<bold>Transaction Fee</bold>"
+                    />
+                  </Link>
                 </li>
               </ol>
               <p className="text-secondary">
@@ -85,7 +112,7 @@ export default function TermsOfRewardDistribution() {
               </p>
             </div>
           </li>
-          <li className="space-y-1">
+          <li className="space-y-1" id="anchor1">
             <h3 className="font-bold">{t("rewardTerms.s5_title")}</h3>
             <div className="space-y-1 text-secondary">
               <p>

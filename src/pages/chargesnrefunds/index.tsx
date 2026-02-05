@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Trans, useTranslation } from "react-i18next";
 
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
+import { setupAnchorFlash } from "@/utils/anchorFlash";
 import { satsToBtc } from "@/utils/formatter";
 
 export default function ChargesnRefunds() {
@@ -19,6 +20,16 @@ export default function ChargesnRefunds() {
     window.scrollTo(0, 0);
   }, []);
 
+  useEffect(() => {
+    const cleanups = [
+      setupAnchorFlash({ hash: "anchor1" }),
+      setupAnchorFlash({ hash: "anchor2" }),
+      setupAnchorFlash({ hash: "anchor3" }),
+      setupAnchorFlash({ hash: "anchor4" }),
+    ];
+    return () => cleanups.forEach((fn) => fn());
+  }, []);
+
   return (
     <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27 text-primary px-2 md:px-0">
       <h1 className="text-2xl md:text-3xl fw-m text-center text-primary">
@@ -30,7 +41,7 @@ export default function ChargesnRefunds() {
 
         <div className="space-y-4">
           <ol className="list-decimal pl-6 marker:font-bold space-y-3">
-            <li className="space-y-1">
+            <li className="space-y-1" id="anchor1">
               <h3 className="font-bold">
                 {t("charges.s1_1_title", "Platform Service Fee")}
               </h3>
@@ -45,7 +56,7 @@ export default function ChargesnRefunds() {
                     />
                   </p>
                 </li>
-                <li className="space-y-1">
+                <li className="space-y-1" id="anchor2">
                   <p className="font-bold">{t("charges.s1_1_2_title")}</p>
                   <p>
                     <Trans
@@ -57,11 +68,11 @@ export default function ChargesnRefunds() {
                 </li>
               </ol>
             </li>
-            <li className="space-y-1">
+            <li className="space-y-1" id="anchor3">
               <h3 className="font-bold">{t("charges.s1_2_title")}</h3>
               <p className="text-secondary">{t("charges.s1_2_text")}</p>
             </li>
-            <li className="space-y-1">
+            <li className="space-y-1" id="anchor4">
               <h3 className="font-bold">{t("charges.s1_3_title")}</h3>
               <p className="text-secondary">{t("charges.s1_3_text1")}</p>
               <p className="text-secondary">

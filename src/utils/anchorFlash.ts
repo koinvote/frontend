@@ -1,0 +1,94 @@
+type AnchorFlashOptions = {
+  hash: string;
+  elementId?: string;
+  durationMs?: number;
+  color?: string;
+};
+
+const STYLE_ID = "anchor-flash-style";
+
+function getHeaderOffset() {
+  if (typeof window === "undefined") return 0;
+  const header = document.querySelector("header");
+  if (!header) return 0;
+  const style = window.getComputedStyle(header);
+  if (style.position !== "fixed" && style.position !== "sticky") return 0;
+  return Math.ceil(header.getBoundingClientRect().height);
+}
+
+function ensureStyle(color: string, durationMs: number) {
+  if (document.getElementById(STYLE_ID)) return;
+  const style = document.createElement("style");
+  style.id = STYLE_ID;
+  style.textContent = `
+    @keyframes anchorFlash {
+      0%, 100% { color: ${color}; }
+      50% { color: inherit; }
+    }
+    .anchor-flash-text,
+    .anchor-flash-text > * {
+      color: ${color};
+      animation: anchorFlash ${durationMs}ms ease-in-out;
+    }
+    .anchor-flash-text::marker,
+    .anchor-flash-text li::marker {
+      color: ${color};
+      animation: anchorFlash ${durationMs}ms ease-in-out;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+export function setupAnchorFlash(options: AnchorFlashOptions) {
+  const {
+    hash,
+    elementId = hash,
+    durationMs = 3000,
+    color = "#f97316",
+  } = options;
+
+  if (typeof window === "undefined") return () => {};
+  ensureStyle(color, durationMs);
+
+  const className = "anchor-flash-text";
+  let timer: number | undefined;
+
+  const highlight = (attempt = 0) => {
+    if (!window.location.hash.includes(hash)) return;
+    const target = document.getElementById(elementId);
+    if (!target) return;
+
+    const offset = getHeaderOffset();
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0, top) });
+
+    target.classList.remove(className);
+    void target.offsetWidth;
+    target.classList.add(className);
+
+    if (timer) window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      target.classList.remove(className);
+    }, durationMs);
+
+    if (offset === 0 && attempt < 2 && document.querySelector("header")) {
+      window.setTimeout(() => highlight(attempt + 1), 120);
+    }
+  };
+
+  const triggerHighlight = () => highlight();
+
+  if (document.readyState === "complete") {
+    window.requestAnimationFrame(triggerHighlight);
+  } else {
+    window.addEventListener("load", triggerHighlight, { once: true });
+  }
+
+  window.addEventListener("hashchange", triggerHighlight);
+
+  return () => {
+    window.removeEventListener("load", triggerHighlight);
+    window.removeEventListener("hashchange", triggerHighlight);
+    if (timer) window.clearTimeout(timer);
+  };
+}

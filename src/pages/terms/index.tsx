@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Trans, useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 export default function Terms() {
   const { t } = useTranslation();
@@ -122,7 +123,19 @@ export default function Terms() {
                 <Trans i18nKey="terms.s4_p1" components={{ bold }} />
               </p>
               <p>
-                <Trans i18nKey="terms.s4_p2" components={{ bold }} />
+                <Trans
+                  i18nKey="terms.s4_p2"
+                  components={{
+                    bold,
+                    a: (
+                      <Link
+                        to="/charges-refunds#anchor2"
+                        className="text-orange-500"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                />
               </p>
             </div>
           </li>
@@ -139,13 +152,46 @@ export default function Terms() {
                 <Trans i18nKey="terms.s5_3" components={{ bold }} />
               </li>
               <li>
-                <Trans i18nKey="terms.s5_4" components={{ bold }} />
+                <Trans
+                  i18nKey="terms.s5_4"
+                  components={{
+                    bold,
+                    a1: (
+                      <Link
+                        to="/charges-refunds#anchor1"
+                        className="text-orange-500"
+                        target="_blank"
+                      />
+                    ),
+                    a2: (
+                      <Link
+                        to="/charges-refunds#anchor3"
+                        className="text-orange-500"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                  default="After deducting <a1>service fees</a1> and <a2>transaction fees</a2>, the remaining reward pool will be distributed proportionally to the winning addresses based on their holdings."
+                />
               </li>
               <li>
                 <Trans i18nKey="terms.s5_5" components={{ bold }} />
               </li>
               <li>
-                <Trans i18nKey="terms.s5_6" components={{ bold }} />
+                <Trans
+                  i18nKey="terms.s5_6"
+                  components={{
+                    bold,
+                    a: (
+                      <Link
+                        to="/terms-reward-distribution#anchor1"
+                        className="text-orange-500"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                  default="If the payout amount for a winning address is below the <a>minimum payout threshold (Dust Rule)</a>, the reward will be redistributed."
+                />
               </li>
             </ul>
           </li>
@@ -159,7 +205,20 @@ export default function Terms() {
                 <Trans i18nKey="terms.s6_p2" components={{ bold }} />
               </p>
               <p>
-                <Trans i18nKey="terms.s6_p3" components={{ bold }} />
+                <Trans
+                  i18nKey="terms.s6_p3"
+                  components={{
+                    bold,
+                    a: (
+                      <Link
+                        to="/charges-refunds#anchor4"
+                        className="text-orange-500"
+                        target="_blank"
+                      />
+                    ),
+                  }}
+                  default="ll Preheat-related fees and rules are governed by the platform’s <link><bold>Charges & Refunds</bold></link> policy."
+                />
               </p>
             </div>
           </li>
