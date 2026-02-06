@@ -105,6 +105,10 @@
     "rewardDistributionTextPlural": "The reward will be distributed to up to {{count}} addresses"
   },
   "confirmPay": {
+    "extendTime": "Extend {{minutes}} min",
+    "extending": "Extending...",
+    "extendSuccess": "Time extended by {{minutes}} minutes",
+    "extendFailed": "Failed to extend time",
     "paymentReceived": "Payment received. Please wait for confirmation.",
     "addressCopied": "Address copied to clipboard",
     "failedToCopy": "Failed to copy address",

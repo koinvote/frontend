@@ -99,6 +99,10 @@
     "rewardDistributionTextPlural": "獎勵將分配給最多 {{count}} 個地址"
   },
   "confirmPay": {
+    "extendTime": "延長 {{minutes}} 分",
+    "extending": "延長中...",
+    "extendSuccess": "已延長 {{minutes}} 分鐘",
+    "extendFailed": "延長失敗",
     "paymentReceived": "已收到付款，請等待確認。",
     "addressCopied": "地址已複製到剪貼簿",
     "failedToCopy": "地址複製失敗",

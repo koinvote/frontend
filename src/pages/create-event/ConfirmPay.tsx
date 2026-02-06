@@ -15,6 +15,7 @@ import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
+import CONSTS from "@/consts";
 import { useHomeStore } from "@/stores/homeStore";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { formatDepositCountdown, satsToBtc } from "@/utils/formatter";
@@ -84,6 +85,9 @@ export default function ConfirmPay() {
   //     depositStatus?.status?.toUpperCase() === "EXPIRED",
   // });
   const [countdownDisplay, setCountdownDisplay] = useState<string>("00:00");
+  const [isExtending, setIsExtending] = useState(false);
+  const [showExtendButton, setShowExtendButton] = useState(false);
+  const [canExtend, setCanExtend] = useState(false);
   const isCheckingStatusRef = useRef(false);
   const statusCheckIntervalRef = useRef<number | null>(null);
   const hasNavigatedRef = useRef(false);
@@ -200,7 +204,44 @@ export default function ConfirmPay() {
     } finally {
       isCheckingStatusRef.current = false;
     }
-  }, [eventId, navigate, setStatus, showToast]);
+  }, [eventId, navigate, setStatus, showToast, t]);
+
+  // Handle extend timeout
+  const handleExtendTimeout = useCallback(async () => {
+    if (!eventId || isExtending) return;
+
+    try {
+      setIsExtending(true);
+      const response = (await API.extendDepositTimeout(
+        eventId,
+      )()) as unknown as ApiResponse<DepositStatusRes>;
+
+      if (!response.success || !response.data) {
+        showToast(
+          "error",
+          response.message ||
+            t("confirmPay.extendFailed", "Failed to extend time"),
+        );
+        return;
+      }
+
+      // Update deposit status with new timeout
+      setDepositStatus(response.data);
+      // After successful extend, button becomes disabled until remaining < 30 min again
+      setCanExtend(false);
+      showToast(
+        "success",
+        t("confirmPay.extendSuccess", "Time extended by {{minutes}} minutes", {
+          minutes: CONSTS.DEPOSIT_EXTEND_TIME,
+        }),
+      );
+    } catch (error) {
+      console.error("Error extending timeout:", error);
+      showToast("error", t("confirmPay.extendFailed", "Failed to extend time"));
+    } finally {
+      setIsExtending(false);
+    }
+  }, [eventId, isExtending, showToast, t]);
 
   // Initialize countdown timer
   useEffect(() => {
@@ -228,6 +269,20 @@ export default function ConfirmPay() {
     const updateCountdown = () => {
       const formatted = formatDepositCountdown(timeoutAt);
       setCountdownDisplay(formatted);
+
+      // Check remaining time for extend button
+      const deadline = dayjs.utc(timeoutAt);
+      const now = dayjs();
+      const remainingMinutes = deadline.diff(now, "minute", true);
+      const isUnderThreshold =
+        remainingMinutes > 0 &&
+        remainingMinutes < CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES;
+
+      // Show button once remaining < 30 min (and keep it visible)
+      if (isUnderThreshold) {
+        setShowExtendButton(true);
+      }
+      setCanExtend(isUnderThreshold);
 
       // Check if countdown has reached 0
       if (formatted === "00:00" && !hasNavigatedRef.current) {
@@ -457,7 +512,25 @@ export default function ConfirmPay() {
           <CircleLeftIcon className="w-8 h-8 fill-current" />
         </button>
       </div>
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+      <div className="relative w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+        {isUnconfirmed && showExtendButton && (
+          <Button
+            name="extendButton"
+            type="button"
+            appearance="outline"
+            tone="primary"
+            text="sm"
+            className="absolute right-4 top-6 sm:right-8 sm:top-8 sm:w-40"
+            onClick={handleExtendTimeout}
+            disabled={isExtending || !canExtend}
+          >
+            {isExtending
+              ? t("confirmPay.extending", "Extending...")
+              : t("confirmPay.extendTime", "Extend {{minutes}} min", {
+                  minutes: CONSTS.DEPOSIT_EXTEND_TIME,
+                })}
+          </Button>
+        )}
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           {t("confirmPay.title", "Payment Instructions")}
         </h1>

@@ -121,6 +121,11 @@ export const API = {
       `/events/${eventId}/deposit-status`,
     ),
 
+  extendDepositTimeout: (eventId: string) =>
+    get<ApiResponse<DepositStatusRes>, void>(
+      `/events/${eventId}/deposit-extend`,
+    ),
+
   generateReplyPlaintext: () =>
     post<ApiResponse<GetReplyPlainTextRes>, GenerateReplyPlaintextReq>(
       "/replies/generate-plaintext",

@@ -1,6 +1,7 @@
 // MSW handlers for API mocking
 import type { ApiResponse, ReplyReceiptData } from "@/api";
 import { DepositStatus } from "@/api/types";
+import CONSTS from "@/consts";
 import { http, HttpResponse } from "msw";
 import {
   mockAdminSystemParameters,
@@ -17,7 +18,19 @@ import {
 } from "./data";
 
 const API_BASE_URL = "/api/v1";
-let DEPOSIT_STATUS_CALL_COUNT = 0;
+
+// ============ 調整這裡控制狀態變化時間（分鐘）============
+// PENDING_TIME: 幾分鐘後變成 UNCONFIRMED
+// CONFIRM_TIME: 幾分鐘後變成 RECEIVED
+const PENDING_TIME = 0.5; // 0.5 分鐘 = 30 秒
+const CONFIRM_TIME = 10; // 10 分鐘
+// ========================================================
+
+// Track deposit status timing
+let DEPOSIT_START_TIME: number | null = null;
+let DEPOSIT_PENDING_TIMEOUT_AT: string | null = null; // 初始 PENDING 的到期時間
+let DEPOSIT_FIRST_SEEN_AT: string | null = null;
+let DEPOSIT_TIMEOUT_AT: string | null = null;
 
 export const handlers = [
   // GET /system/parameters - Get system configuration
@@ -82,9 +95,6 @@ export const handlers = [
 
   // GET /events/:eventId - Get event detail
   http.get(`${API_BASE_URL}/events/:eventId`, ({ params }) => {
-    if (DEPOSIT_STATUS_CALL_COUNT >= 20) {
-      DEPOSIT_STATUS_CALL_COUNT = 0;
-    }
     const { eventId } = params;
 
     // Find matching event from list or return default detail
@@ -121,12 +131,15 @@ export const handlers = [
       });
     }
 
-    // Return default mock event detail
+    // Return default mock event detail with the requested eventId
     return HttpResponse.json<ApiResponse<typeof mockEventDetail>>({
       code: "200",
       success: true,
       message: null,
-      data: mockEventDetail,
+      data: {
+        ...mockEventDetail,
+        event_id: eventId as string,
+      },
     });
   }),
 
@@ -204,8 +217,51 @@ export const handlers = [
 
   // GET /events/:eventId/deposit-status - Get deposit status
   http.get(`${API_BASE_URL}/events/:eventId/deposit-status`, ({ params }) => {
-    DEPOSIT_STATUS_CALL_COUNT += 1;
     const { eventId } = params;
+    const now = Date.now();
+
+    // Initialize start time and pending timeout on first call
+    if (!DEPOSIT_START_TIME) {
+      DEPOSIT_START_TIME = now;
+      // Set initial 15 min timeout for PENDING status
+      DEPOSIT_PENDING_TIMEOUT_AT = new Date(now + 15 * 60 * 1000).toISOString();
+    }
+
+    // Calculate elapsed time in minutes
+    const elapsedMinutes = (now - DEPOSIT_START_TIME) / (60 * 1000);
+
+    // Determine status based on elapsed time
+    let status: DepositStatus;
+    if (elapsedMinutes < PENDING_TIME) {
+      status = DepositStatus.PENDING;
+    } else if (elapsedMinutes < CONFIRM_TIME) {
+      status = DepositStatus.UNCONFIRMED;
+    } else {
+      status = DepositStatus.RECEIVED;
+    }
+
+    // When transitioning to UNCONFIRMED, set first_seen_at and timeout (+45 min)
+    if (status === DepositStatus.UNCONFIRMED && !DEPOSIT_FIRST_SEEN_AT) {
+      DEPOSIT_FIRST_SEEN_AT = new Date(
+        DEPOSIT_START_TIME + PENDING_TIME * 60 * 1000,
+      ).toISOString();
+      DEPOSIT_TIMEOUT_AT = new Date(
+        DEPOSIT_START_TIME + PENDING_TIME * 60 * 1000 + 45 * 60 * 1000,
+      ).toISOString();
+    }
+
+    // For PENDING status, use stored pending timeout
+    // For UNCONFIRMED/RECEIVED, use the stored timeout
+    const depositTimeoutAt =
+      status === DepositStatus.PENDING
+        ? DEPOSIT_PENDING_TIMEOUT_AT!
+        : DEPOSIT_TIMEOUT_AT || new Date(now + 45 * 60 * 1000).toISOString();
+
+    // confirmed_at is set when status becomes RECEIVED
+    const confirmedAt =
+      status === DepositStatus.RECEIVED
+        ? new Date(DEPOSIT_START_TIME + CONFIRM_TIME * 60 * 1000).toISOString()
+        : null;
 
     return HttpResponse.json<ApiResponse<typeof mockDepositStatus>>({
       code: "200",
@@ -213,24 +269,93 @@ export const handlers = [
       message: null,
       data: {
         ...mockDepositStatus,
-        status:
-          DEPOSIT_STATUS_CALL_COUNT < 10
-            ? DepositStatus.PENDING
-            : DEPOSIT_STATUS_CALL_COUNT < 20
-              ? DepositStatus.UNCONFIRMED
-              : DepositStatus.RECEIVED,
+        deposit_timeout_at: depositTimeoutAt,
+        first_seen_at:
+          status === DepositStatus.PENDING ? null : DEPOSIT_FIRST_SEEN_AT,
+        confirmed_at: confirmedAt,
+        status,
         event_id: eventId as string,
       },
     });
   }),
 
-  // GET /events/:eventId/replies - Get event replies
-  http.get(`${API_BASE_URL}/events/:eventId/replies`, ({ request }) => {
+  // GET /events/:eventId/deposit-extend - Extend deposit timeout by 30 minutes
+  http.get(`${API_BASE_URL}/events/:eventId/deposit-extend`, ({ params }) => {
+    const { eventId } = params;
+
+    // Check if there's an existing timeout
+    if (!DEPOSIT_TIMEOUT_AT) {
+      return HttpResponse.json<ApiResponse<null>>(
+        {
+          code: "400000",
+          success: false,
+          message: "No deposit timeout to extend",
+          data: null,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Check remaining time
+    const now = Date.now();
+    const currentTimeout = new Date(DEPOSIT_TIMEOUT_AT).getTime();
+    const remainingMs = currentTimeout - now;
+    const remainingMinutes = remainingMs / (60 * 1000);
+
+    if (remainingMinutes >= CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES) {
+      return HttpResponse.json<ApiResponse<null>>(
+        {
+          code: "400000",
+          success: false,
+          message: `Remaining time must be less than ${CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES} minutes`,
+          data: null,
+        },
+        { status: 400 },
+      );
+    }
+
+    // Extend by 30 minutes from current timeout
+    const newTimeout = new Date(
+      currentTimeout + CONSTS.DEPOSIT_EXTEND_TIME * 60 * 1000,
+    ).toISOString();
+    DEPOSIT_TIMEOUT_AT = newTimeout;
+
+    return HttpResponse.json<ApiResponse<typeof mockDepositStatus>>({
+      code: "200",
+      success: true,
+      message: null,
+      data: {
+        ...mockDepositStatus,
+        deposit_timeout_at: newTimeout,
+        first_seen_at: DEPOSIT_FIRST_SEEN_AT,
+        confirmed_at: null,
+        status: DepositStatus.UNCONFIRMED,
+        event_id: eventId as string,
+      },
+    });
+  }),
+
+  // GET /replies?event_id={event_id} - Get event replies
+  http.get(`${API_BASE_URL}/replies`, ({ request }) => {
     const url = new URL(request.url);
+    const eventId = url.searchParams.get("event_id");
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");
     const search = url.searchParams.get("search") || "";
     const sortBy = url.searchParams.get("sortBy") || "balance";
+
+    // Return empty if no event_id
+    if (!eventId) {
+      return HttpResponse.json<ApiResponse<any>>(
+        {
+          code: "400000",
+          success: false,
+          message: "event_id is required",
+          data: null,
+        },
+        { status: 400 },
+      );
+    }
 
     let replies = [...mockGetListRepliesResponse.replies];
 
