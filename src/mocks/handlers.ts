@@ -101,7 +101,7 @@ export const handlers = [
     const eventFromList = mockEventList.find((e) => e.event_id === eventId);
 
     if (eventFromList) {
-      // Create detail from list item
+      // Create detail from list item, including status
       const detail = {
         ...mockEventDetail,
         id: eventFromList.id,
@@ -109,13 +109,17 @@ export const handlers = [
         title: eventFromList.title,
         description: eventFromList.description,
         event_type: eventFromList.event_type,
+        event_reward_type: eventFromList.event_reward_type,
+        status: eventFromList.status,
         total_reward_satoshi: eventFromList.total_reward_satoshi,
         participants_count: eventFromList.participants_count,
         total_stake_satoshi: eventFromList.total_stake_satoshi,
         hashtags: eventFromList.hashtags,
         created_at: eventFromList.created_at,
+        preheat_start_at: eventFromList.preheat_start_at,
         started_at: eventFromList.started_at,
         deadline_at: eventFromList.deadline_at,
+        ended_at: eventFromList.ended_at,
         options: eventFromList.options,
         top_replies: eventFromList.top_replies.map((reply) => ({
           ...reply,
@@ -131,7 +135,13 @@ export const handlers = [
       });
     }
 
-    // Return default mock event detail with the requested eventId
+    // For dynamically created events (e.g., from payment flow), return as ongoing
+    const now = new Date();
+    const startedAt = new Date(now.getTime() - 1000).toISOString(); // 1 second ago
+    const deadlineAt = new Date(
+      now.getTime() + 24 * 60 * 60 * 1000,
+    ).toISOString(); // 24 hours from now
+
     return HttpResponse.json<ApiResponse<typeof mockEventDetail>>({
       code: "200",
       success: true,
@@ -139,6 +149,10 @@ export const handlers = [
       data: {
         ...mockEventDetail,
         event_id: eventId as string,
+        status: 3, // ACTIVE/ongoing
+        created_at: now.toISOString(),
+        started_at: startedAt,
+        deadline_at: deadlineAt,
       },
     });
   }),
