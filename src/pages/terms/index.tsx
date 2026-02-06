@@ -126,11 +126,10 @@ export default function Terms() {
                 <Trans
                   i18nKey="terms.s4_p2"
                   components={{
-                    bold,
                     a: (
                       <Link
                         to="/charges-refunds#anchor2"
-                        className="text-orange-500"
+                        className="underline"
                         target="_blank"
                       />
                     ),
@@ -159,14 +158,14 @@ export default function Terms() {
                     a1: (
                       <Link
                         to="/charges-refunds#anchor1"
-                        className="text-orange-500"
+                        className="underline"
                         target="_blank"
                       />
                     ),
                     a2: (
                       <Link
                         to="/charges-refunds#anchor3"
-                        className="text-orange-500"
+                        className="underline"
                         target="_blank"
                       />
                     ),
@@ -185,7 +184,7 @@ export default function Terms() {
                     a: (
                       <Link
                         to="/terms-reward-distribution#anchor1"
-                        className="text-orange-500"
+                        className="underline"
                         target="_blank"
                       />
                     ),
@@ -208,11 +207,10 @@ export default function Terms() {
                 <Trans
                   i18nKey="terms.s6_p3"
                   components={{
-                    bold,
                     a: (
                       <Link
                         to="/charges-refunds#anchor4"
-                        className="text-orange-500"
+                        className="underline"
                         target="_blank"
                       />
                     ),
