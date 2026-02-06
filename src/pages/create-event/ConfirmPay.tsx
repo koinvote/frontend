@@ -460,11 +460,6 @@ export default function ConfirmPay() {
     }
   });
 
-  // Handle cancel - go back to create event
-  const handleCancel = () => {
-    navigate("/create-event");
-  };
-
   // Handle back to preview
   const handleBackToPreview = () => {
     if (state) {
@@ -605,7 +600,7 @@ export default function ConfirmPay() {
                 "confirmPay.contactSupport",
                 "If you have any questions, please contact",
               )}{" "}
-              <span className="flex items-center gap-1 inline-flex">
+              <span className="inline-flex items-center gap-1">
                 support@koinvote.com
                 <button
                   type="button"
@@ -715,8 +710,7 @@ export default function ConfirmPay() {
                 <span>
                   {t(
                     "confirmPay.warning",
-                    "Do NOT split your payment. Transactions below {{threshold}} BTC will NOT trigger a refund.",
-                    { threshold: refundThresholdBtc },
+                    "Do NOT split your payment. Incorrect payment amounts may not be refundable.",
                   )}
                 </span>
               </div>
@@ -727,7 +721,7 @@ export default function ConfirmPay() {
                   {t("confirmPay.toThisAddress", "To this address")}
                 </div>
                 <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-bg">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full bg-secondary flex items-center justify-center">
+                  <div className="w-5 h-5 shrink-0 rounded-full bg-secondary flex items-center justify-center">
                     <BTCIcon
                       className="w-3 h-3 [&>path]:stroke-[#A1A1A1]"
                       style={{
@@ -741,7 +735,7 @@ export default function ConfirmPay() {
                   <button
                     type="button"
                     onClick={() => handleCopyAddress(depositAddress)}
-                    className="p-1 hover:opacity-70 flex-shrink-0 cursor-pointer"
+                    className="p-1 hover:opacity-70 shrink-0 cursor-pointer"
                   >
                     <CopyIcon className="w-4 h-4 text-secondary" />
                   </button>
@@ -759,7 +753,7 @@ export default function ConfirmPay() {
               appearance="solid"
               tone="primary"
               text="sm"
-              className="sm:w-[160px]"
+              className="sm:w-40"
               onClick={handleBackToPreview}
             >
               {t("confirmPay.backToPreview", "Back to Preview")}

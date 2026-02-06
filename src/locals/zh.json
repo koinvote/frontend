@@ -125,7 +125,7 @@
     "sendExactly": "請支付",
     "paymentAmountCopied": "付款金額已複製到剪貼簿",
     "failedToCopyPaymentAmount": "付款金額複製失敗",
-    "warning": "請勿分拆付款。低於 {{threshold}} BTC 的交易將不會觸發退款。",
+    "warning": "請勿分拆付款。不正確的金額將不會觸發退款。",
     "toThisAddress": "至此地址",
     "backToPreview": "返回預覽",
     "cancel": "取消"

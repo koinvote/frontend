@@ -131,7 +131,7 @@
     "sendExactly": "Send exactly",
     "paymentAmountCopied": "Payment amount copied to clipboard",
     "failedToCopyPaymentAmount": "Failed to copy payment amount",
-    "warning": "Do NOT split your payment. Transactions below {{threshold}} BTC will NOT trigger a refund.",
+    "warning": "Do NOT split your payment. Incorrect payment amounts may not be refundable.",
     "toThisAddress": "To this address",
     "backToPreview": "Back to Preview",
     "cancel": "Cancel"
