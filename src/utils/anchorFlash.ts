@@ -22,8 +22,8 @@ function ensureStyle(color: string, durationMs: number) {
   style.id = STYLE_ID;
   style.textContent = `
     @keyframes anchorFlash {
-      0%, 100% { color: ${color}; }
-      50% { color: inherit; }
+      0% { color: ${color}; }
+      100% { color: inherit }
     }
     .anchor-flash-text,
     .anchor-flash-text > * {
@@ -43,7 +43,7 @@ export function setupAnchorFlash(options: AnchorFlashOptions) {
   const {
     hash,
     elementId = hash,
-    durationMs = 3000,
+    durationMs = 1500,
     color = "#f97316",
   } = options;
 

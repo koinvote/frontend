@@ -28,9 +28,7 @@ export default function TermsOfRewardDistribution() {
         {t("rewardTerms.title")}
       </h1>
 
-      <p className="text-secondary leading-relaxed">
-        {t("rewardTerms.intro")}
-      </p>
+      <p className="text-secondary leading-relaxed">{t("rewardTerms.intro")}</p>
 
       <section>
         <ol className="list-decimal pl-6 marker:font-bold space-y-3">
@@ -79,31 +77,23 @@ export default function TermsOfRewardDistribution() {
               <p className="text-secondary">
                 <Trans i18nKey="rewardTerms.s4_0" components={{ bold }} />
               </p>
-              <ol className="list-decimal pl-6 marker:font-bold space-y-1 text-secondary marker:text-orange-500">
+              <ol className="list-decimal pl-6 marker:font-bold space-y-1 text-secondary">
                 <li>
                   <Link
                     to="/charges-refunds#anchor1"
-                    className="text-orange-500"
+                    className="underline"
                     target="_blank"
                   >
-                    <Trans
-                      i18nKey="rewardTerms.s4_fee_1"
-                      components={{ bold }}
-                      default="<bold>Platform Service Fee</bold>"
-                    />
+                    {t("rewardTerms.s4_fee_1", "Platform Service Fee")}
                   </Link>
                 </li>
                 <li>
                   <Link
                     to="/charges-refunds#anchor3"
-                    className="text-orange-500"
+                    className="underline"
                     target="_blank"
                   >
-                    <Trans
-                      i18nKey="rewardTerms.s4_fee_2"
-                      components={{ bold }}
-                      default="<bold>Transaction Fee</bold>"
-                    />
+                    {t("rewardTerms.s4_fee_2", "Transaction Fee")}
                   </Link>
                 </li>
               </ol>
@@ -151,9 +141,7 @@ export default function TermsOfRewardDistribution() {
 
       <section>
         <h2 className="text-xl fw-m mb-2">{t("rewardTerms.examplesTitle")}</h2>
-        <p className="text-secondary mb-2">
-          {t("rewardTerms.examplesIntro")}
-        </p>
+        <p className="text-secondary mb-2">{t("rewardTerms.examplesIntro")}</p>
 
         <div className="space-y-3">
           <div className="space-y-1">
@@ -214,7 +202,9 @@ export default function TermsOfRewardDistribution() {
               <p>{t("rewardTerms.ex2_steps_label")}</p>
               <ol className="list-decimal pl-6 marker:font-bold space-y-1">
                 <li className="space-y-1">
-                  <p className="font-bold">{t("rewardTerms.ex2_step1_label")}</p>
+                  <p className="font-bold">
+                    {t("rewardTerms.ex2_step1_label")}
+                  </p>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>
                       <Trans
@@ -243,7 +233,9 @@ export default function TermsOfRewardDistribution() {
                   </ul>
                 </li>
                 <li className="space-y-1">
-                  <p className="font-bold">{t("rewardTerms.ex2_step2_label")}</p>
+                  <p className="font-bold">
+                    {t("rewardTerms.ex2_step2_label")}
+                  </p>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>{t("rewardTerms.ex2_step2_a")}</li>
                     <li>{t("rewardTerms.ex2_step2_b")}</li>
@@ -251,14 +243,18 @@ export default function TermsOfRewardDistribution() {
                   </ul>
                 </li>
                 <li className="space-y-1">
-                  <p className="font-bold">{t("rewardTerms.ex2_step3_label")}</p>
+                  <p className="font-bold">
+                    {t("rewardTerms.ex2_step3_label")}
+                  </p>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>{t("rewardTerms.ex2_step3_1")}</li>
                     <li>{t("rewardTerms.ex2_step3_2")}</li>
                   </ul>
                 </li>
                 <li className="space-y-1">
-                  <p className="font-bold">{t("rewardTerms.ex2_final_label")}</p>
+                  <p className="font-bold">
+                    {t("rewardTerms.ex2_final_label")}
+                  </p>
                   <ul className="list-disc pl-6 space-y-1">
                     <li>
                       <Trans
