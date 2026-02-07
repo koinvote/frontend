@@ -12,6 +12,7 @@ interface AdminFormFieldBaseProps {
   disabled?: boolean;
   suffix?: ReactNode;
   className?: string;
+  error?: string;
 }
 
 interface AdminFormFieldInputProps extends AdminFormFieldBaseProps {
@@ -38,37 +39,48 @@ export function AdminFormField(props: AdminFormFieldProps) {
     disabled = false,
     suffix,
     className = "",
+    error,
   } = props;
 
-  const inputClassName = `w-24 border border-admin-border rounded-[4px] px-3 py-2 bg-white tx-14 ${className}`;
+  const baseInputClassName = `w-24 border rounded-[4px] px-3 py-2 bg-white tx-14 ${className}`;
+  const inputClassName = error
+    ? `${baseInputClassName} border-red-500`
+    : `${baseInputClassName} border-admin-border`;
 
   return (
     <div className="flex flex-wrap items-center gap-3 max-w-xl">
       {label && <label className="tx-14 text-admin-text-sub">{label}</label>}
-      {props.type === "input" ? (
-        <input
-          type={props.inputType || "text"}
-          step={props.step}
-          className={inputClassName}
-          placeholder={props.placeholder || "輸入"}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-        />
-      ) : (
-        <select
-          className={inputClassName}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          disabled={disabled}
-        >
-          {props.options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      )}
+      <div className="relative pb-2">
+        {props.type === "input" ? (
+          <input
+            type={props.inputType || "text"}
+            step={props.step}
+            className={inputClassName}
+            placeholder={props.placeholder || "輸入"}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
+          />
+        ) : (
+          <select
+            className={inputClassName}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            disabled={disabled}
+          >
+            {props.options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        )}
+        {error && (
+          <span className="absolute left-0 -bottom-3 mt-1 text-red-500 text-xs whitespace-nowrap">
+            {error}
+          </span>
+        )}
+      </div>
       {suffix && <span className="tx-14">{suffix}</span>}
     </div>
   );

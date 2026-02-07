@@ -19,15 +19,17 @@ export function AdminFormSection({ title, children }: AdminFormSectionProps) {
 interface AdminFormSectionWithFieldProps {
   title: string;
   fieldProps: AdminFormFieldProps;
+  error?: string;
 }
 
 export function AdminFormSectionWithField({
   title,
   fieldProps,
+  error,
 }: AdminFormSectionWithFieldProps) {
   return (
     <AdminFormSection title={title}>
-      <AdminFormField {...fieldProps} />
+      <AdminFormField {...fieldProps} error={error} />
     </AdminFormSection>
   );
 }

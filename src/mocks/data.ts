@@ -349,9 +349,9 @@ export const mockGetListRepliesResponse: GetListRepliesRes = {
 // Admin System Parameters Mock
 export const mockAdminSystemParameters: AdminSystemParametersRes = {
   min_reward_amount_satoshi: 50000,
-  satoshi_per_extra_winner: 10000,
+  satoshi_per_extra_winner: 12345,
   satoshi_per_duration_hour: 10000,
-  dust_threshold_satoshi: 10000,
+  dust_threshold_satoshi: 4444,
   free_hours: 24,
   platform_fee_percentage: 2.5,
   refund_service_fee_percentage: 0.5,
