@@ -1,12 +1,20 @@
-import { Outlet } from 'react-router'
-import AdminMenu from '@/admin/AdminMenu'
-import Logo from '@/assets/logo/logo.svg?react'
+import ComputerIcon from "@/assets/icons/computer.svg?react";
+import LogoutIcon from "@/assets/icons/logout.svg?react";
+import ProfileIcon from "@/assets/icons/profile.svg?react";
+import { Outlet, useNavigate } from "react-router";
 
-import ComputerIcon from '@/assets/icons/computer.svg?react'
-import ProfileIcon from '@/assets/icons/profile.svg?react'
-import LogoutIcon from '@/assets/icons/logout.svg?react'
+import AdminMenu from "@/admin/AdminMenu";
+import { removeAdminToken } from "@/api/http";
+import Logo from "@/assets/logo/logo.svg?react";
 
 export default function AdminLayout() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    removeAdminToken();
+    navigate("/admin/login");
+  };
+
   return (
     <div className="min-h-screen bg-admin-bg text-admin-text-main">
       {/* Top bar */}
@@ -20,18 +28,21 @@ export default function AdminLayout() {
           <button
             type="button"
             className="flex items-center gap-1 text-admin-text-sub hover:text-admin-text-main transition-colors cursor-pointer"
-            onClick={() => window.location.href = '/'}
+            onClick={() => (window.location.href = "/")}
           >
             <ComputerIcon className="w-5 h-5" />
             切換至前台
           </button>
           <div className="flex items-center gap-1">
-            <span><ProfileIcon className="w-5 h-5" /></span>
+            <span>
+              <ProfileIcon className="w-5 h-5" />
+            </span>
             <span className="text-admin-text-sub">Admin</span>
           </div>
           <button
             type="button"
             className="flex items-center gap-1 tx-14 text-admin-text-sub hover:text-admin-text-main cursor-pointer"
+            onClick={handleLogout}
           >
             <LogoutIcon className="w-5 h-5" />
             登出
@@ -52,5 +63,5 @@ export default function AdminLayout() {
         </main>
       </div>
     </div>
-  )
+  );
 }

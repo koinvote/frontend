@@ -1,5 +1,7 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
+import { toast } from "@/components/base/Toast/toast";
+
 export type RequestConf = AxiosRequestConfig;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -96,13 +98,35 @@ adminHttp.interceptors.request.use(
   }
 );
 
-// Response interceptor: Same as regular http
+// Response interceptor: Handle token expiration and errors
 adminHttp.interceptors.response.use(
   (response) => response.data,
   (error) => {
     // Attach standardized error message to error object for easy access in components
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any).apiMessage = getApiErrorMessage(error);
+
+    // Check for token expiration or invalid token
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || "";
+
+    if (
+      status === 401 ||
+      message.toLowerCase().includes("token expired") ||
+      message.toLowerCase().includes("invalid token") ||
+      message.toLowerCase().includes("token invalid")
+    ) {
+      // Show toast, clear token and redirect to login
+      toast("error", "連線已過期，請重新登入");
+      removeAdminToken();
+      if (typeof window !== "undefined") {
+        // Delay redirect to allow toast to show
+        setTimeout(() => {
+          window.location.href = "/admin/login";
+        }, 1500);
+      }
+    }
+
     return Promise.reject(error);
   }
 );
