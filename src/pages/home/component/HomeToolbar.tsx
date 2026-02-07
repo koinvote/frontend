@@ -133,7 +133,7 @@ export function HomeToolbar() {
               borderRadius: 12,
             },
           }}
-          defaultValue={status}
+          value={status}
           options={[
             { label: t("homeToolbar.preheat", "Preheat"), value: "preheat" },
             { label: t("homeToolbar.ongoing", "Ongoing"), value: "ongoing" },
