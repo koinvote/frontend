@@ -99,13 +99,16 @@ export default function AdminRewardRulesPage() {
         showToast("error", errorMessage);
       }
     } catch (error: unknown) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.apiMessage ||
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.message ||
-        "獲取系統參數失敗";
-      showToast("error", errorMessage);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(error as any)?.isHandled) {
+        const errorMessage =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (error as any)?.apiMessage ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (error as any)?.message ||
+          "獲取系統參數失敗";
+        showToast("error", errorMessage);
+      }
     } finally {
       setIsLoadingRestore(false);
     }
@@ -156,10 +159,13 @@ export default function AdminRewardRulesPage() {
         showToast("error", errorMessage);
       }
     } catch (error: unknown) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.apiMessage || (error as any)?.message || "儲存失敗";
-      showToast("error", errorMessage);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(error as any)?.isHandled) {
+        const errorMessage =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (error as any)?.apiMessage || (error as any)?.message || "儲存失敗";
+        showToast("error", errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

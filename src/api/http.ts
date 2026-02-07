@@ -116,6 +116,10 @@ adminHttp.interceptors.response.use(
       message.toLowerCase().includes("invalid token") ||
       message.toLowerCase().includes("token invalid")
     ) {
+      // Mark error as handled to prevent duplicate toasts
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (error as any).isHandled = true;
+
       // Show toast, clear token and redirect to login
       toast("error", "連線已過期，請重新登入");
       removeAdminToken();
