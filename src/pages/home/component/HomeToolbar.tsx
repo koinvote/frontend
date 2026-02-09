@@ -49,17 +49,6 @@ export function HomeToolbar() {
 
   const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-  // Delay enabling interaction after loading finishes to prevent race condition
-  const [canInteract, setCanInteract] = useState(true);
-  useEffect(() => {
-    if (isLoading) {
-      setCanInteract(false);
-    } else {
-      const timer = setTimeout(() => setCanInteract(true), 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading]);
-
   // debounce search 300ms
   useEffect(() => {
     const id = setTimeout(() => {
@@ -127,7 +116,7 @@ export function HomeToolbar() {
         <Segmented<HomeStatusFilter>
           block={isDesktop ? false : true}
           size="large"
-          className={!canInteract ? "pointer-events-none" : ""}
+          className={isLoading ? "pointer-events-none" : ""}
           classNames={{
             label: styles["segmented-label"],
           }}

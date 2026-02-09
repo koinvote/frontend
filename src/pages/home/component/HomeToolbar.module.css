@@ -7,3 +7,11 @@
     padding: 0 4px !important;
   }
 }
+
+/* Disable hover/active effect on touch devices to prevent stuck state */
+@media (hover: none) {
+  :global(.ant-segmented-item:not(.ant-segmented-item-selected)):hover,
+  :global(.ant-segmented-item:not(.ant-segmented-item-selected)):active {
+    background: transparent !important;
+  }
+}
