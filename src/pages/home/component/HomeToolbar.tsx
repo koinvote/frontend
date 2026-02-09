@@ -1,4 +1,3 @@
-import { Segmented } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -6,13 +5,13 @@ import { API, type ApiResponse } from "@/api/index";
 import type { GetHotHashtagsRes } from "@/api/response";
 import ClearIcon from "@/assets/icons/clear.svg?react";
 import SearchIcon from "@/assets/icons/search.svg?react";
+import { Segmented } from "@/components/base/CustomSegmented";
 import {
   type HomeSortField,
   type HomeSortOrder,
   type HomeStatusFilter,
 } from "@/pages/create-event/types/index";
 import { useHomeStore } from "@/stores/homeStore";
-import styles from "./HomeToolbar.module.css";
 
 export function HomeToolbar() {
   const { t } = useTranslation();
@@ -114,25 +113,9 @@ export function HomeToolbar() {
     <div className="flex flex-col gap-3 md:gap-4">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
         <Segmented<HomeStatusFilter>
-          block={isDesktop ? false : true}
+          block={!isDesktop}
           size="large"
-          className={isLoading ? "pointer-events-none" : ""}
-          classNames={{
-            label: styles["segmented-label"],
-          }}
-          styles={{
-            root: {
-              border: "1px solid var(--color-border)",
-              borderRadius: 12,
-            },
-            item: {
-              paddingLeft: 6,
-              paddingRight: 6,
-              paddingTop: 0,
-              paddingBottom: 0,
-              borderRadius: 12,
-            },
-          }}
+          loading={isLoading}
           value={status}
           options={[
             { label: t("homeToolbar.preheat", "Preheat"), value: "preheat" },

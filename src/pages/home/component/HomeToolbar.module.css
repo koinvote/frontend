@@ -1,9 +1,0 @@
-.segmented-label {
-  white-space: normal;
-}
-@media (max-width: 375px) {
-  .segmented-label {
-    font-size: 14px !important;
-    padding: 0 4px !important;
-  }
-}

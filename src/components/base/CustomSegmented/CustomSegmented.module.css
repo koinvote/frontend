@@ -1,0 +1,165 @@
+/* Container */
+.segmented {
+  /* Dark mode variables (default) */
+  --segmented-thumb-bg: #f5f5f0;
+  --segmented-item-hover-bg: rgba(255, 255, 255, 0.1);
+  --segmented-item-active-bg: rgba(255, 255, 255, 0.15);
+  --segmented-selected-color: #0a0a0a;
+
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  gap: 0;
+}
+
+/* Light mode variables */
+:global(:root:not(.dark)) .segmented {
+  --segmented-thumb-bg: #ffffff;
+  --segmented-item-hover-bg: rgba(0, 0, 0, 0.06);
+  --segmented-item-active-bg: rgba(0, 0, 0, 0.1);
+  --segmented-selected-color: #0a0a0a;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+/* Sliding thumb - the selected indicator */
+.thumb {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  background: var(--segmented-thumb-bg);
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px 0 rgba(0, 0, 0, 0.03),
+    0 1px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px 0 rgba(0, 0, 0, 0.02);
+  transition:
+    transform 0.3s cubic-bezier(0.645, 0.045, 0.355, 1),
+    width 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Item button */
+.item {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 6px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  color: var(--color-secondary);
+  font-family: var(--ant-font-family);
+  font-size: 14px;
+  line-height: 1.5rem;
+  cursor: pointer;
+  transition:
+    color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1),
+    background 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+  white-space: normal;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @media (max-width: 768px) {
+    flex: 1;
+  }
+}
+
+.item:focus {
+  outline: none;
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
+
+/* Hover state - only on devices that support hover */
+@media (hover: hover) {
+  .item:not(.selected):not(.itemDisabled):hover {
+    color: var(--color-primary);
+    background: var(--segmented-item-hover-bg);
+  }
+}
+
+/* Active/pressed state */
+.item:not(.selected):not(.itemDisabled):active {
+  color: var(--color-primary);
+  background: var(--segmented-item-active-bg);
+}
+
+/* Selected state - dark text on light thumb */
+.item.selected {
+  color: var(--segmented-selected-color);
+}
+
+/* Disabled item */
+.item.itemDisabled {
+  color: var(--color-secondary);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Label */
+.label {
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Loading state - only disable interaction, no visual change */
+.loading {
+  pointer-events: none;
+}
+
+/* Sizes */
+.small {
+  padding: 2px;
+}
+
+.small .thumb {
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+}
+
+.small .item {
+  min-height: 20px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.middle .item {
+  min-height: 28px;
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.large .item {
+  min-height: 32px;
+  padding: 4px 16px;
+  font-size: 16px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 375px) {
+  .large .item {
+    padding: 4px 6px;
+    font-size: 14px;
+  }
+}

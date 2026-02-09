@@ -339,26 +339,3 @@
     white-space: nowrap !important;
   }
 }
-
-/* ------------- antd custom ------------- */
-/* disable segmented mobile hover */
-@media (hover: none) {
-  .ant-segmented
-    .ant-segmented-item:not(.ant-segmented-item-selected):not(
-      .ant-segmented-item-disabled
-    ):hover {
-    color: var(--ant-segmented-item-color) !important;
-  }
-  .ant-segmented
-    .ant-segmented-item:not(.ant-segmented-item-selected):not(
-      .ant-segmented-item-disabled
-    ):hover::after {
-    background: transparent !important;
-  }
-  .ant-segmented
-    .ant-segmented-item:not(.ant-segmented-item-selected):not(
-      .ant-segmented-item-disabled
-    ):active::after {
-    background: var(--ant-segmented-item-hover-color) !important;
-  }
-}
