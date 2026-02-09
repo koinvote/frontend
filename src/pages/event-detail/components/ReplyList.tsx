@@ -190,10 +190,10 @@ function ReplyItem({
   console.log("balanceDisplayMode", balanceDisplayMode);
 
   const getDisplayBalance = () => {
-    if (
-      eventStatus === EventStatus.ENDED ||
-      eventStatus === EventStatus.COMPLETED
-    ) {
+    if (eventStatus === EventStatus.ENDED) {
+      return reply.balance_at_current_satoshi;
+    }
+    if (eventStatus === EventStatus.COMPLETED) {
       if (balanceDisplayMode === "on_chain") {
         return reply.balance_at_current_satoshi;
       }
