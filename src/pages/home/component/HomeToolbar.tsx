@@ -116,7 +116,7 @@ export function HomeToolbar() {
         <Segmented<HomeStatusFilter>
           block={isDesktop ? false : true}
           size="large"
-          className={isLoading ? "pointer-events-none" : ""}
+          disabled={isLoading}
           classNames={{
             label: styles["segmented-label"],
           }}
