@@ -414,7 +414,12 @@ function ReplyItem({
                 </span>
                 <button
                   type="button"
-                  onClick={() => onCopy(reply.btc_address, "Bitcoin Address")}
+                  onClick={() =>
+                    onCopy(
+                      reply.btc_address,
+                      t("replyList.bitcoinAddress", "Bitcoin Address"),
+                    )
+                  }
                   className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors cursor-pointer"
                 >
                   <CopyIcon className="w-4 h-4" />
@@ -435,7 +440,12 @@ function ReplyItem({
                 </span>
                 <button
                   type="button"
-                  onClick={() => onCopy(reply.signature, "Bitcoin Signature")}
+                  onClick={() =>
+                    onCopy(
+                      reply.signature,
+                      t("replyList.bitcoinSignature", "Bitcoin Signature"),
+                    )
+                  }
                   className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors cursor-pointer"
                 >
                   <CopyIcon className="w-4 h-4" />
@@ -456,7 +466,12 @@ function ReplyItem({
                 </span>
                 <button
                   type="button"
-                  onClick={() => onCopy(reply.plaintext, "Plaintext")}
+                  onClick={() =>
+                    onCopy(
+                      reply.plaintext,
+                      t("replyList.plaintext", "Plaintext"),
+                    )
+                  }
                   className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors cursor-pointer"
                 >
                   <CopyIcon className="w-4 h-4" />
