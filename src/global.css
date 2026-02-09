@@ -346,6 +346,12 @@
   .ant-segmented
     .ant-segmented-item:not(.ant-segmented-item-selected):not(
       .ant-segmented-item-disabled
+    ):hover {
+    color: var(--ant-segmented-item-color) !important;
+  }
+  .ant-segmented
+    .ant-segmented-item:not(.ant-segmented-item-selected):not(
+      .ant-segmented-item-disabled
     ):hover::after {
     background: transparent !important;
   }
