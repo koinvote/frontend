@@ -57,7 +57,7 @@
     ],
     "numberOfRecipients": "獎勵分配人數",
     "enablePreheat": "開啟預熱",
-    "enablePreheatTooltip": "預熱允許在回覆開放前查看活動。在此期間，活動可見但回覆不可見。",
+    "enablePreheatTooltip": "預熱允許在回覆開放前查看活動。在此期間，活動可見但回覆暫不開放。",
     "durationOfEvent": "活動時長",
     "rewardBtcPlaceholderEnabled": "輸入獎勵（最低 {{min}} ）",
     "optionPlaceholder": "選項 {{n}}",
