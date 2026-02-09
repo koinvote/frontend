@@ -1,6 +1,6 @@
 import { cn } from "@/utils/style";
 import { GlobalOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import { Button, Divider, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
@@ -37,9 +37,10 @@ const items: Item[] = [
     key: "menu.verification",
     Icon: VerificationIcon,
   },
-  { to: "/charges-refunds", key: "menu.charges", Icon: ChargesnrefundsIcon },
-
   { to: "", key: "menu.support", Icon: SupportIcon },
+];
+const termItems: Item[] = [
+  { to: "/charges-refunds", key: "menu.charges", Icon: ChargesnrefundsIcon },
   {
     to: "/terms-reward-distribution",
     key: "menu.termsOfRewardDistribution",
@@ -108,6 +109,62 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
             }
             onClick={onItemClick}
           >
+            {({ isActive }) => (
+              <>
+                {collapsed ? (
+                  <Tooltip
+                    placement="right"
+                    title={t(key)}
+                    color={theme === "dark" ? "#000" : "#fff"}
+                  >
+                    <span
+                      className={cn(
+                        "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                        "text-current",
+                      )}
+                    >
+                      <Icon
+                        className={cn(
+                          "h-5! w-5!",
+                          isActive ? "text-primary" : "text-secondary",
+                        )}
+                        style={{
+                          width: "1.25rem",
+                          height: "1.25rem",
+                        }}
+                      />
+                    </span>
+                  </Tooltip>
+                ) : (
+                  <span
+                    className={cn(
+                      "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                      "text-current",
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "h-5! w-5!",
+                        isActive ? "text-primary" : "text-secondary",
+                      )}
+                      style={{ width: "1.25rem", height: "1.25rem" }}
+                    />
+                  </span>
+                )}
+                <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
+              </>
+            )}
+          </NavLink>
+        ) : (
+          <div
+            className={cn(
+              baseLink,
+              collapsed ? "justify-center px-2" : "gap-3",
+              `cursor-pointer`,
+            )}
+            key={key}
+            onClick={handleSupportClick}
+          >
             {collapsed ? (
               <Tooltip
                 placement="right"
@@ -143,6 +200,78 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
               </span>
             )}
             <span className={cn(collapsed && "sr-only")}>{t(key)}</span>
+          </div>
+        ),
+      )}
+
+      <Divider styles={{ root: { margin: "8px 0" } }} />
+      {!collapsed && (
+        <div className="p-3 pb-0 mb-2 text-xs text-neutral-500 font-medium">
+          {t("menu.terms", "TERMS")}
+        </div>
+      )}
+      {termItems.map(({ to, key, Icon }) =>
+        to ? (
+          <NavLink
+            key={to}
+            to={to}
+            aria-label={t(key)}
+            className={({ isActive }) =>
+              cn(
+                baseLink,
+                isActive && activeLink,
+                collapsed ? "justify-center px-2" : "gap-3",
+              )
+            }
+            onClick={onItemClick}
+          >
+            {({ isActive }) => (
+              <>
+                {collapsed ? (
+                  <Tooltip
+                    placement="right"
+                    title={t(key)}
+                    color={theme === "dark" ? "#000" : "#fff"}
+                  >
+                    <span
+                      className={cn(
+                        "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                        "text-current",
+                      )}
+                    >
+                      <Icon
+                        className={cn(
+                          "h-5! w-5!",
+                          isActive ? "text-primary" : "text-secondary",
+                        )}
+                        style={{
+                          width: "1.25rem",
+                          height: "1.25rem",
+                        }}
+                      />
+                    </span>
+                  </Tooltip>
+                ) : (
+                  <span
+                    className={cn(
+                      "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+                      "text-current",
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "h-5! w-5!",
+                        isActive ? "text-primary" : "text-secondary",
+                      )}
+                      style={{ width: "1.25rem", height: "1.25rem" }}
+                    />
+                  </span>
+                )}
+                <span className={cn(collapsed && "sr-only", "text-sm")}>
+                  {t(key)}
+                </span>
+              </>
+            )}
           </NavLink>
         ) : (
           <div
