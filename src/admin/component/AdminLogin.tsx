@@ -46,9 +46,9 @@ export default function AdminLogin({
   onLogin,
 }: AdminLoginProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-admin-bg">
-      <div className="w-full max-w-xl bg-white rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.08)] px-10 py-8">
-        <div className="text-center flex items-center justify-center gap-2 mb-8">
+    <div className="bg-admin-bg flex min-h-screen items-center justify-center">
+      <div className="w-full max-w-xl rounded-2xl bg-white px-10 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+        <div className="mb-8 flex items-center justify-center gap-2 text-center">
           <div>
             <Logo className="h-8 w-8" />
           </div>
@@ -66,9 +66,9 @@ export default function AdminLogin({
           {/* Admin Address */}
           <div className="space-y-1">
             <label className="tx-14 text-admin-text-sub">Admin Address</label>
-            <div className="flex items-center gap-2 bg-admin-surface rounded-md px-3 py-2">
+            <div className="bg-admin-surface flex items-center gap-2 rounded-md px-3 py-2">
               <input
-                className="flex-1 bg-transparent border-0 outline-none tx-14 text-admin-text-main"
+                className="tx-14 text-admin-text-main flex-1 border-0 bg-transparent outline-none"
                 value={adminAddress}
                 readOnly
               />
@@ -78,9 +78,9 @@ export default function AdminLogin({
           {/* Hash Key */}
           <div className="space-y-1">
             <label className="tx-14 text-admin-text-sub">Hash Key</label>
-            <div className="flex items-center gap-2 bg-admin-surface rounded-md px-3 py-2">
+            <div className="bg-admin-surface flex items-center gap-2 rounded-md px-3 py-2">
               <input
-                className="flex-1 bg-transparent border-0 outline-none tx-14 text-admin-text-main"
+                className="tx-14 text-admin-text-main flex-1 border-0 bg-transparent outline-none"
                 value={hashKey}
                 readOnly
               />
@@ -90,7 +90,7 @@ export default function AdminLogin({
                 className="text-admin-text-sub hover:text-admin-text-main transition-colors"
                 aria-label="Copy Hash Key"
               >
-                <CopyIcon className="w-5 h-5" />
+                <CopyIcon className="h-5 w-5" />
               </button>
             </div>
           </div>
@@ -99,7 +99,7 @@ export default function AdminLogin({
           <div className="space-y-1">
             <label className="tx-14 text-admin-text-sub">Signature</label>
             <input
-              className="w-full border border-admin-border rounded-md px-3 py-2 tx-14 bg-white"
+              className="border-admin-border tx-14 w-full rounded-md border bg-white px-3 py-2"
               placeholder="Paste your signature here"
               value={signature}
               onChange={(e) => onSignatureChange(e.target.value)}
