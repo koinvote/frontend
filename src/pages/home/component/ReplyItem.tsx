@@ -82,19 +82,18 @@ export function ReplyItem({ reply, t }: ReplyItemProps) {
   return (
     <div
       ref={containerRef}
-      className={`rounded-lg px-2 py-1 -mx-2 -my-1 transition-colors
-        dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)] md:hover:bg-gray-200`}
+      className={`-mx-2 -my-1 rounded-lg px-2 py-1 transition-colors md:hover:bg-gray-200 dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)]`}
     >
       <p
         ref={textRef}
-        className={`text-primary break-words pt-1 ${
+        className={`text-primary pt-1 wrap-break-word ${
           isExpanded ? "" : "line-clamp-1"
         } ${showToggle ? "cursor-pointer" : ""}`}
         onClick={showToggle ? handleToggle : undefined}
       >
         {reply.body}
       </p>
-      <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
+      <div className="text-secondary mt-1 flex flex-col gap-1 text-[11px] md:flex-row md:items-center md:justify-end">
         <div className="flex items-center justify-end gap-2 md:gap-2">
           <span>
             {t("eventCard.weight", "Weight:")}{" "}

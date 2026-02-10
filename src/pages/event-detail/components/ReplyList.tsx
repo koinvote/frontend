@@ -117,12 +117,12 @@ export function ReplyList({
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex min-h-[200px] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-secondary mb-2">
+          <p className="text-secondary mb-2 text-lg">
             {t("replyList.failedToLoadReplies", "Failed to load replies")}
           </p>
-          <p className="text-sm text-secondary">
+          <p className="text-secondary text-sm">
             {error instanceof Error
               ? error.message
               : t("replyList.unknownError", "Unknown error")}
@@ -134,7 +134,7 @@ export function ReplyList({
 
   if (!repliesData || repliesData.replies.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex min-h-[200px] items-center justify-center">
         <p className="text-secondary">
           {eventStatus === 5
             ? t("replyList.noReplies", "No replies")
@@ -284,14 +284,14 @@ function ReplyItem({
     (reply.option_id !== undefined ? getOptionText(reply.option_id) : "");
 
   return (
-    <div className="rounded-xl border border-border bg-bg p-4 md:p-6 relative group flex flex-col h-full">
-      <div className="flex flex-col md:flex-row md:items-stretch md:justify-between gap-4 flex-1">
+    <div className="border-border bg-bg group relative flex h-full flex-col rounded-xl border p-4 md:p-6">
+      <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-stretch md:justify-between">
         {/* Left Column: Balance and Content */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          <div className="flex items-center justify-between gap-2 mb-2">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="mb-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span
-                className={`text-base md:text-lg font-semibold text-primary ${
+                className={`text-primary text-base font-semibold md:text-lg ${
                   !reply.is_reply_valid ? "line-through" : ""
                 }`}
               >
@@ -310,8 +310,8 @@ function ReplyItem({
                     triggerNode.parentElement || document.body
                   }
                 >
-                  <span className="text-green-500 text-xs" {...triggerProps}>
-                    <ReplyValidateIcon className="w-4 h-4 text-current" />
+                  <span className="text-xs text-green-500" {...triggerProps}>
+                    <ReplyValidateIcon className="h-4 w-4 text-current" />
                   </span>
                 </Tooltip>
               ) : (
@@ -327,19 +327,19 @@ function ReplyItem({
                     triggerNode.parentElement || document.body
                   }
                 >
-                  <span className="text-red-500 text-xs" {...triggerProps}>
-                    <InvalidateIcon className="w-4 h-4 text-current" />
+                  <span className="text-xs text-red-500" {...triggerProps}>
+                    <InvalidateIcon className="h-4 w-4 text-current" />
                   </span>
                 </Tooltip>
               )}
             </div>
-            <span className="text-xs md:text-sm text-secondary md:hidden">
+            <span className="text-secondary text-xs md:hidden md:text-sm">
               {timeAgo}
             </span>
           </div>
           {displayText && (
             <p
-              className={`text-sm md:text-base text-primary wrap-break-word ${
+              className={`text-primary text-sm wrap-break-word md:text-base ${
                 !reply.is_reply_valid ? "line-through" : ""
               }`}
             >
@@ -370,11 +370,11 @@ function ReplyItem({
                     tone="primary"
                     size="sm"
                     text="xs"
-                    className="p-0 ml-2 border-0 bg-transparent hover:bg-transparent hover:text-primary h-auto relative top-0.5"
+                    className="hover:text-primary relative top-0.5 ml-2 h-auto border-0 bg-transparent p-0 hover:bg-transparent"
                     onClick={handleCopyHash}
                   >
                     <VerificationWhiteIcon
-                      className="w-4 h-4"
+                      className="h-4 w-4"
                       style={{ color: "#155DFC" }}
                     />
                   </Button>
@@ -395,19 +395,19 @@ function ReplyItem({
         </div>
 
         {/* Right Column: Time and Details */}
-        <div className="flex flex-col items-start md:items-end gap-3 min-w-[280px]">
-          <span className="text-xs md:text-sm text-secondary text-right w-full hidden md:inline-block md:whitespace-nowrap">
+        <div className="flex min-w-[280px] flex-col items-start gap-3 md:items-end">
+          <span className="text-secondary hidden w-full text-right text-xs md:inline-block md:text-sm md:whitespace-nowrap">
             {timeAgo}
           </span>
 
-          <div className="flex flex-col gap-4 w-full">
+          <div className="flex w-full flex-col gap-4">
             {/* Bitcoin Address */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-secondary">
+              <span className="text-secondary text-xs">
                 {t("replyList.bitcoinAddress", "Bitcoin Address")}
               </span>
-              <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
-                <span className="text-xs text-primary font-mono truncate">
+              <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
+                <span className="text-primary truncate font-mono text-xs">
                   {truncateAddress(reply.btc_address)}
                 </span>
                 <button
@@ -418,9 +418,9 @@ function ReplyItem({
                       t("replyList.bitcoinAddress", "Bitcoin Address"),
                     )
                   }
-                  className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors cursor-pointer"
+                  className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
                 >
-                  <CopyIcon className="w-4 h-4" />
+                  <CopyIcon className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -429,11 +429,11 @@ function ReplyItem({
 
             {/* Bitcoin Signature */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-secondary">
+              <span className="text-secondary text-xs">
                 {t("replyList.bitcoinSignature", "Bitcoin Signature")}
               </span>
-              <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
-                <span className="text-xs text-primary font-mono truncate">
+              <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
+                <span className="text-primary truncate font-mono text-xs">
                   {truncateText(reply.signature, 20)}
                 </span>
                 <button
@@ -444,9 +444,9 @@ function ReplyItem({
                       t("replyList.bitcoinSignature", "Bitcoin Signature"),
                     )
                   }
-                  className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors cursor-pointer"
+                  className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
                 >
-                  <CopyIcon className="w-4 h-4" />
+                  <CopyIcon className="h-4 w-4" />
                 </button>
               </div>
             </div>
@@ -455,11 +455,11 @@ function ReplyItem({
 
             {/* Plaintext */}
             <div className="flex flex-col gap-1">
-              <span className="text-xs text-secondary">
+              <span className="text-secondary text-xs">
                 {t("replyList.plaintext", "Plaintext")}
               </span>
-              <div className="flex items-center justify-between gap-2 p-2 rounded bg-surface border border-border">
-                <span className="text-xs text-primary font-mono truncate">
+              <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
+                <span className="text-primary truncate font-mono text-xs">
                   {truncateText(reply.plaintext, 20)}
                 </span>
                 <button
@@ -470,9 +470,9 @@ function ReplyItem({
                       t("replyList.plaintext", "Plaintext"),
                     )
                   }
-                  className="shrink-0 p-1 hover:bg-surface-hover rounded text-secondary hover:text-primary transition-colors cursor-pointer"
+                  className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
                 >
-                  <CopyIcon className="w-4 h-4" />
+                  <CopyIcon className="h-4 w-4" />
                 </button>
               </div>
             </div>
