@@ -20,15 +20,6 @@ function generateRandomHashKey(): string {
   return result;
 }
 
-/**
- * Generate plaintext for admin login
- * Format: "koinvote.com|admin_login|timestamp|random_code"
- */
-function generatePlaintext(randomCode: string): string {
-  const timestamp = Math.floor(Date.now() / 1000);
-  return `koinvote.com|admin_login|${timestamp}|${randomCode}`;
-}
-
 const adminAddress = truncateAddress(systemConsts.ADMIN_ADDRESS);
 
 export default function AdminLoginPage() {
@@ -36,7 +27,6 @@ export default function AdminLoginPage() {
   const { showToast } = useToast();
 
   const [hashKey, setHashKey] = useState<string>("");
-  const [plaintext, setPlaintext] = useState<string>("");
   const [signature, setSignature] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,7 +34,6 @@ export default function AdminLoginPage() {
   useEffect(() => {
     const randomHashKey = generateRandomHashKey();
     setHashKey(randomHashKey);
-    setPlaintext(generatePlaintext(randomHashKey));
   }, []);
 
   const handleCopy = async (text: string, label: string) => {
@@ -62,18 +51,13 @@ export default function AdminLoginPage() {
       return;
     }
 
-    if (!plaintext) {
-      showToast("error", "Plaintext not generated. Please refresh the page.");
-      return;
-    }
-
     try {
       setIsLoading(true);
 
       // Note: axios interceptor returns response.data at runtime, but types may still reflect AxiosResponse
       const loginRes = (await AdminAPI.login({
         address: systemConsts.ADMIN_ADDRESS,
-        plaintext,
+        plaintext: hashKey,
         signature,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       })) as any;
