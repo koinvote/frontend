@@ -3,7 +3,7 @@ name: Deploy to GCE dev
 on:
   push:
     branches:
-      - dev 
+      - dev
 
 jobs:
   deploy:
@@ -27,3 +27,18 @@ jobs:
             git pull origin dev
             npm ci
             npm run build:dev
+
+      - name: Send Telegram notification
+        uses: appleboy/telegram-action@master
+        if: always() # 確保無論成功或失敗都會跑這步
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            🚀 **部署通知**
+            專案: ${{ github.repository }}
+            狀態: ${{ job.status == 'success' && '✅ 成功' || '❌ 失敗' }}
+            提交訊息: ${{ github.event.head_commit.message }}
+            執行者: ${{ github.actor }}
+
+            查看詳情: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
