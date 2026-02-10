@@ -332,7 +332,19 @@ function ReplyItem({
                   </span>
                 </Tooltip>
               )}
-              {eventType === "open" && reply.content && contentHash && (
+            </div>
+            <span className="text-xs md:text-sm text-secondary md:hidden">
+              {timeAgo}
+            </span>
+          </div>
+          {displayText && (
+            <p
+              className={`text-sm md:text-base text-primary wrap-break-word ${
+                !reply.is_reply_valid ? "line-through" : ""
+              }`}
+            >
+              {displayText}
+              {contentHash && (
                 <Tooltip
                   title={t(
                     "replyList.tapToCopyHash",
@@ -353,35 +365,21 @@ function ReplyItem({
                     },
                   }}
                 >
-                  <span>
-                    <Button
-                      appearance="outline"
-                      tone="primary"
-                      size="sm"
-                      text="xs"
-                      className="p-0 border-0 bg-transparent hover:bg-transparent hover:text-primary"
-                      onClick={handleCopyHash}
-                    >
-                      <VerificationWhiteIcon
-                        className="w-4 h-4"
-                        style={{ color: "#155DFC" }}
-                      />
-                    </Button>
-                  </span>
+                  <Button
+                    appearance="outline"
+                    tone="primary"
+                    size="sm"
+                    text="xs"
+                    className="p-0 ml-2 border-0 bg-transparent hover:bg-transparent hover:text-primary h-auto relative top-0.5"
+                    onClick={handleCopyHash}
+                  >
+                    <VerificationWhiteIcon
+                      className="w-4 h-4"
+                      style={{ color: "#155DFC" }}
+                    />
+                  </Button>
                 </Tooltip>
               )}
-            </div>
-            <span className="text-xs md:text-sm text-secondary md:hidden">
-              {timeAgo}
-            </span>
-          </div>
-          {displayText && (
-            <p
-              className={`text-sm md:text-base text-primary wrap-break-word ${
-                !reply.is_reply_valid ? "line-through" : ""
-              }`}
-            >
-              {displayText}
             </p>
           )}
 
