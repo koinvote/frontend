@@ -176,7 +176,8 @@ export default function ReplyPage() {
         API.generateReplyPlaintext()({
           event_id: eventId,
           btc_address: btcAddress,
-          content: event.event_type === "open" ? replyContent : undefined,
+          content:
+            event.event_type === "open" ? replyContent.trim() : undefined,
           option_id:
             event.event_type === "single_choice"
               ? selectedOptionId || undefined
