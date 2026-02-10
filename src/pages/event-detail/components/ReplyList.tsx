@@ -208,15 +208,15 @@ function ReplyItem({
   const timeAgo = formatRelativeTime(reply.created_at, t);
 
   // Calculate SHA-256 hash of reply content
-  const [contentHash, setContentHash] = useState<string | null>(null);
+  const [answerHash, setAnswerHash] = useState<string | null>(null);
 
   // Handle copy content hash
   const handleCopyHash = useDebouncedClick(async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (!contentHash) return;
+    if (!answerHash) return;
     try {
-      await navigator.clipboard.writeText(contentHash);
+      await navigator.clipboard.writeText(answerHash);
       showToast(
         "success",
         t("replyList.hashCopiedToClipboard", "Hash copied to clipboard"),
@@ -231,28 +231,15 @@ function ReplyItem({
   });
 
   useEffect(() => {
-    const calculateHash = async () => {
-      if (!reply.content) {
-        setContentHash(null);
-        return;
-      }
-      try {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(reply.content);
-        const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray
-          .map((b) => b.toString(16).padStart(2, "0"))
-          .join("");
-        setContentHash(hashHex);
-      } catch (error) {
-        console.error("Failed to calculate SHA-256 hash:", error);
-        setContentHash(null);
-      }
-    };
-
-    calculateHash();
-  }, [reply.content]);
+    if (eventType === "open" && reply.content_hash) {
+      setAnswerHash(reply.content_hash);
+      return;
+    }
+    if (eventType === "single_choice" && reply.option_hash) {
+      setAnswerHash(reply.option_hash);
+      return;
+    }
+  }, [eventType, reply.content_hash, reply.option_hash]);
 
   // Helper to get option text
   const getOptionText = (optionId: number) => {
@@ -338,13 +325,15 @@ function ReplyItem({
             </span>
           </div>
           {displayText && (
-            <p
-              className={`text-primary text-sm wrap-break-word md:text-base ${
-                !reply.is_reply_valid ? "line-through" : ""
-              }`}
-            >
-              {displayText}
-              {contentHash && (
+            <div>
+              <span
+                className={`text-primary text-sm wrap-break-word md:text-base ${
+                  !reply.is_reply_valid ? "line-through" : ""
+                }`}
+              >
+                {displayText}
+              </span>
+              {answerHash && (
                 <Tooltip
                   title={t(
                     "replyList.tapToCopyHash",
@@ -370,14 +359,14 @@ function ReplyItem({
                     tone="primary"
                     size="sm"
                     text="xs"
-                    className="hover:text-primary relative top-0.5 ml-2 h-auto border-0 bg-transparent p-0 hover:bg-transparent"
+                    className="hover:text-primary relative top-0.5 ml-1 h-auto border-0 bg-transparent p-0 hover:bg-transparent"
                     onClick={handleCopyHash}
                   >
                     <IconSha className="text-secondary h-4 w-4" />
                   </Button>
                 </Tooltip>
               )}
-            </p>
+            </div>
           )}
 
           <div className="flex-1"></div>

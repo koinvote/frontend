@@ -168,9 +168,10 @@ export interface Reply {
   id: number;
   event_id: string;
   btc_address: string;
-  option_id?: number;
-  content?: string;
-  content_hash?: string;
+  option_id: number;
+  option_hash: string;
+  content: string;
+  content_hash: string;
   plaintext: string;
   signature: string;
   nonce_timestamp: string;
@@ -181,8 +182,6 @@ export interface Reply {
   balance_at_current_satoshi: number; //Current real-time balance
   balance_last_updated_at: string;
   is_hidden: boolean;
-  hidden_at: string;
-  hidden_by_admin_id: string;
   created_at: string;
   created_by_ip: string;
   updated_at: string;

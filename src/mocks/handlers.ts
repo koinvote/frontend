@@ -436,6 +436,8 @@ export const handlers = [
         event_id: "EVT_20241203_ABC123",
         btc_address: "tb1q...",
         option_id: 1,
+        option_hash:
+          "7f83627d02e5aca9a76b5fc57955376c3462792edfdd19bf113fcd414af2cd38",
         content: null,
         content_hash: null,
         plaintext:
@@ -449,8 +451,6 @@ export const handlers = [
         balance_at_current_satoshi: null,
         balance_last_updated_at: null,
         is_hidden: false,
-        hidden_at: null,
-        hidden_by_admin_id: null,
         created_at: "2024-12-03T10:15:30Z",
         created_by_ip: "192.168.1.1",
         updated_at: "2024-12-03T10:15:30Z",
