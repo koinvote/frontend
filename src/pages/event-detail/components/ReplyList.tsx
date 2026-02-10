@@ -4,7 +4,7 @@ import { EventStatus, ReplySortBy, type EventType } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import InvalidateIcon from "@/assets/icons/invalidate.svg?react";
 import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
-import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
+import IconSha from "@/assets/icons/sha256.svg?react";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
@@ -373,10 +373,7 @@ function ReplyItem({
                     className="hover:text-primary relative top-0.5 ml-2 h-auto border-0 bg-transparent p-0 hover:bg-transparent"
                     onClick={handleCopyHash}
                   >
-                    <VerificationWhiteIcon
-                      className="h-4 w-4"
-                      style={{ color: "#155DFC" }}
-                    />
+                    <IconSha className="text-secondary h-4 w-4" />
                   </Button>
                 </Tooltip>
               )}
