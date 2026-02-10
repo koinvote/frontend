@@ -40,7 +40,7 @@ const ChecklistItem = ({
   <div className="flex items-center gap-2">
     <div
       className={cn(
-        "w-2 h-2 rounded-full",
+        "h-2 w-2 rounded-full",
         isValid ? "bg-green-500" : isError ? "bg-red-500" : "bg-white/20",
       )}
     />
@@ -367,22 +367,22 @@ export default function ReplyPage() {
   if (!event) return <div>Event not found</div>;
 
   return (
-    <div className="flex-col flex items-center justify-center w-full px-2 md:px-0 pb-10">
-      <div className="h-[50px] w-full relative">
+    <div className="flex w-full flex-col items-center justify-center px-2 pb-10 md:px-0">
+      <div className="relative h-[50px] w-full">
         <button
           type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
           onClick={goBack}
         >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
+          <CircleLeftIcon className="h-8 w-8 fill-current" />
         </button>
       </div>
 
-      <div className="w-full max-w-3xl rounded-3xl border border-gray-450 bg-bg px-6 py-6 md:px-8 md:py-8">
+      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-primary">
           {t("reply.title", "Reply to Win BTC")}{" "}
         </h1>
-        <p className="mt-1 tx-14 lh-20 text-secondary">
+        <p className="tx-14 lh-20 text-secondary mt-1">
           {t(
             "reply.subtitle",
             "Complete the steps below to submit your reply and enter the draw.",
@@ -390,10 +390,10 @@ export default function ReplyPage() {
         </p>
 
         {/* 1. Event Information */}
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <div className="flex items-center gap-2 mb-4">
+        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
+          <div className="mb-4 flex items-center gap-2">
             <span className="text-accent text-lg">
-              <TrophyIcon className="w-4 h-4" />
+              <TrophyIcon className="h-4 w-4" />
             </span>
             <h2 className="tx-16 lh-20 fw-m text-primary">
               {t("reply.eventInfo", "Event Information")}
@@ -403,27 +403,27 @@ export default function ReplyPage() {
           <h3 className="tx-16 lh-24 fw-m text-primary mb-2">{event.title}</h3>
           <p className="tx-14 lh-20 text-secondary mb-4">{event.description}</p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
             <EventInfoBox
               label={t("reply.timeRemaining", "Time Remaining")}
               value={eventCountdown}
-              icon={<ClockIcon className="w-3 h-3 text-[#2B7FFF]" />}
+              icon={<ClockIcon className="h-3 w-3 text-[#2B7FFF]" />}
             />
             <EventInfoBox
               label={t("reply.eventId", "Event-ID")}
               value={event.event_id}
-              icon={<HashIcon className="w-3 h-3 text-[#00C950]" />}
+              icon={<HashIcon className="h-3 w-3 text-[#00C950]" />}
             />
             <EventInfoBox
               label={t("reply.rewardAmount", "Reward Amount")}
               value={rewardText}
-              icon={<TrophyIcon className="w-3 h-3 text-[#AD46FF]" />}
+              icon={<TrophyIcon className="h-3 w-3 text-[#AD46FF]" />}
             />
             <EventInfoBox
               label={t("reply.maxRecipients", "Max Recipients")}
               value={event.max_recipient || "-"}
               icon={
-                <EventCardParticipantsIcon className="w-3 h-3 text-[#AD46FF]" />
+                <EventCardParticipantsIcon className="h-3 w-3 text-[#AD46FF]" />
               }
             />
           </div>
@@ -432,7 +432,7 @@ export default function ReplyPage() {
             <span className="tx-14 text-secondary">
               {t("reply.eventType", "Response type")}:
             </span>
-            <span className="px-3 py-1 rounded-full bg-white text-black text-xs font-medium border border-border">
+            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
               {event.event_type === "open"
                 ? t("reply.openEnded", "Open-ended")
                 : t("reply.singleChoice", "Single-choice")}
@@ -441,13 +441,10 @@ export default function ReplyPage() {
         </div>
 
         {/* 2. Enter BTC Address */}
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
-            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
-            >
-              <span className="text-black tx-12 md:tx-14">1</span>
+        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+              <span className="tx-12 md:tx-14 text-black">1</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">
               {t("reply.enterBtcAddressTitle", "Enter BTC Address")}
@@ -472,14 +469,14 @@ export default function ReplyPage() {
               autoCapitalize="off"
               spellCheck="false"
               className={cn(
-                "w-full px-3 py-2 rounded-lg border bg-bg text-primary tx-14 outline-none focus:ring-2 transition-all",
+                "bg-bg text-primary tx-14 w-full rounded-lg border px-3 py-2 transition-all outline-none focus:ring-2",
                 btcAddress && !isAddressValid
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-accent",
               )}
             />
             {btcAddress && !isAddressValid && (
-              <p className="text-red-500 text-xs">
+              <p className="text-xs text-red-500">
                 {t("reply.invalidBtcAddress", "Invalid BTC address")}
               </p>
             )}
@@ -487,10 +484,10 @@ export default function ReplyPage() {
         </div>
 
         {/* 3. Enter/Select Reply */}
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6">
-              <span className="text-black tx-12 md:tx-14">2</span>
+        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+              <span className="tx-12 md:tx-14 text-black">2</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">
               {event.event_type === "open"
@@ -515,7 +512,7 @@ export default function ReplyPage() {
                 placeholder={t("reply.replyPlaceholder", "Enter your reply...")}
                 rows={4}
                 className={cn(
-                  "w-full px-3 py-2 rounded-lg border bg-bg text-primary tx-14 outline-none focus:ring-2 transition-all resize-none",
+                  "bg-bg text-primary tx-14 w-full resize-none rounded-lg border px-3 py-2 transition-all outline-none focus:ring-2",
                   "border-border focus:ring-accent",
                 )}
               />
@@ -549,7 +546,7 @@ export default function ReplyPage() {
                     <label
                       key={optionId}
                       className={cn(
-                        "flex items-center p-3 rounded-lg border cursor-pointer transition-all hover:bg-white/5",
+                        "flex cursor-pointer items-center rounded-lg border p-3 transition-all hover:bg-white/5",
                         selectedOptionId === optionId
                           ? "border-accent bg-accent/5"
                           : "border-border bg-bg",
@@ -580,13 +577,10 @@ export default function ReplyPage() {
         </div>
 
         {/* 4. Generate Plaintext */}
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
-            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
-            >
-              <span className="text-black tx-12 md:tx-14">3</span>
+        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+              <span className="tx-12 md:tx-14 text-black">3</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">
               {t("reply.generatePlaintext", "Generate the Plaintext")}
@@ -608,26 +602,26 @@ export default function ReplyPage() {
           {plaintext && (
             <div className="mt-4 space-y-2">
               <div className="relative">
-                <div className="px-3 py-2 rounded-lg border border-border bg-bg">
+                <div className="border-border bg-bg rounded-lg border px-3 py-2">
                   <div className="flex items-center justify-between gap-2">
-                    <p className="tx-12 lh-18 text-green-500 break-all font-mono flex-1">
+                    <p className="tx-12 lh-18 flex-1 font-mono break-all text-green-500">
                       {plaintext}
                     </p>
                     <button
                       type="button"
                       onClick={handleCopyPlaintext}
-                      className="flex-shrink-0 text-secondary hover:text-primary transition-colors cursor-pointer"
+                      className="text-secondary hover:text-primary flex-shrink-0 cursor-pointer transition-colors"
                       aria-label="Copy plaintext"
                     >
-                      <CopyIcon className="w-4 h-4" />
+                      <CopyIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
               </div>
 
               {countdown > 0 ? (
-                <div className="flex items-center gap-2 text-green-500 text-xs">
-                  <ClockIcon className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-xs text-green-500">
+                  <ClockIcon className="h-4 w-4" />
                   <span>
                     {t("reply.expiredIn", "Expired in {{time}}", {
                       time: formatTimeRemaining(countdown),
@@ -635,8 +629,8 @@ export default function ReplyPage() {
                   </span>
                 </div>
               ) : (
-                <div className="flex items-center gap-2 text-red-500 text-xs">
-                  <ClockIcon className="w-4 h-4" />
+                <div className="flex items-center gap-2 text-xs text-red-500">
+                  <ClockIcon className="h-4 w-4" />
                   <span>
                     {t(
                       "reply.plaintextExpired",
@@ -650,13 +644,10 @@ export default function ReplyPage() {
         </div>
 
         {/* 5. Enter Signature */}
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full 
-            border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
-            >
-              <span className="text-black tx-12 md:tx-14">4</span>
+        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+              <span className="tx-12 md:tx-14 text-black">4</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">
               {t("reply.enterSignatureTitle", "Enter Signature")}
@@ -676,27 +667,24 @@ export default function ReplyPage() {
                 "reply.signaturePlaceholder",
                 "Paste the signature generated by your BTC wallet for the plaintext here...",
               )}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 outline-none focus:ring-2 focus:ring-accent font-mono transition-all"
+              className="border-border bg-bg text-primary tx-14 focus:ring-accent w-full rounded-lg border px-3 py-2 font-mono transition-all outline-none focus:ring-2"
             />
           </div>
         </div>
 
         {/* 6. Submit Reply */}
-        <div className="mt-6 rounded-xl border border-border bg-surface p-4 md:p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="flex h-5 w-5 shrink-0 items-center justify-center 
-            rounded-full border border-border fw-m bg-primary-lightModeGray md:w-6 md:h-6"
-            >
-              <span className="text-black tx-12 md:tx-14">5</span>
+        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+              <span className="tx-12 md:tx-14 text-black">5</span>
             </div>
             <h2 className="tx-16 fw-m text-primary">
               {t("reply.submitReply", "Submit Reply")}
             </h2>
           </div>
 
-          <div className="bg-bg rounded-xl p-4 mb-6">
-            <div className="text-sm font-medium text-primary mb-3">
+          <div className="bg-bg mb-6 rounded-xl p-4">
+            <div className="text-primary mb-3 text-sm font-medium">
               {t("reply.preSubmitChecklist", "Pre-submit checklist")} :
             </div>
             <div className="space-y-2">
@@ -734,7 +722,7 @@ export default function ReplyPage() {
               type="button"
               appearance="outline"
               tone="white"
-              className="flex-1 text-black dark:text-white border-border dark:border-white hover:bg-white/5"
+              className="border-border flex-1 text-black hover:bg-white/5 dark:border-white dark:text-white"
               onClick={goBack}
             >
               {t("reply.cancel", "Cancel")}
