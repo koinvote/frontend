@@ -3,6 +3,7 @@ import http, { adminHttp, type RequestConf } from "./http.ts";
 
 import type {
   AdminLoginReq,
+  ContactUsReq,
   CreateEventReq,
   GenerateReplyPlaintextReq,
   GetEventListReq,
@@ -163,6 +164,9 @@ export const API = {
 
   // Subscribe API
   subscribe: post<ApiResponse<void>, SubscribeReq>("/subscribe"),
+
+  // Contact Us API
+  contactUs: post<ApiResponse<void>, ContactUsReq>("/contact-us"),
 
   // Pre-generate OG image (fire-and-forget, different base path)
   preGenerateOgImage: (eventId: string) => {

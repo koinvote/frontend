@@ -12,11 +12,8 @@ import SubscribeIcon from "@/assets/icons/menu-subscribe.svg?react";
 import SupportIcon from "@/assets/icons/menu-support.svg?react";
 import TermsIcon from "@/assets/icons/menu-terms.svg?react";
 import VerificationIcon from "@/assets/icons/menu-verificationTool.svg?react";
-import { useToast } from "@/components/base/Toast/useToast";
-import CONSTS from "@/consts";
 import { useLanguagesStore } from "@/stores/languagesStore";
 import { useThemeStore } from "@/stores/themeStore";
-import { useDebouncedClick } from "@/utils/helper";
 
 interface MenuProps {
   onItemClick?: () => void;
@@ -37,7 +34,7 @@ const items: Item[] = [
     key: "menu.verification",
     Icon: VerificationIcon,
   },
-  { to: "", key: "menu.support", Icon: SupportIcon },
+  { to: "/support", key: "menu.support", Icon: SupportIcon },
 ];
 
 const termItems: Item[] = [
@@ -62,7 +59,6 @@ interface MenuItemProps {
   collapsed: boolean;
   theme: string;
   onLinkClick?: () => void;
-  onNonLinkClick?: () => void;
   labelClassName?: string;
 }
 
@@ -71,7 +67,6 @@ function MenuItem({
   collapsed,
   theme,
   onLinkClick,
-  onNonLinkClick,
   labelClassName,
 }: MenuItemProps) {
   const { t } = useTranslation();
@@ -80,12 +75,15 @@ function MenuItem({
   const iconWrapper = (isActive: boolean) => (
     <span
       className={cn(
-        "inline-flex h-6 w-6 items-center justify-center rounded-md shrink-0",
+        "inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md",
         "text-current",
       )}
     >
       <Icon
-        className={cn("h-5! w-5!", isActive ? "text-primary" : "text-secondary")}
+        className={cn(
+          "h-5! w-5!",
+          isActive ? "text-primary" : "text-secondary",
+        )}
         style={{ width: "1.25rem", height: "1.25rem" }}
       />
     </span>
@@ -134,7 +132,6 @@ function MenuItem({
         collapsed ? "justify-center px-2" : "gap-3",
         "cursor-pointer",
       )}
-      onClick={onNonLinkClick}
     >
       {collapsed ? (
         <Tooltip
@@ -156,37 +153,12 @@ function MenuItem({
 
 const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const { t } = useTranslation();
-  const { showToast } = useToast();
 
   const theme = useThemeStore((state) => state.theme);
   const toggle = useThemeStore((state) => state.toggle);
 
   const { current, setLanguage } = useLanguagesStore();
   const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
-
-  const handleSupportClick = useDebouncedClick(async () => {
-    if (!CONSTS.SUPPORT_EMAIL) return;
-
-    try {
-      await navigator.clipboard.writeText(CONSTS.SUPPORT_EMAIL);
-      showToast(
-        "success",
-        t(
-          "support.copyEmailSuccess",
-          "Support email copied: support@koinvote.com",
-        ),
-      );
-    } catch (error) {
-      console.error("Failed to copy:", error);
-      showToast(
-        "error",
-        t(
-          "common.failedToCopyText",
-          "Failed to copy support email: support@koinvote.com",
-        ),
-      );
-    }
-  });
 
   return (
     <nav className="space-y-1">
@@ -197,13 +169,12 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           collapsed={collapsed}
           theme={theme}
           onLinkClick={onItemClick}
-          onNonLinkClick={handleSupportClick}
         />
       ))}
 
       <Divider styles={{ root: { margin: "8px 0" } }} />
       {!collapsed && (
-        <div className="p-3 pb-0 mb-2 text-xs text-neutral-500 font-medium">
+        <div className="mb-2 p-3 pb-0 text-xs font-medium text-neutral-500">
           {t("menu.terms", "TERMS")}
         </div>
       )}
@@ -214,13 +185,12 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           collapsed={collapsed}
           theme={theme}
           onLinkClick={onItemClick}
-          onNonLinkClick={handleSupportClick}
           labelClassName="text-sm"
         />
       ))}
 
       <div className="absolute bottom-0 left-0 w-full">
-        <div className="p-4 border-t border-border">
+        <div className="border-border border-t p-4">
           {collapsed ? (
             <div>
               <Tooltip

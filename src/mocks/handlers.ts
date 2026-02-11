@@ -634,6 +634,23 @@ export const handlers = [
     });
   }),
 
+  // POST /contact-us - Contact us form submission
+  http.post(`${API_BASE_URL}/contact-us`, async ({ request }) => {
+    const body = (await request.json()) as {
+      email: string;
+      subject: string;
+      message?: string;
+    };
+    console.log("[Mock] Contact us request:", body);
+
+    return HttpResponse.json<ApiResponse<void>>({
+      code: "000000",
+      success: true,
+      message: null,
+      data: undefined as unknown as void,
+    });
+  }),
+
   http.get(`${API_BASE_URL}/receipt/pub-keys`, () => {
     return HttpResponse.json<
       ApiResponse<typeof mockGetReceiptVerifyPubKeysRes>

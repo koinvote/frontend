@@ -1,4 +1,12 @@
 {
+  "general": {
+    "charactersLeft": "字元內",
+    "characterLeft": "字元內",
+    "clearButton": "清除",
+    "cleared": "已清除",
+    "sendButton": "送出",
+    "cancel": "取消"
+  },
   "layout": {
     "title": "Koinvote",
     "createEvent": "建立活動",
@@ -244,8 +252,27 @@
     "s5_2": "你於政策更新後繼續使用本平台，即視為同意更新後之內容。"
   },
   "support": {
+    "title": "聯絡我們",
+    "emailLabel": "Email",
+    "emailPlaceholder": "你的電子信箱",
+    "subjectLabel": "主旨",
+    "subjectPlaceholder": "訊息主旨",
+    "toLabel": "收件者",
+    "messageLabel": "訊息內容",
+    "messagePlaceholder": "輸入你的訊息",
+    "clearConfirmTitle": "確認要刪除所有內容嗎？",
+    "clearConfirmMessage": "此動作無法復原",
+    "sendSuccessTitle": "訊息已送出",
+    "sendSuccessDescription": "我們會透過 Email 與您聯繫",
+    "sendFailed": "發生錯誤了，請稍後再試一次，或直接寄信到 {{supportEmail}}",
     "copyEmailSuccess": "支援信箱地址已複製到剪貼簿：support@koinvote.com",
-    "failedToCopyText": "支援信箱地址複製失敗：support@koinvote.com"
+    "failedToCopyText": "支援信箱地址複製失敗：support@koinvote.com",
+    "emailRequired": "請輸入你的電子信箱",
+    "emailInvalid": "請輸入有效的電子信箱",
+    "subjectRequired": "請輸入主旨",
+    "subjectMaxLength": "主旨不得超過 150 個字元",
+    "messageRequired": "請輸入訊息內容",
+    "messageMaxLength": "訊息不得超過 3000 個字元"
   },
   "terms": {
     "title": "服務條款",

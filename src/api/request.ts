@@ -74,3 +74,9 @@ export interface GenerateReplyPlaintextReq {
 export interface SubscribeReq {
   email: string;
 }
+
+export interface ContactUsReq {
+  email: string;
+  subject: string;
+  message?: string;
+}

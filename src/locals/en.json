@@ -1,4 +1,12 @@
 {
+  "general": {
+    "charactersLeft": "characters left",
+    "characterLeft": "character left",
+    "clearButton": "Clear",
+    "cleared": "Cleared!",
+    "sendButton": "Send",
+    "cancel": "Cancel"
+  },
   "layout": {
     "title": "Koinvote",
     "createEvent": "Create",
@@ -238,8 +246,28 @@
     "s5_2": "Continued use of the platform constitutes acceptance of the updated policy."
   },
   "support": {
+    "title": "Contact",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Your email address",
+    "subjectLabel": "Subject",
+    "subjectPlaceholder": "Subject of your message",
+    "toLabel": "To",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Enter your message",
+    "clearConfirmTitle": "Clear all content?",
+    "clearConfirmMessage": "This action cannot be undone.",
+    "clearConfirmCancel": "Cancel",
+    "sendSuccessTitle": "Message sent",
+    "sendSuccessDescription": "We will contact you via email",
+    "sendFailed": "Something went wrong. Please try again later or email {{supportEmail}}",
     "copyEmailSuccess": "Support email copied to clipboard: support@koinvote.com",
-    "failedToCopyText": "Failed to copy support email: support@koinvote.com"
+    "failedToCopyText": "Failed to copy support email: support@koinvote.com",
+    "emailRequired": "Please enter your email address",
+    "emailInvalid": "Please enter a valid email address",
+    "subjectRequired": "Please enter a subject",
+    "subjectMaxLength": "Subject must be 150 characters or less",
+    "messageRequired": "Please enter a message",
+    "messageMaxLength": "Message must be 3000 characters or less"
   },
   "terms": {
     "title": "Terms of Service",
