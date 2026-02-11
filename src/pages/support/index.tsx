@@ -230,15 +230,12 @@ export default function Support() {
           <label className="fw-m text-primary mb-2 text-sm">
             {t("support.toLabel", "To")}
           </label>
-          <div className="relative">
-            <Input disabled />
-            <div className="absolute top-[5px] left-3 flex justify-center text-base md:text-sm">
-              {SUPPORT_EMAIL}
-              <CopyIcon
-                className="hover:text-primary text-secondary mt-1 ml-1 cursor-pointer md:mt-0.5"
-                onClick={handleCopyEmail}
-              />
-            </div>
+          <div className="flex">
+            {SUPPORT_EMAIL}
+            <CopyIcon
+              className="hover:text-primary text-secondary mt-1 ml-1 cursor-pointer md:mt-0.5"
+              onClick={handleCopyEmail}
+            />
           </div>
         </div>
 
