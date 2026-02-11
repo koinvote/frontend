@@ -27,6 +27,7 @@ jobs:
             git pull origin main
             npm ci
             npm run build
+            rm -f dist/mockServiceWorker.js
 
       - name: Send Telegram notification
         uses: appleboy/telegram-action@master

@@ -187,8 +187,6 @@ function ReplyItem({
     singleLine: isDesktop,
   });
 
-  console.log("balanceDisplayMode", balanceDisplayMode);
-
   const getDisplayBalance = () => {
     if (eventStatus === EventStatus.ENDED) {
       return reply.balance_at_current_satoshi;

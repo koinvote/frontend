@@ -70,7 +70,7 @@ const VerificationTool = () => {
         </span>
       ),
       children: (
-        <p className="px-4 py-2 text-secondary">
+        <p className="text-secondary px-4 py-2">
           {t("verificationTool.faq1_answer")}
         </p>
       ),
@@ -83,7 +83,7 @@ const VerificationTool = () => {
         </span>
       ),
       children: (
-        <p className="px-4 py-2 text-secondary">
+        <p className="text-secondary px-4 py-2">
           {t("verificationTool.faq2_answer")}
         </p>
       ),
@@ -96,33 +96,29 @@ const VerificationTool = () => {
         </span>
       ),
       children: (
-        <p className="px-4 py-2 text-secondary">
+        <p className="text-secondary px-4 py-2">
           {t("verificationTool.faq3_answer")}
         </p>
       ),
     },
   ];
 
-  const onChange = (key: string | string[]) => {
-    console.log(key);
-  };
-
   return (
     <div className="flex flex-col items-start justify-start overflow-x-hidden px-2 md:px-0">
-      <div className="h-[50px] w-full relative">
+      <div className="relative h-[50px] w-full">
         <BackButton onClick={goBack} />
       </div>
-      <div className="flex flex-col gap-6 w-full px-4 pb-6 md:px-8 md:pb-10 ">
+      <div className="flex w-full flex-col gap-6 px-4 pb-6 md:px-8 md:pb-10">
         {/* Intro card */}
-        <div className="flex gap-4 p-4 md:p-8 md:items-center border-b border-border">
+        <div className="border-border flex gap-4 border-b p-4 md:items-center md:p-8">
           <span>
             <VerificationIcon />
           </span>
           <div className="flex flex-col items-start justify-center">
-            <h1 className="text-2xl fw-m text-accent">
+            <h1 className="fw-m text-accent text-2xl">
               {t("verificationTool.title", "Verification Guide")}
             </h1>
-            <p className="text-secondary leading-relaxed md:tx-16">
+            <p className="text-secondary md:tx-16 leading-relaxed">
               {t(
                 "verificationTool.description",
                 "How to independently verify events and receipts using open-source tools",
@@ -132,9 +128,9 @@ const VerificationTool = () => {
         </div>
 
         {/* Intro note box */}
-        <div className="flex flex-col items-start justify-start gap-2 border border-border p-4 rounded-xl md:tx-16 w-full">
+        <div className="border-border md:tx-16 flex w-full flex-col items-start justify-start gap-2 rounded-xl border p-4">
           <div className="flex flex-row items-center justify-start gap-2">
-            <VerificationWhiteIcon className="w-6 h-6" />
+            <VerificationWhiteIcon className="h-6 w-6" />
             <span className="text-primary">
               {t(
                 "verificationTool.introductionTitle",
@@ -157,7 +153,7 @@ const VerificationTool = () => {
         </div>
 
         {/* Event Result Verification */}
-        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16">
+        <section className="border-border md:tx-16 w-full space-y-6 rounded-xl border p-4">
           <h2 className="fw-m md:tx-18">
             {t(
               "verificationTool.eventResultTitle",
@@ -165,15 +161,11 @@ const VerificationTool = () => {
             )}
           </h2>
 
-          <div className="border-b border-border w-full" />
+          <div className="border-border w-full border-b" />
 
           {/* Step 1 */}
           <div className="flex gap-4">
-            <div
-              className="flex h-7 w-7 shrink-0 items-center justify-center
-               rounded-full border border-border fw-m bg-primary-lightModeGray
-               md:w-10 md:h-10"
-            >
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
               <span className="text-black">1</span>
             </div>
             <div className="space-y-2">
@@ -183,7 +175,7 @@ const VerificationTool = () => {
                   "Go to the Reward Distribution Report to download the verification package (CSV).",
                 )}
               </h3>
-              <ul className="pl-6 list-disc text-secondary">
+              <ul className="text-secondary list-disc pl-6">
                 <li>
                   {t(
                     "verificationTool.step1_1",
@@ -206,18 +198,14 @@ const VerificationTool = () => {
             </div>
           </div>
 
-          <div className="border-b border-border w-full" />
+          <div className="border-border w-full border-b" />
 
           {/* Step 2 */}
           <div className="flex gap-4">
-            <div
-              className="flex h-7 w-7 shrink-0 items-center justify-center
-            rounded-full border border-border fw-m bg-primary-lightModeGray
-            md:w-10 md:h-10"
-            >
+            <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
               <span className="text-black">2</span>
             </div>
-            <div className="space-y-4 w-full">
+            <div className="w-full space-y-4">
               <h3 className="fw-m">
                 {t(
                   "verificationTool.step2Title",
@@ -291,21 +279,17 @@ const VerificationTool = () => {
           </div>
           {/* Terminal-like code block */}
           <div className="md:ml-14">
-            <div className="relative mt-2 w-full rounded-xl border border-border bg-surface border-t-38 border-t-neutral-200 dark:border-t-neutral-700">
+            <div className="border-border bg-surface relative mt-2 w-full rounded-xl border border-t-38 border-t-neutral-200 dark:border-t-neutral-700">
               <button
                 type="button"
                 onClick={() => handleCopy(eventCode)}
-                className="absolute right-3 -top-8 tx-12 px-3 py-1 
-               rounded-lg bg-[--color-bg] text-secondary hover:bg-border cursor-pointer"
+                className="tx-12 text-secondary hover:bg-border absolute -top-8 right-3 cursor-pointer rounded-lg bg-[--color-bg] px-3 py-1"
               >
-                <CopyIcon className="w-4 h-4 text-current inline-block mr-1" />
+                <CopyIcon className="mr-1 inline-block h-4 w-4 text-current" />
                 {t("verificationTool.codeBlockCopy", "Copy code")}
               </button>
 
-              <pre
-                className="m-0 p-4 text-secondary tx-12 md:tx-14 font-mono
-               whitespace-pre-wrap wrap-break-word"
-              >
+              <pre className="text-secondary tx-12 md:tx-14 m-0 p-4 font-mono wrap-break-word whitespace-pre-wrap">
                 {/* 有顏色的版本, 註釋拆出來 for i18n */}
                 {t("verificationTool.codeBlockAlt1", "# Download the verifier")}
                 <br />
@@ -340,21 +324,17 @@ const VerificationTool = () => {
         </section>
 
         {/* Receipt Verification */}
-        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16">
+        <section className="border-border md:tx-16 w-full space-y-6 rounded-xl border p-4">
           <h2 className="fw-m md:tx-18">
             {t("verificationTool.receiptSectionTitle", "Receipt Verification")}
           </h2>
 
-          <div className="border-b border-border w-full" />
+          <div className="border-border w-full border-b" />
 
           {/* Step 1 + image */}
           <div className="flex flex-col gap-4">
             <div className="flex gap-4">
-              <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center
-              rounded-full border border-border fw-m bg-primary-lightModeGray
-              md:w-10 md:h-10"
-              >
+              <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
                 <span className="text-black">1</span>
               </div>
               <div className="space-y-1">
@@ -380,24 +360,20 @@ const VerificationTool = () => {
                   "verificationTool.receiptImageAlt",
                   "Screenshot of the submission success screen with the Download Receipt button highlighted.",
                 )}
-                className="max-w-xs md:max-w-sm border border-accent rounded-xl"
+                className="border-accent max-w-xs rounded-xl border md:max-w-sm"
               />
             </div>
           </div>
 
-          <div className="border-b border-border w-full" />
+          <div className="border-border w-full border-b" />
 
           {/* Step 2 + sample */}
           <div className="flex flex-col gap-4">
             <div className="flex gap-4">
-              <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center
-            rounded-full border border-border fw-m bg-primary-lightModeGray
-            md:w-10 md:h-10"
-              >
+              <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
                 <span className="text-black">2</span>
               </div>
-              <div className="space-y-4 w-full">
+              <div className="w-full space-y-4">
                 <h3 className="fw-m">
                   {t(
                     "verificationTool.receiptStep2Title",
@@ -406,7 +382,7 @@ const VerificationTool = () => {
                 </h3>
 
                 {/* 2.1 View the open-source code */}
-                <div className="space-y-1 text-secondary leading-relaxed whitespace-pre-line">
+                <div className="text-secondary space-y-1 leading-relaxed whitespace-pre-line">
                   <p>
                     {t(
                       "verificationTool.receiptStep2Description1",
@@ -421,7 +397,7 @@ const VerificationTool = () => {
                         {item.alg.toLocaleUpperCase()} {` `}
                         Public Key (Base64):
                         <br />
-                        <span className="text-green-600 break-all">
+                        <span className="break-all text-green-600">
                           {item.public_key}
                         </span>
                       </div>
@@ -448,7 +424,7 @@ const VerificationTool = () => {
                   "verificationTool.receiptSampleImageAlt",
                   "Screenshot showing the kid field in the receipt file.",
                 )}
-                className="max-w-xs sm:max-w-md md:max-w-md lg:max-w-lg border border-accent rounded-xl"
+                className="border-accent max-w-xs rounded-xl border sm:max-w-md md:max-w-md lg:max-w-lg"
               />
             </div>
           </div>
@@ -456,14 +432,10 @@ const VerificationTool = () => {
           {/* Step 3 */}
           <div className="flex flex-col gap-4">
             <div className="flex gap-4">
-              <div
-                className="flex h-7 w-7 shrink-0 items-center justify-center
-            rounded-full border border-border fw-m bg-primary-lightModeGray
-            md:w-10 md:h-10"
-              >
+              <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
                 <span className="text-black">2</span>
               </div>
-              <div className="space-y-4 w-full">
+              <div className="w-full space-y-4">
                 <h3 className="fw-m">
                   {t(
                     "verificationTool.receiptStep3Title",
@@ -472,7 +444,7 @@ const VerificationTool = () => {
                 </h3>
 
                 {/* 2.1 View the open-source code */}
-                <div className="space-y-1 text-secondary leading-relaxed whitespace-pre-line">
+                <div className="text-secondary space-y-1 leading-relaxed whitespace-pre-line">
                   <p>
                     {t(
                       "verificationTool.receiptStep3Description1",
@@ -489,7 +461,7 @@ const VerificationTool = () => {
                       https://cyphr.me/ed25519_tool/ed.html
                     </a>
                   </p>
-                  <ul className="mt-4 pl-6 list-disc">
+                  <ul className="mt-4 list-disc pl-6">
                     <li>Algorithm → ed25519</li>
                     <li>Message → receipt payload (UTF-8)</li>
                     <li>Public Key → mapped public key for the kid (Base64)</li>
@@ -508,14 +480,13 @@ const VerificationTool = () => {
         </section>
 
         {/* FAQ */}
-        <section className="w-full space-y-6 border border-border p-4 rounded-xl md:tx-16">
+        <section className="border-border md:tx-16 w-full space-y-6 rounded-xl border p-4">
           <h2 className="fw-m md:tx-18">
             {t("verificationTool.faqTitle", "FAQ")}
           </h2>
           <Collapse
             items={faqItems}
             className="text-sm! md:text-base!"
-            onChange={onChange}
             bordered={false}
             expandIcon={({ isActive }) => (
               <DownOutlined rotate={isActive ? 180 : 0} />

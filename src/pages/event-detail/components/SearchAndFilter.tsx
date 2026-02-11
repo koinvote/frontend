@@ -87,7 +87,7 @@ export function SearchAndFilter({
 
   const handleRewardClick = useDebouncedClick(() => {
     // Logic not implemented yet
-    console.log("Reward clicked");
+    // console.log("Reward clicked");
   });
 
   const isActive = eventStatus === EventStatus.ACTIVE;

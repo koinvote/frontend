@@ -90,10 +90,7 @@ export default function ReplyPage() {
   // --- Validation States ---
   const isAddressValid = useMemo(() => {
     if (!btcAddress) return false;
-    const network =
-      import.meta.env.MODE === "development"
-        ? Network.mainnet // Or testnet depending on env setup
-        : Network.mainnet;
+    const network = Network.mainnet;
     // Simple validation for now, or match CreateEvent logic
     return validate(btcAddress, network);
   }, [btcAddress]);
