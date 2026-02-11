@@ -2,9 +2,10 @@ import { Button, Input } from "antd";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import { CheckOutlined, MailOutlined } from "@ant-design/icons";
+import { MailOutlined } from "@ant-design/icons";
 
 import { API } from "@/api";
+import CheckCircle from "@/assets/icons/check_circle.svg?react";
 import { toast } from "@/components/base/Toast/toast";
 import { useHomeStore } from "@/stores/homeStore";
 
@@ -62,12 +63,12 @@ export default function Subscribe() {
   };
 
   return (
-    <div className="flex flex-col items-center max-w-3xl mx-auto space-y-6 px-2 md:px-0 text-center [@media(min-height:933px)]:mt-[300px] [@media(max-height:932px)]:justify-center [@media(max-height:932px)]:h-[calc(100dvh-7rem)]">
-      <h1 className="text-xl sm:text-2xl lg:text-3xl fw-m">
+    <div className="mx-auto flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center gap-3 px-6 text-center text-xl md:px-0">
+      <h1 className="fw-m text-center text-2xl md:text-3xl">
         {t("subscribe.title", "Don't Miss Any Chance to Earn Bitcoin")}
       </h1>
 
-      <p className="max-w-xl text-lg md:text-xl text-gray-400">
+      <p className="text-lg text-gray-400 md:text-xl">
         {t(
           "subscribe.description",
           "Enter your email and you’ll be notified when new reward events are announced.",
@@ -75,12 +76,12 @@ export default function Subscribe() {
       </p>
 
       {isSuccess ? (
-        <div className="flex flex-col gap-4 md:min-w-md mt-10 text-center">
-          <p className="text-lg md:text-xl text-primary">
-            <CheckOutlined className="text-green-400! mr-2" />
+        <div className="mt-10 flex flex-col items-center gap-4 text-center md:min-w-md">
+          <CheckCircle className="mb-1" />
+          <p className="text-primary text-lg md:text-xl">
             {t("subscribe.successMessageTitle", "Subscription successful.")}
           </p>
-          <p className="text-lg md:text-xl text-gray-400 wrap-break-word">
+          <p className="text-lg wrap-break-word text-gray-400 md:text-xl">
             {t(
               "subscribe.successMessageDescription",
               "You'll be notified when new reward events go live.",
@@ -88,7 +89,7 @@ export default function Subscribe() {
           </p>
         </div>
       ) : (
-        <div className="w-full flex flex-col gap-4 md:min-w-md mt-10">
+        <div className="mt-10 flex w-full max-w-3xl flex-col gap-4 md:min-w-md">
           <Input
             className="p-4!"
             size={isDesktop ? "large" : "small"}
@@ -107,7 +108,7 @@ export default function Subscribe() {
             disabled={isLoading}
           />
           {error && (
-            <p className="text-left text-red-500 text-sm -mt-2">{error}</p>
+            <p className="-mt-2 text-left text-sm text-red-500">{error}</p>
           )}
           <Button
             size="large"
