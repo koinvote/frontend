@@ -18,7 +18,7 @@ export function useBackOrFallback(fallbackPath: string) {
       navigate(-1);
       return;
     }
-    navigate(fallbackPath);
+    navigate(fallbackPath, { replace: true });
   };
 
   return goBack;
@@ -32,7 +32,7 @@ export function useBackIfInternal(fallbackPath: string) {
       navigate(-1);
       return;
     }
-    navigate(fallbackPath);
+    navigate(fallbackPath, { replace: true });
   };
 
   return goBack;
