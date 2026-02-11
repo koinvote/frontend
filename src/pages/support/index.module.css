@@ -1,9 +1,0 @@
-@layer base {
-  @media (max-width: 767px) {
-    .form input[type="text"],
-    .form input:not([type]),
-    .form textarea {
-      font-size: 14px !important;
-    }
-  }
-}

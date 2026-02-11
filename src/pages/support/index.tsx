@@ -9,7 +9,6 @@ import { API } from "@/api";
 import CheckCircle from "@/assets/icons/check_circle.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import CONSTS from "@/consts";
-import styles from "./index.module.css";
 
 import { toast } from "@/components/base/Toast/toast";
 
@@ -163,10 +162,7 @@ export default function Support() {
         {t("support.title", "Contact")}
       </h1>
 
-      <form
-        className={`${styles.form} flex flex-col gap-6`}
-        onSubmit={handleSubmit(onSubmit)}
-      >
+      <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
         {/* Email */}
         <div className="flex flex-col gap-1">
           <label className="fw-m text-primary mb-2 text-sm">
@@ -189,7 +185,7 @@ export default function Support() {
             )}
           />
           {errors.email && (
-            <p className="text-xs text-red-500">{errors.email.message}</p>
+            <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
           )}
         </div>
 
@@ -215,7 +211,7 @@ export default function Support() {
               />
             )}
           />
-          <div className="flex text-xs text-gray-400">
+          <div className="text-secondary mt-1 flex text-xs">
             {errors.subject ? (
               <p className="text-red-500">{errors.subject.message}</p>
             ) : (
@@ -235,11 +231,14 @@ export default function Support() {
             {t("support.toLabel", "To")}
           </label>
           <div className="relative">
-            <Input value={SUPPORT_EMAIL} className="text-primary!" disabled />
-            <CopyIcon
-              className="hover:text-primary absolute top-1/2 left-44 -translate-2 cursor-pointer text-gray-400"
-              onClick={handleCopyEmail}
-            />
+            <Input disabled />
+            <div className="absolute top-[5px] left-3 flex justify-center text-base md:text-sm">
+              {SUPPORT_EMAIL}
+              <CopyIcon
+                className="hover:text-primary text-secondary mt-1 ml-1 cursor-pointer md:mt-0.5"
+                onClick={handleCopyEmail}
+              />
+            </div>
           </div>
         </div>
 
@@ -266,7 +265,7 @@ export default function Support() {
               />
             )}
           />
-          <div className="flex text-xs text-gray-400">
+          <div className="text-secondary mt-1 flex text-xs">
             {errors.message ? (
               <p className="text-red-500">{errors.message.message}</p>
             ) : (
