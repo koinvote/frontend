@@ -510,6 +510,9 @@ export default function ReplyPage() {
                     setReplyContent(e.target.value);
                   }
                 }}
+                onBlur={(e) => {
+                  setReplyContent(e.target.value.trim());
+                }}
                 placeholder={t("reply.replyPlaceholder", "Enter your reply...")}
                 rows={4}
                 className={cn(
@@ -611,7 +614,7 @@ export default function ReplyPage() {
                     <button
                       type="button"
                       onClick={handleCopyPlaintext}
-                      className="text-secondary hover:text-primary flex-shrink-0 cursor-pointer transition-colors"
+                      className="text-secondary hover:text-primary shrink-0 cursor-pointer transition-colors"
                       aria-label="Copy plaintext"
                     >
                       <CopyIcon className="h-4 w-4" />

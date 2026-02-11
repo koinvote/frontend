@@ -36,7 +36,7 @@ export const mockSystemConfig: SystemConfigRes = {
 export const mockEventList: EventListDataRes[] = [
   {
     id: 1,
-    event_type: "open-ended",
+    event_type: "open",
     event_id: "evt_001_mock",
     title: "What's the best Bitcoin scaling solution?",
     description:
@@ -76,7 +76,7 @@ export const mockEventList: EventListDataRes[] = [
   },
   {
     id: 2,
-    event_type: "single-choice",
+    event_type: "single_choice",
     event_id: "evt_002_mock",
     title: "Which Bitcoin conference will you attend in 2026?",
     description: "Vote for your preferred Bitcoin conference this year!",
@@ -118,7 +118,7 @@ export const mockEventList: EventListDataRes[] = [
   },
   {
     id: 3,
-    event_type: "open-ended",
+    event_type: "open",
     event_id: "evt_003_mock",
     title: "Best Bitcoin wallet for beginners?",
     description:
@@ -152,7 +152,7 @@ export const mockEventList: EventListDataRes[] = [
   },
   {
     id: 4,
-    event_type: "single-choice",
+    event_type: "single_choice",
     event_id: "evt_004_mock",
     title: "Bitcoin halving prediction: What will the price be in 2028?",
     description:
@@ -215,7 +215,7 @@ export const mockEventDetail: EventDetailDataRes = {
   title: "What's the best Bitcoin scaling solution?",
   description:
     "Lightning Network vs other L2 solutions. Share your thoughts on the future of Bitcoin scaling. We want to hear detailed explanations about why you prefer certain solutions over others.",
-  event_type: "open-ended",
+  event_type: "open",
   event_reward_type: "rewarded",
   status: EventStatus.ACTIVE,
   initial_reward_satoshi: 80000,
