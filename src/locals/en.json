@@ -626,7 +626,7 @@
     "description": "Description",
     "responseType": "Response type",
     "openEnded": "Open-ended",
-    "singleChoice": "Single choice",
+    "singleChoice": "Multiple choice",
     "hashtag": "Hashtag",
     "rewardType": "Reward type",
     "rewardEvent": "Reward event",
