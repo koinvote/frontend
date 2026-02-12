@@ -455,7 +455,7 @@ export default function PreviewEvent() {
           <Field label={t("preview.responseType", "Response type")}>
             {eventType === "open"
               ? t("preview.openEnded", "Open-ended")
-              : t("preview.singleChoice", "Single choice")}
+              : t("preview.singleChoice", "Multiple choice")}
           </Field>
 
           {/* Hashtag */}
