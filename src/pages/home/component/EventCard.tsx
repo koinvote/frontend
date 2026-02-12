@@ -214,7 +214,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       >
         <p
           ref={descriptionRef}
-          className={`mt-2 text-xs md:text-sm text-secondary wrap-break-word overflow-wrap-anywhere ${
+          className={`mt-2 text-xs md:text-sm text-secondary whitespace-pre-line wrap-break-word overflow-wrap-anywhere ${
             isDescriptionExpanded ? "" : "line-clamp-2"
           }`}
         >

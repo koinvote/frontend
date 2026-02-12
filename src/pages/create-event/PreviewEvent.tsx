@@ -610,7 +610,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="space-y-1">
       <div className="tx-12 lh-18 text-secondary">{label}</div>
-      <div className="tx-14 lh-20 text-primary break-words">{children}</div>
+      <div className="tx-14 lh-20 text-primary whitespace-pre-line break-words">{children}</div>
     </div>
   );
 }
