@@ -37,7 +37,7 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
             🚀 **部署通知**
-            專案: ${{ github.repository }}
+            專案: ${{ github.repository }} PROD
             狀態: ${{ job.status == 'success' && '✅ 成功' || '❌ 失敗' }}
             提交訊息: ${{ github.event.head_commit.message }}
             執行者: ${{ github.actor }}

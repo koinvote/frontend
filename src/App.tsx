@@ -8,11 +8,12 @@ import { PageLoading } from "@/components";
 import { registerToast } from "@/components/base/Toast/toast";
 import { ToastProvider } from "@/components/base/Toast/ToastProvider";
 import { useToast } from "@/components/base/Toast/useToast";
-import { useThemeStore } from "@/stores/themeStore";
 import {
   DEFAULT_REFRESH_INTERVAL_MS,
   useSystemParametersStore,
 } from "@/stores/systemParametersStore";
+import { useThemeStore } from "@/stores/themeStore";
+import { version } from "../package.json";
 
 function ToastRegister() {
   const { showToast } = useToast();
@@ -37,6 +38,10 @@ function App() {
       .startAutoRefresh(DEFAULT_REFRESH_INTERVAL_MS); // auto refresh every 10 seconds
     return () => useSystemParametersStore.getState().stopAutoRefresh();
   }, [initTheme]);
+
+  useEffect(() => {
+    console.log(`Koinvote v${version}`);
+  }, []);
 
   return (
     <ConfigProvider key={theme} theme={getThemeConfig(theme === "dark")}>
