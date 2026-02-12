@@ -4,7 +4,7 @@ export default function About() {
   const { t } = useTranslation()
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 px-2 md:px-0">
       <h1 className="text-2xl md:text-3xl fw-m text-center">{t('about.title')}</h1>
 
       <p className="fw-m lg:tx-16">

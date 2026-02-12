@@ -1,15 +1,34 @@
+import { useCallback, useEffect, useRef } from "react";
 
-import { useEffect, useCallback } from 'react'
-import { mockFetchEventsForHome } from '@/pages/home/mockData'
-import { useHomeStore } from '@/stores/homeStore'
+import { API, type ApiResponse } from "@/api/index";
+import type { GetEventListRes } from "@/api/response";
+import { useHomeStore } from "@/stores/homeStore";
+import { mapApiEventToEventSummary } from "@/utils/eventTransform";
+
+// Map frontend status filter to backend tab parameter
+const mapStatusToTab = (
+  status: "preheat" | "ongoing" | "completed",
+): "preheat" | "ongoing" | "completed" => {
+  return status;
+};
+
+// Map frontend sortField to backend sortBy
+const mapSortFieldToSortBy = (
+  sortField: "time" | "reward" | "participation",
+): "time" | "reward" | "participation" => {
+  if (sortField === "reward") return "reward";
+  return sortField;
+};
+
+// 移除 calculatePopularHashtags，改为从 API 获取
 
 export function useHomeEvents() {
   const {
     status,
     debouncedSearch,
+    activeHashtag,
     sortField,
     sortOrder,
-    activeHashtag,
     events,
     hasMore,
     offset,
@@ -20,67 +39,155 @@ export function useHomeEvents() {
     appendEvents,
     setLoading,
     setError,
-  } = useHomeStore()
+  } = useHomeStore();
+
+  // Track the status when request was made to prevent race conditions
+  const requestStatusRef = useRef(status);
+
+  // Update requestStatusRef when status changes
+  useEffect(() => {
+    requestStatusRef.current = status;
+  }, [status]);
 
   const loadFirstPage = useCallback(async () => {
-    setLoading(true)
-    setError(false)
+    // Capture the status at the time of request
+    const requestStatus = status;
+    requestStatusRef.current = requestStatus;
+
+    setLoading(true);
+    setError(false);
     try {
-      const res = await mockFetchEventsForHome({
-        status,
-        search: debouncedSearch,
-        sortField,
-        sortOrder,
-        hashtag: activeHashtag,
-        page: 1,
-        limit,
-      })
-      setEvents(res.items, res.total, res.hasMore, res.offset + res.items.length)
+      const currentPage = 1;
+      // 区分 hashtag 搜索和普通搜索
+      // 如果 activeHashtag 存在，使用 tag 参数；否则使用 q 参数
+      const hashtagForTag = activeHashtag
+        ? activeHashtag.startsWith("#")
+          ? activeHashtag.slice(1)
+          : activeHashtag
+        : undefined;
+
+      // q 参数用于用户手动输入的搜索（title/description/Event ID）
+      // 如果 activeHashtag 存在，q 应该为空（因为使用 tag 参数）
+      const q = activeHashtag ? "" : debouncedSearch || "";
+
+      const res = (await API.getEventList({
+        tab: mapStatusToTab(requestStatus),
+        q,
+        tag: hashtagForTag,
+        page: String(currentPage),
+        limit: String(limit),
+        sortBy: mapSortFieldToSortBy(sortField),
+        order: sortOrder,
+      })) as unknown as ApiResponse<GetEventListRes>;
+
+      // Only update events if status hasn't changed since the request was made
+      if (requestStatusRef.current !== requestStatus) {
+        return; // Status changed, ignore this response
+      }
+
+      if (res.success && res.data) {
+        const transformedEvents = res.data.events.map(
+          mapApiEventToEventSummary,
+        );
+        const total = res.data.events.length; // Backend doesn't return total, use current page length
+        const hasMoreData = res.data.events.length === limit;
+        const newOffset = transformedEvents.length;
+
+        setEvents(transformedEvents, total, hasMoreData, newOffset);
+      } else {
+        setError(true);
+      }
     } catch (e) {
-      console.error('Failed to load events', e)
-      setError(true)
+      // Only set error if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        console.error("Failed to load events", e);
+        setError(true);
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        setLoading(false);
+      }
     }
   }, [
     status,
     debouncedSearch,
+    activeHashtag,
     sortField,
     sortOrder,
-    activeHashtag,
     limit,
     setEvents,
     setLoading,
     setError,
-  ])
+  ]);
 
   const loadMore = useCallback(async () => {
-    if (isLoading || !hasMore) return
-    setLoading(true)
-    setError(false)
+    if (isLoading || !hasMore) return;
+
+    // Capture the status at the time of request
+    const requestStatus = status;
+
+    setLoading(true);
+    setError(false);
     try {
-      const res = await mockFetchEventsForHome({
-        status,
-        search: debouncedSearch,
-        sortField,
-        sortOrder,
-        hashtag: activeHashtag,
-        page: offset,
-        limit: limit,
-      })
-      appendEvents(res.items, res.hasMore, res.offset + res.items.length)
+      // Calculate page number from offset
+      const currentPage = Math.floor(offset / limit) + 1;
+      // 区分 hashtag 搜索和普通搜索
+      // 如果 activeHashtag 存在，使用 tag 参数；否则使用 q 参数
+      const hashtagForTag = activeHashtag
+        ? activeHashtag.startsWith("#")
+          ? activeHashtag.slice(1)
+          : activeHashtag
+        : undefined;
+
+      // q 参数用于用户手动输入的搜索（title/description/Event ID）
+      // 如果 activeHashtag 存在，q 应该为空（因为使用 tag 参数）
+      const q = activeHashtag ? "" : debouncedSearch || "";
+
+      const res = (await API.getEventList({
+        tab: mapStatusToTab(requestStatus),
+        q,
+        tag: hashtagForTag,
+        page: String(currentPage),
+        limit: String(limit),
+        sortBy: mapSortFieldToSortBy(sortField),
+        order: sortOrder,
+      })) as unknown as ApiResponse<GetEventListRes>;
+
+      // Only update events if status hasn't changed since the request was made
+      if (requestStatusRef.current !== requestStatus) {
+        return; // Status changed, ignore this response
+      }
+
+      if (res.success && res.data) {
+        const transformedEvents = res.data.events.map(
+          mapApiEventToEventSummary,
+        );
+        const hasMoreData = res.data.events.length === limit;
+        const newOffset = offset + transformedEvents.length;
+
+        appendEvents(transformedEvents, hasMoreData, newOffset);
+      } else {
+        setError(true);
+      }
     } catch (e) {
-      console.error('Failed to load more events', e)
-      setError(true)
+      // Only set error if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        console.error("Failed to load more events", e);
+        setError(true);
+      }
     } finally {
-      setLoading(false)
+      // Only update loading state if status hasn't changed
+      if (requestStatusRef.current === requestStatus) {
+        setLoading(false);
+      }
     }
   }, [
     status,
     debouncedSearch,
+    activeHashtag,
     sortField,
     sortOrder,
-    activeHashtag,
     offset,
     limit,
     isLoading,
@@ -88,12 +195,18 @@ export function useHomeEvents() {
     appendEvents,
     setLoading,
     setError,
-  ])
+  ]);
 
   // filters 改變時重新載入第一頁
   useEffect(() => {
-    loadFirstPage()
-  }, [loadFirstPage])
+    // 如果 store 中已經有數據（例如從 persist 恢復），且 offset > 0
+    // 說明是頁面刷新或導航返回，此時不應該重新加載第一頁，以免丟失滾動位置和數據
+    // 只有當 offset 為 0 (表示 filter 改變或被手動重置) 時才加載
+    if (events.length > 0 && offset > 0) {
+      return;
+    }
+    loadFirstPage();
+  }, [loadFirstPage, events.length, offset]);
 
   return {
     events,
@@ -102,5 +215,5 @@ export function useHomeEvents() {
     hasMore,
     loadMore,
     reload: loadFirstPage,
-  }
+  };
 }

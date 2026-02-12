@@ -1,25 +1,82 @@
 // api/request.ts
-import type { EventType, EventRewardType } from './types'
+import type { EventType, EventRewardType } from "./types";
 
 export interface CreateEventReq {
-    title: string
-    description: string
-    event_type: EventType
-    event_reward_type: EventRewardType
-    initial_reward_satoshi: number
-    duration_hours: number
-    refund_address: string
+  title: string;
+  description: string;
+  event_type: EventType;
+  event_reward_type: EventRewardType;
+  initial_reward_satoshi: number;
+  duration_hours: number;
+  creator_address: string;
+  options?: string[];
+  preheat_hours?: number;
+  hashtags?: string[];
+}
 
-    options?: string[]
-    preheat_hours?: number
-  }
-  
 export interface GetEventListReq {
-    state: number
-    q: string
-    page: number
-    limit: number
-    sortBy: string
-    order: string
-  }
-  
+  tab: "preheat" | "ongoing" | "completed";
+  q: string;
+  tag?: string;
+  page: string;
+  limit: string;
+  sortBy: "time" | "reward" | "participation";
+  order: "desc" | "asc";
+}
+
+export interface GetListRepliesReq {
+  event_id: string;
+  search?: string; //Search supports partial matching on BTC address, reply content, and option text
+  sortBy?: "time" | "balance"; // Default sorting is by balance (descending), then by creation time
+  order?: "desc" | "asc"; // default: desc
+  page?: number; // default: 1
+  limit?: number; // default: 20, max: 100
+}
+
+// Admin API Request Types
+export interface AdminLoginReq {
+  address: string;
+  plaintext: string;
+  signature: string;
+}
+
+export interface UpdateSystemParametersReq {
+  min_reward_sats: number;
+  sats_per_extra_winner: number;
+  sats_per_duration_hour: number;
+  platform_fee_percent: number;
+  min_payout_sats: number;
+  free_hours: number;
+}
+
+export interface VerifySignatureReq {
+  signature: string;
+}
+
+export interface SubmitReplyReq {
+  event_id: string;
+  btc_address: string;
+  content?: string; // For open-ended
+  option_id?: number; // For single-choice
+  plaintext: string;
+  signature: string;
+  nonce_timestamp: string;
+  random_code: string;
+}
+
+export interface GenerateReplyPlaintextReq {
+  event_id: string;
+  btc_address: string;
+  option_id?: number; // For single-choice
+  content?: string; // For open-ended
+}
+
+export interface SubscribeReq {
+  email: string;
+}
+
+export interface ContactUsReq {
+  email: string;
+  subject: string;
+  message?: string;
+}

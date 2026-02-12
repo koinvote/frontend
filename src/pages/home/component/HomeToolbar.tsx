@@ -1,169 +1,264 @@
-import { useEffect, useState } from 'react'
-import { useHomeStore } from '@/stores/homeStore'
-import { type HomeSortField, type HomeSortOrder } from '@/pages/home/types/index'
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const SORT_OPTIONS: { value: HomeSortField; label: string }[] = [
-  { value: 'time', label: 'Time' },
-  { value: 'bounty', label: 'Bounty' },
-  { value: 'participation', label: 'Participation' },
-]
+import { API, type ApiResponse } from "@/api/index";
+import type { GetHotHashtagsRes } from "@/api/response";
+import ClearIcon from "@/assets/icons/clear.svg?react";
+import SearchIcon from "@/assets/icons/search.svg?react";
+import { Segmented } from "@/components/base/CustomSegmented";
+import {
+  type HomeSortField,
+  type HomeSortOrder,
+  type HomeStatusFilter,
+} from "@/pages/create-event/types/index";
+import { useHomeStore } from "@/stores/homeStore";
 
 export function HomeToolbar() {
+  const { t } = useTranslation();
+
+  const SORT_OPTIONS: { value: HomeSortField; label: string }[] = useMemo(
+    () => [
+      { value: "time", label: t("homeToolbar.sortTime", "Time") },
+      { value: "reward", label: t("homeToolbar.sortReward", "Reward") },
+      {
+        value: "participation",
+        label: t("homeToolbar.sortParticipation", "Participation"),
+      },
+    ],
+    [t],
+  );
   const {
+    isDesktop,
     status,
     search,
     sortField,
     sortOrder,
+    isSortActive,
     activeHashtag,
+    popularHashtags,
+    isLoading,
     setStatus,
     setSearch,
     setDebouncedSearch,
     setSort,
+    setIsSortActive,
     setActiveHashtag,
-    resetFilters,
-  } = useHomeStore()
+    // resetFilters,
+  } = useHomeStore();
 
-  const [popularHashtags] = useState<string[]>([])
-
-
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   // debounce search 300ms
   useEffect(() => {
     const id = setTimeout(() => {
-      setDebouncedSearch(search)
-    }, 300)
-    return () => clearTimeout(id)
-  }, [search, setDebouncedSearch])
-
-  const isOngoing = status === 'ongoing'
-
-  // const sortLabel = useMemo(
-  //   () =>
-  //     SORT_OPTIONS.find((opt) => opt.value === sortField)?.label ?? 'Time',
-  //   [sortField],
-  // )
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [search, setDebouncedSearch]);
 
   const toggleSortOrder = () => {
-    const next: HomeSortOrder = sortOrder === 'asc' ? 'desc' : 'asc'
-    setSort(sortField, next)
-  }
+    const next: HomeSortOrder = sortOrder === "asc" ? "desc" : "asc";
+    setIsSortActive(true);
+    setSort(sortField, next);
+  };
 
   const handleSortChange = (field: HomeSortField) => {
-    // 根據狀態給預設順序
-    const defaultOrder: HomeSortOrder =
-      field === 'time'
-        ? isOngoing
-          ? 'asc'
-          : 'desc'
-        : 'desc'
-    setSort(field, defaultOrder)
-  }
+    setIsSortActive(true);
+    setSort(field, sortOrder);
+  };
+
+  // 获取热门标签
+  useEffect(() => {
+    const fetchHotHashtags = async () => {
+      try {
+        const res = (await API.getHotHashtags({
+          tab: status,
+          limit: 10,
+        })) as unknown as ApiResponse<GetHotHashtagsRes>;
+        if (res.success && res.data) {
+          // 确保标签有 # 前缀
+          const hashtags = res.data.map((tag) =>
+            tag.startsWith("#") ? tag : `#${tag}`,
+          );
+          useHomeStore.getState().setPopularHashtags(hashtags);
+        }
+      } catch (error) {
+        console.error("Failed to fetch hot hashtags", error);
+      }
+    };
+    fetchHotHashtags();
+  }, [status]);
+
+  const handleTabChange = (value: HomeStatusFilter) => {
+    setStatus(value);
+    // 預設排序
+    if (!isSortActive) {
+      if (value === "completed") {
+        setSort("time", "desc");
+      } else {
+        setSort("time", "asc");
+      }
+    }
+  };
 
   const handleHashtagClick = (tag: string) => {
     if (activeHashtag && activeHashtag.toLowerCase() === tag.toLowerCase()) {
-      setActiveHashtag(null)
+      setActiveHashtag(null);
     } else {
-      setActiveHashtag(tag)
+      setActiveHashtag(tag);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-3 md:gap-4">
-      {/* status tabs + sort (desktop 可以橫排，mobile 堆疊) */}
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div className="inline-flex rounded-full bg-surface border border-border p-1 w-fit">
-          <button
-            type="button"
-            className={`px-4 py-1.5 rounded-full text-sm md:text-base ${
-              isOngoing ? 'bg-accent text-accent-foreground' : 'text-secondary'
-            }`}
-            onClick={() => setStatus('ongoing')}
-          >
-            Ongoing
-          </button>
-          <button
-            type="button"
-            className={`px-4 py-1.5 rounded-full text-sm md:text-base ${
-              !isOngoing ? 'bg-accent text-accent-foreground' : 'text-secondary'
-            }`}
-            onClick={() => setStatus('completed')}
-          >
-            Completed
-          </button>
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+        <Segmented<HomeStatusFilter>
+          block={!isDesktop}
+          size="large"
+          loading={isLoading}
+          value={status}
+          options={[
+            { label: t("homeToolbar.preheat", "Preheat"), value: "preheat" },
+            { label: t("homeToolbar.ongoing", "Ongoing"), value: "ongoing" },
+            {
+              label: t("homeToolbar.completed", "Completed"),
+              value: "completed",
+            },
+          ]}
+          onChange={handleTabChange}
+        />
+
+        {/* search */}
+        <div className="relative flex flex-1 items-center min-w-0">
+          <div className="absolute left-4 pointer-events-none">
+            <SearchIcon className="w-4 h-4 text-secondary" />
+          </div>
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              if (activeHashtag && e.target.value !== activeHashtag) {
+                setActiveHashtag(null);
+              }
+            }}
+            onFocus={() => setIsSearchFocused(true)}
+            onBlur={() => setIsSearchFocused(false)}
+            placeholder={t(
+              "homeToolbar.searchPlaceholder",
+              "Search by title, address, Event ID",
+            )}
+            className="flex-1 rounded-xl border border-border bg-surface pl-11 
+          pr-10 py-2 text-base md:text-base outline-none w-full min-w-0 
+          focus:ring-0.5 focus:ring-(--color-orange-500) 
+          focus:border-(--color-orange-500)"
+          />
+          {(isSearchFocused || search) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearch("");
+                setDebouncedSearch("");
+                setActiveHashtag(null);
+                setIsSearchFocused(false);
+              }}
+              className="absolute right-3 flex items-center justify-center w-5 h-5 rounded-full hover:bg-surface-hover text-secondary hover:text-primary transition-colors"
+              aria-label="Clear search"
+            >
+              <ClearIcon className="w-4 h-4 text-secondary" />
+            </button>
+          )}
         </div>
 
         {/* sort */}
-        <div className="flex items-center gap-2 self-start md:self-auto">
+        <div className="flex items-center gap-2 w-full md:w-auto self-start md:self-auto">
           <button
             type="button"
             onClick={toggleSortOrder}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface text-xs"
+            className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-xs flex-shrink-0"
           >
-            {sortOrder === 'asc' ? '↑' : '↓'}
+            {sortOrder === "asc" ? "↑" : "↓"}
           </button>
-          <select
-            className="h-9 rounded-full border border-border bg-surface px-3 text-sm md:text-base"
-            value={sortField}
-            onChange={(e) => handleSortChange(e.target.value as HomeSortField)}
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="relative flex-1 md:flex-none">
+            <select
+              className="cursor-pointer w-full h-9 rounded-xl 
+              border border-border bg-surface px-3 pr-8 text-sm 
+              md:text-base text-center appearance-none 
+              outline-none transition-all"
+              style={{
+                textAlign: "center",
+                textAlignLast: "center",
+              }}
+              value={sortField}
+              onChange={(e) =>
+                handleSortChange(e.target.value as HomeSortField)
+              }
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option
+                  key={opt.value}
+                  value={opt.value}
+                  className="text-center"
+                  style={{ textAlign: "center" }}
+                >
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            {/* 自定义下拉箭头 */}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="text-secondary"
+              >
+                <path
+                  d="M3 4.5L6 7.5L9 4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* search */}
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by title, body, hashtag, Event ID, or BTC address..."
-          className="flex-1 rounded-full border border-border bg-surface px-4 py-2 text-sm md:text-base outline-none"
-        />
       </div>
 
       {/* popular hashtags */}
       {popularHashtags.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs md:text-sm text-secondary">
-            Popular hashtags
-          </span>
-          {popularHashtags.map((tag) => {
-            const isActive =
-              activeHashtag &&
-              activeHashtag.toLowerCase() === tag.toLowerCase()
-            return (
-              <button
-                key={tag}
-                type="button"
-                onClick={() => handleHashtagClick(tag)}
-                className={`rounded-full px-3 py-1 text-xs md:text-sm border ${
-                  isActive
-                    ? 'bg-accent text-accent-foreground border-accent'
-                    : 'bg-surface border-border text-secondary'
-                }`}
-              >
-                {tag}
-              </button>
-            )
-          })}
-
-          {/* 清除搜尋條件 */}
-          {(search || activeHashtag) && (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="ml-auto text-xs md:text-sm text-accent underline"
-            >
-              Clear filters
-            </button>
-          )}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs md:text-sm text-secondary">
+              {t("homeToolbar.popularHashtags", "Popular hashtags")}
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {popularHashtags.map((tag) => {
+              const isActive =
+                activeHashtag &&
+                activeHashtag.toLowerCase() === tag.toLowerCase();
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => handleHashtagClick(tag)}
+                  className={`cursor-pointer rounded-xl px-3 py-1 text-xs md:text-sm border ${
+                    isActive
+                      ? "bg-accent text-accent-foreground border-accent"
+                      : "bg-surface border-border text-secondary"
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,0 +1,293 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
+
+const SATS_PER_BTC = 100_000_000;
+
+type TranslateFunction = (
+  key: string,
+  defaultValue: string,
+  options?: Record<string, unknown>,
+) => string;
+
+/** BTC -> sats*/
+export const btcToSats = (value: string) => {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num <= 0) return 0;
+  return Math.round(num * SATS_PER_BTC);
+};
+
+/**
+ * Convert Satoshi to BTC string for display
+ * @param satoshi - Satoshi value (number or null/undefined)
+ * @param options - Formatting options
+ * @param options.decimals - Number of decimal places (default: 8)
+ * @param options.suffix - Whether to append " BTC" suffix (default: true)
+ * @param options.showZero - Whether to show "0 BTC" for zero values (default: true)
+ * @returns Formatted BTC string (e.g., "0.00012345 BTC") or "--" for invalid/null values
+ */
+export const satsToBtc = (
+  satoshi: number | null | undefined,
+  options?: {
+    decimals?: number;
+    suffix?: boolean;
+    showZero?: boolean;
+    trimTrailingZeros?: boolean;
+  }
+): string => {
+  const {
+    decimals = 8,
+    suffix = true,
+    showZero = true,
+    trimTrailingZeros = false,
+  } = options ?? {};
+
+  // Handle null/undefined
+  if (satoshi === null || satoshi === undefined) {
+    return "--";
+  }
+
+  // Handle invalid numbers
+  if (!Number.isFinite(satoshi)) {
+    return "--";
+  }
+
+  // Handle zero
+  if (satoshi === 0) {
+    return showZero ? (suffix ? "0 BTC" : "0") : "--";
+  }
+
+  // Convert to BTC
+  const btc = satoshi / SATS_PER_BTC;
+  const fixed = btc.toFixed(decimals);
+
+  const formatted = trimTrailingZeros
+    ? (() => {
+        const [intPart, fracPart = ""] = fixed.split(".");
+        if (!fracPart) return fixed;
+        const trimmedFrac = fracPart.replace(/0+$/, "");
+        return trimmedFrac ? `${intPart}.${trimmedFrac}` : intPart;
+      })()
+    : fixed;
+
+  return suffix ? `${formatted} BTC` : formatted;
+};
+
+/**
+ * Format preheat duration: 一律進位，最大單位 w，最小單位 hr
+ */
+export const formatPreheatDuration = (
+  hours: number,
+  t?: TranslateFunction,
+): string => {
+  const w = t ? t("formatter.w", "w") : "w";
+  const hr = t ? t("formatter.hr", "hr") : "hr";
+
+  if (hours <= 0) return `0${hr}`;
+
+  // 一律進位（向上取整）
+  const roundedHours = Math.ceil(hours);
+
+  // 計算週數（1週 = 168小時）
+  const weeks = Math.floor(roundedHours / 168);
+  const remainingHours = roundedHours % 168;
+
+  if (weeks > 0 && remainingHours === 0) {
+    return `${weeks}${w}`;
+  }
+  if (weeks > 0) {
+    return `${weeks}${w} ${remainingHours}${hr}`;
+  }
+  return `${remainingHours}${hr}`;
+};
+
+/**
+ * Format duration from started_at to deadline_at: 用 w d hr 呈現，最小單位 hr
+ */
+export const formatEventDuration = (
+  startedAt: string,
+  deadlineAt: string,
+  t?: TranslateFunction,
+): string => {
+  const w = t ? t("formatter.w", "w") : "w";
+  const d = t ? t("formatter.d", "d") : "d";
+  const h = t ? t("formatter.h", "h") : "h";
+
+  const start = dayjs.utc(startedAt);
+  const deadline = dayjs.utc(deadlineAt);
+  const diffHours = deadline.diff(start, "hour");
+
+  if (diffHours <= 0) return `0${h}`;
+
+  const weeks = Math.floor(diffHours / (24 * 7));
+  const remainingAfterWeeks = diffHours % (24 * 7);
+  const days = Math.floor(remainingAfterWeeks / 24);
+  const hours = remainingAfterWeeks % 24;
+
+  const parts: string[] = [];
+  if (weeks > 0) {
+    parts.push(`${weeks}${w}`);
+  }
+  if (days > 0) {
+    parts.push(`${days}${d}`);
+  }
+  if (hours > 0 || parts.length === 0) {
+    parts.push(`${hours}${h}`);
+  }
+
+  return parts.join(" ");
+};
+
+/**
+ * Format preheat countdown: 從 started_at 計算（預熱結束時即進入 ongoing），最小單位秒
+ */
+export const formatPreheatCountdown = (
+  startedAt: string,
+  t?: TranslateFunction,
+): string => {
+  const d = t ? t("formatter.d", "d") : "d";
+  const h = t ? t("formatter.h", "h") : "h";
+  const m = t ? t("formatter.m", "m") : "m";
+  const s = t ? t("formatter.s", "s") : "s";
+
+  const start = dayjs.utc(startedAt);
+  const now = dayjs();
+  const diffMs = start.diff(now);
+
+  if (diffMs <= 0) {
+    return `0${s}`;
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) {
+    return `${days}${d} ${hours}${h} ${minutes}${m} ${seconds}${s}`;
+  }
+  if (hours > 0) {
+    return `${hours}${h} ${minutes}${m} ${seconds}${s}`;
+  }
+  if (minutes > 0) {
+    return `${minutes}${m} ${seconds}${s}`;
+  }
+  return `${seconds}${s}`;
+};
+
+/**
+ * Format ongoing countdown: 從 deadline_at 計算，最小單位是秒
+ */
+export const formatOngoingCountdown = (
+  deadlineAt: string,
+  t?: TranslateFunction,
+): string => {
+  const d = t ? t("formatter.d", "d") : "d";
+  const h = t ? t("formatter.h", "h") : "h";
+  const m = t ? t("formatter.m", "m") : "m";
+  const s = t ? t("formatter.s", "s") : "s";
+
+  const deadline = dayjs.utc(deadlineAt);
+  const now = dayjs();
+  const diffMs = deadline.diff(now);
+
+  if (diffMs <= 0) {
+    return `0${s}`;
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) {
+    return `${days}${d} ${hours}${h} ${minutes}${m} ${seconds}${s}`;
+  }
+  if (hours > 0) {
+    return `${hours}${h} ${minutes}${m} ${seconds}${s}`;
+  }
+  if (minutes > 0) {
+    return `${minutes}${m} ${seconds}${s}`;
+  }
+  return `${seconds}${s}`;
+};
+
+/**
+ * Format completed time: "Ended on Jan 3, 2025 — 14:32 UTC"
+ */
+export const formatCompletedTime = (
+  deadlineAt: string,
+  prefixText: string
+): string => {
+  const deadline = dayjs.utc(deadlineAt);
+  const dateStr = deadline.format("MMM D, YYYY");
+  const timeStr = deadline.format("HH:mm");
+  return `${prefixText} ${dateStr} — ${timeStr} UTC`;
+};
+
+/**
+ * Format deposit countdown: 從 deposit_timeout_at (UTC) 計算，格式為 MM:SS
+ * 如果時間已過期或為 0，返回 "00:00"
+ */
+export const formatDepositCountdown = (depositTimeoutAt: string): string => {
+  const deadline = dayjs.utc(depositTimeoutAt);
+  const now = dayjs();
+  const diffMs = deadline.diff(now);
+
+  if (diffMs <= 0) {
+    return "00:00";
+  }
+
+  const totalSeconds = Math.floor(diffMs / 1000);
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+export function formatRelativeTime(
+  dateString: string,
+  t?: TranslateFunction,
+): string {
+  // 確保將服務器返回的 UTC 時間正確解析為 UTC
+  const date = dayjs.utc(dateString);
+  const now = dayjs();
+
+  const diffSeconds = now.diff(date, "second");
+  if (diffSeconds < 60) {
+    const seconds = Math.max(1, diffSeconds);
+    return t
+      ? t("formatter.secondsAgo", "{{seconds}}s ago", { seconds })
+      : `${seconds}s ago`;
+  }
+
+  const diffMinutes = now.diff(date, "minute");
+  if (diffMinutes < 60) {
+    return t
+      ? t("formatter.minutesAgo", "{{minutes}}m ago", { minutes: diffMinutes })
+      : `${diffMinutes}m ago`;
+  }
+
+  const diffHours = now.diff(date, "hour");
+  if (diffHours < 24) {
+    return t
+      ? t("formatter.hoursAgo", "{{hours}}h ago", { hours: diffHours })
+      : `${diffHours}h ago`;
+  }
+
+  const diffDays = now.diff(date, "day");
+  if (diffDays < 7) {
+    return t
+      ? t("formatter.daysAgo", "{{days}}d ago", { days: diffDays })
+      : `${diffDays}d ago`;
+  }
+
+  const weeks = Math.floor(diffDays / 7);
+  return t
+    ? t("formatter.weeksAgo", "{{weeks}}w ago", { weeks })
+    : `${weeks}w ago`;
+}

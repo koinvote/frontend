@@ -1,0 +1,156 @@
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+
+/**
+ * Custom hook for Tooltip with click and hover interactions
+ *
+ * Features:
+ * - Hover to show, hover away to hide (if opened by hover)
+ * - Click to toggle (show/hide)
+ * - Click outside to close (if opened by click)
+ * - Click-opened tooltip stays open even when hover away (if keepOpenOnClick is true)
+ *
+ * @returns Object containing tooltip state and event handlers
+ */
+interface UseTooltipWithClickOptions {
+  singleLine?: boolean;
+  /** 点击后是否保持 tooltip 打开，默认为 false（点击后立即关闭） */
+  keepOpenOnClick?: boolean;
+}
+
+export function useTooltipWithClick(options?: UseTooltipWithClickOptions) {
+  const { singleLine = false, keepOpenOnClick = false } = options || {};
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipOpenedByClick, setTooltipOpenedByClick] = useState(false);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  // 点击外部关闭 tooltip（只有在 keepOpenOnClick 为 true 时才启用）
+  useEffect(() => {
+    if (!tooltipOpen || !keepOpenOnClick) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+
+      // 如果点击的是触发区域本身，不在这里处理（由 onClick 处理）
+      if (triggerRef.current && triggerRef.current.contains(target)) {
+        return;
+      }
+
+      // 如果点击的是 tooltip 内容区域，不关闭
+      if (target.closest(".ant-tooltip-inner")) {
+        return;
+      }
+
+      // 其他情况都关闭 tooltip
+      setTooltipOpenedByClick(false);
+      setTooltipOpen(false);
+    };
+
+    // 使用 click 事件，在捕获阶段处理，确保在其他点击处理之前
+    document.addEventListener("click", handleClickOutside, true);
+    return () => {
+      document.removeEventListener("click", handleClickOutside, true);
+    };
+  }, [tooltipOpen, keepOpenOnClick]);
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      if (keepOpenOnClick) {
+        // 如果 keepOpenOnClick 为 true，使用 toggle 行为
+        // 阻止点击事件冒泡和默认行为
+        e.stopPropagation();
+        e.preventDefault();
+
+        // 如果已经打开且是点击打开的，则关闭；否则打开
+        if (tooltipOpenedByClick && tooltipOpen) {
+          setTooltipOpenedByClick(false);
+          setTooltipOpen(false);
+        } else {
+          setTooltipOpenedByClick(true);
+          setTooltipOpen(true);
+        }
+      } else {
+        // 如果 keepOpenOnClick 为 false，点击不做任何操作（就像普通 tooltip 一样）
+        // 不阻止事件，让 tooltip 只通过 hover 控制
+      }
+    },
+    [tooltipOpenedByClick, tooltipOpen, keepOpenOnClick]
+  );
+
+  const handleMouseEnter = useCallback(() => {
+    // hover 进入时，如果不是点击打开的，可以打开
+    if (!tooltipOpenedByClick) {
+      setTooltipOpen(true);
+    }
+  }, [tooltipOpenedByClick]);
+
+  const handleMouseLeave = useCallback(() => {
+    // 鼠标离开时，如果 tooltip 是因为点击打开的且 keepOpenOnClick 为 true，保持打开
+    if (tooltipOpenedByClick && keepOpenOnClick) {
+      setTooltipOpen(true);
+    } else {
+      // hover 打开的，或者 keepOpenOnClick 为 false 时，可以关闭
+      setTooltipOpen(false);
+    }
+  }, [tooltipOpenedByClick, keepOpenOnClick]);
+
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      // 如果 tooltip 是因为点击打开的且 keepOpenOnClick 为 true，我们需要阻止它关闭
+      if (!open && tooltipOpenedByClick && keepOpenOnClick) {
+        // 点击打开的，保持打开 - 使用 setTimeout 确保在下一个事件循环中设置
+        setTimeout(() => {
+          setTooltipOpen(true);
+        }, 0);
+        return;
+      }
+      // hover 打开的，或者 keepOpenOnClick 为 false 时，可以正常关闭
+      setTooltipOpen(open);
+    },
+    [tooltipOpenedByClick, keepOpenOnClick]
+  );
+
+  // 确保当 tooltipOpenedByClick 为 true 且 keepOpenOnClick 为 true 时，tooltip 保持打开
+  useEffect(() => {
+    if (tooltipOpenedByClick && keepOpenOnClick && !tooltipOpen) {
+      setTooltipOpen(true);
+    }
+  }, [tooltipOpenedByClick, tooltipOpen, keepOpenOnClick]);
+
+  // 使用 useMemo 确保样式会根据 singleLine 的变化更新
+  // 当 singleLine 为 true 时，设置 whiteSpace 为 nowrap，并让宽度自动适应内容
+  const overlayStyle = useMemo(
+    () => (singleLine ? { whiteSpace: "nowrap" } : undefined),
+    [singleLine]
+  );
+
+  const overlayInnerStyle = useMemo(
+    () =>
+      singleLine
+        ? {
+            whiteSpace: "nowrap",
+            width: "max-content",
+          }
+        : undefined,
+    [singleLine]
+  );
+
+  return {
+    tooltipProps: {
+      trigger: [] as ("hover" | "focus" | "click" | "contextMenu")[],
+      open: tooltipOpen,
+      onOpenChange: handleOpenChange,
+      overlayStyle,
+      overlayInnerStyle,
+    },
+    triggerProps: {
+      ref: (node: HTMLElement | null) => {
+        triggerRef.current = node;
+      },
+      "data-tooltip-trigger": true,
+      // 只有在 keepOpenOnClick 为 true 时才添加 onClick 处理器
+      ...(keepOpenOnClick ? { onClick: handleClick } : {}),
+      onMouseEnter: handleMouseEnter,
+      onMouseLeave: handleMouseLeave,
+    },
+  };
+}
