@@ -1,30 +1,6 @@
+import CopyIcon from "@/assets/icons/copy.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
 import { Button } from "@/components/base/Button";
-
-function CopyIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
-      <rect
-        x="9"
-        y="9"
-        width="11"
-        height="11"
-        rx="2"
-        stroke="currentColor"
-        fill="none"
-      />
-      <rect
-        x="4"
-        y="4"
-        width="11"
-        height="11"
-        rx="2"
-        stroke="currentColor"
-        fill="none"
-      />
-    </svg>
-  );
-}
 
 interface AdminLoginProps {
   adminAddress: string;
@@ -90,7 +66,7 @@ export default function AdminLogin({
                 className="text-admin-text-sub hover:text-admin-text-main transition-colors"
                 aria-label="Copy Hash Key"
               >
-                <CopyIcon className="h-5 w-5" />
+                <CopyIcon className="h-5 w-5 cursor-pointer" />
               </button>
             </div>
           </div>
