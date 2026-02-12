@@ -521,7 +521,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
 
       {/* Description */}
       {event.description && (
-        <p className="text-sm md:text-base text-secondary leading-relaxed wrap-break-word min-w-0">
+        <p className="text-sm md:text-base text-secondary leading-relaxed whitespace-pre-line wrap-break-word min-w-0">
           {event.description}
         </p>
       )}
