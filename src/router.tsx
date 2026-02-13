@@ -31,7 +31,7 @@ import AdminLoginPage from "@/admin/pages/login";
 import AdminRefundsPage from "@/admin/pages/refund";
 import AdminRewardRulesPage from "@/admin/pages/rewardRules";
 import AdminSubscribersPage from "@/admin/pages/subscribe";
-import AdminSystemSettingPage from "@/admin/pages/systemSetting";
+import AdminWithdrawal from "@/admin/pages/withdrawal";
 import AdminLayout from "@/layout/AdminLayout";
 
 const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
@@ -83,7 +83,7 @@ export const router = createBrowserRouter([
           { path: "reward-rules", element: <AdminRewardRulesPage /> },
           { path: "fees", element: <AdminFeesPage /> },
           { path: "refunds", element: <AdminRefundsPage /> },
-          { path: "system-setting", element: <AdminSystemSettingPage /> },
+          { path: "withdrawal", element: <AdminWithdrawal /> },
           { path: "announcements", element: <AdminAnnouncementsPage /> },
           { path: "subscribers", element: <AdminSubscribersPage /> },
         ],

@@ -39,15 +39,15 @@ export default function AdminLoginPage() {
   const handleCopy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showToast("success", `${label} copied to clipboard`);
+      showToast("success", `${label} 已複製到剪貼簿`);
     } catch {
-      showToast("error", `Failed to copy ${label}`);
+      showToast("error", `${label} 複製失敗`);
     }
   };
 
   const handleLogin = async () => {
     if (!signature.trim()) {
-      showToast("error", "Please enter a signature");
+      showToast("error", "請輸入簽名");
       return;
     }
 
@@ -68,18 +68,18 @@ export default function AdminLoginPage() {
       if (envelope?.success && envelope?.data?.token) {
         // Save token to localStorage
         setAdminToken(envelope.data.token);
-        showToast("success", "Login successful");
+        showToast("success", "登入成功");
 
         // Navigate to reward-rules page
         navigate("/admin/reward-rules");
       } else {
-        const errorMessage = envelope?.message || "Login failed";
+        const errorMessage = envelope?.message || "登入失敗";
         showToast("error", errorMessage);
       }
     } catch (error: unknown) {
       const errorMessage =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.apiMessage || (error as any)?.message || "Login failed";
+        (error as any)?.apiMessage || (error as any)?.message || "登入失敗";
       showToast("error", errorMessage);
     } finally {
       setIsLoading(false);
