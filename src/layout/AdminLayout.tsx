@@ -51,7 +51,7 @@ export default function AdminLayout() {
       </header>
 
       {/* Main layout */}
-      <div className="flex min-h-screen">
+      <div className="flex min-h-[calc(100vh-48px)]">
         {/* 左側 menu 區 */}
         <aside className="bg-admin-card w-56 shrink-0 overflow-y-auto border-neutral-200 px-4 py-20">
           <AdminMenu />

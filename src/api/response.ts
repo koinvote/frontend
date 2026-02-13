@@ -234,6 +234,29 @@ export interface CreateWithdrawalRes {
   status: string;
 }
 
+// Withdrawal Record Types
+export type WithdrawalRecordStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export interface WithdrawalRecord {
+  id: number;
+  from_address: string;
+  to_address: string;
+  txid: string;
+  amount: number;
+  fee: number;
+  ticket_id: string;
+  status: WithdrawalRecordStatus;
+  timestamp: string;
+}
+
+export interface GetWithdrawalRecordRes {
+  withdrawals: WithdrawalRecord[];
+}
+
 // Payout Report Types
 export type PayoutStatus =
   | "completed" // 已完成派獎

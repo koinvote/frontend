@@ -86,3 +86,11 @@ export interface CreateWithdrawalReq {
   hash_key: string;
   signature: string;
 }
+
+export interface GetWithdrawalRecordReq {
+  page?: string;
+  limit?: string;
+  to_address?: string;
+  start_time?: string;
+  end_time?: string;
+}

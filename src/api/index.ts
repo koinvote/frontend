@@ -7,6 +7,7 @@ import type {
   CreateEventReq,
   CreateWithdrawalReq,
   GenerateReplyPlaintextReq,
+  GetWithdrawalRecordReq,
   GetEventListReq,
   GetListRepliesReq,
   SubmitReplyReq,
@@ -28,6 +29,7 @@ import type {
   GetReceiptVerifyPubKeysRes,
   GetReplyPlainTextRes,
   CreateWithdrawalRes,
+  GetWithdrawalRecordRes,
   WithdrawalInfoRes,
   GetSignaturePlainTextRes,
   PayoutReportRes,
@@ -204,5 +206,9 @@ export const AdminAPI = {
   createWithdrawal: adminPost<
     ApiResponse<CreateWithdrawalRes>,
     CreateWithdrawalReq
+  >("/admin/withdrawals"),
+  getWithdrawalRecords: adminGet<
+    ApiResponse<GetWithdrawalRecordRes>,
+    GetWithdrawalRecordReq
   >("/admin/withdrawals"),
 };
