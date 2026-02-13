@@ -1,6 +1,7 @@
+import { Button } from "antd";
+
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
-import { Button } from "@/components/base/Button";
 
 interface AdminLoginProps {
   adminAddress: string;
@@ -32,7 +33,7 @@ export default function AdminLogin({
             <div className="tx-20 text-admin-text-main fw-m">
               Koinvote Admin
             </div>
-            <div className="tx-14 text-admin-text-sub">
+            <div className="text-admin-text-sub text-sm">
               Admin Login Interface
             </div>
           </div>
@@ -41,10 +42,10 @@ export default function AdminLogin({
         <div className="space-y-4">
           {/* Admin Address */}
           <div className="space-y-1">
-            <label className="tx-14 text-admin-text-sub">Admin Address</label>
-            <div className="bg-admin-surface flex items-center gap-2 rounded-md px-3 py-2">
+            <label className="text-admin-text-sub text-sm">Admin Address</label>
+            <div className="bg-admin-surface mt-2 flex items-center gap-2 rounded-md px-3 py-2">
               <input
-                className="tx-14 text-admin-text-main flex-1 border-0 bg-transparent outline-none"
+                className="text-admin-text-main flex-1 border-0 bg-transparent font-mono text-sm outline-none"
                 value={adminAddress}
                 readOnly
               />
@@ -53,10 +54,10 @@ export default function AdminLogin({
 
           {/* Hash Key */}
           <div className="space-y-1">
-            <label className="tx-14 text-admin-text-sub">Hash Key</label>
-            <div className="bg-admin-surface flex items-center gap-2 rounded-md px-3 py-2">
+            <label className="text-admin-text-sub text-sm">Hash Key</label>
+            <div className="bg-admin-surface mt-2 flex items-center gap-2 rounded-md px-3 py-2">
               <input
-                className="tx-14 text-admin-text-main flex-1 border-0 bg-transparent outline-none"
+                className="text-admin-text-main flex-1 border-0 bg-transparent font-mono text-sm outline-none"
                 value={hashKey}
                 readOnly
               />
@@ -73,9 +74,9 @@ export default function AdminLogin({
 
           {/* Signature */}
           <div className="space-y-1">
-            <label className="tx-14 text-admin-text-sub">Signature</label>
+            <label className="text-admin-text-sub text-sm">Signature</label>
             <input
-              className="border-admin-border tx-14 w-full rounded-md border bg-white px-3 py-2"
+              className="focus:border-accent mt-2 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 font-mono text-sm outline-none"
               placeholder="Paste your signature here"
               value={signature}
               onChange={(e) => onSignatureChange(e.target.value)}
@@ -86,10 +87,8 @@ export default function AdminLogin({
           <div className="pt-2">
             <Button
               block
-              size="lg"
-              text="md"
-              tone="orange"
-              className="w-full"
+              size="large"
+              type="primary"
               onClick={onLogin}
               disabled={isLoading}
             >

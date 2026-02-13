@@ -180,7 +180,7 @@ export default function AdminRewardRulesPage() {
   return (
     <div>
       {/* Header */}
-      <div className="bg-white border-admin-border h-20 px-6 py-4 flex items-center justify-between">
+      <div className="flex h-20 items-center justify-between border-neutral-200 bg-white px-6 py-4">
         <h1 className="tx-18 fw-l">獎金與派獎規則</h1>
       </div>
 

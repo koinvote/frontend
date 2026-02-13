@@ -44,13 +44,13 @@ export function AdminFormField(props: AdminFormFieldProps) {
 
   const baseInputClassName = `w-24 border rounded-[4px] px-3 py-2 bg-white tx-14 ${className}`;
   const inputClassName = error
-    ? `${baseInputClassName} border-red-500`
-    : `${baseInputClassName} border-admin-border`;
+    ? `${baseInputClassName} border-red-500 focus:border-accent outline-none`
+    : `${baseInputClassName} border-neutral-200 focus:border-accent outline-none`;
 
   return (
-    <div className="flex flex-wrap items-center gap-3 max-w-xl">
-      {label && <label className="tx-14 text-admin-text-sub">{label}</label>}
-      <div className="relative pb-2">
+    <div className="flex max-w-xl flex-wrap items-center gap-3">
+      {label && <label className="text-sm">{label}</label>}
+      <div className="relative">
         {props.type === "input" ? (
           <input
             type={props.inputType || "text"}
@@ -76,12 +76,12 @@ export function AdminFormField(props: AdminFormFieldProps) {
           </select>
         )}
         {error && (
-          <span className="absolute left-0 -bottom-3 mt-1 text-red-500 text-xs whitespace-nowrap">
+          <span className="absolute -bottom-5 left-0 mt-1 text-xs whitespace-nowrap text-red-500">
             {error}
           </span>
         )}
       </div>
-      {suffix && <span className="tx-14">{suffix}</span>}
+      {suffix && <span className="text-sm">{suffix}</span>}
     </div>
   );
 }

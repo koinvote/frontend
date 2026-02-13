@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Modal } from "antd";
+import { Button, Modal } from "antd";
 import { useState } from "react";
 
 import { AdminFormSection } from "@/admin/component/AdminFormSection";
@@ -8,7 +8,6 @@ import type { WithdrawalInfoRes } from "@/api/response";
 import CheckCircle from "@/assets/icons/check_circle.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
-import { Button } from "@/components/base/Button";
 import { toast } from "@/components/base/Toast/toast";
 import systemConsts from "@/consts";
 import { truncateAddress } from "@/utils/address";
@@ -131,7 +130,7 @@ export default function AdminWithdrawalPage() {
 
   return (
     <div>
-      <div className="border-admin-border flex h-20 items-center justify-between bg-white px-6 py-4">
+      <div className="flex h-20 items-center justify-between border-neutral-200 bg-white px-6 py-4">
         <h1 className="tx-18 fw-l">提款相關</h1>
       </div>
 
@@ -174,10 +173,8 @@ export default function AdminWithdrawalPage() {
               </div>
               <div className="pt-2">
                 <Button
-                  size="md"
-                  text="sm"
-                  tone="white"
-                  appearance="solid"
+                  size="middle"
+                  autoInsertSpace={false}
                   onClick={handleWithdrawal}
                   disabled={isFetchingInfo}
                 >
@@ -269,10 +266,10 @@ export default function AdminWithdrawalPage() {
                   if (signatureError) setSignatureError("");
                 }}
                 placeholder="Paste signature here"
-                className={`text-secondary w-full rounded-lg border px-3 py-4 font-mono text-sm outline-none focus:ring-2 ${
+                className={`text-secondary w-full rounded-lg border px-3 py-4 font-mono text-sm outline-none ${
                   signatureError
                     ? "border-red-500 focus:ring-red-500"
-                    : "focus:ring-admin-accent border-neutral-200"
+                    : "focus:border-accent border-neutral-200"
                 }`}
               />
               {signatureError && (
@@ -281,16 +278,16 @@ export default function AdminWithdrawalPage() {
             </div>
 
             {/* Submit button */}
-            <button
-              type="button"
+            <Button
+              type="primary"
+              size="large"
               onClick={handleWithdraw}
               disabled={
                 isSubmitting || !adminAddress.trim() || !signature.trim()
               }
-              className="bg-admin-accent w-full cursor-pointer rounded-lg py-3 text-center font-medium text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {isSubmitting ? "Submitting..." : "Withdraw"}
-            </button>
+            </Button>
           </div>
         )}
       </Modal>
