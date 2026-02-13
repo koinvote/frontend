@@ -35,14 +35,14 @@ export function SingleChoiceOptions({ options, t }: SingleChoiceOptionsProps) {
   return (
     <section
       data-options-list
-      className={`mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm bg-[rgba(var(--color-gray-450-rgb),0.5)] transition-colors ${
+      className={`border-border mt-3 rounded-xl border bg-[rgba(var(--color-gray-450-rgb),0.5)] px-3 py-2 text-xs transition-colors md:text-sm ${
         hasMore
-          ? "cursor-pointer dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)] md:hover:bg-gray-200"
+          ? "cursor-pointer md:hover:bg-gray-200 dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)]"
           : ""
       }`}
       onClick={handleToggle}
     >
-      <div className="mb-1 text-[11px] md:text-xs text-secondary flex items-center justify-between">
+      <div className="text-secondary mb-1 flex items-center justify-between text-[11px] md:text-xs">
         <span>
           {sortedOptions.length > 1
             ? t("eventCard.options", "Options")
@@ -59,12 +59,12 @@ export function SingleChoiceOptions({ options, t }: SingleChoiceOptionsProps) {
 
       {displayOptions.map((opt, index) => (
         <div key={index}>
-          {index > 0 && <div className="my-1 border-t border-border" />}
+          {index > 0 && <div className="border-border my-1 border-t" />}
           <div className="py-1">
-            <p className="text-primary wrap-break-word line-clamp-1">
+            <p className="text-primary line-clamp-1 wrap-break-word">
               {typeof opt === "string" ? opt : opt.option_text}
             </p>
-            <div className="mt-1 flex flex-col gap-1 md:flex-row md:items-center md:justify-end text-[11px] text-secondary">
+            <div className="text-secondary mt-1 flex flex-col gap-1 text-[11px] md:flex-row md:items-center md:justify-end">
               <div className="flex items-center justify-end gap-2 md:gap-2">
                 {typeof opt !== "string" && (
                   <>
