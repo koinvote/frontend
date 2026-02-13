@@ -22,8 +22,11 @@ export function useWithdrawalModal() {
       } else {
         toast("error", res.message || "取得提款資訊失敗");
       }
-    } catch {
-      toast("error", "取得提款資訊失敗");
+    } catch (error: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      if (!(error as any)?.isHandled) {
+        toast("error", "取得提款資訊失敗");
+      }
     } finally {
       setIsFetchingInfo(false);
     }
