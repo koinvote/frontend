@@ -378,13 +378,20 @@ export default function ReplyPage() {
 
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-primary">
-          {t("reply.title", "Reply to Win BTC")}{" "}
+          {event.event_reward_type === "rewarded"
+            ? t("reply.title", "Reply to Win BTC")
+            : t("reply.titleFree", "Submit Your Reply")}
         </h1>
         <p className="tx-14 lh-20 text-secondary mt-1">
-          {t(
-            "reply.subtitle",
-            "Complete the steps below to submit your reply and enter the draw.",
-          )}
+          {event.event_reward_type === "rewarded"
+            ? t(
+                "reply.subtitle",
+                "Complete the steps below to submit your reply and enter the draw.",
+              )
+            : t(
+                "reply.subtitleFree",
+                "Complete the steps below to submit your reply.",
+              )}
         </p>
 
         {/* 1. Event Information */}

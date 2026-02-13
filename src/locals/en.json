@@ -687,7 +687,9 @@
   },
   "reply": {
     "title": "Reply to Win BTC",
+    "titleFree": "Submit Your Reply",
     "subtitle": "Complete the steps below to submit your reply and enter the draw.",
+    "subtitleFree": "Complete the steps below to submit your reply.",
     "eventInfo": "Event Information",
     "timeRemaining": "Time remaining",
     "eventId": "Event ID",
