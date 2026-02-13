@@ -690,7 +690,9 @@
   },
   "reply": {
     "title": "回覆贏取 BTC",
+    "titleFree": "提交您的回覆",
     "subtitle": "完成以下步驟提交您的回覆並參與抽獎。",
+    "subtitleFree": "完成以下步驟提交您的回覆。",
     "eventInfo": "活動資訊",
     "timeRemaining": "剩餘時間",
     "eventId": "活動 ID",

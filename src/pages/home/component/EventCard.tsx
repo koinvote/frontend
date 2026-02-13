@@ -1,6 +1,7 @@
 import { Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -24,6 +25,7 @@ interface EventCardProps {
 export function EventCard({ event, onClick }: EventCardProps) {
   const { showToast } = useToast();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [countdown, setCountdown] = useState(() => formatCountdown(event, t));
 
   useEffect(() => {
@@ -158,11 +160,11 @@ export function EventCard({ event, onClick }: EventCardProps) {
   return (
     <article
       onClick={handleCardClick}
-      className="cursor-pointer rounded-2xl border border-border bg-bg px-4 py-3 md:px-6 md:py-4 transition md:hover:bg-surface/80"
+      className="border-border bg-bg md:hover:bg-surface/80 cursor-pointer rounded-2xl border px-4 py-3 transition md:px-6 md:py-4"
     >
       {/* header row: title + reward + time */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <h2 className="text-base md:text-lg font-semibold text-primary w-full md:min-w-0 md:flex-1 md:shrink wrap-break-word">
+        <h2 className="text-primary w-full text-base font-semibold wrap-break-word md:min-w-0 md:flex-1 md:shrink md:text-lg">
           {event.title}
         </h2>
         <div className="shrink-0">
@@ -214,7 +216,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       >
         <p
           ref={descriptionRef}
-          className={`mt-2 text-xs md:text-sm text-secondary whitespace-pre-line wrap-break-word overflow-wrap-anywhere ${
+          className={`text-secondary overflow-wrap-anywhere mt-2 text-xs wrap-break-word whitespace-pre-line md:text-sm ${
             isDescriptionExpanded ? "" : "line-clamp-2"
           }`}
         >
@@ -224,7 +226,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
         {showDescriptionToggle && (
           <button
             type="button"
-            className="mt-1 text-xs md:text-sm cursor-pointer"
+            className="mt-1 cursor-pointer text-xs md:text-sm"
             onClick={handleDescriptionToggle}
           >
             {isDescriptionExpanded
@@ -238,22 +240,26 @@ export function EventCard({ event, onClick }: EventCardProps) {
       {event.event_type === "single_choice" &&
       event.options &&
       event.options.length > 0 ? (
-        <SingleChoiceOptions options={event.options} t={t} />
+        <SingleChoiceOptions
+          options={event.options}
+          eventId={event.event_id}
+          t={t}
+        />
       ) : (
         (primaryReply || secondaryReply) && (
           <section
             data-top-replies
-            className="mt-3 rounded-xl border border-border px-3 py-2 text-xs md:text-sm bg-[rgba(var(--color-gray-450-rgb),0.5)]"
-            onClick={(e) => e.stopPropagation()}
+            className="border-border mt-3 rounded-xl border bg-[rgba(var(--color-gray-450-rgb),0.5)] px-3 py-2 text-xs md:text-sm"
+            onClick={() => navigate(`/event/${event.event_id}`)}
           >
-            <div className="mb-1 text-[11px] md:text-xs text-secondary">
+            <div className="text-secondary mb-1 text-[11px] md:text-xs">
               {t("eventCard.topReply", "Top reply")}
             </div>
 
             {primaryReply && <ReplyItem reply={primaryReply} t={t} />}
 
             {primaryReply && secondaryReply && (
-              <div className="my-1 border-t border-border" />
+              <div className="border-border my-1 border-t" />
             )}
 
             {secondaryReply && <ReplyItem reply={secondaryReply} t={t} />}
@@ -262,7 +268,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       )}
 
       {/* footer: participants + total stake + copy */}
-      <div className="mt-3 text-[11px] md:text-xs text-secondary">
+      <div className="text-secondary mt-3 text-[11px] md:text-xs">
         {!isDesktop ? (
           /* Mobile Layout: Three items distributed evenly */
           <div className="flex items-center justify-between">
@@ -287,7 +293,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 className="flex items-center gap-1"
               >
                 <span>
-                  <EventCardParticipantsIcon className="w-3 h-3" />
+                  <EventCardParticipantsIcon className="h-3 w-3" />
                 </span>
                 <span>{event.participants_count}</span>
               </div>
@@ -306,10 +312,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
             <button
               type="button"
               onClick={handleCopyUrl}
-              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary"
+              className="hover:bg-surface-hover text-secondary flex items-center justify-center rounded p-1 transition-colors"
               aria-label="Copy event URL"
             >
-              <CopyIcon className="w-4 h-4 text-current" />
+              <CopyIcon className="h-4 w-4 text-current" />
             </button>
           </div>
         ) : (
@@ -334,7 +340,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
                   className="flex items-center gap-1"
                 >
                   <span>
-                    <EventCardParticipantsIcon className="w-3 h-3" />
+                    <EventCardParticipantsIcon className="h-3 w-3" />
                   </span>
                   <span>
                     {event.participants_count}
@@ -369,10 +375,10 @@ export function EventCard({ event, onClick }: EventCardProps) {
             <button
               type="button"
               onClick={handleCopyUrl}
-              className="cursor-pointer flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary shrink-0"
+              className="hover:bg-surface-hover text-secondary flex shrink-0 cursor-pointer items-center justify-center rounded p-1 transition-colors"
               aria-label="Copy event URL"
             >
-              <CopyIcon className="w-4 h-4 text-current" />
+              <CopyIcon className="h-4 w-4 text-current" />
             </button>
           </div>
         )}
