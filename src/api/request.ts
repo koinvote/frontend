@@ -80,3 +80,9 @@ export interface ContactUsReq {
   subject: string;
   message?: string;
 }
+
+export interface CreateWithdrawalReq {
+  admin_address: string;
+  hash_key: string;
+  signature: string;
+}

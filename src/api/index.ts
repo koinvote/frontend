@@ -5,6 +5,7 @@ import type {
   AdminLoginReq,
   ContactUsReq,
   CreateEventReq,
+  CreateWithdrawalReq,
   GenerateReplyPlaintextReq,
   GetEventListReq,
   GetListRepliesReq,
@@ -26,6 +27,8 @@ import type {
   GetListRepliesRes,
   GetReceiptVerifyPubKeysRes,
   GetReplyPlainTextRes,
+  CreateWithdrawalRes,
+  WithdrawalInfoRes,
   GetSignaturePlainTextRes,
   PayoutReportRes,
   SystemConfigRes,
@@ -195,4 +198,11 @@ export const AdminAPI = {
     ApiResponse<void>,
     UpdateSystemParametersReq
   >("/admin/system-parameters"),
+  getWithdrawalInfo: adminGet<ApiResponse<WithdrawalInfoRes>, void>(
+    "/admin/withdrawals/info",
+  ),
+  createWithdrawal: adminPost<
+    ApiResponse<CreateWithdrawalRes>,
+    CreateWithdrawalReq
+  >("/admin/withdrawals"),
 };

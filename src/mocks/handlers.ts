@@ -651,6 +651,67 @@ export const handlers = [
     });
   }),
 
+  // Admin API - POST /admin/withdrawals
+  http.post(`${API_BASE_URL}/admin/withdrawals`, async ({ request }) => {
+    const body = (await request.json()) as {
+      admin_address: string;
+      hash_key: string;
+      signature: string;
+    };
+
+    // Simulate signature validation failure if signature is "invalid"
+    if (body.signature === "invalid") {
+      return HttpResponse.json<ApiResponse<null>>(
+        {
+          code: "400000",
+          success: false,
+          message: "Invalid signature",
+          data: null,
+        },
+        { status: 400 },
+      );
+    }
+
+    return HttpResponse.json<ApiResponse<any>>({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        id: 12,
+        to_address: "bc1qexamplewithdrawaddress123456789",
+        amount_satoshi: 50000,
+        fee_satoshi: 250,
+        txid: "abc123def456789012345678901234567890abcdef1234567890abcdef123456",
+        status: "completed",
+      },
+    });
+  }),
+
+  // Admin API - GET /admin/withdrawals/info
+  http.get(`${API_BASE_URL}/admin/withdrawals/info`, () => {
+    return HttpResponse.json<
+      ApiResponse<{
+        platform_amount_satoshi: number;
+        withdrawable_amount_satoshi: number;
+        withdraw_address: string;
+        fee_satoshi: number;
+        hash_key: string;
+      }>
+    >({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        platform_amount_satoshi: 250000,
+        withdrawable_amount_satoshi: 50000,
+        withdraw_address: "bc1qexamplewithdrawaddress123456789",
+        fee_satoshi: 250,
+        hash_key:
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      },
+    });
+  }),
+
   http.get(`${API_BASE_URL}/receipt/pub-keys`, () => {
     return HttpResponse.json<
       ApiResponse<typeof mockGetReceiptVerifyPubKeysRes>
