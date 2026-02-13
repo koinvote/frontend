@@ -1,14 +1,22 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
 
 import { type EventOption } from "@/api/response";
 import { satsToBtc } from "@/utils/formatter";
 
 export interface SingleChoiceOptionsProps {
   options: EventOption[] | string[];
+  eventId: string;
   t: (key: string, defaultValue: string) => string;
 }
 
-export function SingleChoiceOptions({ options, t }: SingleChoiceOptionsProps) {
+export function SingleChoiceOptions({
+  options,
+  eventId,
+  t,
+}: SingleChoiceOptionsProps) {
+  const navigate = useNavigate();
+
   const sortedOptions = useMemo(() => {
     const allObjects =
       Array.isArray(options) &&
@@ -27,9 +35,13 @@ export function SingleChoiceOptions({ options, t }: SingleChoiceOptionsProps) {
   const displayOptions = isExpanded ? sortedOptions : sortedOptions.slice(0, 2);
   const hasMore = sortedOptions.length > 2;
 
-  const handleToggle = (e: React.MouseEvent) => {
+  const handleOptionsClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (hasMore) setIsExpanded((prev) => !prev);
+    if (hasMore) {
+      setIsExpanded((prev) => !prev);
+    } else {
+      navigate(`/event/${eventId}`);
+    }
   };
 
   return (
@@ -40,7 +52,7 @@ export function SingleChoiceOptions({ options, t }: SingleChoiceOptionsProps) {
           ? "cursor-pointer md:hover:bg-gray-200 dark:md:hover:bg-[rgba(var(--color-gray-450-rgb),0.8)]"
           : ""
       }`}
-      onClick={handleToggle}
+      onClick={handleOptionsClick}
     >
       <div className="text-secondary mb-1 flex items-center justify-between text-[11px] md:text-xs">
         <span>

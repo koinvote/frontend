@@ -1,6 +1,7 @@
 import { Tooltip } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -24,6 +25,7 @@ interface EventCardProps {
 export function EventCard({ event, onClick }: EventCardProps) {
   const { showToast } = useToast();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [countdown, setCountdown] = useState(() => formatCountdown(event, t));
 
   useEffect(() => {
@@ -238,13 +240,17 @@ export function EventCard({ event, onClick }: EventCardProps) {
       {event.event_type === "single_choice" &&
       event.options &&
       event.options.length > 0 ? (
-        <SingleChoiceOptions options={event.options} t={t} />
+        <SingleChoiceOptions
+          options={event.options}
+          eventId={event.event_id}
+          t={t}
+        />
       ) : (
         (primaryReply || secondaryReply) && (
           <section
             data-top-replies
             className="border-border mt-3 rounded-xl border bg-[rgba(var(--color-gray-450-rgb),0.5)] px-3 py-2 text-xs md:text-sm"
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => navigate(`/event/${event.event_id}`)}
           >
             <div className="text-secondary mb-1 text-[11px] md:text-xs">
               {t("eventCard.topReply", "Top reply")}
