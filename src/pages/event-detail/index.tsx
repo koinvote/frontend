@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
-import { mapApiTopReply } from "@/utils/eventTransform";
 import type {
   EventDetailDataRes,
   GetCompletedTopRepliesRes,
@@ -11,6 +10,7 @@ import { EventStatus, ReplySortBy } from "@/api/types";
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
+import { mapApiTopReply } from "@/utils/eventTransform";
 import { useQuery } from "@tanstack/react-query";
 import { Divider } from "./components/Divider";
 import { EventInfo } from "./components/EventInfo";
@@ -82,10 +82,7 @@ const EventDetail = () => {
       return response.data;
     },
     enabled:
-      !!eventId &&
-      !!eventDetail &&
-      (eventDetail.status === EventStatus.COMPLETED ||
-        eventDetail.status === EventStatus.ENDED),
+      !!eventId && !!eventDetail && eventDetail.status !== EventStatus.PREHEAT,
   });
 
   // Merge data from top replies API with event detail
@@ -173,6 +170,12 @@ const EventDetail = () => {
     hasRestoredScroll.current = false;
   }, [eventId]);
 
+  useEffect(() => {
+    if (eventDetail?.status === EventStatus.ACTIVE) {
+      setBalanceDisplayMode("on_chain");
+    }
+  }, [eventDetail?.status]);
+
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);
   };
@@ -191,10 +194,10 @@ const EventDetail = () => {
 
   if (eventError || !eventDetail) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex min-h-[400px] items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-secondary mb-2">Failed to load event</p>
-          <p className="text-sm text-secondary">
+          <p className="text-secondary mb-2 text-lg">Failed to load event</p>
+          <p className="text-secondary text-sm">
             {eventError instanceof Error ? eventError.message : "Unknown error"}
           </p>
         </div>
@@ -203,17 +206,17 @@ const EventDetail = () => {
   }
 
   return (
-    <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
-      <div className="h-[50px] w-full relative">
+    <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
+      <div className="relative h-[50px] w-full">
         <button
           type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
           onClick={goBack}
         >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
+          <CircleLeftIcon className="h-8 w-8 fill-current" />
         </button>
       </div>
-      <div className="w-full max-w-3xl rounded-3xl border border-gray-450 bg-bg px-6 py-6 md:px-8 md:py-8">
+      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}
         <EventInfo event={eventDetail} topReplies={displayTopReplies} />
         {/* Divider */}
