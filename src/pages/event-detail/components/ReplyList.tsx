@@ -9,7 +9,7 @@ import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -94,6 +94,7 @@ export function ReplyList({
       return response.data;
     },
     enabled: !!eventId,
+    placeholderData: keepPreviousData,
   });
 
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {
