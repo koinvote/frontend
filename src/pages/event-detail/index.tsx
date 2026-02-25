@@ -82,7 +82,12 @@ const EventDetail = () => {
       return response.data;
     },
     enabled:
-      !!eventId && !!eventDetail && eventDetail.status !== EventStatus.PREHEAT,
+      !!eventId &&
+      !!eventDetail &&
+      eventDetail.status !== EventStatus.PREHEAT &&
+      // For active events, wait until balanceDisplayMode is set to "on_chain" to avoid double fetch
+      (eventDetail.status !== EventStatus.ACTIVE ||
+        balanceDisplayMode === "on_chain"),
   });
 
   // Merge data from top replies API with event detail
