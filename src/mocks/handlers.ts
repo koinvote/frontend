@@ -357,6 +357,7 @@ export const handlers = [
     const limit = parseInt(url.searchParams.get("limit") || "20");
     const search = url.searchParams.get("search") || "";
     const sortBy = url.searchParams.get("sortBy") || "balance";
+    const balanceType = url.searchParams.get("balance_type") || "snapshot";
 
     // Return empty if no event_id
     if (!eventId) {
@@ -384,9 +385,15 @@ export const handlers = [
 
     // Sort by balance or time
     if (sortBy === "balance") {
-      replies.sort(
-        (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
-      );
+      if (balanceType === "current") {
+        replies.sort(
+          (a, b) => b.balance_at_current_satoshi - a.balance_at_current_satoshi,
+        );
+      } else {
+        replies.sort(
+          (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
+        );
+      }
     } else if (sortBy === "time") {
       replies.sort(
         (a, b) =>

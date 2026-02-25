@@ -31,6 +31,7 @@ export interface GetListRepliesReq {
   order?: "desc" | "asc"; // default: desc
   page?: number; // default: 1
   limit?: number; // default: 20, max: 100
+  balance_type?: "snapshot" | "current";
 }
 
 // Admin API Request Types

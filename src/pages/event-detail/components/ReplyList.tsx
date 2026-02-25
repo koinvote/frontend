@@ -75,8 +75,10 @@ export function ReplyList({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["replies", eventId, page, limit, search, sortBy, order],
+    queryKey: ["replies", eventId, page, limit, search, sortBy, order, balanceDisplayMode],
     queryFn: async () => {
+      const balanceType =
+        balanceDisplayMode === "on_chain" ? "current" : "snapshot";
       const response = (await API.getListReplies()({
         event_id: eventId,
         search: search || undefined,
@@ -84,6 +86,7 @@ export function ReplyList({
         order,
         page,
         limit,
+        balance_type: balanceType,
       })) as unknown as ApiResponse<GetListRepliesRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch replies");
