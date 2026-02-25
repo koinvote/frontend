@@ -1,5 +1,5 @@
 import { useToast } from "@/components/base/Toast/useToast";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 // import { Button } from "@/components/base/Button";
@@ -313,7 +313,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         key: "reward-amount",
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
-          <span className="text-xs md:text-sm font-semibold text-primary">
+          <span className="text-primary text-xs font-semibold md:text-sm">
             {rewardAmountBtc} BTC ({event.winner_count}{" "}
             {event.winner_count === 1
               ? t("eventInfo.address", "Address")
@@ -329,7 +329,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         key: "additional-reward",
         label: t("eventInfo.additionalReward", "Additional Reward:"),
         value: (
-          <span className="text-xs md:text-sm text-primary">
+          <span className="text-primary text-xs md:text-sm">
             {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
             {event.additional_winner_count === 1
               ? t("eventInfo.address", "Address")
@@ -344,11 +344,11 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
       key: "time-remaining",
       label: t("eventInfo.timeRemaining", "Time Remaining:"),
       value: isCompleted ? (
-        <div className="text-xs md:text-sm font-semibold text-black dark:text-white mt-1">
+        <div className="mt-1 text-xs font-semibold text-black md:text-sm dark:text-white">
           {timeRemaining}
         </div>
       ) : (
-        <span className="text-xs md:text-sm font-semibold text-accent">
+        <span className="text-accent text-xs font-semibold md:text-sm">
           {timeRemaining}
         </span>
       ),
@@ -360,7 +360,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         key: "duration",
         label: t("eventInfo.durationOfEvent", "Duration of This Event:"),
         value: (
-          <span className="text-xs md:text-sm text-primary">
+          <span className="text-primary text-xs md:text-sm">
             {eventDurationDisplay}
           </span>
         ),
@@ -372,7 +372,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         key: "preheat-duration",
         label: t("eventInfo.preheatDuration", "Preheat Duration:"),
         value: (
-          <span className="text-xs md:text-sm text-primary">
+          <span className="text-primary text-xs md:text-sm">
             {preheatDurationDisplay}
           </span>
         ),
@@ -383,7 +383,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
       key: "event-id",
       label: t("eventInfo.eventId", "Event-ID:"),
       value: (
-        <span className="text-xs md:text-sm text-primary">
+        <span className="text-primary text-xs md:text-sm">
           {event.event_id}
         </span>
       ),
@@ -395,13 +395,11 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         key: "creator-address",
         label: t("eventInfo.creatorAddress", "Creator address:"),
         value: (
-          <div className="flex items-center gap-2 mt-1">
+          <div className="mt-1 flex items-center gap-2">
             <button
               type="button"
               onClick={handleAddressClick}
-              className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed 
-              border-black dark:border-white hover:border-gray-500 dark:hover:border-gray-400 
-              transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
+              className="cursor-pointer border-b border-dashed border-black font-mono text-xs text-black transition-colors hover:border-gray-500 hover:text-gray-500 md:text-sm dark:border-white dark:text-white dark:hover:border-gray-400 dark:hover:text-gray-400"
               aria-label={t(
                 "eventInfo.searchByCreatorAddress",
                 "Search events by creator address",
@@ -417,13 +415,13 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
             <button
               type="button"
               onClick={handleCopyCreatorAddress}
-              className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary cursor-pointer!"
+              className="hover:bg-surface-hover text-secondary hover:text-primary flex cursor-pointer! items-center justify-center rounded p-1 transition-colors"
               aria-label={t(
                 "eventInfo.copyCreatorAddress",
                 "Copy creator address",
               )}
             >
-              <CopyIcon className="w-4 h-4 text-current" />
+              <CopyIcon className="h-4 w-4 text-current" />
             </button>
           </div>
         ),
@@ -450,7 +448,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
             ? t("eventInfo.hashtags", "Hashtags:")
             : t("eventInfo.hashtag", "Hashtag:"),
         value: (
-          <div className="flex flex-wrap gap-2 mt-1">
+          <div className="mt-1 flex flex-wrap gap-2">
             {event.hashtags.map((tag, index) => {
               const hashtagWithPrefix = tag.startsWith("#") ? tag : `#${tag}`;
               return (
@@ -458,7 +456,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
                   key={index}
                   type="button"
                   onClick={() => handleHashtagClick(tag)}
-                  className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
+                  className="inline-flex cursor-pointer items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-black transition-colors hover:bg-gray-300 md:text-sm dark:bg-white dark:hover:bg-gray-100"
                   aria-label={t(
                     "eventInfo.filterByHashtag",
                     "Filter by {{hashtag}}",
@@ -499,37 +497,95 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
     t,
   ]);
 
+  // Description expand/collapse
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [showDescriptionToggle, setShowDescriptionToggle] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    const checkDescriptionOverflow = () => {
+      if (!descriptionRef.current) return;
+
+      const computedStyle = window.getComputedStyle(descriptionRef.current);
+      const lineHeight =
+        parseFloat(computedStyle.lineHeight) ||
+        parseFloat(computedStyle.fontSize) * 1.5;
+
+      const clone = descriptionRef.current.cloneNode(true) as HTMLElement;
+      clone.className = descriptionRef.current.className.replace(
+        "line-clamp-2",
+        "",
+      );
+      clone.style.position = "absolute";
+      clone.style.visibility = "hidden";
+      clone.style.width = `${descriptionRef.current.offsetWidth}px`;
+      clone.style.whiteSpace = "pre-line";
+      clone.style.wordBreak = "break-word";
+      clone.style.overflow = "visible";
+      clone.style.height = "auto";
+      clone.style.maxHeight = "none";
+
+      document.body.appendChild(clone);
+      const fullHeight = clone.scrollHeight;
+      document.body.removeChild(clone);
+
+      const clampedHeight = descriptionRef.current.clientHeight;
+      const expectedHeight = lineHeight * 2;
+      const TOLERANCE = 2;
+
+      const isOverflowing =
+        fullHeight > expectedHeight + TOLERANCE ||
+        fullHeight > clampedHeight + TOLERANCE;
+
+      setShowDescriptionToggle(isOverflowing || isDescriptionExpanded);
+    };
+
+    const timer = setTimeout(checkDescriptionOverflow, 0);
+    window.addEventListener("resize", checkDescriptionOverflow);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", checkDescriptionOverflow);
+    };
+  }, [event.description, isDescriptionExpanded]);
+
   return (
     <div className="flex flex-col gap-6">
       {/* Title and Copy Link */}
       <div className="flex items-start justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-semibold text-primary flex-1 wrap-break-word min-w-0">
+        <h1 className="text-primary min-w-0 flex-1 text-2xl font-semibold wrap-break-word md:text-3xl">
           {event.title}
         </h1>
-        {/* <Button
-          type="button"
-          appearance="outline"
-          tone="primary"
-          text="sm"
-          className="shrink-0"
-          onClick={handleCopyLink}
-        >
-          <CopyIcon className="w-4 h-4 mr-2" />
-          Copy Link
-        </Button> */}
       </div>
 
       {/* Description */}
       {event.description && (
-        <p className="text-sm md:text-base text-secondary leading-relaxed whitespace-pre-line wrap-break-word min-w-0">
-          {event.description}
-        </p>
+        <div>
+          <p
+            ref={descriptionRef}
+            className={`text-secondary min-w-0 text-sm leading-relaxed wrap-break-word whitespace-pre-line md:text-base ${
+              isDescriptionExpanded ? "" : "line-clamp-2"
+            }`}
+          >
+            {event.description}
+          </p>
+          {showDescriptionToggle && (
+            <button
+              type="button"
+              className="mt-1 cursor-pointer text-xs md:text-sm"
+              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+            >
+              {isDescriptionExpanded
+                ? t("eventCard.showLess", "Show less")
+                : t("eventCard.showMore", "Show more")}
+            </button>
+          )}
+        </div>
       )}
 
       {/* Top Reply / Options */}
       {displayData.length > 0 && displayTitle && (
         <div>
-          <h2 className="text-sm md:text-base font-semibold text-primary mb-3">
+          <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
             {displayTitle}
           </h2>
           <div className="space-y-2">
@@ -541,16 +597,16 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
       )}
 
       {/* Desktop: Two Column Layout */}
-      <div className="hidden md:grid grid-cols-2 gap-4 md:gap-6">
+      <div className="hidden grid-cols-2 gap-4 md:grid md:gap-6">
         {/* Left Column */}
         <div className="flex flex-col gap-3">
           {/* Only show rewards in ongoing or completed state */}
           {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
             <div>
-              <span className="text-xs md:text-sm text-secondary">
+              <span className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.rewardAmount", "Reward Amount:")}
               </span>
-              <span className="text-xs md:text-sm font-semibold text-primary ml-2">
+              <span className="text-primary ml-2 text-xs font-semibold md:text-sm">
                 {rewardAmountBtc} BTC ({event.winner_count}{" "}
                 {event.winner_count === 1
                   ? t("eventInfo.address", "Address")
@@ -562,10 +618,10 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
 
           {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
             <div>
-              <span className="text-xs md:text-sm text-secondary">
+              <span className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.additionalReward", "Additional Reward:")}
               </span>
-              <span className="text-xs md:text-sm text-primary ml-2">
+              <span className="text-primary ml-2 text-xs md:text-sm">
                 {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
                 {event.additional_winner_count === 1
                   ? t("eventInfo.address", "Address")
@@ -576,15 +632,15 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
           )}
 
           <div>
-            <span className="text-xs md:text-sm text-secondary">
+            <span className="text-secondary text-xs md:text-sm">
               {t("eventInfo.timeRemaining", "Time Remaining:")}
             </span>
             {isCompleted ? (
-              <div className="text-xs md:text-sm text-black dark:text-white mt-1">
+              <div className="mt-1 text-xs text-black md:text-sm dark:text-white">
                 {timeRemaining}
               </div>
             ) : (
-              <span className="text-xs md:text-sm font-semibold text-accent ml-2">
+              <span className="text-accent ml-2 text-xs font-semibold md:text-sm">
                 {timeRemaining}
               </span>
             )}
@@ -593,15 +649,14 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
           {/* Show creator address in all states */}
           {(isPreheat || isOngoing || isCompleted) && event.creator_address && (
             <div className="flex items-center gap-2">
-              <span className="text-xs md:text-sm text-secondary">
+              <span className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.creatorAddress", "Creator address:")}
               </span>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="mt-1 flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleAddressClick}
-                  className="text-xs md:text-sm text-black dark:text-white font-mono border-b border-dashed border-black
-                  dark:border-white hover:border-gray-500 dark:hover:border-gray-400 transition-colors cursor-pointer hover:text-gray-500 dark:hover:text-gray-400"
+                  className="cursor-pointer border-b border-dashed border-black font-mono text-xs text-black transition-colors hover:border-gray-500 hover:text-gray-500 md:text-sm dark:border-white dark:text-white dark:hover:border-gray-400 dark:hover:text-gray-400"
                   aria-label={t(
                     "eventInfo.searchByCreatorAddress",
                     "Search events by creator address",
@@ -617,23 +672,23 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
                 <button
                   type="button"
                   onClick={handleCopyCreatorAddress}
-                  className="flex items-center justify-center p-1 hover:bg-surface-hover rounded transition-colors text-secondary hover:text-primary cursor-pointer!"
+                  className="hover:bg-surface-hover text-secondary hover:text-primary flex cursor-pointer! items-center justify-center rounded p-1 transition-colors"
                   aria-label={t(
                     "eventInfo.copyCreatorAddress",
                     "Copy creator address",
                   )}
                 >
-                  <CopyIcon className="w-4 h-4 text-current" />
+                  <CopyIcon className="h-4 w-4 text-current" />
                 </button>
               </div>
             </div>
           )}
 
           <div>
-            <span className="text-xs md:text-sm text-secondary">
+            <span className="text-secondary text-xs md:text-sm">
               {t("eventInfo.eventType", "Event Type:")}
             </span>
-            <span className="text-xs md:text-sm text-black dark:text-white ml-2">
+            <span className="ml-2 text-xs text-black md:text-sm dark:text-white">
               {event.event_type === "open"
                 ? t("reply.openEnded", "Open-ended")
                 : t("reply.singleChoice", "Multiple choice")}
@@ -646,10 +701,10 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
           {/* Only show event duration in ongoing or completed state */}
           {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
             <div>
-              <span className="text-xs md:text-sm text-secondary">
+              <span className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.durationOfEvent", "Duration of This Event:")}
               </span>
-              <span className="text-xs md:text-sm text-primary ml-2">
+              <span className="text-primary ml-2 text-xs md:text-sm">
                 {eventDurationDisplay}
               </span>
             </div>
@@ -658,32 +713,32 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
           {/* Show preheat duration in all states if it exists */}
           {preheatDurationDisplay && (
             <div>
-              <span className="text-xs md:text-sm text-secondary">
+              <span className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.preheatDuration", "Preheat Duration:")}
               </span>
-              <span className="text-xs md:text-sm text-primary ml-2">
+              <span className="text-primary ml-2 text-xs md:text-sm">
                 {preheatDurationDisplay}
               </span>
             </div>
           )}
 
           <div>
-            <span className="text-xs md:text-sm text-secondary">
+            <span className="text-secondary text-xs md:text-sm">
               {t("eventInfo.eventId", "Event-ID:")}
             </span>
-            <span className="text-xs md:text-sm text-primary ml-2">
+            <span className="text-primary ml-2 text-xs md:text-sm">
               {event.event_id}
             </span>
           </div>
 
           {event.hashtags && event.hashtags.length > 0 && (
             <div>
-              <span className="text-xs md:text-sm text-secondary">
+              <span className="text-secondary text-xs md:text-sm">
                 {event.hashtags.length > 1
                   ? t("eventInfo.hashtags", "Hashtags:")
                   : t("eventInfo.hashtag", "Hashtag:")}
               </span>
-              <div className="flex flex-wrap gap-2 mt-1">
+              <div className="mt-1 flex flex-wrap gap-2">
                 {event.hashtags.map((tag, index) => {
                   const hashtagWithPrefix = tag.startsWith("#")
                     ? tag
@@ -693,7 +748,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
                       key={index}
                       type="button"
                       onClick={() => handleHashtagClick(tag)}
-                      className="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 dark:bg-white text-black text-xs md:text-sm hover:bg-gray-300 dark:hover:bg-gray-100 transition-colors cursor-pointer"
+                      className="inline-flex cursor-pointer items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-black transition-colors hover:bg-gray-300 md:text-sm dark:bg-white dark:hover:bg-gray-100"
                       aria-label={t(
                         "eventInfo.filterByHashtag",
                         "Filter by {{hashtag}}",
@@ -711,10 +766,10 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
       </div>
 
       {/* Mobile: Ordered List */}
-      <div className="md:hidden flex flex-col gap-3">
+      <div className="flex flex-col gap-3 md:hidden">
         {mobileFields.map((field) => (
           <div key={field.key}>
-            <span className="text-xs text-secondary">{field.label}</span>
+            <span className="text-secondary text-xs">{field.label}</span>
             <div className="mt-1">{field.value}</div>
           </div>
         ))}
