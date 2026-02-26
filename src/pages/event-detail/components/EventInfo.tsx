@@ -44,6 +44,20 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
     }
   });
 
+  const isPreheat = event.status === EventStatus.PREHEAT;
+  const isOngoing = event.status === EventStatus.ACTIVE;
+  const isCompleted =
+    event.status === EventStatus.ENDED ||
+    event.status === EventStatus.COMPLETED;
+  const isRewarded = event.event_reward_type === "rewarded";
+
+  // Handle options click - navigate to reply page when event is active
+  const handleOptionsClick = useCallback(() => {
+    if (isOngoing) {
+      navigate(`/event/${event.event_id}/reply`);
+    }
+  }, [isOngoing, event.event_id, navigate]);
+
   // Handle address click - navigate to home with search
   const handleAddressClick = useCallback(() => {
     if (event.creator_address) {
@@ -73,13 +87,6 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
   //     showToast("error", "Failed to copy link");
   //   }
   // });
-
-  const isPreheat = event.status === EventStatus.PREHEAT;
-  const isOngoing = event.status === EventStatus.ACTIVE;
-  const isCompleted =
-    event.status === EventStatus.ENDED ||
-    event.status === EventStatus.COMPLETED;
-  const isRewarded = event.event_reward_type === "rewarded";
 
   // Handle hashtag click - navigate to home with hashtag filter and keep current status tab
   const handleHashtagClick = useCallback(
@@ -584,7 +591,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
 
       {/* Top Reply / Options */}
       {displayData.length > 0 && displayTitle && (
-        <div>
+        <div onClick={handleOptionsClick} className={isOngoing ? "cursor-pointer" : ""}>
           <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
             {displayTitle}
           </h2>
