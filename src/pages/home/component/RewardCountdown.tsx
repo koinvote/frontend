@@ -16,13 +16,14 @@ export function RewardCountdown({
   return (
     <div
       {...triggerProps}
-      className="flex flex-row md:flex-col items-center md:items-end
-          gap-4 md:gap-1 text-xs md:text-sm text-secondary"
+      className="text-secondary flex flex-row items-center gap-4 text-xs md:flex-col md:items-end md:gap-1 md:text-sm"
     >
-      <span className="font-semibold text-accent flex items-center gap-1 ">
-        <BTCIcon />
-        {totalRewardBtc} BTC
-      </span>
+      {Number(totalRewardBtc) > 0 && (
+        <span className="text-accent flex items-center gap-1 font-semibold">
+          <BTCIcon />
+          {totalRewardBtc} BTC
+        </span>
+      )}
       <span className="tabular-nums">{countdown}</span>
     </div>
   );

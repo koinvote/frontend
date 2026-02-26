@@ -10,7 +10,7 @@ const items: Item[] = [
   { to: "/admin/reward-rules", label: "獎金與派獎規則" },
   { to: "/admin/fees", label: "手續費相關" },
   { to: "/admin/refunds", label: "退款相關" },
-  // { to: "/admin/system-setting", label: "系統設定" },
+  { to: "/admin/withdrawal", label: "提款相關" },
   // { to: '/admin/announcements', label: '公告管理' },
   // { to: '/admin/subscribers',  label: '訂閱者 email 匯出' },
 ];

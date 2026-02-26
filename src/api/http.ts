@@ -44,7 +44,7 @@ http.interceptors.response.use(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (error as any).apiMessage = getApiErrorMessage(error);
     return Promise.reject(error);
-  }
+  },
 );
 export default http;
 
@@ -95,8 +95,11 @@ adminHttp.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
+
+// Track whether a 401 redirect is already in progress to avoid duplicate toasts
+let isRedirectingToLogin = false;
 
 // Response interceptor: Handle token expiration and errors
 adminHttp.interceptors.response.use(
@@ -116,23 +119,25 @@ adminHttp.interceptors.response.use(
       message.toLowerCase().includes("invalid token") ||
       message.toLowerCase().includes("token invalid")
     ) {
-      // Mark error as handled to prevent duplicate toasts
+      // 防止 401 時再跳「取得XX失敗」等業務 toast
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (error as any).isHandled = true;
 
-      // Show toast, clear token and redirect to login
-      toast("error", "連線已過期，請重新登入");
-      removeAdminToken();
-      if (typeof window !== "undefined") {
-        // Delay redirect to allow toast to show
-        setTimeout(() => {
-          window.location.href = "/admin/login";
-        }, 1500);
+      // 防止「連線已過期」重複出現
+      if (!isRedirectingToLogin) {
+        isRedirectingToLogin = true;
+        toast("error", "連線已過期，請重新登入");
+        removeAdminToken();
+        if (typeof window !== "undefined") {
+          setTimeout(() => {
+            window.location.href = "/admin/login";
+          }, 1500);
+        }
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export { adminHttp };

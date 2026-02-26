@@ -94,7 +94,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       clone.style.position = "absolute";
       clone.style.visibility = "hidden";
       clone.style.width = `${descriptionRef.current.offsetWidth}px`;
-      clone.style.whiteSpace = "normal";
+      clone.style.whiteSpace = "pre-line";
       clone.style.wordBreak = "break-word";
       clone.style.overflow = "visible";
       clone.style.height = "auto";

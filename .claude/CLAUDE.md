@@ -12,6 +12,9 @@ KoinVote is a React + TypeScript voting/event platform built with Vite. The appl
 # Development server with hot reload
 npm run dev
 
+# Development server with mock API (MSW)
+npm run dev:mock
+
 # Build for development environment
 npm run build:dev
 
@@ -46,13 +49,14 @@ src/
 │   ├── request.ts    # Request type definitions
 │   └── response.ts   # Response type definitions
 ├── admin/            # Admin dashboard
-│   ├── pages/        # Admin pages (fees, refunds, system settings, etc.)
+│   ├── pages/        # Admin pages (rewardRules, fee, refund, withdrawal, etc.)
 │   └── component/    # Admin-specific reusable components
 ├── components/       # Shared UI components
 │   └── base/         # Base components like Toast
 ├── hooks/            # Custom React hooks
 ├── layout/           # Layout components (Layout, AdminLayout)
 ├── locals/           # i18n translation files (en.json, zh.json)
+├── mocks/            # MSW mock API handlers and data (dev only)
 ├── pages/            # Public-facing pages
 ├── stores/           # Zustand stores
 ├── types/            # TypeScript type definitions
@@ -115,13 +119,15 @@ src/
 
 ### Environment Configuration
 
-Two environment files:
+Three environment files:
 - `.env.development`: Development config (`VITE_COMING_SOON=false`)
 - `.env.production`: Production config (`VITE_COMING_SOON=true`)
+- `.env.mock`: Mock mode config (`VITE_USE_MOCK=true`, used by `npm run dev:mock`)
 
 Environment variables:
 - `VITE_COMING_SOON`: Toggle coming soon mode (shows ComingSoon page for all public routes)
 - `VITE_API_BASE_URL`: API base URL (set to `/api/v1`, proxied in dev via vite.config.ts)
+- `VITE_USE_MOCK`: Enable MSW mock API (`true`/`false`, see `MOCK_GUIDE.md` for details)
 
 Dev proxy in `vite.config.ts` forwards `/api/v1` to `http://35.229.204.234:8080`
 
@@ -141,3 +147,5 @@ These pages likely pass data via route state or query params.
 - TypeScript strict mode enabled
 - Prefer functional components with hooks
 - Use `class-variance-authority` (cva) and `tailwind-merge` (twMerge) for dynamic styling
+- Split components into separate files whenever possible — avoid large single-file pages with many inline components
+- Admin (backend) and public (frontend) pages should use consistent, similar styling patterns

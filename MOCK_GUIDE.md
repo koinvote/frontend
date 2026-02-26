@@ -61,18 +61,25 @@ npm run dev
 - ✅ `GET /events/:eventId/signature-plaintext` - 取得簽名明文
 - ✅ `POST /events/:eventId/verify-signature` - 驗證簽名
 - ✅ `GET /events/:eventId/deposit-status` - 取得存款狀態
-- ✅ `GET /events/:eventId/replies` - 取得回覆列表（支援搜尋、排序、分頁）
+- ✅ `GET /events/:eventId/deposit-extend` - 延長存款逾時
+- ✅ `GET /replies` - 取得回覆列表（支援搜尋、排序、分頁）
 - ✅ `POST /replies/generate-plaintext` - 取得回覆明文
 - ✅ `POST /replies` - 送出回覆
+- ✅ `GET /replies/:id/receipt` - 下載回覆收據
 - ✅ `GET /hot-hashtags` - 取得熱門標籤
 - ✅ `GET /events/:eventId/payout-report` - 取得派獎報告
-- ✅ `GET /events/:eventId/verification-csv` - 下載驗證 CSV 檔案
+- ✅ `POST /subscribe` - 訂閱電子報
+- ✅ `POST /contact-us` - 聯絡我們
+- ✅ `GET /receipt/pub-keys` - 取得收據驗證公鑰
 
 ### 管理員 API
 
 - ✅ `POST /admin/login` - 管理員登入
 - ✅ `GET /admin/system-parameters` - 取得系統參數
 - ✅ `PUT /admin/system-parameters` - 更新系統參數
+- ✅ `GET /admin/withdrawals/info` - 取得提款資訊
+- ✅ `POST /admin/withdrawals` - 建立提款
+- ✅ `GET /admin/withdrawals` - 取得提款紀錄（支援分頁）
 
 ## 自訂 Mock 資料
 

@@ -8,9 +8,9 @@ interface AdminFormSectionProps {
 
 export function AdminFormSection({ title, children }: AdminFormSectionProps) {
   return (
-    <section className="space-y-2 p-4 rounded bg-white">
-      <h2 className="fw-l tx-16">{title}</h2>
-      {children}
+    <section className="space-y-2 rounded bg-white">
+      <h2 className="fw-l tx-16 border-b border-neutral-200 p-4">{title}</h2>
+      <div className="px-4 pt-2 pb-6">{children}</div>
     </section>
   );
 }

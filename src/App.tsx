@@ -43,6 +43,16 @@ function App() {
     console.log(`Koinvote v${version}`);
   }, []);
 
+  // workaround: Twitter/X in-app browser 首次載入時 innerWidth 可能不準，
+  // 多次觸發 resize 讓 Layout 重新讀取正確的 viewport 寬度
+  useEffect(() => {
+    const delays = [100, 300, 1000];
+    const timers = delays.map((ms) =>
+      setTimeout(() => window.dispatchEvent(new Event("resize")), ms),
+    );
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
   return (
     <ConfigProvider key={theme} theme={getThemeConfig(theme === "dark")}>
       <ToastProvider>

@@ -9,7 +9,7 @@ import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -75,8 +75,10 @@ export function ReplyList({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["replies", eventId, page, limit, search, sortBy, order],
+    queryKey: ["replies", eventId, page, limit, search, sortBy, order, balanceDisplayMode],
     queryFn: async () => {
+      const balanceType =
+        balanceDisplayMode === "on_chain" ? "current" : "snapshot";
       const response = (await API.getListReplies()({
         event_id: eventId,
         search: search || undefined,
@@ -84,6 +86,7 @@ export function ReplyList({
         order,
         page,
         limit,
+        balance_type: balanceType,
       })) as unknown as ApiResponse<GetListRepliesRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch replies");
@@ -91,6 +94,7 @@ export function ReplyList({
       return response.data;
     },
     enabled: !!eventId,
+    placeholderData: keepPreviousData,
   });
 
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {

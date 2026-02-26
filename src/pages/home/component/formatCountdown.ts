@@ -65,39 +65,38 @@ export function formatCountdown(event: EventSummary, t: TranslateFunction) {
 
   // COMPLETED
   if (event.status === EventStatus.COMPLETED) {
-    if (event.ended_at) {
-      // 確保將服務器返回的 UTC 時間正確解析為 UTC
-      const ended = dayjs.utc(event.ended_at);
-      const now = dayjs();
-      const diffDays = now.diff(ended, "day");
-
-      if (diffDays < 1) {
-        const hours = now.diff(ended, "hour");
-        return t("eventCard.hoursAgo", "{{hours}}h ago", { hours });
-      }
-      if (diffDays < 7) {
-        return t("eventCard.daysAgo", "{{days}}d ago", { days: diffDays });
-      }
-      const weeks = Math.floor(diffDays / 7);
-      return t("eventCard.weeksAgo", "{{weeks}}w ago", { weeks });
-    }
-    // If no ended_at, use deadline_at as fallback
-    // 確保將服務器返回的 UTC 時間正確解析為 UTC
-    const deadline = dayjs.utc(event.deadline_at);
+    const ref = event.ended_at
+      ? dayjs.utc(event.ended_at)
+      : dayjs.utc(event.deadline_at);
     const now = dayjs();
-    if (deadline.isBefore(now)) {
-      const diffDays = now.diff(deadline, "day");
-      if (diffDays < 1) {
-        const hours = now.diff(deadline, "hour");
-        return t("eventCard.hoursAgo", "{{hours}}h ago", { hours });
-      }
-      if (diffDays < 7) {
-        return t("eventCard.daysAgo", "{{days}}d ago", { days: diffDays });
-      }
-      const weeks = Math.floor(diffDays / 7);
-      return t("eventCard.weeksAgo", "{{weeks}}w ago", { weeks });
+
+    if (ref.isAfter(now)) {
+      return t("eventCard.ended", "Ended");
     }
-    return t("eventCard.ended", "Ended");
+
+    const diffSeconds = now.diff(ref, "second");
+    const diffMinutes = now.diff(ref, "minute");
+    const diffHours = now.diff(ref, "hour");
+    const diffDays = now.diff(ref, "day");
+
+    if (diffMinutes < 1) {
+      return t("eventCard.secondsAgo", "{{seconds}}s ago", {
+        seconds: diffSeconds,
+      });
+    }
+    if (diffHours < 1) {
+      return t("eventCard.minutesAgo", "{{minutes}}m ago", {
+        minutes: diffMinutes,
+      });
+    }
+    if (diffDays < 1) {
+      return t("eventCard.hoursAgo", "{{hours}}h ago", { hours: diffHours });
+    }
+    if (diffDays < 7) {
+      return t("eventCard.daysAgo", "{{days}}d ago", { days: diffDays });
+    }
+    const weeks = Math.floor(diffDays / 7);
+    return t("eventCard.weeksAgo", "{{weeks}}w ago", { weeks });
   }
 
   return t("eventCard.ended", "Ended");

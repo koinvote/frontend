@@ -31,6 +31,7 @@ export interface GetListRepliesReq {
   order?: "desc" | "asc"; // default: desc
   page?: number; // default: 1
   limit?: number; // default: 20, max: 100
+  balance_type?: "snapshot" | "current";
 }
 
 // Admin API Request Types
@@ -79,4 +80,18 @@ export interface ContactUsReq {
   email: string;
   subject: string;
   message?: string;
+}
+
+export interface CreateWithdrawalReq {
+  admin_address: string;
+  hash_key: string;
+  signature: string;
+}
+
+export interface GetWithdrawalRecordReq {
+  page?: string;
+  limit?: string;
+  to_address?: string;
+  start_time?: string;
+  end_time?: string;
 }

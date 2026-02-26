@@ -215,6 +215,48 @@ export interface AdminSystemParametersRes {
   required_confirmations: number; //所需確認數
 }
 
+// Withdrawal Info Types
+export interface WithdrawalInfoRes {
+  platform_amount_satoshi: number;
+  withdrawable_amount_satoshi: number;
+  withdraw_address: string;
+  fee_satoshi: number;
+  hash_key: string;
+}
+
+// Withdrawal Types
+export interface CreateWithdrawalRes {
+  id: number;
+  to_address: string;
+  amount_satoshi: number;
+  fee_satoshi: number;
+  txid: string;
+  status: string;
+}
+
+// Withdrawal Record Types
+export type WithdrawalRecordStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
+
+export interface WithdrawalRecord {
+  id: number;
+  from_address: string;
+  to_address: string;
+  txid: string;
+  amount: number;
+  fee: number;
+  ticket_id: string;
+  status: WithdrawalRecordStatus;
+  timestamp: string;
+}
+
+export interface GetWithdrawalRecordRes {
+  withdrawals: WithdrawalRecord[];
+}
+
 // Payout Report Types
 export type PayoutStatus =
   | "completed" // 已完成派獎

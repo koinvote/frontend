@@ -357,6 +357,7 @@ export const handlers = [
     const limit = parseInt(url.searchParams.get("limit") || "20");
     const search = url.searchParams.get("search") || "";
     const sortBy = url.searchParams.get("sortBy") || "balance";
+    const balanceType = url.searchParams.get("balance_type") || "snapshot";
 
     // Return empty if no event_id
     if (!eventId) {
@@ -384,9 +385,15 @@ export const handlers = [
 
     // Sort by balance or time
     if (sortBy === "balance") {
-      replies.sort(
-        (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
-      );
+      if (balanceType === "current") {
+        replies.sort(
+          (a, b) => b.balance_at_current_satoshi - a.balance_at_current_satoshi,
+        );
+      } else {
+        replies.sort(
+          (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
+        );
+      }
     } else if (sortBy === "time") {
       replies.sort(
         (a, b) =>
@@ -648,6 +655,116 @@ export const handlers = [
       success: true,
       message: null,
       data: undefined as unknown as void,
+    });
+  }),
+
+  // Admin API - POST /admin/withdrawals
+  http.post(`${API_BASE_URL}/admin/withdrawals`, async ({ request }) => {
+    const body = (await request.json()) as {
+      admin_address: string;
+      hash_key: string;
+      signature: string;
+    };
+
+    // Simulate signature validation failure if signature is "invalid"
+    if (body.signature === "invalid") {
+      return HttpResponse.json<ApiResponse<null>>(
+        {
+          code: "400000",
+          success: false,
+          message: "Invalid signature",
+          data: null,
+        },
+        { status: 400 },
+      );
+    }
+
+    return HttpResponse.json<ApiResponse<any>>({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        id: 12,
+        to_address: "bc1qexamplewithdrawaddress123456789",
+        amount_satoshi: 50000,
+        fee_satoshi: 250,
+        txid: "abc123def456789012345678901234567890abcdef1234567890abcdef123456",
+        status: "completed",
+      },
+    });
+  }),
+
+  // Admin API - GET /admin/withdrawals/info
+  http.get(`${API_BASE_URL}/admin/withdrawals/info`, () => {
+    return HttpResponse.json<
+      ApiResponse<{
+        platform_amount_satoshi: number;
+        withdrawable_amount_satoshi: number;
+        withdraw_address: string;
+        fee_satoshi: number;
+        hash_key: string;
+      }>
+    >({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        platform_amount_satoshi: 250000,
+        withdrawable_amount_satoshi: 50000,
+        withdraw_address: "bc1qexamplewithdrawaddress123456789",
+        fee_satoshi: 250,
+        hash_key:
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      },
+    });
+  }),
+
+  // Admin API - GET /admin/withdrawals (withdrawal records)
+  http.get(`${API_BASE_URL}/admin/withdrawals`, ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+
+    const statuses = ["completed", "processing", "failed"] as const;
+    const addresses = [
+      "bc1q9u0h6s9m8l6e8y7r8j2h0k9k0q0q6s5xk8m8y4d0u3q2p0a6v",
+      "bc1qabc123def456ghi789jkl012mno345pqr678stu",
+      "bc1qxyz789abc012def345ghi678jkl901mno234pqr",
+    ];
+    const toAddresses = [
+      "1AUSGLKM2cyse7hJjmz5zGvZvh5aTwJQNk",
+      "3J98t1WpEZ73CNmQviecrnyiWrnqRhWNLy",
+      "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+    ];
+
+    const allRecords = Array.from({ length: 38 }, (_, i) => {
+      const id = i + 1;
+      // Spread records across multiple dates (Dec 1–15, 2025)
+      const day = 15 - Math.floor(i / 3);
+      const hour = 9 + (i % 8);
+      return {
+        id,
+        from_address: addresses[i % addresses.length],
+        to_address: toAddresses[i % toAddresses.length],
+        txid: `0x${id.toString(16).padStart(4, "0")}a1e9403f1792d959f6e73d877c1a0e55a49e0a5c7ff02c02e364a0c5c0${id.toString(16).padStart(2, "0")}`,
+        amount: 1000000 + id * 234567,
+        fee: 800 + id * 73,
+        ticket_id: `194${7000 + id}`,
+        status: statuses[i % statuses.length],
+        timestamp: `2025-12-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${String((i * 7) % 60).padStart(2, "0")}:00Z`,
+      };
+    });
+
+    const limit = 15;
+    const start = (page - 1) * limit;
+    const paged = allRecords.slice(start, start + limit);
+
+    return HttpResponse.json({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        withdrawals: paged,
+      },
     });
   }),
 
