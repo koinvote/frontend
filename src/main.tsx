@@ -1,12 +1,12 @@
+import { Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
+import App from './App.tsx'
 import './global.css'
 import './globalAntd.css'
-import App from './App.tsx'
-import { Suspense } from 'react'
 import './i18n.ts'
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Loading } from '@/components/base/Loading.tsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // Start MSW in development mode if VITE_USE_MOCK is enabled
 async function enableMocking() {
@@ -33,9 +33,13 @@ if (gaId) {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  function gtag(...args: unknown[]) { window.dataLayer.push(args); }
-  gtag('js', new Date());
-  gtag('config', gaId);
+  // 使用更標準的 gtag 初始化方式
+  window.gtag = function(...args) {
+    window.dataLayer.push(args);
+  };
+  
+  window.gtag('js', new Date());
+  window.gtag('config', gaId);
 }
 
 const queryClient = new QueryClient()
