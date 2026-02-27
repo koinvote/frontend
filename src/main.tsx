@@ -26,6 +26,7 @@ async function enableMocking() {
 
 // Google Analytics — only inject when VITE_GA_ID is set (production)
 const gaId = import.meta.env.VITE_GA_ID;
+
 if (gaId) {
   const script = document.createElement('script');
   script.async = true;
@@ -33,9 +34,11 @@ if (gaId) {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  // 使用更標準的 gtag 初始化方式
-  window.gtag = function(...args) {
-    window.dataLayer.push(args);
+  
+  // 必須使用 function 關鍵字並直接傳遞 arguments 物件
+  window.gtag = function() {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer.push(arguments); 
   };
   
   window.gtag('js', new Date());
