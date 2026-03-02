@@ -181,6 +181,12 @@ const EventDetail = () => {
     }
   }, [eventDetail?.status]);
 
+  useEffect(() => {
+    if (eventDetail?.title) {
+      document.title = `${eventDetail.title} | Koinvote`;
+    }
+  }, [eventDetail?.title]);
+
   const handleSearchChange = (newSearch: string) => {
     setSearch(newSearch);
   };
