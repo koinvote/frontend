@@ -1,4 +1,3 @@
-import { Tooltip } from "antd";
 import {
   useCallback,
   useEffect,
@@ -6,18 +5,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router";
 
 import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
-import MinusIcon from "@/assets/icons/minus.svg?react";
-import PlusIcon from "@/assets/icons/plus.svg?react";
 import { Button } from "@/components/base/Button";
 import { useBackIfInternal } from "@/hooks/useBack";
-import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { cn } from "@/utils/style";
-
-import type { EventType } from "@/api/types";
 
 import {
   getAddressInfo,
@@ -28,117 +22,27 @@ import {
 
 import type { AddressValidationStatus } from "./types/index";
 
-import { useHomeStore } from "@/stores/homeStore";
-import { useSystemParametersStore } from "@/stores/systemParametersStore";
-import { satsToBtc } from "@/utils/formatter";
 import { useTranslation } from "react-i18next";
 
-type ResultVisibility = "public" | "paid_only" | "creator_only";
+import {
+  CREATE_EVENT_DRAFT_KEY,
+  DEFAULT_VALUES,
+  type CreateEventDraft,
+  type CreateEventFormValues,
+  type PreviewEventState,
+} from "./formTypes";
 
-type PreviewEventState = {
-  creatorAddress: string;
-  title: string;
-  description: string;
-  hashtag: string;
-  eventType: EventType;
-  isRewarded: boolean;
-  rewardBtc?: string;
-  maxRecipient?: number;
-  durationHours: number;
-  options?: string[];
-  enablePreheat: boolean;
-  preheatHours?: number;
-  resultVisibility: ResultVisibility;
-  creatorEmail?: string;
-  unlockPriceBtc?: string;
-};
-
-type CreateEventDraft = {
-  creatorAddress: string;
-  title: string;
-  description: string;
-  hashtags: string;
-  eventType: EventType;
-  isRewarded: boolean;
-  rewardBtc: string;
-  options: string[];
-  durationHours: string;
-  enablePreheat: boolean;
-  preheatHours: string;
-  agree: boolean;
-  resultVisibility: ResultVisibility;
-  creatorEmail: string;
-  unlockPriceBtc: string;
-};
-
-type CreateEventFormValues = {
-  creatorAddress: string;
-  title: string;
-  description: string;
-  eventType: EventType;
-  options: { value: string }[];
-  isRewarded: boolean;
-  durationHours: string;
-  rewardBtc: string;
-  enablePreheat: boolean;
-  preheatHours: string;
-  agree: boolean;
-  resultVisibility: ResultVisibility;
-  creatorEmail: string;
-  unlockPriceBtc: string;
-};
-
-const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
-
-const DEFAULT_VALUES: CreateEventFormValues = {
-  creatorAddress: "",
-  title: "",
-  description: "",
-  eventType: "single_choice",
-  options: [{ value: "" }],
-  isRewarded: true,
-  durationHours: "",
-  rewardBtc: "",
-  enablePreheat: false,
-  preheatHours: "",
-  agree: false,
-  resultVisibility: "public",
-  creatorEmail: "",
-  unlockPriceBtc: "",
-};
-
-const normalizeTag = (raw: string) => {
-  const v = raw.trim();
-  if (!v) return null;
-  const lowerCased = v.toLowerCase();
-
-  const noHash = lowerCased.replace(/^#+/, "");
-
-  const cleaned = noHash.replace(/[^\w]/g, "");
-
-  if (!cleaned) return null;
-  return cleaned.slice(0, 20);
-};
-
-const formatTooltipText = (text: string) => {
-  const parts = text.split(/(\.\s+)/);
-  const result: React.ReactNode[] = [];
-
-  parts.forEach((part, index) => {
-    if (part === "") return;
-
-    if (part.match(/^\.\s+$/)) {
-      result.push(".");
-      if (index < parts.length - 1) {
-        result.push(<br key={`br-${index}`} />);
-      }
-    } else {
-      result.push(<span key={`text-${index}`}>{part}</span>);
-    }
-  });
-
-  return <>{result}</>;
-};
+import { CreatorAddressField } from "./components/CreatorAddressField";
+import { DescriptionField } from "./components/DescriptionField";
+import { DurationField } from "./components/DurationField";
+import { HashtagField } from "./components/HashtagField";
+import { OptionsField } from "./components/OptionsField";
+import { PreheatField } from "./components/PreheatField";
+import { ResponseTypeField } from "./components/ResponseTypeField";
+import { ResultVisibilityField } from "./components/ResultVisibilityField";
+import { RewardBtcField } from "./components/RewardBtcField";
+import { RewardTypeField } from "./components/RewardTypeField";
+import { TitleField } from "./components/TitleField";
 
 export default function CreateEvent() {
   const { t } = useTranslation();
@@ -149,17 +53,7 @@ export default function CreateEvent() {
   const isProgrammaticRef = useRef(false);
   const goBack = useBackIfInternal("/");
 
-  const { isDesktop } = useHomeStore();
-
-  const singleChoiceTooltip = useTooltipWithClick({ singleLine: isDesktop });
-  const openEndedTooltip = useTooltipWithClick({ singleLine: isDesktop });
-  const creatorAddressTooltip = useTooltipWithClick({
-    singleLine: isDesktop,
-  });
-  const enablePreheatTooltip = useTooltipWithClick();
-
   const ACTIVE_BTC_NETWORK = Network.mainnet;
-
   const networkLabel =
     ACTIVE_BTC_NETWORK === Network.mainnet ? "mainnet" : "testnet";
 
@@ -182,56 +76,42 @@ export default function CreateEvent() {
   const [optionsTouched, setOptionsTouched] = useState(false);
 
   // -------- React Hook Form --------
+  const methods = useForm<CreateEventFormValues>({
+    mode: "onTouched",
+    defaultValues: DEFAULT_VALUES,
+  });
+
   const {
-    register,
-    control,
     handleSubmit,
     watch,
-    setValue,
     reset,
     setError,
     clearErrors,
     setFocus,
     trigger,
     formState: { errors, isSubmitting, touchedFields },
-  } = useForm<CreateEventFormValues>({
-    mode: "onTouched",
-    defaultValues: DEFAULT_VALUES,
-  });
+  } = methods;
 
-  const {
-    fields: optionFields,
-    append: appendOption,
-    remove: removeOption,
-  } = useFieldArray({ control, name: "options" });
-
-  // Reactive watched values (replace individual useState)
+  // Reactive watched values
   const creatorAddress = watch("creatorAddress");
   const durationHours = watch("durationHours");
-  const rewardBtc = watch("rewardBtc");
   const isRewarded = watch("isRewarded");
   const enablePreheat = watch("enablePreheat");
   const eventType = watch("eventType");
   const title = watch("title");
-  const description = watch("description");
-  const preheatHours = watch("preheatHours");
   const agree = watch("agree");
   const resultVisibility = watch("resultVisibility");
+  const rewardBtc = watch("rewardBtc");
+  const creatorEmail = watch("creatorEmail");
+  const unlockPriceBtc = watch("unlockPriceBtc");
 
   // Refs for current values used inside validate closures to avoid stale captures
   const addrStatusRef = useRef(addrStatus);
   addrStatusRef.current = addrStatus;
   const addrErrorRef = useRef(addrError);
   addrErrorRef.current = addrError;
-  const isRewardedRef = useRef(isRewarded);
-  isRewardedRef.current = isRewarded;
-  const enablePreheatRef = useRef(enablePreheat);
-  enablePreheatRef.current = enablePreheat;
-  const minRewardBtcRef = useRef(0);
   const hashtagListRef = useRef(hashtagList);
   hashtagListRef.current = hashtagList;
-  const resultVisibilityRef = useRef(resultVisibility);
-  resultVisibilityRef.current = resultVisibility;
 
   // -------- Effects --------
 
@@ -400,13 +280,11 @@ export default function CreateEvent() {
           .filter(Boolean),
       );
 
-      if (draft.rewardBtc) {
-        // Mark rewardBtc as touched so isPreviewDisabled sees it
-        trigger("rewardBtc");
-      }
-      if (draft.unlockPriceBtc) {
-        trigger("unlockPriceBtc");
-      }
+      // Trigger validation after React re-renders with the restored values so
+      // that child-component refs (minRewardBtcRef, etc.) are up to date.
+      requestAnimationFrame(() => {
+        trigger();
+      });
 
       highlightLastField();
       isProgrammaticRef.current = false;
@@ -500,123 +378,6 @@ export default function CreateEvent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultVisibility]);
 
-  // -------- System parameters --------
-  const params = useSystemParametersStore((s) => s.params);
-
-  // -------- Computed values --------
-
-  const minRewardBtc = useMemo(() => {
-    if (!params) {
-      return 0.000011;
-    }
-
-    const durationHoursNum = Number(durationHours);
-    const freeHours = params.free_hours ?? 0;
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const minRewardAmountSatoshi = params.min_reward_amount_satoshi ?? 0;
-
-    if (!Number.isFinite(durationHoursNum) || durationHoursNum <= 0) {
-      return minRewardAmountSatoshi / 100_000_000;
-    }
-
-    let minRewardSatoshi: number;
-
-    if (durationHoursNum <= freeHours) {
-      minRewardSatoshi = satoshiPerDurationHour;
-    } else {
-      const durationBasedMin = durationHoursNum * satoshiPerDurationHour;
-      minRewardSatoshi = Math.max(minRewardAmountSatoshi, durationBasedMin);
-    }
-
-    return minRewardSatoshi / 100_000_000;
-  }, [params, durationHours]);
-
-  // Keep ref in sync for validate closures
-  minRewardBtcRef.current = minRewardBtc;
-
-  const rewardBtcPlaceholder =
-    Number(durationHours) > 0
-      ? t(
-          "createEvent.rewardBtcPlaceholderEnabled",
-          "Enter reward (Min {{min}})",
-          {
-            min: minRewardBtc.toFixed(8),
-          },
-        )
-      : t("createEvent.rewardBtcPlaceholder", "Set Duration First");
-
-  const maxRecipients = useMemo(() => {
-    if (!isRewarded || !rewardBtc) return null;
-
-    const rewardAmountSatoshi = Math.round(parseFloat(rewardBtc) * 100_000_000);
-    if (!Number.isFinite(rewardAmountSatoshi) || rewardAmountSatoshi <= 0) {
-      return null;
-    }
-
-    const satoshiPerExtraWinner = params?.satoshi_per_extra_winner ?? 0;
-    if (!satoshiPerExtraWinner || satoshiPerExtraWinner <= 0) {
-      return null;
-    }
-
-    return Math.floor(rewardAmountSatoshi / satoshiPerExtraWinner);
-  }, [isRewarded, rewardBtc, params?.satoshi_per_extra_winner]);
-
-  const platformFeeSatoshi = useMemo(() => {
-    if (isRewarded) return null;
-    if (!params) return null;
-
-    const duration = Number(durationHours);
-    const freeHours = params.free_hours ?? 0;
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = params.platform_fee_percentage ?? 0;
-
-    if (!Number.isFinite(duration) || duration <= 0) return null;
-
-    const billableHours =
-      freeHours > 0 ? Math.max(0, duration - freeHours) : duration;
-
-    if (billableHours <= 0) return 0;
-
-    const fee =
-      billableHours * satoshiPerDurationHour * (platformFeePercentage / 100);
-
-    return Math.round(fee);
-  }, [isRewarded, params, durationHours]);
-
-  const platformFeeDisplay = useMemo(() => {
-    return satsToBtc(platformFeeSatoshi);
-  }, [platformFeeSatoshi]);
-
-  const preheatFeeSatoshi = useMemo(() => {
-    if (!enablePreheat) return null;
-    if (!params) return null;
-
-    const preheatHoursNum = Number(preheatHours);
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = params.platform_fee_percentage ?? 0;
-
-    if (
-      !Number.isFinite(preheatHoursNum) ||
-      preheatHoursNum < 1 ||
-      preheatHoursNum > 720
-    ) {
-      return null;
-    }
-
-    const multiplier = 0.2 + 0.8 * (preheatHoursNum / 720);
-    const fee =
-      preheatHoursNum *
-      satoshiPerDurationHour *
-      (platformFeePercentage / 100) *
-      multiplier;
-
-    return Math.round(fee);
-  }, [enablePreheat, params, preheatHours]);
-
-  const preheatFeeDisplay = useMemo(() => {
-    return satsToBtc(preheatFeeSatoshi);
-  }, [preheatFeeSatoshi]);
-
   // Options validation (array-level error)
   const validateOptions = useCallback(
     (fields: { value: string }[]): string | null => {
@@ -656,14 +417,11 @@ export default function CreateEvent() {
       !title.trim() ||
       !duration ||
       duration <= 0 ||
-      (isRewarded && !touchedFields.rewardBtc) ||
-      !!errors.rewardBtc ||
+      (isRewarded && (!rewardBtc || !!errors.rewardBtc)) ||
       (eventType === "single_choice" && hasOptionsError) ||
       (enablePreheat && !!errors.preheatHours) ||
-      (resultVisibility === "paid_only" &&
-        (!touchedFields.creatorEmail || !!errors.creatorEmail)) ||
-      (resultVisibility === "paid_only" &&
-        (!touchedFields.unlockPriceBtc || !!errors.unlockPriceBtc)) ||
+      (resultVisibility === "paid_only" && (!creatorEmail || !!errors.creatorEmail)) ||
+      (resultVisibility === "paid_only" && (!unlockPriceBtc || !!errors.unlockPriceBtc)) ||
       !agree
     );
   }, [
@@ -673,7 +431,7 @@ export default function CreateEvent() {
     durationHours,
     errors.preheatHours,
     isRewarded,
-    touchedFields.rewardBtc,
+    rewardBtc,
     errors.rewardBtc,
     optionValues,
     eventType,
@@ -681,84 +439,11 @@ export default function CreateEvent() {
     enablePreheat,
     validateOptions,
     resultVisibility,
-    touchedFields.creatorEmail,
+    creatorEmail,
     errors.creatorEmail,
-    touchedFields.unlockPriceBtc,
+    unlockPriceBtc,
     errors.unlockPriceBtc,
   ]);
-
-  // -------- Hashtag handlers --------
-  const MAX_TAGS = 3;
-  const MAX_TAG_LENGTH = 20;
-
-  const addTag = (raw: string) => {
-    const tag = normalizeTag(raw);
-    if (!tag) return;
-
-    setHashtagList((prev) => {
-      if (prev.length >= MAX_TAGS) return prev;
-      if (prev.includes(tag)) return prev;
-      return [...prev, tag];
-    });
-  };
-
-  const removeTag = (tag: string) => {
-    setHashtagList((prev) => prev.filter((t) => t !== tag));
-  };
-
-  const commitByDelimiters = (value: string) => {
-    const parts = value.split(/[,\s]+/g).filter(Boolean);
-    if (!parts.length) return;
-    parts.forEach(addTag);
-  };
-
-  const handleHashtagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.nativeEvent?.isComposing) return;
-
-    if (e.key === "Enter" || e.key === "," || e.key === " ") {
-      e.preventDefault();
-      commitByDelimiters(hashtagInput);
-      setHashtagInput("");
-      return;
-    }
-
-    if (e.key === "Backspace" && !hashtagInput) {
-      setHashtagList((prev) => prev.slice(0, -1));
-    }
-  };
-
-  const handleHashtagBlur = () => {
-    if (hashtagInput.trim()) {
-      commitByDelimiters(hashtagInput);
-      setHashtagInput("");
-    }
-  };
-
-  const handleHashtagChange = (v: string) => {
-    if (hashtagList.length >= MAX_TAGS) {
-      setHashtagInput("");
-      return;
-    }
-
-    if (/[,\s]/.test(v)) {
-      commitByDelimiters(v);
-      setHashtagInput("");
-      return;
-    }
-
-    const cleaned = v.replace(/^#+/g, "").replace(/[^\w]/g, "");
-    const truncated = cleaned.slice(0, MAX_TAG_LENGTH);
-    const prefix = v.startsWith("#") ? "#" : "";
-    setHashtagInput(prefix + truncated);
-  };
-
-  const currentInputCleaned = useMemo(() => {
-    return hashtagInput.replace(/^#+/g, "").replace(/[^\w]/g, "");
-  }, [hashtagInput]);
-
-  const hashtagCharsLeft = useMemo(() => {
-    return Math.max(0, MAX_TAG_LENGTH - currentInputCleaned.length);
-  }, [currentInputCleaned]);
 
   // -------- Clear handler --------
   const handleClear = () => {
@@ -855,1089 +540,134 @@ export default function CreateEvent() {
           {t("createEvent.formTitle")}
         </h1>
 
-        <form
-          ref={formRef}
-          className="space-y-6"
-          onSubmit={onSubmit}
-          autoComplete="off"
-          onFocus={handleFormItemFocus}
-        >
-          {/* Creator address */}
-          <div>
-            <div className="flex items-center gap-1 mb-1">
-              <label className="tx-14 lh-20 fw-m text-primary mr-1">
-                {t("createEvent.creatorAddress")}
-              </label>
-              <Tooltip
-                placement="topLeft"
-                title={t("createEvent.creatorAddressTooltip")}
-                color="white"
-                arrow={{ pointAtCenter: true }}
-                {...creatorAddressTooltip.tooltipProps}
-                overlayInnerStyle={{
-                  ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
-                }}
-              >
-                <span
-                  {...creatorAddressTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer flex items-center"
-                >
-                  ⓘ
-                </span>
-              </Tooltip>
-              <span className={`text-(--color-orange-500) ml-1`}>*</span>
-            </div>
-            <Controller
-              control={control}
-              name="creatorAddress"
-              rules={{
-                validate: () =>
-                  addrStatusRef.current === "valid" ||
-                  addrErrorRef.current ||
-                  t("createEvent.addressInvalid", "Invalid address."),
-              }}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  // Override DOM name/id to avoid browser autofill
-                  name="field_7x9abtca"
-                  id="field_7x9abtca"
-                  type="text"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  autoComplete="one-time-code"
-                  spellCheck="false"
-                  placeholder={t("createEvent.creatorAddressPlaceholder")}
-                  className={`w-full rounded-xl border border-border bg-white px-3 py-2
-    tx-14 lh-20 text-black placeholder:text-secondary
-    focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-    ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""}
-    ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""}
-  `}
-                />
-              )}
+        <FormProvider {...methods}>
+          <form
+            ref={formRef}
+            className="space-y-6"
+            onSubmit={onSubmit}
+            autoComplete="off"
+            onFocus={handleFormItemFocus}
+          >
+            <CreatorAddressField
+              addrStatus={addrStatus}
+              addrInfo={addrInfo}
+              addrError={addrError}
+              addrStatusRef={addrStatusRef}
+              addrErrorRef={addrErrorRef}
             />
-            <div className="mt-1 tx-12 lh-18">
-              {addrStatus === "checking" && (
-                <span className="text-secondary">
-                  {t("createEvent.addressChecking", "Checking…")}
-                </span>
-              )}
-              {addrStatus === "valid" && addrInfo && (
-                <span className="text-green-600">
-                  {t("createEvent.addressValid", "Valid ({{type}})", {
-                    type: addrInfo.type.toUpperCase(),
-                  })}
-                </span>
-              )}
-              {addrStatus === "invalid" && (
-                <span className="text-red-500">
-                  {addrError ||
-                    t("createEvent.addressInvalid", "Invalid address.")}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Title */}
-          <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-              {t("createEvent.title")}{" "}
-              <span className="text-(--color-orange-500)">*</span>
-            </label>
-            <input
-              {...register("title", {
-                required: t(
-                  "createEvent.alertTitleRequired",
-                  "Please enter a title.",
-                ),
-                maxLength: {
-                  value: 120,
-                  message: t(
-                    "createEvent.alertTitleTooLong",
-                    "Title cannot exceed 120 characters.",
-                  ),
-                },
-              })}
-              autoComplete="one-time-code"
-              type="text"
-              maxLength={120}
-              placeholder={t("createEvent.titlePlaceholder")}
-              className={cn(
-                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
-                errors.title
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-(--color-orange-500)",
-              )}
+            <TitleField />
+            <DescriptionField />
+            <HashtagField
+              hashtagList={hashtagList}
+              hashtagInput={hashtagInput}
+              setHashtagList={setHashtagList}
+              setHashtagInput={setHashtagInput}
+              setLastField={setLastField}
             />
-            <div className="flex justify-between mt-1">
-              {errors.title && (
-                <span className="tx-12 lh-18 text-red-500">
-                  {errors.title.message}
-                </span>
-              )}
-              <span
-                className={cn(
-                  "tx-12 lh-18 ml-auto",
-                  title.length >= 120 ? "text-red-500" : "text-secondary",
-                )}
-              >
-                {120 - title.length}{" "}
-                {t("createEvent.characterLeft", "characters left")}
-              </span>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-              {t("createEvent.description")}
-            </label>
-            <Controller
-              control={control}
-              name="description"
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  maxLength={500}
-                  rows={3}
-                  onChange={(e) => {
-                    if (e.target.value.length <= 500) {
-                      field.onChange(e);
-                    }
-                  }}
-                  placeholder={t("createEvent.descriptionPlaceholder")}
-                  className={`w-full rounded-xl border border-border bg-white px-3 py-2
-                         tx-14 lh-20 text-black placeholder:text-secondary
-                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-                         resize-none h-auto min-h-[100px]
-                         ${
-                           field.value.length >= 500
-                             ? "border-red-500 focus:ring-red-500"
-                             : ""
-                         }`}
-                />
-              )}
+            <ResponseTypeField />
+            <OptionsField
+              optionsError={optionsError}
+              setOptionsError={setOptionsError}
+              setOptionsTouched={setOptionsTouched}
+              validateOptions={validateOptions}
             />
-            <span
-              className={`tx-12 lh-18 block text-right
-              ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
-            >
-              {500 - description.length}{" "}
-              {t("createEvent.characterLeft", "characters left")}
-            </span>
-          </div>
+            <RewardTypeField />
+            <DurationField />
+            <RewardBtcField setLastField={setLastField} />
+            <ResultVisibilityField />
+            <PreheatField />
 
-          {/* Hashtags */}
-          <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-              {t("createEvent.hashtags", "Hashtags")}
-            </label>
-
+            {/* Terms checkbox */}
             <div
               className={cn(
-                "w-full rounded-xl border border-border bg-white px-3 py-2",
-                "flex flex-wrap items-center gap-2",
-                "focus-within:ring-2 focus-within:ring-(--color-orange-500)",
+                "pt-2 border-t rounded-lg p-2 -mx-2",
+                errors.agree ? "border-2 border-red-500" : "border-border",
               )}
-              onMouseDown={(e) => {
-                const target = e.target as HTMLElement;
-                if (target.closest("[data-chip-remove]")) return;
-                (
-                  e.currentTarget.querySelector(
-                    "input",
-                  ) as HTMLInputElement | null
-                )?.focus();
-              }}
             >
-              {hashtagList.map((tag) => (
-                <span
-                  key={tag}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full",
-                    "bg-surface text-primary border border-border",
-                    "px-3 py-1 tx-12 lh-18",
-                  )}
-                >
-                  <span className="select-none">#{tag}</span>
-                  <button
-                    type="button"
-                    data-chip-remove
-                    aria-label={`Remove ${tag}`}
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-white/10"
-                    onClick={() => {
-                      removeTag(tag);
-                      setLastField("hashtags");
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-
-              <input
-                name="hashtags"
-                autoComplete="one-time-code"
-                type="text"
-                value={hashtagInput}
-                onChange={(e) => handleHashtagChange(e.target.value)}
-                onKeyDown={handleHashtagKeyDown}
-                onBlur={handleHashtagBlur}
-                className={cn(
-                  "min-w-[120px] flex-1",
-                  "bg-transparent outline-none",
-                  "tx-14 lh-20 text-black placeholder:text-secondary",
-                )}
-              />
-            </div>
-
-            <span
-              className={cn("tx-12 lh-18 block text-right", "text-secondary")}
-            >
-              {hashtagList.length >= MAX_TAGS
-                ? t("createEvent.maxHashtags", "Max 3 hashtags")
-                : `${hashtagCharsLeft} ${t("createEvent.characterLeft", "characters left")}`}
-            </span>
-          </div>
-
-          {/* Response type */}
-          <div>
-            <p
-              id="responseTypeTitle"
-              className="tx-14 lh-20 fw-m text-primary mb-2"
-            >
-              {t("createEvent.responseType", "Response Type")}
-              <span className="text-(--color-orange-500)">*</span>
-            </p>
-            <Controller
-              control={control}
-              name="eventType"
-              render={({ field }) => (
-                <div className="space-y-2">
-                  <label className="flex tx-14 lh-20 text-primary">
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        name="responseType"
-                        type="radio"
-                        className="radio-orange"
-                        checked={field.value === "single_choice"}
-                        onChange={() => field.onChange("single_choice")}
-                      />
-                      <span>
-                        {t(
-                          "createEvent.responseTypeOptions.1.label",
-                          "Single-choice",
-                        )}
-                      </span>
-                      <Tooltip
-                        title={t(
-                          "createEvent.singleChoiceTooltip",
-                          "Participants choose one option from a list you create.",
-                        )}
-                        placement="top"
-                        color="white"
-                        {...singleChoiceTooltip.tooltipProps}
-                      >
-                        <span
-                          {...singleChoiceTooltip.triggerProps}
-                          className="cursor-pointer"
-                        >
-                          ⓘ
-                        </span>
-                      </Tooltip>
-                    </div>
-                  </label>
-                  <label className="flex tx-14 lh-20 text-primary">
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        name="responseType"
-                        type="radio"
-                        className="radio-orange"
-                        checked={field.value === "open"}
-                        onChange={() => field.onChange("open")}
-                      />
-                      <span>
-                        {t(
-                          "createEvent.responseTypeOptions.0.label",
-                          "Open-ended",
-                        )}
-                      </span>
-                      <Tooltip
-                        title={t(
-                          "createEvent.openEndedTooltip",
-                          "Participants can submit their own responses.",
-                        )}
-                        placement="top"
-                        color="white"
-                        {...openEndedTooltip.tooltipProps}
-                      >
-                        <span
-                          {...openEndedTooltip.triggerProps}
-                          className="cursor-pointer"
-                        >
-                          ⓘ
-                        </span>
-                      </Tooltip>
-                    </div>
-                  </label>
-                </div>
-              )}
-            />
-          </div>
-
-          {/* Options（只有 single_choice 時顯示） */}
-          {eventType === "single_choice" && (
-            <div>
-              <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-                {t("createEvent.options")}
-                <span className="text-(--color-orange-500)">*</span>
-              </label>
-
-              <div className="space-y-2">
-                {optionFields.map((field, index) => {
-                  const isLast = index === optionFields.length - 1;
-                  const canRemove = optionFields.length > 1;
-                  const optValue = watch(`options.${index}.value`) ?? "";
-
-                  return (
-                    <div key={field.id} className="flex items-center gap-2">
-                      <div className="relative w-full">
-                        <input
-                          {...register(`options.${index}.value`, {
-                            maxLength: 20,
-                          })}
-                          autoComplete="one-time-code"
-                          type="text"
-                          maxLength={20}
-                          onBlur={() => {
-                            setOptionsTouched(true);
-                            setOptionsError(validateOptions(watch("options")));
-                          }}
-                          placeholder={t(
-                            "createEvent.optionPlaceholder",
-                            "Option {{n}}",
-                            { n: index + 1 },
-                          )}
-                          className="w-full rounded-xl border border-border bg-white px-3 py-2
-                           tx-14 lh-20 text-black placeholder:text-secondary
-                           focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
-                        />
-                        <span
-                          className={`tx-12 lh-18 absolute right-3 bottom-1 ${
-                            optValue.length >= 20
-                              ? "text-red-500"
-                              : "text-secondary"
-                          }`}
-                        >
-                          {optValue.length}/20
-                        </span>
-                      </div>
-
-                      {canRemove && (
-                        <div
-                          className={cn(
-                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
-                          )}
-                          onClick={() => removeOption(index)}
-                        >
-                          <MinusIcon />
-                        </div>
-                      )}
-
-                      {isLast && optionFields.length < 5 && (
-                        <div
-                          className={cn(
-                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
-                          )}
-                          onClick={() => appendOption({ value: "" })}
-                        >
-                          <PlusIcon />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              {optionsError && (
-                <p className="tx-12 lh-18 text-red-500 mt-1">{optionsError}</p>
-              )}
-            </div>
-          )}
-
-          {/* Reward type */}
-          <div>
-            <p
-              id="rewardTypeTitle"
-              className="tx-14 lh-20 fw-m text-primary mb-2"
-            >
-              {t("createEvent.rewardType")}
-              <span className="text-(--color-orange-500)">*</span>
-            </p>
-            <Controller
-              control={control}
-              name="isRewarded"
-              render={({ field }) => (
-                <div className="space-y-2">
-                  <label className="flex tx-14 lh-20 text-primary">
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        name="rewardType"
-                        type="radio"
-                        className="radio-orange"
-                        checked={field.value === true}
-                        onChange={() => field.onChange(true)}
-                      />
-                      <span>{t("createEvent.rewarded", "Rewarded")}</span>
-                    </div>
-                  </label>
-                  <label className="flex tx-14 lh-20 text-primary">
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        name="rewardType"
-                        type="radio"
-                        className="radio-orange"
-                        checked={field.value === false}
-                        onChange={() => field.onChange(false)}
-                      />
-                      <span>
-                        {t("createEvent.nonRewarded", "Non-Rewarded")}
-                      </span>
-                    </div>
-                  </label>
-                </div>
-              )}
-            />
-          </div>
-
-          {/* Duration */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="tx-14 lh-20 fw-m text-primary">
-                {t("createEvent.durationOfEvent", "Duration of this event")}
-                <span className="text-(--color-orange-500)">*</span>
-              </label>
-            </div>
-            <Controller
-              control={control}
-              name="durationHours"
-              rules={{
-                validate: (v) => {
-                  const n = Number(v);
-                  return (
-                    (Number.isFinite(n) && n > 0) ||
-                    t(
-                      "createEvent.alertInvalidDuration",
-                      "Please enter a valid duration.",
-                    )
-                  );
-                },
-              }}
-              render={({ field }) => (
+              <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
                 <input
-                  {...field}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/[^0-9]/g, "");
-                    field.onChange(v);
-                    const n = Number(v);
-                    if (!Number.isFinite(n) || n <= 0) {
-                      setValue("rewardBtc", "");
-                      setValue("unlockPriceBtc", "");
-                    }
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const pastedText = e.clipboardData.getData("text");
-                    const numbersOnly = pastedText.replace(/[^0-9]/g, "");
-                    if (numbersOnly) {
-                      field.onChange(numbersOnly);
-                      const n = Number(numbersOnly);
-                      if (!Number.isFinite(n) || n <= 0) {
-                        setValue("rewardBtc", "");
-                        setValue("unlockPriceBtc", "");
-                      }
-                    }
-                  }}
-                  placeholder={
-                    isRewarded
-                      ? t("createEvent.enterHoursMin", "Enter hours (Min 1)")
-                      : t(
-                          "createEvent.freeHours",
-                          "First {{hours}} hours are free",
-                          { hours: params?.free_hours },
-                        )
-                  }
-                  className={cn(
-                    "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
-                    errors.durationHours
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-border focus:ring-(--color-orange-500)",
-                  )}
+                  {...methods.register("agree", {
+                    validate: (v) =>
+                      v ||
+                      t(
+                        "createEvent.alertAgreeRequired",
+                        "Please agree to the Terms of Service to continue.",
+                      ),
+                  })}
+                  type="checkbox"
+                  className="mt-0.5 accent-(--color-orange-500) cursor-pointer"
                 />
-              )}
-            />
-            {errors.durationHours && (
-              <p className="tx-12 lh-18 text-red-500 mt-1">
-                {errors.durationHours.message}
-              </p>
-            )}
-          </div>
-
-          {/* Reward (BTC) */}
-          {isRewarded && (
-            <div>
-              <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-                {t("createEvent.rewardBtc", "Reward (BTC)")}{" "}
-                <span className="text-(--color-orange-500)">*</span>
+                <span>
+                  {t("createEvent.agreeToThe", "I agree to the")}{" "}
+                  <Link
+                    to="/terms"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("createEvent.termsOfService", "Terms of Service")}
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/terms-reward-distribution"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("createEvent.rewardDistribution", "Reward Distribution")}
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/privacy"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("createEvent.privacyPolicy", "Privacy Policy")}
+                  </Link>{" "}
+                  {t("createEvent.and", "and")}{" "}
+                  <Link
+                    to="/charges-refunds"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("createEvent.chargesRefunds", "Charges & Refunds")}
+                  </Link>
+                  .
+                </span>
               </label>
-              <div className="flex items-center gap-2">
-                <Controller
-                  control={control}
-                  name="rewardBtc"
-                  rules={{
-                    validate: (v) => {
-                      if (!isRewardedRef.current) return true;
-                      if (!v || v.trim() === "")
-                        return t(
-                          "createEvent.errorEnterRewardAmount",
-                          "Please enter reward amount",
-                        );
-                      const amount = parseFloat(v);
-                      if (!Number.isFinite(amount) || amount <= 0)
-                        return t(
-                          "createEvent.errorInvalidRewardAmount",
-                          "Please enter a valid reward amount",
-                        );
-                      if (amount < minRewardBtcRef.current)
-                        return t(
-                          "createEvent.errorMinimumReward",
-                          "Minimum {{min}} BTC",
-                          { min: minRewardBtcRef.current.toFixed(8) },
-                        );
-                      return true;
-                    },
-                  }}
-                  render={({ field }) => (
-                    <input
-                      {...field}
-                      disabled={Number(durationHours) <= 0}
-                      type="text"
-                      inputMode="decimal"
-                      onChange={(e) => {
-                        const v = e.target.value.replace(/[^0-9.]/g, "");
-                        const parts = v.split(".");
-                        const cleaned =
-                          parts.length > 0
-                            ? parts[0] +
-                              (parts.length > 1
-                                ? "." + parts.slice(1).join("")
-                                : "")
-                            : "";
-                        field.onChange(cleaned);
-                      }}
-                      onPaste={(e) => {
-                        e.preventDefault();
-                        const pastedText = e.clipboardData.getData("text");
-                        const cleaned = pastedText.replace(/[^0-9.]/g, "");
-                        const parts = cleaned.split(".");
-                        const numbersOnly =
-                          parts.length > 0
-                            ? parts[0] +
-                              (parts.length > 1
-                                ? "." + parts.slice(1).join("")
-                                : "")
-                            : "";
-                        if (numbersOnly) {
-                          field.onChange(numbersOnly);
-                        }
-                      }}
-                      placeholder={rewardBtcPlaceholder}
-                      className={cn(
-                        "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
-                        errors.rewardBtc
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-border focus:ring-(--color-orange-500)",
-                      )}
-                    />
-                  )}
-                />
-                <Button
-                  disabled={Number(durationHours) <= 0}
-                  type="button"
-                  appearance="solid"
-                  tone="white"
-                  text="sm"
-                  className="w-[125px] border-border rounded-xl"
-                  onClick={() => {
-                    setValue("rewardBtc", minRewardBtc.toString(), {
-                      shouldValidate: true,
-                      shouldTouch: true,
-                    });
-                    setLastField("rewardBtc");
-                  }}
-                >
-                  {t("createEvent.minimum")}
-                </Button>
-              </div>
-              {errors.rewardBtc && (
-                <p className="tx-12 lh-18 text-red-500 mt-1">
-                  {errors.rewardBtc.message}
+              {errors.agree && (
+                <p className="tx-12 lh-18 text-red-500 mt-1 ml-6">
+                  {errors.agree.message as string}
                 </p>
               )}
             </div>
-          )}
 
-          {/* Number of recipients */}
-          {isRewarded && (
-            <div>
-              <p className="tx-14 lh-20 fw-m text-primary mb-1">
-                {t("createEvent.numberOfRecipients")}
-              </p>
-              <p className="tx-12 lh-18 text-black dark:text-white">
-                {maxRecipients !== null && maxRecipients > 0
-                  ? maxRecipients === 1
-                    ? t(
-                        "createEvent.rewardDistributionText",
-                        "The reward will be distributed to up to {{count}} address",
-                        { count: maxRecipients },
-                      )
-                    : t(
-                        "createEvent.rewardDistributionTextPlural",
-                        "The reward will be distributed to up to {{count}} addresses",
-                        { count: maxRecipients },
-                      )
-                  : "--"}
-              </p>
-            </div>
-          )}
-
-          {/* Platform fee（只有 no reward 時顯示） */}
-          {!isRewarded && (
-            <div>
-              <p className="tx-14 lh-20 fw-m text-primary mb-1">
-                {t("createEvent.platformFee", "Platform fee:")}
-              </p>
-              <p className="tx-12 lh-18 dark:text-white text-black">
-                {platformFeeDisplay}
-              </p>
-            </div>
-          )}
-
-          {/* Result visibility */}
-          <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-2">
-              {t("createEvent.resultVisibility", "Result visibility")}
-              <span className="text-(--color-orange-500)"> *</span>
-            </p>
-            <Controller
-              control={control}
-              name="resultVisibility"
-              render={({ field }) => (
-                <div className="flex gap-6">
-                  {(
-                    [
-                      "public",
-                      "paid_only",
-                      "creator_only",
-                    ] as ResultVisibility[]
-                  ).map((value) => (
-                    <label
-                      key={value}
-                      className="flex items-center gap-2 tx-14 lh-20 text-primary cursor-pointer"
-                    >
-                      <input
-                        name="resultVisibility"
-                        type="radio"
-                        className="radio-orange"
-                        checked={field.value === value}
-                        onChange={() => {
-                          field.onChange(value);
-                          if (value !== "paid_only") {
-                            clearErrors("creatorEmail");
-                            clearErrors("unlockPriceBtc");
-                          }
-                        }}
-                      />
-                      <span>
-                        {value === "public" &&
-                          t(
-                            "createEvent.resultVisibilityPublic",
-                            "Public",
-                          )}
-                        {value === "paid_only" &&
-                          t(
-                            "createEvent.resultVisibilityPaidOnly",
-                            "Paid-only",
-                          )}
-                        {value === "creator_only" &&
-                          t(
-                            "createEvent.resultVisibilityCreatorOnly",
-                            "Creator-only",
-                          )}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            />
-
-            {/* Extra fields shown only when paid_only is selected */}
-            {resultVisibility === "paid_only" && (
-              <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-4">
-                {/* Creator email */}
-                <div>
-                  <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-                    {t("createEvent.creatorEmail", "Creator email")}
-                    <span className="text-(--color-orange-500)"> *</span>
-                  </label>
-                  <input
-                    {...register("creatorEmail", {
-                      validate: (v) => {
-                        if (resultVisibilityRef.current !== "paid_only")
-                          return true;
-                        if (!v || !v.trim())
-                          return t(
-                            "createEvent.creatorEmailRequired",
-                            "Please enter your email.",
-                          );
-                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                        if (!emailRegex.test(v.trim()))
-                          return t(
-                            "createEvent.creatorEmailInvalid",
-                            "Please enter a valid email address.",
-                          );
-                        return true;
-                      },
-                    })}
-                    type="text"
-                    autoComplete="one-time-code"
-                    placeholder={t(
-                      "createEvent.creatorEmailPlaceholder",
-                      "Please enter a valid email address",
-                    )}
-                    className={cn(
-                      "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
-                      errors.creatorEmail
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-border focus:ring-(--color-orange-500)",
-                    )}
-                  />
-                  <p className="tx-12 lh-18 text-secondary mt-1">
-                    {t(
-                      "createEvent.creatorEmailHint",
-                      "This email will be used by you to unlock this event's results.",
-                    )}
-                  </p>
-                  {errors.creatorEmail && (
-                    <p className="tx-12 lh-18 text-red-500 mt-1">
-                      {errors.creatorEmail.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Unlock price (BTC) */}
-                <div>
-                  <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-                    {t("createEvent.unlockPriceBtc", "Unlock price (BTC)")}
-                    <span className="text-(--color-orange-500)"> *</span>
-                  </label>
-                  <Controller
-                    control={control}
-                    name="unlockPriceBtc"
-                    rules={{
-                      validate: (v) => {
-                        if (resultVisibilityRef.current !== "paid_only")
-                          return true;
-                        if (!v || v.trim() === "")
-                          return t(
-                            "createEvent.unlockPriceRequired",
-                            "Please enter unlock price.",
-                          );
-                        const amount = parseFloat(v);
-                        if (!Number.isFinite(amount) || amount <= 0)
-                          return t(
-                            "createEvent.unlockPriceInvalid",
-                            "Please enter a valid amount.",
-                          );
-                        return true;
-                      },
-                    }}
-                    render={({ field }) => (
-                      <input
-                        {...field}
-                        disabled={Number(durationHours) <= 0}
-                        type="text"
-                        inputMode="decimal"
-                        onChange={(e) => {
-                          const v = e.target.value.replace(/[^0-9.]/g, "");
-                          const parts = v.split(".");
-                          const cleaned =
-                            parts.length > 0
-                              ? parts[0] +
-                                (parts.length > 1
-                                  ? "." + parts.slice(1).join("")
-                                  : "")
-                              : "";
-                          field.onChange(cleaned);
-                        }}
-                        onPaste={(e) => {
-                          e.preventDefault();
-                          const pastedText = e.clipboardData.getData("text");
-                          const cleaned = pastedText.replace(/[^0-9.]/g, "");
-                          const parts = cleaned.split(".");
-                          const numbersOnly =
-                            parts.length > 0
-                              ? parts[0] +
-                                (parts.length > 1
-                                  ? "." + parts.slice(1).join("")
-                                  : "")
-                              : "";
-                          if (numbersOnly) field.onChange(numbersOnly);
-                        }}
-                        placeholder={
-                          Number(durationHours) > 0
-                            ? t(
-                                "createEvent.enterUnlockPrice",
-                                "Enter unlock price",
-                              )
-                            : t(
-                                "createEvent.setDurationFirst",
-                                "Set Duration First",
-                              )
-                        }
-                        className={cn(
-                          "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
-                          errors.unlockPriceBtc
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-border focus:ring-(--color-orange-500)",
-                        )}
-                      />
-                    )}
-                  />
-                  {errors.unlockPriceBtc && (
-                    <p className="tx-12 lh-18 text-red-500 mt-1">
-                      {errors.unlockPriceBtc.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Preheat */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 tx-14 lh-20 text-primary">
-              <Controller
-                control={control}
-                name="enablePreheat"
-                render={({ field }) => (
-                  <input
-                    id="enable-preheat"
-                    type="checkbox"
-                    className="accent-(--color-orange-500)"
-                    checked={field.value}
-                    onChange={(e) => {
-                      field.onChange(e.target.checked);
-                      if (!e.target.checked) {
-                        setValue("preheatHours", "");
-                        clearErrors("preheatHours");
-                      }
-                    }}
-                  />
+            {/* Actions */}
+            <div className="pt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Button
+                name="clearButton"
+                type="button"
+                appearance="outline"
+                tone="primary"
+                text="sm"
+                className="sm:w-40"
+                onClick={handleClear}
+              >
+                {t("createEvent.clear", "Clear")}
+              </Button>
+              <Button
+                name="previewButton"
+                type="submit"
+                appearance="solid"
+                tone="primary"
+                text="sm"
+                className={cn(
+                  "sm:w-40",
+                  isPreviewDisabled && !isSubmitting && "opacity-50",
                 )}
-              />
-              <label
-                htmlFor="enable-preheat"
-                className="tx-14 lh-20 text-primary cursor-pointer"
+                disabled={isSubmitting}
               >
-                {t("createEvent.enablePreheat")}
-              </label>
-              <Tooltip
-                placement="topLeft"
-                title={formatTooltipText(t("createEvent.enablePreheatTooltip"))}
-                color="white"
-                arrow={{ pointAtCenter: true }}
-                {...enablePreheatTooltip.tooltipProps}
-              >
-                <span
-                  {...enablePreheatTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer"
-                >
-                  ⓘ
-                </span>
-              </Tooltip>
+                {isSubmitting
+                  ? t("createEvent.submitting", "Submitting…")
+                  : t("createEvent.preview", "Preview")}
+              </Button>
             </div>
-            <Controller
-              control={control}
-              name="preheatHours"
-              rules={{
-                validate: (v) => {
-                  if (!enablePreheatRef.current) return true;
-                  if (!v || v.trim() === "")
-                    return t(
-                      "createEvent.errorEnterPreheatHours",
-                      "Please enter preheat hours",
-                    );
-                  const n = Number(v);
-                  if (!Number.isFinite(n))
-                    return t(
-                      "createEvent.errorInvalidNumber",
-                      "Please enter a valid number",
-                    );
-                  if (n > 720)
-                    return t(
-                      "createEvent.errorMaxPreheatHours",
-                      "Maximum preheat hours is 720",
-                    );
-                  if (n < 1)
-                    return t(
-                      "createEvent.errorMinPreheatHours",
-                      "Minimum preheat hours is 1",
-                    );
-                  return true;
-                },
-              }}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  disabled={!enablePreheat}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/[^0-9]/g, "");
-                    field.onChange(v);
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const pastedText = e.clipboardData.getData("text");
-                    const numbersOnly = pastedText.replace(/[^0-9]/g, "");
-                    if (numbersOnly) {
-                      field.onChange(numbersOnly);
-                    }
-                  }}
-                  placeholder={t(
-                    "createEvent.enterHoursMax",
-                    "Enter hours (max 720)",
-                  )}
-                  className={cn(
-                    "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
-                    errors.preheatHours
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-border focus:ring-(--color-orange-500)",
-                  )}
-                />
-              )}
-            />
-            {enablePreheat && errors.preheatHours && (
-              <p className="tx-12 lh-18 text-red-500 mt-1">
-                {errors.preheatHours.message}
-              </p>
-            )}
-          </div>
-
-          {/* Preheat fee */}
-          <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-1">
-              {t("createEvent.preheatFee", "Preheat fee:")}
-            </p>
-            <p className="tx-12 lh-18 dark:text-white text-black">
-              {preheatFeeDisplay}
-            </p>
-          </div>
-
-          {/* Terms checkbox */}
-          <div
-            className={cn(
-              "pt-2 border-t rounded-lg p-2 -mx-2",
-              errors.agree ? "border-2 border-red-500" : "border-border",
-            )}
-          >
-            <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
-              <input
-                {...register("agree", {
-                  validate: (v) =>
-                    v ||
-                    t(
-                      "createEvent.alertAgreeRequired",
-                      "Please agree to the Terms of Service to continue.",
-                    ),
-                })}
-                type="checkbox"
-                className="mt-0.5 accent-(--color-orange-500) cursor-pointer"
-              />
-              <span>
-                {t("createEvent.agreeToThe", "I agree to the")}{" "}
-                <Link
-                  to="/terms"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.termsOfService", "Terms of Service")}
-                </Link>
-                ,{" "}
-                <Link
-                  to="/terms-reward-distribution"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.rewardDistribution", "Reward Distribution")}
-                </Link>
-                ,{" "}
-                <Link
-                  to="/privacy"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.privacyPolicy", "Privacy Policy")}
-                </Link>{" "}
-                {t("createEvent.and", "and")}{" "}
-                <Link
-                  to="/charges-refunds"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.chargesRefunds", "Charges & Refunds")}
-                </Link>
-                .
-              </span>
-            </label>
-            {errors.agree && (
-              <p className="tx-12 lh-18 text-red-500 mt-1 ml-6">
-                {errors.agree.message as string}
-              </p>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="pt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Button
-              name="clearButton"
-              type="button"
-              appearance="outline"
-              tone="primary"
-              text="sm"
-              className="sm:w-40"
-              onClick={handleClear}
-            >
-              {t("createEvent.clear", "Clear")}
-            </Button>
-            <Button
-              name="previewButton"
-              type="submit"
-              appearance="solid"
-              tone="primary"
-              text="sm"
-              className={cn(
-                "sm:w-40",
-                isPreviewDisabled && !isSubmitting && "opacity-50",
-              )}
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? t("createEvent.submitting", "Submitting…")
-                : t("createEvent.preview", "Preview")}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );
