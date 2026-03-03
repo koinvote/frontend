@@ -116,6 +116,7 @@
     "resultVisibilityPublic": "Public",
     "resultVisibilityPaidOnly": "Paid-only",
     "resultVisibilityCreatorOnly": "Creator-only",
+    "resultVisibilityRewardedOnly": "Available for rewarded events only",
     "creatorEmail": "Creator email",
     "creatorEmailPlaceholder": "Please enter a valid email address",
     "creatorEmailHint": "This email will be used by you to unlock this event's results.",
@@ -125,7 +126,8 @@
     "enterUnlockPrice": "Enter unlock price",
     "setDurationFirst": "Set Duration First",
     "unlockPriceRequired": "Please enter unlock price.",
-    "unlockPriceInvalid": "Please enter a valid amount."
+    "unlockPriceInvalid": "Please enter a valid amount.",
+    "unlockPriceMaxExceeded": "Maximum unlock price is 1,000,000 BTC."
   },
   "confirmPay": {
     "extendTime": "Extend {{minutes}} min",

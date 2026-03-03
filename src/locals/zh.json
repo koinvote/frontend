@@ -110,6 +110,7 @@
     "resultVisibilityPublic": "公開",
     "resultVisibilityPaidOnly": "僅付費可見",
     "resultVisibilityCreatorOnly": "僅創建者可見",
+    "resultVisibilityRewardedOnly": "僅限有獎事件使用",
     "creatorEmail": "創建者 Email",
     "creatorEmailPlaceholder": "請輸入有效的電子郵件地址",
     "creatorEmailHint": "此 Email 將用於解鎖活動結果。",
@@ -119,7 +120,8 @@
     "enterUnlockPrice": "輸入解鎖費用",
     "setDurationFirst": "請先設定活動時長",
     "unlockPriceRequired": "請輸入解鎖費用。",
-    "unlockPriceInvalid": "請輸入有效的金額。"
+    "unlockPriceInvalid": "請輸入有效的金額。",
+    "unlockPriceMaxExceeded": "解鎖價格最大值為 1,000,000 BTC。"
   },
   "confirmPay": {
     "extendTime": "延長 {{minutes}} 分",
