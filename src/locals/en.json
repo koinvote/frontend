@@ -117,6 +117,7 @@
     "resultVisibilityPaidOnly": "Paid-only",
     "resultVisibilityCreatorOnly": "Creator-only",
     "resultVisibilityRewardedOnly": "Available for rewarded events only",
+    "resultVisibilityOpenEndedDisabled": "Not available for open-ended events",
     "creatorEmail": "Creator email",
     "creatorEmailPlaceholder": "Please enter a valid email address",
     "creatorEmailHint": "This email will be used by you to unlock this event's results.",
