@@ -153,6 +153,8 @@
     "platformFee": "Platform Fee",
     "totalAmount": "Total Amount",
     "refundAddress": "Refund Address",
+    "unlockKey": "Unlock key",
+    "unlockKeyHint": "This address will be used by you to unlock this event's results.",
     "sendExactly": "Send exactly",
     "paymentAmountCopied": "Payment amount copied to clipboard",
     "failedToCopyPaymentAmount": "Failed to copy payment amount",
@@ -670,7 +672,13 @@
     "confirmPay": "Confirm & Pay",
     "reviewConfirm": "Please review and confirm your event details.",
     "noEventData": "No event data to preview. Please create an event first.",
-    "backToCreate": "Back to Create Event"
+    "backToCreate": "Back to Create Event",
+    "resultVisibility": "Result visibility",
+    "unlockEmail": "Unlock email",
+    "unlockEmailHint": "This email will be used by you to unlock this event's results.",
+    "confirmUnlockEmail": "Confirm unlock email",
+    "confirmUnlockEmailMismatch": "Email does not match.",
+    "unlockPrice": "Unlock price"
   },
   "confirmSign": {
     "title": "Confirm & Sign",

@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -16,6 +17,7 @@ import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { satsToBtc } from "@/utils/formatter";
+import { cn } from "@/utils/style";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -31,6 +33,9 @@ type PreviewEventState = {
   options?: string[];
   enablePreheat: boolean;
   preheatHours?: number;
+  resultVisibility?: "public" | "paid_only" | "creator_only";
+  creatorEmail?: string;
+  unlockPriceBtc?: string;
 };
 
 function formatDuration(
@@ -59,6 +64,8 @@ export default function PreviewEvent() {
   const { showToast } = useToast();
 
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
+  const [confirmEmail, setConfirmEmail] = useState("");
+  const confirmEmailRef = useRef<HTMLInputElement>(null);
 
   // Get system parameters
   const params = useSystemParametersStore((s) => s.params);
@@ -237,10 +244,20 @@ export default function PreviewEvent() {
     eventType,
     rewardBtc,
     options = [],
+    resultVisibility,
+    creatorEmail,
+    unlockPriceBtc,
   } = state || {};
 
   const handlePrimaryClick = useCallback(async () => {
     if (!state) return;
+    if (
+      state.resultVisibility === "paid_only" &&
+      confirmEmail !== state.creatorEmail
+    ) {
+      confirmEmailRef.current?.focus();
+      return;
+    }
     if (isFree) {
       // FREE flow → 先創建 event，然後導航到簽名流程
       try {
@@ -358,7 +375,7 @@ export default function PreviewEvent() {
         setIsCreatingEvent(false);
       }
     }
-  }, [isFree, state, navigate, showToast]);
+  }, [isFree, state, navigate, showToast, confirmEmail]);
 
   // Handle Enter key press for free events
   useEffect(() => {
@@ -386,17 +403,17 @@ export default function PreviewEvent() {
   // 如果 user 直接打網址進來，沒有 state，就導回 create-event
   if (!state) {
     return (
-      <div className="flex-col flex items-center justify-center w-full">
-        <div className="h-[50px] w-full relative">
+      <div className="flex w-full flex-col items-center justify-center">
+        <div className="relative h-[50px] w-full">
           <button
             type="button"
-            className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+            className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
             onClick={() => navigate(-1)}
           >
-            <CircleLeftIcon className="w-8 h-8 fill-current" />
+            <CircleLeftIcon className="h-8 w-8 fill-current" />
           </button>
         </div>
-        <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+        <div className="border-admin-bg bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
           <p className="tx-14 lh-20 text-primary">
             {t(
               "preview.noEventData",
@@ -419,22 +436,22 @@ export default function PreviewEvent() {
   }
 
   return (
-    <div className="flex-col flex items-center justify-center w-full">
-      <div className="h-[50px] w-full relative">
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="relative h-[50px] w-full">
         <button
           type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
           onClick={() => navigate(-1)}
         >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
+          <CircleLeftIcon className="h-8 w-8 fill-current" />
         </button>
       </div>
 
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+      <div className="border-admin-bg bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           {t("preview.title", "Preview Your Event")}
         </h1>
-        <p className="mt-1 tx-14 lh-20 text-secondary">{headerSubTitle}</p>
+        <p className="tx-14 lh-20 text-secondary mt-1">{headerSubTitle}</p>
 
         <div className="mt-6 space-y-4">
           {/* Creator address */}
@@ -497,7 +514,7 @@ export default function PreviewEvent() {
           {/* Single choice options */}
           {eventType === "single_choice" && options.length > 0 && (
             <Field label={t("preview.options", "Options")}>
-              <ol className="list-decimal pl-5 space-y-1">
+              <ol className="list-decimal space-y-1 pl-5">
                 {options.map((opt, idx) => (
                   <li key={idx} className="tx-14 lh-20 text-primary">
                     {opt || "--"}
@@ -519,6 +536,58 @@ export default function PreviewEvent() {
             </Field>
           )}
 
+          {/* Result visibility / unlock email / confirm unlock email / unlock price（paid_only 才顯示） */}
+          {resultVisibility === "paid_only" && (
+            <>
+              <Field label={t("preview.resultVisibility", "Result visibility")}>
+                {t("createEvent.resultVisibilityPaidOnly", "Paid-only")}
+              </Field>
+              <Field label={t("preview.unlockEmail", "Unlock email")}>
+                <div>
+                  <div>{creatorEmail || "--"}</div>
+                  <div className="tx-12 lh-18 mt-1 text-(--color-orange-500)">
+                    {t(
+                      "preview.unlockEmailHint",
+                      "This email will be used by you to unlock this event's results.",
+                    )}
+                  </div>
+                </div>
+              </Field>
+              <div className="space-y-1">
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("preview.confirmUnlockEmail", "Confirm unlock email")}
+                  <span className="text-(--color-orange-500)"> *</span>
+                </div>
+                <input
+                  ref={confirmEmailRef}
+                  type="text"
+                  value={confirmEmail}
+                  onChange={(e) => setConfirmEmail(e.target.value)}
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  autoComplete="one-time-code"
+                  spellCheck={false}
+                  placeholder={t(
+                    "preview.confirmUnlockEmail",
+                    "Confirm unlock email",
+                  )}
+                  className="tx-14 lh-20 placeholder:text-secondary border-border w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none"
+                />
+                {confirmEmail && confirmEmail !== creatorEmail && (
+                  <p className="tx-12 lh-18 text-red-500">
+                    {t(
+                      "preview.confirmUnlockEmailMismatch",
+                      "Email does not match.",
+                    )}
+                  </p>
+                )}
+              </div>
+              <Field label={t("preview.unlockPrice", "Unlock price")}>
+                {unlockPriceBtc ? `${unlockPriceBtc} BTC` : "--"}
+              </Field>
+            </>
+          )}
+
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (
             <>
@@ -535,7 +604,7 @@ export default function PreviewEvent() {
             <div className="flex flex-col gap-1">
               <span>{totalFeeDisplay}</span>
               {showLowTotalWarning && (
-                <span className="text-xs md:text-sm text-red-700 mt-1">
+                <span className="mt-1 text-xs text-red-700 md:text-sm">
                   {t(
                     "preview.lowAmountWarning",
                     "Under 0.00002 BTC, your wallet may not be able to send this transaction.",
@@ -547,7 +616,7 @@ export default function PreviewEvent() {
         </div>
 
         {/* Terms */}
-        <div className="pt-2 border-t border-border mt-2">
+        <div className="border-border mt-2 border-t pt-2">
           <p className="tx-12 lh-18 text-secondary">
             {t("preview.byProceeding", "By proceeding, you agree to the")}{" "}
             <Link to="/terms" className="text-(--color-orange-500) underline">
@@ -592,7 +661,12 @@ export default function PreviewEvent() {
             appearance="solid"
             tone="primary"
             text="sm"
-            className="sm:w-40"
+            className={cn(
+              "sm:w-40",
+              resultVisibility === "paid_only" &&
+                confirmEmail !== creatorEmail &&
+                "opacity-50",
+            )}
             disabled={isCreatingEvent}
             onClick={handlePrimaryClick}
           >
@@ -610,7 +684,9 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="space-y-1">
       <div className="tx-12 lh-18 text-secondary">{label}</div>
-      <div className="tx-14 lh-20 text-primary whitespace-pre-line break-words">{children}</div>
+      <div className="tx-14 lh-20 text-primary break-words whitespace-pre-line">
+        {children}
+      </div>
     </div>
   );
 }
