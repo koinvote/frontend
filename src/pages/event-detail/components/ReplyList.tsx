@@ -5,19 +5,23 @@ import CopyIcon from "@/assets/icons/copy.svg?react";
 import InvalidateIcon from "@/assets/icons/invalidate.svg?react";
 import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
 import IconSha from "@/assets/icons/sha256.svg?react";
+import UnlockIcon from "@/assets/icons/unlock.svg?react";
+import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
+import { cn } from "@/utils/style";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 // import ReportIcon from "@/assets/icons/report.svg?react";
-import { Button } from "@/components/base/Button";
+import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
 import { formatRelativeTime } from "@/utils/formatter";
@@ -35,6 +39,13 @@ interface ReplyListProps {
   eventType?: EventType;
   eventStatus?: number;
   balanceDisplayMode?: "snapshot" | "on_chain";
+  resultVisibility?: "public" | "paid_only" | "creator_only";
+  unlockPrice?: string;
+  unlockCount?: number;
+  participantsCount?: number;
+  totalStakeSatoshi?: number;
+  eventTitle?: string;
+  onLockedChange?: (locked: boolean) => void;
 }
 
 function truncateAddress(
@@ -64,18 +75,40 @@ export function ReplyList({
   eventType,
   eventStatus,
   balanceDisplayMode,
+  resultVisibility,
+  unlockPrice,
+  unlockCount,
+  participantsCount,
+  totalStakeSatoshi,
+  eventTitle,
+  onLockedChange,
 }: ReplyListProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
   const limit = 20;
+
+  const [unlockEmail, setUnlockEmail] = useState("");
+  const [submittedEmail, setSubmittedEmail] = useState("");
+  const unlockInputRef = useRef<HTMLInputElement>(null);
 
   const {
     data: repliesData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["replies", eventId, page, limit, search, sortBy, order, balanceDisplayMode],
+    queryKey: [
+      "replies",
+      eventId,
+      page,
+      limit,
+      search,
+      sortBy,
+      order,
+      balanceDisplayMode,
+      submittedEmail,
+    ],
     queryFn: async () => {
       const balanceType =
         balanceDisplayMode === "on_chain" ? "current" : "snapshot";
@@ -87,8 +120,12 @@ export function ReplyList({
         page,
         limit,
         balance_type: balanceType,
+        unlock_email: submittedEmail || undefined,
       })) as unknown as ApiResponse<GetListRepliesRes>;
       if (!response.success) {
+        if (response.message === "locked") {
+          return null; // locked sentinel
+        }
         throw new Error(response.message || "Failed to fetch replies");
       }
       return response.data;
@@ -96,6 +133,29 @@ export function ReplyList({
     enabled: !!eventId,
     placeholderData: keepPreviousData,
   });
+
+  const isLocked = !isLoading && !error && repliesData === null;
+
+  useEffect(() => {
+    onLockedChange?.(isLocked);
+  }, [isLocked, onLockedChange]);
+
+  // When a submitted email still results in locked, redirect to unlock payment page
+  useEffect(() => {
+    if (submittedEmail && isLocked) {
+      navigate(`/event/${eventId}/unlock-payment`, {
+        state: { email: submittedEmail, unlockPrice, eventTitle },
+      });
+    }
+  }, [submittedEmail, isLocked, eventId, unlockPrice, eventTitle, navigate]);
+
+  const handleUnlock = () => {
+    if (!unlockEmail.trim()) {
+      unlockInputRef.current?.focus();
+      return;
+    }
+    setSubmittedEmail(unlockEmail.trim());
+  };
 
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {
     try {
@@ -132,6 +192,89 @@ export function ReplyList({
               : t("replyList.unknownError", "Unknown error")}
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (isLocked) {
+    const totalBtc = satsToBtc(totalStakeSatoshi ?? null, { suffix: false });
+    return (
+      <div className="border-border bg-surface flex flex-col items-center rounded-xl border px-6 py-10 text-center">
+        <div className="bg-surface-hover mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+          <UnlockIcon className="h-7 w-7" />
+        </div>
+        <p className="tx-16 fw-m mb-1 text-(--color-orange-500)">
+          {t(
+            "replyList.unlockResultsWith",
+            "Unlock Results with {{price}} BTC",
+            {
+              price: unlockPrice ?? "?",
+            },
+          )}
+        </p>
+        {unlockCount !== undefined && (
+          <p className="tx-14 mb-4">
+            <span className="fw-m text-(--color-orange-500)">
+              {unlockCount}
+            </span>{" "}
+            <span className="text-primary">
+              {t("replyList.unlocked", "unlocked")}
+            </span>
+          </p>
+        )}
+        <div className="text-secondary tx-13 mb-6 flex items-center gap-4">
+          {participantsCount !== undefined && (
+            <span className="flex items-center gap-1">
+              <EventCardParticipantsIcon className="h-3 w-3" />
+              {t("replyList.participantsCount", "{{count}} Participants", {
+                count: participantsCount,
+              })}
+            </span>
+          )}
+          {totalStakeSatoshi !== undefined && (
+            <span className="flex items-center gap-1">
+              <span>₿</span>
+              {totalBtc} {t("replyList.btcTotal", "BTC Total")}
+            </span>
+          )}
+        </div>
+        <div className="w-full max-w-sm space-y-1">
+          <input
+            ref={unlockInputRef}
+            type="text"
+            name="field_wifjvn1w"
+            id="field_wifjvn1w"
+            autoCorrect="off"
+            autoCapitalize="off"
+            autoComplete="one-time-code"
+            spellCheck="false"
+            value={unlockEmail}
+            onChange={(e) => setUnlockEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleUnlock();
+            }}
+            placeholder={t(
+              "replyList.unlockEmailPlaceholder",
+              "your@email.com",
+            )}
+            className="border-border bg-bg text-primary tx-14 py-2outline-none w-full rounded-lg border px-3 py-2 outline-0 focus:ring-2 focus:ring-(--color-orange-500)"
+          />
+          <p className="text-secondary tx-12 text-left">
+            {t("replyList.enterUnlockEmail", "Enter your unlock email")}
+          </p>
+        </div>
+        <Button
+          type="button"
+          appearance="solid"
+          tone="primary"
+          className={cn(
+            "mt-4 w-full max-w-sm",
+            !unlockEmail.trim() && "opacity-50",
+          )}
+          onClick={handleUnlock}
+        >
+          {t("replyList.unlock", "Unlock")}
+        </Button>
       </div>
     );
   }
