@@ -25,13 +25,13 @@ export function SignModal({ open, data, onClose, onSuccess }: SignModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleWithdraw = async () => {
-    if (!data || !adminAddress.trim() || !signature.trim()) return;
+    if (!data || !signature.trim()) return;
 
     setIsSubmitting(true);
     setSignatureError("");
     try {
       const res = (await AdminAPI.createWithdrawal({
-        admin_address: adminAddress.trim(),
+        admin_address: systemConsts.ADMIN_ADDRESS,
         hash_key: data.hash_key,
         signature: signature.trim(),
       })) as unknown as ApiResponse<unknown>;
