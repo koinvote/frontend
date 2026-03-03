@@ -124,6 +124,8 @@ export interface EventDetailDataRes {
   hashtags: string[];
   preheat_hours: number;
   result_visibility?: "public" | "paid_only" | "creator_only";
+  unlock_price?: string;
+  unlock_count?: number;
 }
 
 export interface GetSignaturePlainTextRes {
@@ -183,6 +185,7 @@ export interface Reply {
   balance_at_current_satoshi: number; //Current real-time balance
   balance_last_updated_at: string;
   is_hidden: boolean;
+  is_creator?: 0 | 1;
   created_at: string;
   created_by_ip: string;
   updated_at: string;

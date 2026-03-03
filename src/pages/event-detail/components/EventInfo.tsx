@@ -471,6 +471,22 @@ export function EventInfo({
       ),
     });
 
+    if (event.result_visibility) {
+      fields.push({
+        key: "result-visibility",
+        label: t("eventInfo.resultVisibility", "Result visibility:"),
+        value: (
+          <span className="text-xs">
+            {event.result_visibility === "public"
+              ? t("reply.resultVisibilityPublic", "Public")
+              : event.result_visibility === "paid_only"
+                ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+          </span>
+        ),
+      });
+    }
+
     if (event.hashtags && event.hashtags.length > 0) {
       fields.push({
         key: "hashtags",
@@ -521,6 +537,7 @@ export function EventInfo({
     event.event_id,
     event.creator_address,
     event.event_type,
+    event.result_visibility,
     event.hashtags,
     handleAddressClick,
     handleHashtagClick,
@@ -735,6 +752,38 @@ export function EventInfo({
                 : t("reply.singleChoice", "Multiple choice")}
             </span>
           </div>
+
+          {event.hashtags && event.hashtags.length > 0 && (
+            <div>
+              <span className="text-secondary text-xs md:text-sm">
+                {event.hashtags.length > 1
+                  ? t("eventInfo.hashtags", "Hashtags:")
+                  : t("eventInfo.hashtag", "Hashtag:")}
+              </span>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {event.hashtags.map((tag, index) => {
+                  const hashtagWithPrefix = tag.startsWith("#")
+                    ? tag
+                    : `#${tag}`;
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => handleHashtagClick(tag)}
+                      className="inline-flex cursor-pointer items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-black transition-colors hover:bg-gray-300 md:text-sm dark:bg-white dark:hover:bg-gray-100"
+                      aria-label={t(
+                        "eventInfo.filterByHashtag",
+                        "Filter by {{hashtag}}",
+                        { hashtag: hashtagWithPrefix },
+                      )}
+                    >
+                      {hashtagWithPrefix}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column */}
@@ -772,35 +821,18 @@ export function EventInfo({
             </span>
           </div>
 
-          {event.hashtags && event.hashtags.length > 0 && (
+          {event.result_visibility && (
             <div>
               <span className="text-secondary text-xs md:text-sm">
-                {event.hashtags.length > 1
-                  ? t("eventInfo.hashtags", "Hashtags:")
-                  : t("eventInfo.hashtag", "Hashtag:")}
+                {t("eventInfo.resultVisibility", "Result visibility:")}
               </span>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {event.hashtags.map((tag, index) => {
-                  const hashtagWithPrefix = tag.startsWith("#")
-                    ? tag
-                    : `#${tag}`;
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleHashtagClick(tag)}
-                      className="inline-flex cursor-pointer items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-black transition-colors hover:bg-gray-300 md:text-sm dark:bg-white dark:hover:bg-gray-100"
-                      aria-label={t(
-                        "eventInfo.filterByHashtag",
-                        "Filter by {{hashtag}}",
-                        { hashtag: hashtagWithPrefix },
-                      )}
-                    >
-                      {hashtagWithPrefix}
-                    </button>
-                  );
-                })}
-              </div>
+              <span className="ml-2 text-xs text-black md:text-sm dark:text-white">
+                {event.result_visibility === "public"
+                  ? t("reply.resultVisibilityPublic", "Public")
+                  : event.result_visibility === "paid_only"
+                    ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                    : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+              </span>
             </div>
           )}
         </div>

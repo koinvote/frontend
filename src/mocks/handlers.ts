@@ -360,6 +360,7 @@ export const handlers = [
     const search = url.searchParams.get("search") || "";
     const sortBy = url.searchParams.get("sortBy") || "balance";
     const balanceType = url.searchParams.get("balance_type") || "snapshot";
+    const unlockEmail = url.searchParams.get("unlock_email") || "";
 
     // Return empty if no event_id
     if (!eventId) {
@@ -374,9 +375,27 @@ export const handlers = [
       );
     }
 
-    let replies = eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
-      ? [...mockExchangeEventReplies]
-      : [...mockGetListRepliesResponse.replies];
+    // Check if this event requires unlock (paid_only result visibility)
+    // For testing: use "paid@test.com" as the verified paid email
+    const PAID_UNLOCK_EMAILS = ["paid@test.com"];
+    const eventDetail =
+      eventId === mockEventDetail.event_id ? mockEventDetail : null;
+    if (
+      eventDetail?.result_visibility === "paid_only" &&
+      (!unlockEmail || !PAID_UNLOCK_EMAILS.includes(unlockEmail))
+    ) {
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000123",
+        success: false,
+        message: "locked",
+        data: {},
+      });
+    }
+
+    let replies =
+      eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
+        ? [...mockExchangeEventReplies]
+        : [...mockGetListRepliesResponse.replies];
 
     // Filter by search
     if (search) {
@@ -395,7 +414,8 @@ export const handlers = [
         );
       } else {
         replies.sort(
-          (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
+          (a, b) =>
+            b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
         );
       }
     } else if (sortBy === "time") {

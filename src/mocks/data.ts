@@ -292,7 +292,9 @@ export const mockEventDetail: EventDetailDataRes = {
   ],
   hashtags: ["bitcoin", "lightning", "scaling"],
   preheat_hours: 12,
-  result_visibility: "public",
+  result_visibility: "paid_only",
+  unlock_price: "0.0005",
+  unlock_count: 128,
 };
 
 // Hot Hashtags Mock

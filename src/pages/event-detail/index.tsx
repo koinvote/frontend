@@ -28,6 +28,7 @@ const EventDetail = () => {
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
   >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
+  const [isRepliesLocked, setIsRepliesLocked] = useState(false);
 
   const {
     data: eventDetail,
@@ -241,14 +242,16 @@ const EventDetail = () => {
         </div>
 
         {/* Second Section: Search and Filter */}
-        <SearchAndFilter
-          eventId={eventId!}
-          eventStatus={eventDetail.status}
-          balanceDisplayMode={effectiveBalanceDisplayMode}
-          onBalanceDisplayModeChange={setBalanceDisplayMode}
-          onSearchChange={handleSearchChange}
-          onSortChange={handleSortChange}
-        />
+        {!isRepliesLocked && (
+          <SearchAndFilter
+            eventId={eventId!}
+            eventStatus={eventDetail.status}
+            balanceDisplayMode={effectiveBalanceDisplayMode}
+            onBalanceDisplayModeChange={setBalanceDisplayMode}
+            onSearchChange={handleSearchChange}
+            onSortChange={handleSortChange}
+          />
+        )}
 
         <div className="h-4" />
 
@@ -262,6 +265,13 @@ const EventDetail = () => {
           order={order}
           options={eventDetail.options}
           eventType={eventDetail.event_type}
+          resultVisibility={eventDetail.result_visibility}
+          unlockPrice={eventDetail.unlock_price}
+          unlockCount={eventDetail.unlock_count}
+          participantsCount={eventDetail.participants_count}
+          totalStakeSatoshi={eventDetail.total_stake_satoshi}
+          eventTitle={eventDetail.title}
+          onLockedChange={setIsRepliesLocked}
         />
       </div>
     </div>
