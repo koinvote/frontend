@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { Tooltip } from "antd";
+import { useEffect, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
@@ -13,18 +14,41 @@ export function ResultVisibilityField() {
     register,
     watch,
     clearErrors,
+    setValue,
     formState: { errors },
   } = useFormContext<CreateEventFormValues>();
 
   const resultVisibility = watch("resultVisibility");
   const durationHours = watch("durationHours");
+  const isRewarded = watch("isRewarded");
 
   const resultVisibilityRef = useRef(resultVisibility);
   resultVisibilityRef.current = resultVisibility;
 
+  // When switching to non-rewarded, reset any rewarded-only visibility selection
+  useEffect(() => {
+    if (
+      !isRewarded &&
+      (resultVisibility === "paid_only" || resultVisibility === "creator_only")
+    ) {
+      setValue("resultVisibility", "public");
+      clearErrors("creatorEmail");
+      clearErrors("unlockPriceBtc");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRewarded]);
+
+  const rewardedOnlyTooltip = t(
+    "createEvent.resultVisibilityRewardedOnly",
+    "Available for rewarded events only",
+  );
+
   return (
     <div>
-      <p className="tx-14 lh-20 fw-m text-primary mb-2">
+      <p
+        id="resultVisibilityTitle"
+        className="tx-14 lh-20 fw-m text-primary mb-2"
+      >
         {t("createEvent.resultVisibility", "Result visibility")}
         <span className="text-(--color-orange-500)"> *</span>
       </p>
@@ -33,67 +57,79 @@ export function ResultVisibilityField() {
         name="resultVisibility"
         render={({ field }) => (
           <div className="flex gap-6">
-            {(
-              [
-                "public",
-                "paid_only",
-                "creator_only",
-              ] as ResultVisibility[]
-            ).map((value) => (
-              <label
-                key={value}
-                className="flex items-center gap-2 tx-14 lh-20 text-primary cursor-pointer"
-              >
-                <input
-                  name="resultVisibility"
-                  type="radio"
-                  className="radio-orange"
-                  checked={field.value === value}
-                  onChange={() => {
-                    field.onChange(value);
-                    if (value !== "paid_only") {
-                      clearErrors("creatorEmail");
-                      clearErrors("unlockPriceBtc");
-                    }
-                  }}
-                />
-                <span>
-                  {value === "public" &&
-                    t(
-                      "createEvent.resultVisibilityPublic",
-                      "Public",
-                    )}
-                  {value === "paid_only" &&
-                    t(
-                      "createEvent.resultVisibilityPaidOnly",
-                      "Paid-only",
-                    )}
-                  {value === "creator_only" &&
-                    t(
-                      "createEvent.resultVisibilityCreatorOnly",
-                      "Creator-only",
-                    )}
-                </span>
-              </label>
-            ))}
+            {(["public", "paid_only"] as ResultVisibility[]).map((value) => {
+              const isDisabled =
+                !isRewarded &&
+                (value === "paid_only" || value === "creator_only");
+
+              const radioLabel = (
+                <label
+                  className={cn(
+                    "tx-14 lh-20 text-primary flex items-center gap-2",
+                    isDisabled
+                      ? "cursor-not-allowed opacity-40"
+                      : "cursor-pointer",
+                  )}
+                >
+                  <input
+                    name="resultVisibility"
+                    type="radio"
+                    className="radio-orange"
+                    checked={field.value === value}
+                    disabled={isDisabled}
+                    onChange={() => {
+                      field.onChange(value);
+                      if (value !== "paid_only") {
+                        clearErrors("creatorEmail");
+                        clearErrors("unlockPriceBtc");
+                      }
+                    }}
+                  />
+                  <span>
+                    {value === "public" &&
+                      t("createEvent.resultVisibilityPublic", "Public")}
+                    {value === "paid_only" &&
+                      t("createEvent.resultVisibilityPaidOnly", "Paid-only")}
+                    {value === "creator_only" &&
+                      t(
+                        "createEvent.resultVisibilityCreatorOnly",
+                        "Creator-only",
+                      )}
+                  </span>
+                </label>
+              );
+
+              return isDisabled ? (
+                <Tooltip
+                  key={value}
+                  title={rewardedOnlyTooltip}
+                  color="white"
+                  placement="top"
+                >
+                  {/* span wrapper needed for Tooltip to attach hover events to a non-interactive element */}
+                  <span>{radioLabel}</span>
+                </Tooltip>
+              ) : (
+                <span key={value}>{radioLabel}</span>
+              );
+            })}
           </div>
         )}
       />
 
       {/* Extra fields shown only when paid_only is selected */}
       {resultVisibility === "paid_only" && (
-        <div className="mt-4 rounded-xl border border-border bg-surface p-4 space-y-4">
+        <div className="border-border bg-surface mt-4 space-y-4 rounded-xl border p-4">
           {/* Creator email */}
           <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
               {t("createEvent.creatorEmail", "Creator email")}
               <span className="text-(--color-orange-500)"> *</span>
             </label>
             <input
               {...register("creatorEmail", {
                 validate: (v) => {
-                  if (resultVisibilityRef.current !== "paid_only")
-                    return true;
+                  if (resultVisibilityRef.current !== "paid_only") return true;
                   if (!v || !v.trim())
                     return t(
                       "createEvent.creatorEmailRequired",
@@ -109,13 +145,18 @@ export function ResultVisibilityField() {
                 },
               })}
               type="text"
+              name="field_wifjvn1w"
+              id="field_wifjvn1w"
+              autoCorrect="off"
+              autoCapitalize="off"
               autoComplete="one-time-code"
+              spellCheck="false"
               placeholder={t(
                 "createEvent.creatorEmailPlaceholder",
                 "Please enter a valid email address",
               )}
               className={cn(
-                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
+                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
                 errors.creatorEmail
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-(--color-orange-500)",
@@ -128,7 +169,7 @@ export function ResultVisibilityField() {
               )}
             </p>
             {errors.creatorEmail && (
-              <p className="tx-12 lh-18 text-red-500 mt-1">
+              <p className="tx-12 lh-18 mt-1 text-red-500">
                 {errors.creatorEmail.message}
               </p>
             )}
@@ -136,7 +177,7 @@ export function ResultVisibilityField() {
 
           {/* Unlock price (BTC) */}
           <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
               {t("createEvent.unlockPriceBtc", "Unlock price (BTC)")}
               <span className="text-(--color-orange-500)"> *</span>
             </label>
@@ -145,8 +186,7 @@ export function ResultVisibilityField() {
               name="unlockPriceBtc"
               rules={{
                 validate: (v) => {
-                  if (resultVisibilityRef.current !== "paid_only")
-                    return true;
+                  if (resultVisibilityRef.current !== "paid_only") return true;
                   if (!v || v.trim() === "")
                     return t(
                       "createEvent.unlockPriceRequired",
@@ -157,6 +197,11 @@ export function ResultVisibilityField() {
                     return t(
                       "createEvent.unlockPriceInvalid",
                       "Please enter a valid amount.",
+                    );
+                  if (amount > 1_000_000)
+                    return t(
+                      "createEvent.unlockPriceMaxExceeded",
+                      "Maximum unlock price is 1,000,000 BTC.",
                     );
                   return true;
                 },
@@ -195,17 +240,11 @@ export function ResultVisibilityField() {
                   }}
                   placeholder={
                     Number(durationHours) > 0
-                      ? t(
-                          "createEvent.enterUnlockPrice",
-                          "Enter unlock price",
-                        )
-                      : t(
-                          "createEvent.setDurationFirst",
-                          "Set Duration First",
-                        )
+                      ? t("createEvent.enterUnlockPrice", "Enter unlock price")
+                      : t("createEvent.setDurationFirst", "Set Duration First")
                   }
                   className={cn(
-                    "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                    "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
                     errors.unlockPriceBtc
                       ? "border-red-500 focus:ring-red-500"
                       : "border-border focus:ring-(--color-orange-500)",
@@ -214,7 +253,7 @@ export function ResultVisibilityField() {
               )}
             />
             {errors.unlockPriceBtc && (
-              <p className="tx-12 lh-18 text-red-500 mt-1">
+              <p className="tx-12 lh-18 mt-1 text-red-500">
                 {errors.unlockPriceBtc.message}
               </p>
             )}

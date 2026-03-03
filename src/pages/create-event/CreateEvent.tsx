@@ -149,7 +149,11 @@ export default function CreateEvent() {
       ) {
         let highLightEl: HTMLElement | null = el.closest("label");
 
-        if (lastField === "responseType" || lastField === "rewardType") {
+        if (
+          lastField === "responseType" ||
+          lastField === "rewardType" ||
+          lastField === "resultVisibility"
+        ) {
           highLightEl = formRef.current.querySelector<HTMLElement>(
             `#${CSS.escape(lastField)}Title`,
           );
