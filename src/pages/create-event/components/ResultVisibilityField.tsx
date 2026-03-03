@@ -21,14 +21,15 @@ export function ResultVisibilityField() {
   const resultVisibility = watch("resultVisibility");
   const durationHours = watch("durationHours");
   const isRewarded = watch("isRewarded");
+  const eventType = watch("eventType");
 
   const resultVisibilityRef = useRef(resultVisibility);
   resultVisibilityRef.current = resultVisibility;
 
-  // When switching to non-rewarded, reset any rewarded-only visibility selection
+  // When switching to non-rewarded or open-ended, reset restricted visibility selections
   useEffect(() => {
     if (
-      !isRewarded &&
+      (!isRewarded || eventType === "open") &&
       (resultVisibility === "paid_only" || resultVisibility === "creator_only")
     ) {
       setValue("resultVisibility", "public");
@@ -36,11 +37,15 @@ export function ResultVisibilityField() {
       clearErrors("unlockPriceBtc");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRewarded]);
+  }, [isRewarded, eventType]);
 
   const rewardedOnlyTooltip = t(
     "createEvent.resultVisibilityRewardedOnly",
     "Available for rewarded events only",
+  );
+  const openEndedDisabledTooltip = t(
+    "createEvent.resultVisibilityOpenEndedDisabled",
+    "Not available for open-ended events",
   );
 
   return (
@@ -58,9 +63,15 @@ export function ResultVisibilityField() {
         render={({ field }) => (
           <div className="flex gap-6">
             {(["public", "paid_only"] as ResultVisibility[]).map((value) => {
-              const isDisabled =
-                !isRewarded &&
-                (value === "paid_only" || value === "creator_only");
+              const isForRestricted =
+                value === "paid_only" || value === "creator_only";
+              const isDisabledForNonRewarded = !isRewarded && isForRestricted;
+              const isDisabledForOpenEnded =
+                eventType === "open" && isForRestricted;
+              const isDisabled = isDisabledForNonRewarded || isDisabledForOpenEnded;
+              const tooltipTitle = isDisabledForOpenEnded
+                ? openEndedDisabledTooltip
+                : rewardedOnlyTooltip;
 
               const radioLabel = (
                 <label
@@ -102,7 +113,7 @@ export function ResultVisibilityField() {
               return isDisabled ? (
                 <Tooltip
                   key={value}
-                  title={rewardedOnlyTooltip}
+                  title={tooltipTitle}
                   color="white"
                   placement="top"
                 >
