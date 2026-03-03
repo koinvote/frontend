@@ -406,7 +406,9 @@ export default function ReplyPage() {
           </div>
 
           <h3 className="tx-16 lh-24 fw-m text-primary mb-2">{event.title}</h3>
-          <p className="tx-14 lh-20 text-secondary whitespace-pre-line mb-4">{event.description}</p>
+          <p className="tx-14 lh-20 text-secondary mb-4 whitespace-pre-line">
+            {event.description}
+          </p>
 
           <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
             <EventInfoBox
@@ -441,6 +443,16 @@ export default function ReplyPage() {
               {event.event_type === "open"
                 ? t("reply.openEnded", "Open-ended")
                 : t("reply.singleChoice", "Single-choice")}
+            </span>
+            <span className="tx-14 text-secondary">
+              {t("reply.resultVisibility", "Result visibility")}:
+            </span>
+            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
             </span>
           </div>
         </div>
