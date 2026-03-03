@@ -105,7 +105,21 @@
     "errorDuplicateOption": "已存在相同的選項",
     "maxHashtags": "最多 3 個標籤",
     "rewardDistributionText": "獎勵將分配給最多 {{count}} 個地址",
-    "rewardDistributionTextPlural": "獎勵將分配給最多 {{count}} 個地址"
+    "rewardDistributionTextPlural": "獎勵將分配給最多 {{count}} 個地址",
+    "resultVisibility": "結果可見性",
+    "resultVisibilityPublic": "公開",
+    "resultVisibilityPaidOnly": "僅付費可見",
+    "resultVisibilityCreatorOnly": "僅創建者可見",
+    "creatorEmail": "創建者 Email",
+    "creatorEmailPlaceholder": "請輸入有效的電子郵件地址",
+    "creatorEmailHint": "此 Email 將用於解鎖活動結果。",
+    "creatorEmailRequired": "請輸入您的電子郵件。",
+    "creatorEmailInvalid": "請輸入有效的電子郵件地址。",
+    "unlockPriceBtc": "解鎖費用 (BTC)",
+    "enterUnlockPrice": "輸入解鎖費用",
+    "setDurationFirst": "請先設定活動時長",
+    "unlockPriceRequired": "請輸入解鎖費用。",
+    "unlockPriceInvalid": "請輸入有效的金額。"
   },
   "confirmPay": {
     "extendTime": "延長 {{minutes}} 分",

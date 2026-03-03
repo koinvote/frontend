@@ -111,7 +111,21 @@
     "errorDuplicateOption": "Duplicate option already exists",
     "maxHashtags": "Max 3 hashtags",
     "rewardDistributionText": "The reward will be distributed to up to {{count}} address",
-    "rewardDistributionTextPlural": "The reward will be distributed to up to {{count}} addresses"
+    "rewardDistributionTextPlural": "The reward will be distributed to up to {{count}} addresses",
+    "resultVisibility": "Result visibility",
+    "resultVisibilityPublic": "Public",
+    "resultVisibilityPaidOnly": "Paid-only",
+    "resultVisibilityCreatorOnly": "Creator-only",
+    "creatorEmail": "Creator email",
+    "creatorEmailPlaceholder": "Please enter a valid email address",
+    "creatorEmailHint": "This email will be used by you to unlock this event's results.",
+    "creatorEmailRequired": "Please enter your email.",
+    "creatorEmailInvalid": "Please enter a valid email address.",
+    "unlockPriceBtc": "Unlock price (BTC)",
+    "enterUnlockPrice": "Enter unlock price",
+    "setDurationFirst": "Set Duration First",
+    "unlockPriceRequired": "Please enter unlock price.",
+    "unlockPriceInvalid": "Please enter a valid amount."
   },
   "confirmPay": {
     "extendTime": "Extend {{minutes}} min",

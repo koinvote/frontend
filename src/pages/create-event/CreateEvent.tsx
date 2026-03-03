@@ -27,6 +27,8 @@ import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { satsToBtc } from "@/utils/formatter";
 import { useTranslation } from "react-i18next";
 
+type ResultVisibility = "public" | "paid_only" | "creator_only";
+
 type PreviewEventState = {
   creatorAddress: string;
   title: string;
@@ -40,6 +42,9 @@ type PreviewEventState = {
   options?: string[];
   enablePreheat: boolean;
   preheatHours?: number;
+  resultVisibility: ResultVisibility;
+  creatorEmail?: string;
+  unlockPriceBtc?: string;
 };
 
 type CreateEventDraft = {
@@ -55,6 +60,9 @@ type CreateEventDraft = {
   enablePreheat: boolean;
   preheatHours: string;
   agree: boolean;
+  resultVisibility: ResultVisibility;
+  creatorEmail: string;
+  unlockPriceBtc: string;
 };
 
 type CreateEventFormValues = {
@@ -69,6 +77,9 @@ type CreateEventFormValues = {
   enablePreheat: boolean;
   preheatHours: string;
   agree: boolean;
+  resultVisibility: ResultVisibility;
+  creatorEmail: string;
+  unlockPriceBtc: string;
 };
 
 const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
@@ -85,6 +96,9 @@ const DEFAULT_VALUES: CreateEventFormValues = {
   enablePreheat: false,
   preheatHours: "",
   agree: false,
+  resultVisibility: "public",
+  creatorEmail: "",
+  unlockPriceBtc: "",
 };
 
 const normalizeTag = (raw: string) => {
@@ -196,6 +210,7 @@ export default function CreateEvent() {
   const description = watch("description");
   const preheatHours = watch("preheatHours");
   const agree = watch("agree");
+  const resultVisibility = watch("resultVisibility");
 
   // Refs for current values used inside validate closures to avoid stale captures
   const addrStatusRef = useRef(addrStatus);
@@ -209,6 +224,8 @@ export default function CreateEvent() {
   const minRewardBtcRef = useRef(0);
   const hashtagListRef = useRef(hashtagList);
   hashtagListRef.current = hashtagList;
+  const resultVisibilityRef = useRef(resultVisibility);
+  resultVisibilityRef.current = resultVisibility;
 
   // -------- Effects --------
 
@@ -372,6 +389,9 @@ export default function CreateEvent() {
         enablePreheat: draft.enablePreheat ?? false,
         preheatHours: draft.preheatHours ?? "",
         agree: draft.agree ?? false,
+        resultVisibility: draft.resultVisibility ?? "public",
+        creatorEmail: draft.creatorEmail ?? "",
+        unlockPriceBtc: draft.unlockPriceBtc ?? "",
       });
 
       setHashtagList(
@@ -384,6 +404,9 @@ export default function CreateEvent() {
       if (draft.rewardBtc) {
         // Mark rewardBtc as touched so isPreviewDisabled sees it
         trigger("rewardBtc");
+      }
+      if (draft.unlockPriceBtc) {
+        trigger("unlockPriceBtc");
       }
 
       highlightLastField();
@@ -413,6 +436,9 @@ export default function CreateEvent() {
         enablePreheat: values.enablePreheat ?? false,
         preheatHours: values.preheatHours ?? "",
         agree: values.agree ?? false,
+        resultVisibility: values.resultVisibility ?? "public",
+        creatorEmail: values.creatorEmail ?? "",
+        unlockPriceBtc: values.unlockPriceBtc ?? "",
       };
       sessionStorage.setItem(CREATE_EVENT_DRAFT_KEY, JSON.stringify(draft));
     });
@@ -436,14 +462,20 @@ export default function CreateEvent() {
       enablePreheat: values.enablePreheat ?? false,
       preheatHours: values.preheatHours ?? "",
       agree: values.agree ?? false,
+      resultVisibility: values.resultVisibility ?? "public",
+      creatorEmail: values.creatorEmail ?? "",
+      unlockPriceBtc: values.unlockPriceBtc ?? "",
     };
     sessionStorage.setItem(CREATE_EVENT_DRAFT_KEY, JSON.stringify(draft));
   }, [hashtagList, watch]);
 
-  // Re-validate rewardBtc when minRewardBtc changes (durationHours changed)
+  // Re-validate rewardBtc / unlockPriceBtc when minRewardBtc changes (durationHours changed)
   useEffect(() => {
     if (touchedFields.rewardBtc) {
       trigger("rewardBtc");
+    }
+    if (touchedFields.unlockPriceBtc) {
+      trigger("unlockPriceBtc");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [durationHours]);
@@ -455,6 +487,19 @@ export default function CreateEvent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enablePreheat]);
+
+  // When switching away from paid_only, clear those errors; switching to paid_only,
+  // re-validate if already touched so errors appear immediately.
+  useEffect(() => {
+    if (resultVisibility !== "paid_only") {
+      clearErrors("creatorEmail");
+      clearErrors("unlockPriceBtc");
+    } else {
+      if (touchedFields.creatorEmail) trigger("creatorEmail");
+      if (touchedFields.unlockPriceBtc) trigger("unlockPriceBtc");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultVisibility]);
 
   // -------- System parameters --------
   const params = useSystemParametersStore((s) => s.params);
@@ -617,6 +662,10 @@ export default function CreateEvent() {
       !!errors.rewardBtc ||
       (eventType === "single_choice" && hasOptionsError) ||
       (enablePreheat && !!errors.preheatHours) ||
+      (resultVisibility === "paid_only" &&
+        (!touchedFields.creatorEmail || !!errors.creatorEmail)) ||
+      (resultVisibility === "paid_only" &&
+        (!touchedFields.unlockPriceBtc || !!errors.unlockPriceBtc)) ||
       !agree
     );
   }, [
@@ -633,6 +682,11 @@ export default function CreateEvent() {
     addrStatus,
     enablePreheat,
     validateOptions,
+    resultVisibility,
+    touchedFields.creatorEmail,
+    errors.creatorEmail,
+    touchedFields.unlockPriceBtc,
+    errors.unlockPriceBtc,
   ]);
 
   // -------- Hashtag handlers --------
@@ -760,6 +814,11 @@ export default function CreateEvent() {
       options: cleanedOptions,
       enablePreheat: data.enablePreheat,
       preheatHours: data.enablePreheat && preheat > 0 ? preheat : undefined,
+      resultVisibility: data.resultVisibility,
+      creatorEmail:
+        data.resultVisibility === "paid_only" ? data.creatorEmail : undefined,
+      unlockPriceBtc:
+        data.resultVisibility === "paid_only" ? data.unlockPriceBtc : undefined,
     };
 
     navigate("/preview-event", { state: previewData });
@@ -1274,6 +1333,7 @@ export default function CreateEvent() {
                     const n = Number(v);
                     if (!Number.isFinite(n) || n <= 0) {
                       setValue("rewardBtc", "");
+                      setValue("unlockPriceBtc", "");
                     }
                   }}
                   onPaste={(e) => {
@@ -1285,6 +1345,7 @@ export default function CreateEvent() {
                       const n = Number(numbersOnly);
                       if (!Number.isFinite(n) || n <= 0) {
                         setValue("rewardBtc", "");
+                        setValue("unlockPriceBtc", "");
                       }
                     }
                   }}
@@ -1452,6 +1513,204 @@ export default function CreateEvent() {
               </p>
             </div>
           )}
+
+          {/* Result visibility */}
+          <div>
+            <p className="tx-14 lh-20 fw-m text-primary mb-2">
+              {t("createEvent.resultVisibility", "Result visibility")}
+              <span className="text-(--color-orange-500)"> *</span>
+            </p>
+            <Controller
+              control={control}
+              name="resultVisibility"
+              render={({ field }) => (
+                <div className="flex gap-6">
+                  {(
+                    [
+                      "public",
+                      "paid_only",
+                      "creator_only",
+                    ] as ResultVisibility[]
+                  ).map((value) => (
+                    <label
+                      key={value}
+                      className="tx-14 lh-20 text-primary flex cursor-pointer items-center gap-2"
+                    >
+                      <input
+                        name="resultVisibility"
+                        type="radio"
+                        className="radio-orange"
+                        checked={field.value === value}
+                        onChange={() => {
+                          field.onChange(value);
+                          if (value !== "paid_only") {
+                            clearErrors("creatorEmail");
+                            clearErrors("unlockPriceBtc");
+                          }
+                        }}
+                      />
+                      <span>
+                        {value === "public" &&
+                          t("createEvent.resultVisibilityPublic", "Public")}
+                        {value === "paid_only" &&
+                          t(
+                            "createEvent.resultVisibilityPaidOnly",
+                            "Paid-only",
+                          )}
+                        {value === "creator_only" &&
+                          t(
+                            "createEvent.resultVisibilityCreatorOnly",
+                            "Creator-only",
+                          )}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            />
+
+            {/* Extra fields shown only when paid_only is selected */}
+            {resultVisibility === "paid_only" && (
+              <div className="border-border bg-surface mt-4 space-y-4 rounded-xl border p-4">
+                {/* Creator email */}
+                <div>
+                  <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
+                    {t("createEvent.creatorEmail", "Creator email")}
+                    <span className="text-(--color-orange-500)"> *</span>
+                  </label>
+                  <input
+                    {...register("creatorEmail", {
+                      validate: (v) => {
+                        if (resultVisibilityRef.current !== "paid_only")
+                          return true;
+                        if (!v || !v.trim())
+                          return t(
+                            "createEvent.creatorEmailRequired",
+                            "Please enter your email.",
+                          );
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(v.trim()))
+                          return t(
+                            "createEvent.creatorEmailInvalid",
+                            "Please enter a valid email address.",
+                          );
+                        return true;
+                      },
+                    })}
+                    type="text"
+                    autoComplete="one-time-code"
+                    placeholder={t(
+                      "createEvent.creatorEmailPlaceholder",
+                      "Please enter a valid email address",
+                    )}
+                    className={cn(
+                      "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
+                      errors.creatorEmail
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-border focus:ring-(--color-orange-500)",
+                    )}
+                  />
+                  <p className="tx-12 lh-18 text-secondary mt-1">
+                    {t(
+                      "createEvent.creatorEmailHint",
+                      "This email will be used by you to unlock this event's results.",
+                    )}
+                  </p>
+                  {errors.creatorEmail && (
+                    <p className="tx-12 lh-18 mt-1 text-red-500">
+                      {errors.creatorEmail.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Unlock price (BTC) */}
+                <div>
+                  <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
+                    {t("createEvent.unlockPriceBtc", "Unlock price (BTC)")}
+                    <span className="text-(--color-orange-500)"> *</span>
+                  </label>
+                  <Controller
+                    control={control}
+                    name="unlockPriceBtc"
+                    rules={{
+                      validate: (v) => {
+                        if (resultVisibilityRef.current !== "paid_only")
+                          return true;
+                        if (!v || v.trim() === "")
+                          return t(
+                            "createEvent.unlockPriceRequired",
+                            "Please enter unlock price.",
+                          );
+                        const amount = parseFloat(v);
+                        if (!Number.isFinite(amount) || amount <= 0)
+                          return t(
+                            "createEvent.unlockPriceInvalid",
+                            "Please enter a valid amount.",
+                          );
+                        return true;
+                      },
+                    }}
+                    render={({ field }) => (
+                      <input
+                        {...field}
+                        disabled={Number(durationHours) <= 0}
+                        type="text"
+                        inputMode="decimal"
+                        onChange={(e) => {
+                          const v = e.target.value.replace(/[^0-9.]/g, "");
+                          const parts = v.split(".");
+                          const cleaned =
+                            parts.length > 0
+                              ? parts[0] +
+                                (parts.length > 1
+                                  ? "." + parts.slice(1).join("")
+                                  : "")
+                              : "";
+                          field.onChange(cleaned);
+                        }}
+                        onPaste={(e) => {
+                          e.preventDefault();
+                          const pastedText = e.clipboardData.getData("text");
+                          const cleaned = pastedText.replace(/[^0-9.]/g, "");
+                          const parts = cleaned.split(".");
+                          const numbersOnly =
+                            parts.length > 0
+                              ? parts[0] +
+                                (parts.length > 1
+                                  ? "." + parts.slice(1).join("")
+                                  : "")
+                              : "";
+                          if (numbersOnly) field.onChange(numbersOnly);
+                        }}
+                        placeholder={
+                          Number(durationHours) > 0
+                            ? t(
+                                "createEvent.enterUnlockPrice",
+                                "Enter unlock price",
+                              )
+                            : t(
+                                "createEvent.setDurationFirst",
+                                "Set Duration First",
+                              )
+                        }
+                        className={cn(
+                          "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
+                          errors.unlockPriceBtc
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-border focus:ring-(--color-orange-500)",
+                        )}
+                      />
+                    )}
+                  />
+                  {errors.unlockPriceBtc && (
+                    <p className="tx-12 lh-18 mt-1 text-red-500">
+                      {errors.unlockPriceBtc.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Preheat */}
           <div className="space-y-2">
