@@ -147,6 +147,8 @@
     "platformFee": "平台費用",
     "totalAmount": "總金額",
     "refundAddress": "退款地址",
+    "unlockKey": "解鎖金鑰",
+    "unlockKeyHint": "此地址將用於解鎖此活動的結果。",
     "sendExactly": "請支付",
     "paymentAmountCopied": "付款金額已複製到剪貼簿",
     "failedToCopyPaymentAmount": "付款金額複製失敗",
@@ -673,7 +675,13 @@
     "confirmPay": "確認並付款",
     "reviewConfirm": "請確認您的活動。",
     "noEventData": "沒有活動資料可預覽。請先建立活動。",
-    "backToCreate": "返回建立活動"
+    "backToCreate": "返回建立活動",
+    "resultVisibility": "結果可見性",
+    "unlockEmail": "解鎖信箱",
+    "unlockEmailHint": "此信箱將用於解鎖此活動的結果。",
+    "confirmUnlockEmail": "確認解鎖信箱",
+    "confirmUnlockEmailMismatch": "信箱不符。",
+    "unlockPrice": "解鎖費用"
   },
   "confirmSign": {
     "title": "確認並簽名",

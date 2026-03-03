@@ -45,6 +45,9 @@ type PreviewEventState = {
   options?: string[];
   enablePreheat: boolean;
   preheatHours?: number;
+  resultVisibility?: "public" | "paid_only" | "creator_only";
+  creatorEmail?: string;
+  unlockPriceBtc?: string;
 };
 
 function formatBtcDisplay(btc: string): string {
@@ -675,6 +678,24 @@ export default function ConfirmPay() {
                 </div>
               </div>
             </div>
+
+            {/* Unlock key (only for paid_only result visibility) */}
+            {state.resultVisibility === "paid_only" && state.creatorEmail && (
+              <div className="space-y-1">
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("confirmPay.unlockKey", "Unlock key")}
+                </div>
+                <div className="tx-14 lh-20 text-primary">
+                  {state.creatorEmail}
+                </div>
+                <div className="tx-12 lh-18 text-(--color-orange-500)">
+                  {t(
+                    "confirmPay.unlockKeyHint",
+                    "This address will be used by you to unlock this event's results.",
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <Divider className="bg-border" />
