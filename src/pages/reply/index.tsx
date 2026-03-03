@@ -444,6 +444,16 @@ export default function ReplyPage() {
                 ? t("reply.openEnded", "Open-ended")
                 : t("reply.singleChoice", "Single-choice")}
             </span>
+            <span className="tx-14 text-secondary">
+              {t("reply.resultVisibility", "Result visibility")}:
+            </span>
+            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+            </span>
           </div>
         </div>
 

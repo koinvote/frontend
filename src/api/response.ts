@@ -123,6 +123,7 @@ export interface EventDetailDataRes {
   top_replies: TopReply[];
   hashtags: string[];
   preheat_hours: number;
+  result_visibility?: "public" | "paid_only" | "creator_only";
 }
 
 export interface GetSignaturePlainTextRes {
