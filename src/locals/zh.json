@@ -575,6 +575,7 @@
     "btcTotal": "BTC 總量",
     "unlockEmailPlaceholder": "your@email.com",
     "enterUnlockEmail": "輸入解鎖信箱",
+    "invalidEmailFormat": "請輸入有效的電子郵件地址",
     "unlock": "解鎖"
   },
   "unlockPayment": {
@@ -591,8 +592,20 @@
     "privacyPolicy": "隱私政策",
     "and": "及",
     "chargesRefunds": "費用與退款",
+    "agreeRequired": "請同意服務條款以繼續。",
+    "copied": "已複製 {{label}}",
+    "copyFailed": "複製失敗",
     "backToEvent": "返回活動",
-    "confirmAndPay": "確認並付款"
+    "confirmAndPay": "確認並付款",
+    "processing": "處理中...",
+    "unlockKey": "解鎖金鑰",
+    "warning": "請支付確切金額。付款金額不正確將無法解鎖，且不予退款。",
+    "toCreatorAddress": "至建立者地址",
+    "byProceeding": "繼續即表示您同意",
+    "paymentReceived": "已收到付款，請等待確認。",
+    "paymentConfirmed": "付款已確認！您現在可以查看結果。",
+    "unlockFailed": "無法啟動付款",
+    "expiredNote": "請返回活動頁面後重試。"
   },
   "subscribe": {
     "title": "別錯過任何賺取比特幣的機會",

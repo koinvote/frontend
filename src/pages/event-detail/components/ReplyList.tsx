@@ -39,13 +39,13 @@ interface ReplyListProps {
   eventType?: EventType;
   eventStatus?: number;
   balanceDisplayMode?: "snapshot" | "on_chain";
-  resultVisibility?: "public" | "paid_only" | "creator_only";
   unlockPrice?: string;
   unlockCount?: number;
   participantsCount?: number;
   totalStakeSatoshi?: number;
   eventTitle?: string;
   onLockedChange?: (locked: boolean) => void;
+  initialUnlockEmail?: string;
 }
 
 function truncateAddress(
@@ -75,13 +75,13 @@ export function ReplyList({
   eventType,
   eventStatus,
   balanceDisplayMode,
-  resultVisibility,
   unlockPrice,
   unlockCount,
   participantsCount,
   totalStakeSatoshi,
   eventTitle,
   onLockedChange,
+  initialUnlockEmail,
 }: ReplyListProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -89,13 +89,17 @@ export function ReplyList({
   const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
   const limit = 20;
 
-  const [unlockEmail, setUnlockEmail] = useState("");
-  const [submittedEmail, setSubmittedEmail] = useState("");
+  const [unlockEmail, setUnlockEmail] = useState(initialUnlockEmail ?? "");
+  const [submittedEmail, setSubmittedEmail] = useState(initialUnlockEmail ?? "");
+  const [emailTouched, setEmailTouched] = useState(false);
   const unlockInputRef = useRef<HTMLInputElement>(null);
+  // True when submittedEmail was auto-applied from payment return — skip redirect in that case
+  const isPaymentReturnRef = useRef(!!initialUnlockEmail);
 
   const {
     data: repliesData,
     isLoading,
+    isFetching,
     error,
   } = useQuery({
     queryKey: [
@@ -140,21 +144,37 @@ export function ReplyList({
     onLockedChange?.(isLocked);
   }, [isLocked, onLockedChange]);
 
-  // When a submitted email still results in locked, redirect to unlock payment page
+  // When a submitted email still results in locked (and fetch is complete), redirect to unlock payment page.
+  // Skip redirect if the email was auto-applied from a payment return — the user just paid, no loop.
   useEffect(() => {
-    if (submittedEmail && isLocked) {
+    if (submittedEmail && isLocked && !isFetching && !isPaymentReturnRef.current) {
       navigate(`/event/${eventId}/unlock-payment`, {
         state: { email: submittedEmail, unlockPrice, eventTitle },
       });
     }
-  }, [submittedEmail, isLocked, eventId, unlockPrice, eventTitle, navigate]);
+  }, [submittedEmail, isLocked, isFetching, eventId, unlockPrice, eventTitle, navigate]);
+
+  const isUnlockEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+    unlockEmail.trim(),
+  );
 
   const handleUnlock = () => {
-    if (!unlockEmail.trim()) {
+    setEmailTouched(true);
+    if (!unlockEmail.trim() || !isUnlockEmailValid) {
       unlockInputRef.current?.focus();
       return;
     }
-    setSubmittedEmail(unlockEmail.trim());
+    const trimmedEmail = unlockEmail.trim();
+    isPaymentReturnRef.current = false; // User manually triggered — re-enable redirect
+    if (trimmedEmail === submittedEmail && isLocked) {
+      // Same email already returned locked (e.g. back from payment, mock doesn't track state).
+      // setSubmittedEmail won't change state, so navigate directly.
+      navigate(`/event/${eventId}/unlock-payment`, {
+        state: { email: trimmedEmail, unlockPrice, eventTitle },
+      });
+      return;
+    }
+    setSubmittedEmail(trimmedEmail);
   };
 
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {
@@ -259,9 +279,18 @@ export function ReplyList({
             )}
             className="border-border bg-bg text-primary tx-14 py-2outline-none w-full rounded-lg border px-3 py-2 outline-0 focus:ring-2 focus:ring-(--color-orange-500)"
           />
-          <p className="text-secondary tx-12 text-left">
-            {t("replyList.enterUnlockEmail", "Enter your unlock email")}
-          </p>
+          {emailTouched && unlockEmail && !isUnlockEmailValid ? (
+            <p className="tx-12 lh-18 text-left text-red-500">
+              {t(
+                "replyList.invalidEmailFormat",
+                "Please enter a valid email address",
+              )}
+            </p>
+          ) : (
+            <p className="text-secondary tx-12 text-left">
+              {t("replyList.enterUnlockEmail", "Enter your unlock email")}
+            </p>
+          )}
         </div>
         <Button
           type="button"

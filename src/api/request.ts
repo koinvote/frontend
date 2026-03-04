@@ -96,3 +96,7 @@ export interface GetWithdrawalRecordReq {
   start_time?: string;
   end_time?: string;
 }
+
+export interface UnlockEventReq {
+  email: string;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
 import type {
@@ -19,6 +19,9 @@ import { SearchAndFilter } from "./components/SearchAndFilter";
 
 const EventDetail = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const location = useLocation();
+  const initialUnlockEmail =
+    (location.state as { unlockEmail?: string } | null)?.unlockEmail;
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
   const goBack = useBackOrFallback("/");
@@ -258,6 +261,7 @@ const EventDetail = () => {
         {/* Third Section: Reply List */}
         <ReplyList
           eventId={eventId!}
+          initialUnlockEmail={initialUnlockEmail}
           eventStatus={eventDetail.status}
           balanceDisplayMode={effectiveBalanceDisplayMode}
           search={search}
@@ -265,7 +269,6 @@ const EventDetail = () => {
           order={order}
           options={eventDetail.options}
           eventType={eventDetail.event_type}
-          resultVisibility={eventDetail.result_visibility}
           unlockPrice={eventDetail.unlock_price}
           unlockCount={eventDetail.unlock_count}
           participantsCount={eventDetail.participants_count}
