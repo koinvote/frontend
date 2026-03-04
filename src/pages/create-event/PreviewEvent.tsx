@@ -12,7 +12,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { API } from "@/api";
 import type { CreateEventReq } from "@/api/request";
 import type { EventType } from "@/api/types";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
@@ -404,16 +404,10 @@ export default function PreviewEvent() {
   if (!state) {
     return (
       <div className="flex w-full flex-col items-center justify-center">
-        <div className="relative h-[50px] w-full">
-          <button
-            type="button"
-            className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-            onClick={() => navigate(-1)}
-          >
-            <CircleLeftIcon className="h-8 w-8 fill-current" />
-          </button>
+        <div className="relative h-[50px] w-full max-w-3xl">
+          <BackButton onClick={() => navigate(-1)} />
         </div>
-        <div className="border-admin-bg bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+        <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
           <p className="tx-14 lh-20 text-primary">
             {t(
               "preview.noEventData",
@@ -437,17 +431,11 @@ export default function PreviewEvent() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={() => navigate(-1)}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={() => navigate(-1)} />
       </div>
 
-      <div className="border-admin-bg bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           {t("preview.title", "Preview Your Event")}
         </h1>

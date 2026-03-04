@@ -15,8 +15,8 @@ import { API } from "@/api";
 import type { UnlockDepositStatusRes } from "@/api/response";
 import { DepositStatus } from "@/api/types";
 import BTCIcon from "@/assets/icons/btc.svg?react";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import CONSTS from "@/consts";
@@ -302,14 +302,8 @@ export default function UnlockPayment() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={() => navigate(-1)}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={() => navigate(-1)} />
       </div>
 
       <div className="border-gray-450 bg-bg relative w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
@@ -341,7 +335,7 @@ export default function UnlockPayment() {
 
         {/* Countdown subtitle (payment initiated, not expired) */}
         {paymentInitiated && !isExpired && (
-          <p className="tx-14 leading-5 text-secondary mb-6">
+          <p className="tx-14 text-secondary mb-6 leading-5">
             {isUnconfirmed
               ? t(
                   "confirmPay.waitingConfirmation",
@@ -360,13 +354,13 @@ export default function UnlockPayment() {
         {/* Expired state */}
         {paymentInitiated && isExpired && (
           <div className="mt-4 space-y-4">
-            <p className="tx-14 leading-5 text-primary">
+            <p className="tx-14 text-primary leading-5">
               {t(
                 "confirmPay.sessionExpired",
                 "This payment session has expired.",
               )}
             </p>
-            <p className="tx-14 leading-5 text-primary">
+            <p className="tx-14 text-primary leading-5">
               {t(
                 "unlockPayment.expiredNote",
                 "Please go back to the event page and try again.",
@@ -383,7 +377,7 @@ export default function UnlockPayment() {
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.unlockKey", "Unlock key")}
               </div>
-              <div className="tx-14 leading-5 text-primary">{email}</div>
+              <div className="tx-14 text-primary leading-5">{email}</div>
             </div>
 
             {/* Divider */}
@@ -439,7 +433,7 @@ export default function UnlockPayment() {
                     style={{ filter: "grayscale(100%) brightness(1.5)" }}
                   />
                 </div>
-                <div className="text-primary tx-13 leading-5 min-w-0 flex-1 font-mono break-all">
+                <div className="text-primary tx-13 min-w-0 flex-1 font-mono leading-5 break-all">
                   {depositAddress}
                 </div>
                 <button
@@ -519,7 +513,7 @@ export default function UnlockPayment() {
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.email", "Unlock email")}
               </div>
-              <div className="tx-14 leading-5 text-primary">{email}</div>
+              <div className="tx-14 text-primary leading-5">{email}</div>
             </div>
 
             {/* Confirm unlock email */}

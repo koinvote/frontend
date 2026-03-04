@@ -90,7 +90,9 @@ export function ReplyList({
   const limit = 20;
 
   const [unlockEmail, setUnlockEmail] = useState(initialUnlockEmail ?? "");
-  const [submittedEmail, setSubmittedEmail] = useState(initialUnlockEmail ?? "");
+  const [submittedEmail, setSubmittedEmail] = useState(
+    initialUnlockEmail ?? "",
+  );
   const [emailTouched, setEmailTouched] = useState(false);
   const unlockInputRef = useRef<HTMLInputElement>(null);
   // True when submittedEmail was auto-applied from payment return — skip redirect in that case
@@ -147,12 +149,25 @@ export function ReplyList({
   // When a submitted email still results in locked (and fetch is complete), redirect to unlock payment page.
   // Skip redirect if the email was auto-applied from a payment return — the user just paid, no loop.
   useEffect(() => {
-    if (submittedEmail && isLocked && !isFetching && !isPaymentReturnRef.current) {
+    if (
+      submittedEmail &&
+      isLocked &&
+      !isFetching &&
+      !isPaymentReturnRef.current
+    ) {
       navigate(`/event/${eventId}/unlock-payment`, {
         state: { email: submittedEmail, unlockPrice, eventTitle },
       });
     }
-  }, [submittedEmail, isLocked, isFetching, eventId, unlockPrice, eventTitle, navigate]);
+  }, [
+    submittedEmail,
+    isLocked,
+    isFetching,
+    eventId,
+    unlockPrice,
+    eventTitle,
+    navigate,
+  ]);
 
   const isUnlockEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
     unlockEmail.trim(),
@@ -262,8 +277,6 @@ export function ReplyList({
           <input
             ref={unlockInputRef}
             type="text"
-            name="field_wifjvn1w"
-            id="field_wifjvn1w"
             autoCorrect="off"
             autoCapitalize="off"
             autoComplete="one-time-code"

@@ -157,8 +157,6 @@ export function ResultVisibilityField() {
                 },
               })}
               type="text"
-              name="field_wifjvn1w"
-              id="field_wifjvn1w"
               autoCorrect="off"
               autoCapitalize="off"
               autoComplete="one-time-code"
