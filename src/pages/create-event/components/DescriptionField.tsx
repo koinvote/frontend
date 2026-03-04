@@ -10,7 +10,7 @@ export function DescriptionField() {
 
   return (
     <div>
-      <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+      <label className="text-primary mb-1 block text-sm leading-5 font-medium">
         {t("createEvent.description")}
       </label>
       <Controller
@@ -27,25 +27,20 @@ export function DescriptionField() {
               }
             }}
             placeholder={t("createEvent.descriptionPlaceholder")}
-            className={`w-full rounded-xl border border-border bg-white px-3 py-2
-                   tx-14 lh-20 text-black placeholder:text-secondary
-                   focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-                   resize-none h-auto min-h-[100px]
-                   ${
-                     field.value.length >= 500
-                       ? "border-red-500 focus:ring-red-500"
-                       : ""
-                   }`}
+            className={`border-border bg-form-bg tx-14 text-primary h-auto min-h-[100px] w-full resize-none rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600 ${
+              field.value.length >= 500
+                ? "border-red-500 focus:ring-red-500"
+                : ""
+            }`}
           />
         )}
       />
-      <span
-        className={`tx-12 lh-18 block text-right
-              ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
+      <div
+        className={`tx-12 lh-18 mt-1 block ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
       >
         {500 - description.length}{" "}
         {t("createEvent.characterLeft", "characters left")}
-      </span>
+      </div>
     </div>
   );
 }

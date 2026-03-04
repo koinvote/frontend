@@ -115,10 +115,10 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
   if (!isRewarded) {
     return (
       <div>
-        <p className="tx-14 lh-20 fw-m text-primary mb-1">
+        <p className="text-primary mb-1 text-sm leading-5 font-medium">
           {t("createEvent.platformFee", "Platform fee:")}
         </p>
-        <p className="tx-12 lh-18 dark:text-white text-black">
+        <p className="tx-12 lh-18 text-black dark:text-white">
           {platformFeeDisplay}
         </p>
       </div>
@@ -129,11 +129,11 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
     <>
       {/* Reward (BTC) */}
       <div>
-        <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-          {t("createEvent.rewardBtc", "Reward (BTC)")}{" "}
-          <span className="text-(--color-orange-500)">*</span>
+        <label className="text-primary mb-1 block text-sm leading-5 font-medium">
+          {t("createEvent.rewardBtc", "Reward (BTC)")}
+          <span className="ml-1 text-(--color-orange-500)">*</span>
         </label>
-        <div className="flex items-center gap-2">
+        <div className="relative flex items-center gap-2">
           <Controller
             control={control}
             name="rewardBtc"
@@ -172,9 +172,7 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
                   const cleaned =
                     parts.length > 0
                       ? parts[0] +
-                        (parts.length > 1
-                          ? "." + parts.slice(1).join("")
-                          : "")
+                        (parts.length > 1 ? "." + parts.slice(1).join("") : "")
                       : "";
                   field.onChange(cleaned);
                 }}
@@ -186,9 +184,7 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
                   const numbersOnly =
                     parts.length > 0
                       ? parts[0] +
-                        (parts.length > 1
-                          ? "." + parts.slice(1).join("")
-                          : "")
+                        (parts.length > 1 ? "." + parts.slice(1).join("") : "")
                       : "";
                   if (numbersOnly) {
                     field.onChange(numbersOnly);
@@ -196,7 +192,7 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
                 }}
                 placeholder={rewardBtcPlaceholder}
                 className={cn(
-                  "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                  "bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none disabled:opacity-60 dark:placeholder:text-neutral-600",
                   errors.rewardBtc
                     ? "border-red-500 focus:ring-red-500"
                     : "border-border focus:ring-(--color-orange-500)",
@@ -210,7 +206,7 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
             appearance="solid"
             tone="white"
             text="sm"
-            className="w-[125px] border-border rounded-xl"
+            className="border-border bg-form-bg text-primary absolute right-2 h-6 rounded-md font-normal! placeholder:text-neutral-300 dark:placeholder:text-neutral-600"
             onClick={() => {
               setValue("rewardBtc", minRewardBtc.toString(), {
                 shouldValidate: true,
@@ -219,11 +215,11 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
               setLastField("rewardBtc");
             }}
           >
-            {t("createEvent.minimum")}
+            {t("createEvent.minimum", "Min")}
           </Button>
         </div>
         {errors.rewardBtc && (
-          <p className="tx-12 lh-18 text-red-500 mt-1">
+          <p className="tx-12 lh-18 mt-1 text-red-500">
             {errors.rewardBtc.message}
           </p>
         )}
@@ -231,7 +227,7 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
 
       {/* Number of recipients */}
       <div>
-        <p className="tx-14 lh-20 fw-m text-primary mb-1">
+        <p className="text-primary mb-1 text-sm leading-5 font-medium">
           {t("createEvent.numberOfRecipients")}
         </p>
         <p className="tx-12 lh-18 text-black dark:text-white">

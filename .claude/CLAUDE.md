@@ -149,3 +149,4 @@ These pages likely pass data via route state or query params.
 - Use `class-variance-authority` (cva) and `tailwind-merge` (twMerge) for dynamic styling
 - Split components into separate files whenever possible — avoid large single-file pages with many inline components
 - Admin (backend) and public (frontend) pages should use consistent, similar styling patterns
+- **Prefer Tailwind utility classes over custom CSS classes whenever possible.** When you encounter custom/shorthand classes (e.g. `tx-14`, `fw-m`, `lh-20`), replace them with their Tailwind equivalents (e.g. `text-sm`, `font-medium`, `leading-5`). Only use custom classes (defined in `global.css`) when there is no suitable Tailwind equivalent.

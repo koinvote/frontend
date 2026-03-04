@@ -35,9 +35,9 @@ export function OptionsField({
 
   return (
     <div>
-      <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+      <label className="text-primary mb-1 block text-sm leading-5 font-medium">
         {t("createEvent.options")}
-        <span className="text-(--color-orange-500)">*</span>
+        <span className="ml-1 text-(--color-orange-500)">*</span>
       </label>
 
       <div className="space-y-2">
@@ -65,12 +65,10 @@ export function OptionsField({
                     "Option {{n}}",
                     { n: index + 1 },
                   )}
-                  className="w-full rounded-xl border border-border bg-white px-3 py-2
-                           tx-14 lh-20 text-black placeholder:text-secondary
-                           focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
+                  className="border-border bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600"
                 />
                 <span
-                  className={`tx-12 lh-18 absolute right-3 bottom-1 ${
+                  className={`tx-12 lh-18 absolute top-1/2 right-3 -translate-y-1/2 text-neutral-300 dark:text-neutral-600 ${
                     optValue.length >= 20 ? "text-red-500" : "text-secondary"
                   }`}
                 >
@@ -81,18 +79,18 @@ export function OptionsField({
               {canRemove && (
                 <div
                   className={cn(
-                    "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
+                    "border-border bg-form-bg text-primary flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border",
                   )}
                   onClick={() => removeOption(index)}
                 >
-                  <MinusIcon />
+                  <MinusIcon className="fill-current" />
                 </div>
               )}
 
               {isLast && optionFields.length < 5 && (
                 <div
                   className={cn(
-                    "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
+                    "border-border bg-form-bg flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border",
                   )}
                   onClick={() => appendOption({ value: "" })}
                 >
@@ -104,7 +102,7 @@ export function OptionsField({
         })}
       </div>
       {optionsError && (
-        <p className="tx-12 lh-18 text-red-500 mt-1">{optionsError}</p>
+        <p className="tx-12 lh-18 mt-1 text-red-500">{optionsError}</p>
       )}
     </div>
   );

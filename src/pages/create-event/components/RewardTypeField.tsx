@@ -11,18 +11,18 @@ export function RewardTypeField() {
     <div>
       <p
         id="rewardTypeTitle"
-        className="tx-14 lh-20 fw-m text-primary mb-2"
+        className="text-primary mb-2 text-sm leading-5 font-medium"
       >
         {t("createEvent.rewardType")}
-        <span className="text-(--color-orange-500)">*</span>
+        <span className="ml-1 text-(--color-orange-500)">*</span>
       </p>
       <Controller
         control={control}
         name="isRewarded"
         render={({ field }) => (
-          <div className="space-y-2">
-            <label className="flex tx-14 lh-20 text-primary">
-              <div className="flex items-center gap-2 cursor-pointer">
+          <div className="flex gap-4">
+            <label className="tx-14 text-primary flex leading-5">
+              <div className="flex cursor-pointer items-center gap-2">
                 <input
                   name="rewardType"
                   type="radio"
@@ -33,8 +33,8 @@ export function RewardTypeField() {
                 <span>{t("createEvent.rewarded", "Rewarded")}</span>
               </div>
             </label>
-            <label className="flex tx-14 lh-20 text-primary">
-              <div className="flex items-center gap-2 cursor-pointer">
+            <label className="tx-14 text-primary flex leading-5">
+              <div className="flex cursor-pointer items-center gap-2">
                 <input
                   name="rewardType"
                   type="radio"
@@ -42,9 +42,7 @@ export function RewardTypeField() {
                   checked={field.value === false}
                   onChange={() => field.onChange(false)}
                 />
-                <span>
-                  {t("createEvent.nonRewarded", "Non-Rewarded")}
-                </span>
+                <span>{t("createEvent.nonRewarded", "Non-Rewarded")}</span>
               </div>
             </label>
           </div>
