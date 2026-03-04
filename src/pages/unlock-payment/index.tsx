@@ -341,7 +341,7 @@ export default function UnlockPayment() {
 
         {/* Countdown subtitle (payment initiated, not expired) */}
         {paymentInitiated && !isExpired && (
-          <p className="tx-14 lh-20 text-secondary mb-6">
+          <p className="tx-14 leading-5 text-secondary mb-6">
             {isUnconfirmed
               ? t(
                   "confirmPay.waitingConfirmation",
@@ -360,13 +360,13 @@ export default function UnlockPayment() {
         {/* Expired state */}
         {paymentInitiated && isExpired && (
           <div className="mt-4 space-y-4">
-            <p className="tx-14 lh-20 text-primary">
+            <p className="tx-14 leading-5 text-primary">
               {t(
                 "confirmPay.sessionExpired",
                 "This payment session has expired.",
               )}
             </p>
-            <p className="tx-14 lh-20 text-primary">
+            <p className="tx-14 leading-5 text-primary">
               {t(
                 "unlockPayment.expiredNote",
                 "Please go back to the event page and try again.",
@@ -383,7 +383,7 @@ export default function UnlockPayment() {
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.unlockKey", "Unlock key")}
               </div>
-              <div className="tx-14 lh-20 text-primary">{email}</div>
+              <div className="tx-14 leading-5 text-primary">{email}</div>
             </div>
 
             {/* Divider */}
@@ -439,7 +439,7 @@ export default function UnlockPayment() {
                     style={{ filter: "grayscale(100%) brightness(1.5)" }}
                   />
                 </div>
-                <div className="text-primary tx-13 lh-20 min-w-0 flex-1 font-mono break-all">
+                <div className="text-primary tx-13 leading-5 min-w-0 flex-1 font-mono break-all">
                   {depositAddress}
                 </div>
                 <button
@@ -519,7 +519,7 @@ export default function UnlockPayment() {
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.email", "Unlock email")}
               </div>
-              <div className="tx-14 lh-20 text-primary">{email}</div>
+              <div className="tx-14 leading-5 text-primary">{email}</div>
             </div>
 
             {/* Confirm unlock email */}
@@ -577,7 +577,7 @@ export default function UnlockPayment() {
                   type="checkbox"
                   checked={agreedToTerms}
                   onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="mt-0.5 cursor-pointer accent-(--color-orange-500)"
+                  className="checkbox-form-bg mt-0.5"
                 />
                 <span className="tx-13 lh-18 text-secondary">
                   {t("unlockPayment.agreeToThe", "I agree to the")}{" "}

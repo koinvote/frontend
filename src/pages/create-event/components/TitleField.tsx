@@ -16,9 +16,9 @@ export function TitleField() {
 
   return (
     <div>
-      <label className="block tx-14 lh-20 fw-m text-primary mb-1">
-        {t("createEvent.title")}{" "}
-        <span className="text-(--color-orange-500)">*</span>
+      <label className="text-primary mb-1 block text-sm leading-5 font-medium">
+        {t("createEvent.title")}
+        <span className="ml-1 text-(--color-orange-500)">*</span>
       </label>
       <input
         {...register("title", {
@@ -39,27 +39,26 @@ export function TitleField() {
         maxLength={120}
         placeholder={t("createEvent.titlePlaceholder")}
         className={cn(
-          "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
+          "bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none dark:placeholder:text-neutral-600",
           errors.title
             ? "border-red-500 focus:ring-red-500"
             : "border-border focus:ring-(--color-orange-500)",
         )}
       />
-      <div className="flex justify-between mt-1">
+      <div className="mt-1 flex justify-between">
         {errors.title && (
           <span className="tx-12 lh-18 text-red-500">
             {errors.title.message}
           </span>
         )}
-        <span
-          className={cn(
-            "tx-12 lh-18 ml-auto",
-            title.length >= 120 ? "text-red-500" : "text-secondary",
-          )}
-        >
-          {120 - title.length}{" "}
-          {t("createEvent.characterLeft", "characters left")}
-        </span>
+      </div>
+      <div
+        className={cn(
+          "lh-18 mt-1 ml-auto text-xs",
+          title.length >= 120 ? "text-red-500" : "text-secondary",
+        )}
+      >
+        {120 - title.length} {t("createEvent.characterLeft", "characters left")}
       </div>
     </div>
   );

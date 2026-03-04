@@ -52,7 +52,7 @@ export function ResultVisibilityField() {
     <div>
       <p
         id="resultVisibilityTitle"
-        className="tx-14 lh-20 fw-m text-primary mb-2"
+        className="text-primary mb-2 text-sm leading-5 font-medium"
       >
         {t("createEvent.resultVisibility", "Result visibility")}
         <span className="text-(--color-orange-500)"> *</span>
@@ -68,7 +68,8 @@ export function ResultVisibilityField() {
               const isDisabledForNonRewarded = !isRewarded && isForRestricted;
               const isDisabledForOpenEnded =
                 eventType === "open" && isForRestricted;
-              const isDisabled = isDisabledForNonRewarded || isDisabledForOpenEnded;
+              const isDisabled =
+                isDisabledForNonRewarded || isDisabledForOpenEnded;
               const tooltipTitle = isDisabledForOpenEnded
                 ? openEndedDisabledTooltip
                 : rewardedOnlyTooltip;
@@ -76,7 +77,7 @@ export function ResultVisibilityField() {
               const radioLabel = (
                 <label
                   className={cn(
-                    "tx-14 lh-20 text-primary flex items-center gap-2",
+                    "tx-14 text-primary flex items-center gap-2 leading-5",
                     isDisabled
                       ? "cursor-not-allowed opacity-40"
                       : "cursor-pointer",
@@ -130,10 +131,10 @@ export function ResultVisibilityField() {
 
       {/* Extra fields shown only when paid_only is selected */}
       {resultVisibility === "paid_only" && (
-        <div className="border-border bg-surface mt-4 space-y-4 rounded-xl border p-4">
+        <div className="border-border mt-4 space-y-4 rounded-xl border p-4">
           {/* Creator email */}
           <div>
-            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
+            <label className="text-primary mb-1 block text-sm leading-5 font-medium">
               {t("createEvent.creatorEmail", "Creator email")}
               <span className="text-(--color-orange-500)"> *</span>
             </label>
@@ -167,7 +168,7 @@ export function ResultVisibilityField() {
                 "Please enter a valid email address",
               )}
               className={cn(
-                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
+                "tx-14 bg-form-bg text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none dark:placeholder:text-neutral-600",
                 errors.creatorEmail
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-(--color-orange-500)",
@@ -188,7 +189,7 @@ export function ResultVisibilityField() {
 
           {/* Unlock price (BTC) */}
           <div>
-            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
+            <label className="text-primary mb-1 block text-sm leading-5 font-medium">
               {t("createEvent.unlockPriceBtc", "Unlock price (BTC)")}
               <span className="text-(--color-orange-500)"> *</span>
             </label>
@@ -255,7 +256,7 @@ export function ResultVisibilityField() {
                       : t("createEvent.setDurationFirst", "Set Duration First")
                   }
                   className={cn(
-                    "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
+                    "tx-14 bg-form-bg text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none disabled:opacity-60 dark:placeholder:text-neutral-600",
                     errors.unlockPriceBtc
                       ? "border-red-500 focus:ring-red-500"
                       : "border-border focus:ring-(--color-orange-500)",

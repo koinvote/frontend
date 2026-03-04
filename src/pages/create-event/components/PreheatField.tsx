@@ -1,8 +1,9 @@
-import { useMemo, useRef } from "react";
 import { Tooltip } from "antd";
+import { useMemo, useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
+import InfoIcon from "@/assets/icons/info.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { satsToBtc } from "@/utils/formatter";
@@ -81,8 +82,8 @@ export function PreheatField() {
   return (
     <>
       {/* Preheat */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 tx-14 lh-20 text-primary">
+      <div>
+        <div className="tx-14 text-primary mb-2 flex items-center gap-2 leading-5">
           <Controller
             control={control}
             name="enablePreheat"
@@ -90,7 +91,7 @@ export function PreheatField() {
               <input
                 id="enable-preheat"
                 type="checkbox"
-                className="accent-(--color-orange-500)"
+                className="checkbox-form-bg"
                 checked={field.value}
                 onChange={(e) => {
                   field.onChange(e.target.checked);
@@ -104,7 +105,7 @@ export function PreheatField() {
           />
           <label
             htmlFor="enable-preheat"
-            className="tx-14 lh-20 text-primary cursor-pointer"
+            className="tx-14 text-primary cursor-pointer leading-5"
           >
             {t("createEvent.enablePreheat")}
           </label>
@@ -117,9 +118,9 @@ export function PreheatField() {
           >
             <span
               {...enablePreheatTooltip.triggerProps}
-              className="tx-14 text-admin-text-main dark:text-white cursor-pointer"
+              className="tx-14 text-admin-text-main cursor-pointer dark:text-white"
             >
-              ⓘ
+              <InfoIcon />
             </span>
           </Tooltip>
         </div>
@@ -172,12 +173,9 @@ export function PreheatField() {
                   field.onChange(numbersOnly);
                 }
               }}
-              placeholder={t(
-                "createEvent.enterHoursMax",
-                "Enter hours (max 720)",
-              )}
+              placeholder={t("createEvent.enterHoursMax", "Enter hours")}
               className={cn(
-                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                "bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none disabled:opacity-60 dark:placeholder:text-neutral-600",
                 errors.preheatHours
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-(--color-orange-500)",
@@ -186,18 +184,24 @@ export function PreheatField() {
           )}
         />
         {enablePreheat && errors.preheatHours && (
-          <p className="tx-12 lh-18 text-red-500 mt-1">
+          <p className="tx-12 lh-18 mt-1 text-red-500">
             {errors.preheatHours.message}
           </p>
         )}
+        <div className="text-secondary mt-1 text-xs">
+          {t(
+            "createEvent.enterPreheatHoursHint",
+            "Min. 1 hour, Max. 720 hours",
+          )}
+        </div>
       </div>
 
       {/* Preheat fee */}
       <div>
-        <p className="tx-14 lh-20 fw-m text-primary mb-1">
+        <p className="text-primary mb-1 text-sm leading-5 font-medium">
           {t("createEvent.preheatFee", "Preheat fee:")}
         </p>
-        <p className="tx-12 lh-18 dark:text-white text-black">
+        <p className="tx-12 lh-18 text-black dark:text-white">
           {preheatFeeDisplay}
         </p>
       </div>

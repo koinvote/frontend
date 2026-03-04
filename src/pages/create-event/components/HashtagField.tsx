@@ -107,13 +107,13 @@ export function HashtagField({
 
   return (
     <div>
-      <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+      <label className="text-primary mb-1 block text-sm leading-5 font-medium">
         {t("createEvent.hashtags", "Hashtags")}
       </label>
 
       <div
         className={cn(
-          "w-full rounded-xl border border-border bg-white px-3 py-2",
+          "border-border bg-form-bg w-full rounded-xl border px-3 py-2",
           "flex flex-wrap items-center gap-2",
           "focus-within:ring-2 focus-within:ring-(--color-orange-500)",
         )}
@@ -121,9 +121,7 @@ export function HashtagField({
           const target = e.target as HTMLElement;
           if (target.closest("[data-chip-remove]")) return;
           (
-            e.currentTarget.querySelector(
-              "input",
-            ) as HTMLInputElement | null
+            e.currentTarget.querySelector("input") as HTMLInputElement | null
           )?.focus();
         }}
       >
@@ -132,8 +130,8 @@ export function HashtagField({
             key={tag}
             className={cn(
               "inline-flex items-center gap-2 rounded-full",
-              "bg-surface text-primary border border-border",
-              "px-3 py-1 tx-12 lh-18",
+              "bg-surface text-primary border-border border",
+              "tx-12 lh-18 px-3 py-1",
             )}
           >
             <span className="select-none">#{tag}</span>
@@ -163,14 +161,12 @@ export function HashtagField({
           className={cn(
             "min-w-[120px] flex-1",
             "bg-transparent outline-none",
-            "tx-14 lh-20 text-black placeholder:text-secondary",
+            "text-primary text-sm leading-5 placeholder:text-neutral-300 dark:placeholder:text-neutral-600",
           )}
         />
       </div>
 
-      <span
-        className={cn("tx-12 lh-18 block text-right", "text-secondary")}
-      >
+      <span className={cn("lh-18 mt-1 block text-xs", "text-secondary")}>
         {hashtagList.length >= MAX_TAGS
           ? t("createEvent.maxHashtags", "Max 3 hashtags")
           : `${hashtagCharsLeft} ${t("createEvent.characterLeft", "characters left")}`}

@@ -19,10 +19,10 @@ export function DurationField() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-1">
-        <label className="tx-14 lh-20 fw-m text-primary">
+      <div className="mb-1 flex items-center justify-between">
+        <label className="text-primary text-sm leading-5 font-medium">
           {t("createEvent.durationOfEvent", "Duration of this event")}
-          <span className="text-(--color-orange-500)">*</span>
+          <span className="ml-1 text-(--color-orange-500)">*</span>
         </label>
       </div>
       <Controller
@@ -71,14 +71,12 @@ export function DurationField() {
             placeholder={
               isRewarded
                 ? t("createEvent.enterHoursMin", "Enter hours (Min 1)")
-                : t(
-                    "createEvent.freeHours",
-                    "First {{hours}} hours are free",
-                    { hours: params?.free_hours },
-                  )
+                : t("createEvent.freeHours", "First {{hours}} hours are free", {
+                    hours: params?.free_hours,
+                  })
             }
             className={cn(
-              "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
+              "bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none dark:placeholder:text-neutral-600",
               errors.durationHours
                 ? "border-red-500 focus:ring-red-500"
                 : "border-border focus:ring-(--color-orange-500)",
@@ -87,10 +85,13 @@ export function DurationField() {
         )}
       />
       {errors.durationHours && (
-        <p className="tx-12 lh-18 text-red-500 mt-1">
+        <p className="tx-12 lh-18 mt-1 text-red-500">
           {errors.durationHours.message}
         </p>
       )}
+      <div className="text-secondary mt-1 text-xs">
+        {t("createEvent.enterHoursHint", "Min. 1 hour")}
+      </div>
     </div>
   );
 }

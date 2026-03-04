@@ -1,14 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router";
 
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import ArrowBackIcon from "@/assets/icons/arroe_back.svg?react";
 import { Button } from "@/components/base/Button";
 import { useBackIfInternal } from "@/hooks/useBack";
 import { cn } from "@/utils/style";
@@ -245,7 +239,14 @@ export default function CreateEvent() {
     }, 500);
 
     return () => window.clearTimeout(timer);
-  }, [creatorAddress, ACTIVE_BTC_NETWORK, networkLabel, t, clearErrors, setError]);
+  }, [
+    creatorAddress,
+    ACTIVE_BTC_NETWORK,
+    networkLabel,
+    t,
+    clearErrors,
+    setError,
+  ]);
 
   // Draft restore on mount
   useEffect(() => {
@@ -424,8 +425,10 @@ export default function CreateEvent() {
       (isRewarded && (!rewardBtc || !!errors.rewardBtc)) ||
       (eventType === "single_choice" && hasOptionsError) ||
       (enablePreheat && !!errors.preheatHours) ||
-      (resultVisibility === "paid_only" && (!creatorEmail || !!errors.creatorEmail)) ||
-      (resultVisibility === "paid_only" && (!unlockPriceBtc || !!errors.unlockPriceBtc)) ||
+      (resultVisibility === "paid_only" &&
+        (!creatorEmail || !!errors.creatorEmail)) ||
+      (resultVisibility === "paid_only" &&
+        (!unlockPriceBtc || !!errors.unlockPriceBtc)) ||
       !agree
     );
   }, [
@@ -500,8 +503,7 @@ export default function CreateEvent() {
       durationHours: duration,
       options: cleanedOptions,
       enablePreheat: data.enablePreheat,
-      preheatHours:
-        data.enablePreheat && preheat > 0 ? preheat : undefined,
+      preheatHours: data.enablePreheat && preheat > 0 ? preheat : undefined,
       resultVisibility: data.resultVisibility,
       creatorEmail:
         data.resultVisibility === "paid_only" ? data.creatorEmail : undefined,
@@ -528,19 +530,19 @@ export default function CreateEvent() {
   };
 
   return (
-    <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
-      <div className="h-[50px] w-full relative">
+    <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
+      <div className="relative h-[50px] w-full">
         <button
           type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+          className="hover:text-admin-text-sub border-gray-450 absolute left-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border text-black dark:text-white"
           onClick={goBack}
         >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
+          <ArrowBackIcon className="h-4 w-4 fill-current" />
         </button>
       </div>
 
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500) mb-6">
+      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+        <h1 className="lh-24 fw-m mb-6 text-lg font-medium text-(--color-orange-500)">
           {t("createEvent.formTitle")}
         </h1>
 
@@ -575,8 +577,8 @@ export default function CreateEvent() {
               setOptionsTouched={setOptionsTouched}
               validateOptions={validateOptions}
             />
-            <RewardTypeField />
             <DurationField />
+            <RewardTypeField />
             <RewardBtcField setLastField={setLastField} />
             <ResultVisibilityField />
             <PreheatField />
@@ -584,11 +586,11 @@ export default function CreateEvent() {
             {/* Terms checkbox */}
             <div
               className={cn(
-                "pt-2 border-t rounded-lg p-2 -mx-2",
+                "-mx-2 rounded-lg p-2 pt-2",
                 errors.agree ? "border-2 border-red-500" : "border-border",
               )}
             >
-              <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
+              <label className="tx-12 lh-18 text-secondary flex items-start gap-2">
                 <input
                   {...methods.register("agree", {
                     validate: (v) =>
@@ -599,12 +601,13 @@ export default function CreateEvent() {
                       ),
                   })}
                   type="checkbox"
-                  className="mt-0.5 accent-(--color-orange-500) cursor-pointer"
+                  className="checkbox-form-bg mt-0.5"
                 />
                 <span>
                   {t("createEvent.agreeToThe", "I agree to the")}{" "}
                   <Link
                     to="/terms"
+                    target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
                     {t("createEvent.termsOfService", "Terms of Service")}
@@ -612,6 +615,7 @@ export default function CreateEvent() {
                   ,{" "}
                   <Link
                     to="/terms-reward-distribution"
+                    target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
                     {t("createEvent.rewardDistribution", "Reward Distribution")}
@@ -619,6 +623,7 @@ export default function CreateEvent() {
                   ,{" "}
                   <Link
                     to="/privacy"
+                    target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
                     {t("createEvent.privacyPolicy", "Privacy Policy")}
@@ -626,6 +631,7 @@ export default function CreateEvent() {
                   {t("createEvent.and", "and")}{" "}
                   <Link
                     to="/charges-refunds"
+                    target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
                     {t("createEvent.chargesRefunds", "Charges & Refunds")}
@@ -634,14 +640,14 @@ export default function CreateEvent() {
                 </span>
               </label>
               {errors.agree && (
-                <p className="tx-12 lh-18 text-red-500 mt-1 ml-6">
+                <p className="tx-12 lh-18 mt-1 ml-6 text-red-500">
                   {errors.agree.message as string}
                 </p>
               )}
             </div>
 
             {/* Actions */}
-            <div className="pt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
               <Button
                 name="clearButton"
                 type="button"

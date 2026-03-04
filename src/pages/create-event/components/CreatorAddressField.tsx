@@ -3,13 +3,13 @@ import type { RefObject } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
-import type { AddressInfo } from "bitcoin-address-validation";
-
+import InfoIcon from "@/assets/icons/info.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
 
-import type { AddressValidationStatus } from "../types/index";
+import type { AddressInfo } from "bitcoin-address-validation";
 import type { CreateEventFormValues } from "../formTypes";
+import type { AddressValidationStatus } from "../types/index";
 
 interface CreatorAddressFieldProps {
   addrStatus: AddressValidationStatus;
@@ -33,10 +33,11 @@ export function CreatorAddressField({
 
   return (
     <div>
-      <div className="flex items-center gap-1 mb-1">
-        <label className="tx-14 lh-20 fw-m text-primary mr-1">
+      <div className="mb-2 flex items-center gap-1">
+        <label className="text-primary text-sm leading-5 font-medium">
           {t("createEvent.creatorAddress")}
         </label>
+        <span className={`mr-1 ml-1 text-(--color-orange-500)`}>*</span>
         <Tooltip
           placement="topLeft"
           title={t("createEvent.creatorAddressTooltip")}
@@ -49,12 +50,11 @@ export function CreatorAddressField({
         >
           <span
             {...creatorAddressTooltip.triggerProps}
-            className="tx-14 text-admin-text-main dark:text-white cursor-pointer flex items-center"
+            className="tx-14 text-admin-text-main flex cursor-pointer items-center dark:text-white"
           >
-            ⓘ
+            <InfoIcon />
           </span>
         </Tooltip>
-        <span className={`text-(--color-orange-500) ml-1`}>*</span>
       </div>
       <Controller
         control={control}
@@ -77,16 +77,11 @@ export function CreatorAddressField({
             autoComplete="one-time-code"
             spellCheck="false"
             placeholder={t("createEvent.creatorAddressPlaceholder")}
-            className={`w-full rounded-xl border border-border bg-white px-3 py-2
-  tx-14 lh-20 text-black placeholder:text-secondary
-  focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-  ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""}
-  ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""}
-`}
+            className={`border-border bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600 ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""} ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""} `}
           />
         )}
       />
-      <div className="mt-1 tx-12 lh-18">
+      <div className="tx-12 lh-18 mt-1">
         {addrStatus === "checking" && (
           <span className="text-secondary">
             {t("createEvent.addressChecking", "Checking…")}
@@ -103,6 +98,12 @@ export function CreatorAddressField({
           <span className="text-red-500">
             {addrError || t("createEvent.addressInvalid", "Invalid address.")}
           </span>
+        )}
+      </div>
+      <div className="text-secondary mt-1 text-xs">
+        {t(
+          "createEvent.creatorAddressHint",
+          "This address will be used to receive payments. Make sure you control the private key for this address.",
         )}
       </div>
     </div>
