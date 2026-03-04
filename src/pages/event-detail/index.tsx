@@ -7,7 +7,7 @@ import type {
   GetCompletedTopRepliesRes,
 } from "@/api/response";
 import { EventStatus, ReplySortBy } from "@/api/types";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
 import { mapApiTopReply } from "@/utils/eventTransform";
@@ -20,8 +20,8 @@ import { SearchAndFilter } from "./components/SearchAndFilter";
 const EventDetail = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const location = useLocation();
-  const initialUnlockEmail =
-    (location.state as { unlockEmail?: string } | null)?.unlockEmail;
+  const initialUnlockEmail = (location.state as { unlockEmail?: string } | null)
+    ?.unlockEmail;
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
   const goBack = useBackOrFallback("/");
@@ -222,14 +222,8 @@ const EventDetail = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={goBack}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={goBack} />
       </div>
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router";
 
-import ArrowBackIcon from "@/assets/icons/arroe_back.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { useBackIfInternal } from "@/hooks/useBack";
 import { cn } from "@/utils/style";
@@ -531,16 +531,9 @@ export default function CreateEvent() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub border-gray-450 absolute left-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border text-black dark:text-white"
-          onClick={goBack}
-        >
-          <ArrowBackIcon className="h-4 w-4 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={goBack} />
       </div>
-
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         <h1 className="lh-24 fw-m mb-6 text-lg font-medium text-(--color-orange-500)">
           {t("createEvent.formTitle")}

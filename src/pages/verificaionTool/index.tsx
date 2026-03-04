@@ -105,10 +105,10 @@ const VerificationTool = () => {
 
   return (
     <div className="flex flex-col items-start justify-start overflow-x-hidden px-2 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <BackButton onClick={goBack} />
-      </div>
       <div className="flex w-full flex-col gap-6 px-4 pb-6 md:px-8 md:pb-10">
+        <div className="relative h-[50px] w-full">
+          <BackButton onClick={goBack} />
+        </div>
         {/* Intro card */}
         <div className="border-border flex gap-4 border-b p-4 md:items-center md:p-8">
           <span>

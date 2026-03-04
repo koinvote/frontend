@@ -11,8 +11,8 @@ import type { DepositStatusRes } from "@/api/response";
 import type { EventType } from "@/api/types";
 import { DepositStatus } from "@/api/types";
 import BTCIcon from "@/assets/icons/btc.svg?react";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import CONSTS from "@/consts";
@@ -500,17 +500,11 @@ export default function ConfirmPay() {
   const isUnconfirmed = depositStatus?.status === DepositStatus.UNCONFIRMED;
 
   return (
-    <div className="flex-col flex items-center justify-center w-full p-2 md:p-0">
-      <div className="h-[50px] w-full relative">
-        <button
-          type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
-        >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
-        </button>
+    <div className="flex w-full flex-col items-center justify-center p-2 md:p-0">
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={() => navigate(-1)} />
       </div>
-      <div className="relative w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+      <div className="border-gray-450 bg-bg relative w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         {isUnconfirmed && showExtendButton && (
           <Button
             name="extendButton"
@@ -518,7 +512,7 @@ export default function ConfirmPay() {
             appearance="outline"
             tone="primary"
             text="sm"
-            className="absolute right-4 top-6 sm:right-8 sm:top-8 sm:w-40"
+            className="absolute top-6 right-4 sm:top-8 sm:right-8 sm:w-40"
             onClick={handleExtendTimeout}
             disabled={isExtending || !canExtend}
           >
@@ -533,7 +527,7 @@ export default function ConfirmPay() {
           {t("confirmPay.title", "Payment Instructions")}
         </h1>
         {!isDonation && !isWaitForRefund && !isExpired && (
-          <p className="mt-1 tx-14 lh-20 text-secondary">
+          <p className="tx-14 lh-20 text-secondary mt-1">
             {isUnconfirmed
               ? t(
                   "confirmPay.waitingConfirmation",
@@ -543,7 +537,7 @@ export default function ConfirmPay() {
                   "confirmPay.completePaymentWithin",
                   "Please complete your payment within",
                 )}
-            <span className="text-(--color-orange-500) font-medium ml-2">
+            <span className="ml-2 font-medium text-(--color-orange-500)">
               {countdownDisplay}
             </span>
           </p>
@@ -608,9 +602,9 @@ export default function ConfirmPay() {
                 <button
                   type="button"
                   onClick={() => handleCopyAddress("support@koinvote.com")}
-                  className="p-1 hover:opacity-70 cursor-pointer"
+                  className="cursor-pointer p-1 hover:opacity-70"
                 >
-                  <CopyIcon className="w-4 h-4 text-secondary" />
+                  <CopyIcon className="text-secondary h-4 w-4" />
                 </button>
               </span>
             </div>
@@ -673,7 +667,7 @@ export default function ConfirmPay() {
                 {t("confirmPay.refundAddress", "Refund Address")}
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
+                <div className="tx-14 lh-20 text-primary flex-1 font-mono break-all">
                   {refundAddress || "--"}
                 </div>
               </div>
@@ -713,15 +707,15 @@ export default function ConfirmPay() {
                     onClick={() =>
                       handleCopyAmount(formatBtcDisplay(totalAmountBtc))
                     }
-                    className="ml-2 p-1 hover:opacity-70 cursor-pointer"
+                    className="ml-2 cursor-pointer p-1 hover:opacity-70"
                   >
-                    <CopyIcon className="w-4 h-4 text-secondary" />
+                    <CopyIcon className="text-secondary h-4 w-4" />
                   </button>
                 </div>
               </div>
 
               {/* Warning message */}
-              <div className="flex items-start gap-2 tx-12 lh-18 text-secondary">
+              <div className="tx-12 lh-18 text-secondary flex items-start gap-2">
                 <span
                   className="text-secondary inline-block"
                   style={{ filter: "grayscale(100%)", opacity: 0.7 }}
@@ -741,24 +735,24 @@ export default function ConfirmPay() {
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.toThisAddress", "To this address")}
                 </div>
-                <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-bg">
-                  <div className="w-5 h-5 shrink-0 rounded-full bg-secondary flex items-center justify-center">
+                <div className="border-border bg-bg flex items-center gap-2 rounded-lg border p-3">
+                  <div className="bg-secondary flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
                     <BTCIcon
-                      className="w-3 h-3 [&>path]:stroke-[#A1A1A1]"
+                      className="h-3 w-3 [&>path]:stroke-[#A1A1A1]"
                       style={{
                         filter: "grayscale(100%) brightness(1.5)",
                       }}
                     />
                   </div>
-                  <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
+                  <div className="tx-14 lh-20 text-primary flex-1 font-mono break-all">
                     {depositAddress}
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopyAddress(depositAddress)}
-                    className="p-1 hover:opacity-70 shrink-0 cursor-pointer"
+                    className="shrink-0 cursor-pointer p-1 hover:opacity-70"
                   >
-                    <CopyIcon className="w-4 h-4 text-secondary" />
+                    <CopyIcon className="text-secondary h-4 w-4" />
                   </button>
                 </div>
               </div>
