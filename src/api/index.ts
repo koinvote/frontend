@@ -12,6 +12,7 @@ import type {
   GetListRepliesReq,
   SubmitReplyReq,
   SubscribeReq,
+  UnlockEventReq,
   UpdateSystemParametersReq,
   VerifySignatureReq,
 } from "./request.ts";
@@ -34,6 +35,8 @@ import type {
   GetSignaturePlainTextRes,
   PayoutReportRes,
   SystemConfigRes,
+  UnlockDepositStatusRes,
+  UnlockEventRes,
   VerifySignatureRes,
 } from "./response.ts";
 
@@ -185,6 +188,24 @@ export const API = {
   getReceiptVerifyPubKeys: get<ApiResponse<GetReceiptVerifyPubKeysRes[]>, void>(
     "/receipt/pub-keys",
   ),
+
+  // Unlock event result (paid_only) — returns unlock_id
+  unlockEvent: (eventId: string) =>
+    post<ApiResponse<UnlockEventRes>, UnlockEventReq>(
+      `/events/${eventId}/unlock`,
+    ),
+
+  // Get unlock deposit status
+  getUnlockDepositStatus: (unlockId: string) =>
+    get<ApiResponse<UnlockDepositStatusRes>, void>(
+      `/events/unlock/${unlockId}/deposit-status`,
+    ),
+
+  // Extend unlock deposit timeout by 30 minutes
+  extendUnlockDepositTimeout: (unlockId: string) =>
+    get<ApiResponse<UnlockDepositStatusRes>, void>(
+      `/events/unlock/${unlockId}/deposit-extend`,
+    ),
 };
 
 // Admin API (requires Bearer token authentication)

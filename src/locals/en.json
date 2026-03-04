@@ -572,6 +572,7 @@
     "btcTotal": "BTC Total",
     "unlockEmailPlaceholder": "your@email.com",
     "enterUnlockEmail": "Enter your unlock email",
+    "invalidEmailFormat": "Please enter a valid email address",
     "unlock": "Unlock"
   },
   "unlockPayment": {
@@ -588,8 +589,20 @@
     "privacyPolicy": "Privacy Policy",
     "and": "and",
     "chargesRefunds": "Charges & Refunds",
+    "agreeRequired": "Please agree to the Terms of Service to continue.",
+    "copied": "{{label}} copied",
+    "copyFailed": "Failed to copy",
     "backToEvent": "Back to Event",
-    "confirmAndPay": "Confirm & Pay"
+    "confirmAndPay": "Confirm & Pay",
+    "processing": "Processing...",
+    "unlockKey": "Unlock key",
+    "warning": "Pay the exact amount. Incorrect payment amount will fail to unlock and are non-refundable.",
+    "toCreatorAddress": "To Creator Address",
+    "byProceeding": "By proceeding, you agree to the",
+    "paymentReceived": "Payment received. Please wait for confirmation.",
+    "paymentConfirmed": "Payment confirmed! You can now view the results.",
+    "unlockFailed": "Failed to initiate payment",
+    "expiredNote": "Please go back to the event page and try again."
   },
   "subscribe": {
     "title": "Don't Miss Any Chance to Earn Bitcoin",
