@@ -45,7 +45,7 @@ export function ResultVisibilityField() {
   );
   const openEndedDisabledTooltip = t(
     "createEvent.resultVisibilityOpenEndedDisabled",
-    "Not available for open-ended events",
+    "Response type must be multiple-choice.",
   );
 
   return (
