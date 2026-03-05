@@ -29,6 +29,7 @@
   --color-border: #232428;
   --color-accent: var(--color-orange-500);
   --color-primary-lightModeGray: var(--color-gray-50);
+  --color-warning: #f2a000;
 
   /* admin color tokens */
   --color-admin-bg: #f3f3f5; /* 外層灰底 */
@@ -285,7 +286,6 @@
   border: 1px solid #e6e6ea;
   display: inline-grid;
   place-content: center;
-
 }
 .dark .radio-orange {
   border-color: #292929;
@@ -315,7 +315,9 @@
   cursor: pointer;
   display: grid;
   place-content: center;
-  transition: background-color 120ms ease-in-out, border-color 120ms ease-in-out;
+  transition:
+    background-color 120ms ease-in-out,
+    border-color 120ms ease-in-out;
 }
 .dark .checkbox-form-bg {
   border-color: #292929;

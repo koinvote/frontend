@@ -490,7 +490,7 @@ export default function ConfirmSign() {
 
         {/* Disclaimer */}
         <div className="border-border mt-6 border-t pt-4">
-          <p className="tx-12 lh-18 text-secondary">
+          <p className="tx-12 lh-18 text-primary">
             {t("confirmSign.byProceeding", "By proceeding, you agree to the")}{" "}
             <Link to="/terms" className="text-(--color-orange-500) underline">
               {t("confirmSign.termsOfService", "Terms of Service")}

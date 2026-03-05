@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
 
 import type { ApiResponse } from "@/api";
 import { API } from "@/api";
@@ -12,6 +12,7 @@ import type { EventType } from "@/api/types";
 import { DepositStatus } from "@/api/types";
 import BTCIcon from "@/assets/icons/btc.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import WarningIcon from "@/assets/icons/warning.svg?react";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
@@ -604,7 +605,7 @@ export default function ConfirmPay() {
                   onClick={() => handleCopyAddress("support@koinvote.com")}
                   className="cursor-pointer p-1 hover:opacity-70"
                 >
-                  <CopyIcon className="text-secondary h-4 w-4" />
+                  <CopyIcon className="text-primary h-6 w-6" />
                 </button>
               </span>
             </div>
@@ -615,7 +616,7 @@ export default function ConfirmPay() {
           <div className="mt-6 space-y-4">
             {/* Reward Amount (only if rewarded) */}
             {state.isRewarded && rewardAmountSatoshi > 0 && (
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.rewardAmount", "Reward Amount")}
                 </div>
@@ -629,7 +630,7 @@ export default function ConfirmPay() {
             {state.enablePreheat &&
               preheatFeeSatoshi !== null &&
               preheatFeeSatoshi > 0 && (
-                <div className="space-y-1">
+                <div className="mb-6 space-y-2">
                   <div className="tx-12 lh-18 text-secondary">
                     {t("confirmPay.preheatFee", "Preheat Fee")}
                   </div>
@@ -641,7 +642,7 @@ export default function ConfirmPay() {
 
             {/* Platform Fee (only for non-reward events with fees) */}
             {showPlatformFee && (
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.platformFee", "Platform Fee")}
                 </div>
@@ -652,7 +653,7 @@ export default function ConfirmPay() {
             )}
 
             {/* Total Amount */}
-            <div className="space-y-1">
+            <div className="mb-6 space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("confirmPay.totalAmount", "Total Amount")}
               </div>
@@ -662,7 +663,7 @@ export default function ConfirmPay() {
             </div>
 
             {/* Refund Address */}
-            <div className="space-y-1">
+            <div className="mb-6 space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("confirmPay.refundAddress", "Refund Address")}
               </div>
@@ -675,14 +676,14 @@ export default function ConfirmPay() {
 
             {/* Unlock key (only for paid_only result visibility) */}
             {state.resultVisibility === "paid_only" && state.creatorEmail && (
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.unlockKey", "Unlock key")}
                 </div>
                 <div className="tx-14 lh-20 text-primary">
                   {state.creatorEmail}
                 </div>
-                <div className="tx-12 lh-18 text-(--color-orange-500)">
+                <div className="tx-12 lh-18 text-warning">
                   {t(
                     "confirmPay.unlockKeyHint",
                     "This address will be used by you to unlock this event's results.",
@@ -696,11 +697,11 @@ export default function ConfirmPay() {
 
             {/* Send exactly */}
             <div className="space-y-4">
-              <div className="space-y-1">
+              <div className="mb-2 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.sendExactly", "Send exactly")}
                 </div>
-                <div className="tx-20 lh-24 fw-m text-primary">
+                <div className="tx-20 lh-24 fw-m text-primary flex items-center">
                   {formatBtcDisplay(totalAmountBtc)} BTC
                   <button
                     type="button"
@@ -709,19 +710,14 @@ export default function ConfirmPay() {
                     }
                     className="ml-2 cursor-pointer p-1 hover:opacity-70"
                   >
-                    <CopyIcon className="text-secondary h-4 w-4" />
+                    <CopyIcon className="text-primary h-6 w-6" />
                   </button>
                 </div>
               </div>
 
               {/* Warning message */}
-              <div className="tx-12 lh-18 text-secondary flex items-start gap-2">
-                <span
-                  className="text-secondary inline-block"
-                  style={{ filter: "grayscale(100%)", opacity: 0.7 }}
-                >
-                  ⚠️
-                </span>
+              <div className="tx-12 lh-18 text-warning mb-6 flex items-start gap-1">
+                <WarningIcon />
                 <span>
                   {t(
                     "confirmPay.warning",
@@ -731,17 +727,15 @@ export default function ConfirmPay() {
               </div>
 
               {/* To this address */}
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.toThisAddress", "To this address")}
                 </div>
                 <div className="border-border bg-bg flex items-center gap-2 rounded-lg border p-3">
-                  <div className="bg-secondary flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-orange-500">
                     <BTCIcon
-                      className="h-3 w-3 [&>path]:stroke-[#A1A1A1]"
-                      style={{
-                        filter: "grayscale(100%) brightness(1.5)",
-                      }}
+                      className="h-3 w-3 [&>path]:stroke-[#000000]"
+                      style={{ filter: "grayscale(100%) brightness(1.5)" }}
                     />
                   </div>
                   <div className="tx-14 lh-20 text-primary flex-1 font-mono break-all">
@@ -752,17 +746,52 @@ export default function ConfirmPay() {
                     onClick={() => handleCopyAddress(depositAddress)}
                     className="shrink-0 cursor-pointer p-1 hover:opacity-70"
                   >
-                    <CopyIcon className="text-secondary h-4 w-4" />
+                    <CopyIcon className="text-primary h-6 w-6" />
                   </button>
                 </div>
+              </div>
+
+              {/* Terms */}
+              <div className="mt-4">
+                <p className="tx-12 lh-18 text-primary">
+                  {t("preview.byProceeding", "By proceeding, you agree to the")}{" "}
+                  <Link
+                    to="/terms"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("preview.termsOfService", "Terms of Service")}
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/terms-reward-distribution"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("preview.rewardDistribution", "Reward Distribution")}
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/privacy"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("preview.privacyPolicy", "Privacy Policy")}
+                  </Link>{" "}
+                  {t("preview.and", "and")}{" "}
+                  <Link
+                    to="/charges-refunds"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("preview.chargesRefunds", "Charges & Refunds")}
+                  </Link>
+                  .
+                </p>
               </div>
             </div>
           </div>
         )}
 
         {/* Action buttons */}
-        <div className="mt-6 flex justify-center">
-          {isExpired && (
+        {isExpired && (
+          <div className="mt-6 flex justify-center">
             <Button
               type="button"
               appearance="solid"
@@ -773,8 +802,8 @@ export default function ConfirmPay() {
             >
               {t("confirmPay.backToPreview", "Back to Preview")}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

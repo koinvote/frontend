@@ -1,3 +1,4 @@
+import { Divider } from "antd";
 import {
   useCallback,
   useEffect,
@@ -445,7 +446,16 @@ export default function PreviewEvent() {
           {/* Creator address */}
           <Field label={t("preview.creatorAddress", "Creator address")}>
             {creatorAddress || "--"}
+            <div className="text-warning mt-2 text-xs">
+              {t(
+                "createEvent.creatorAddressHint",
+                "This address will be used to receive payments. Make sure you control the private key for this address.",
+              )}
+            </div>
           </Field>
+
+          <Divider />
+
           {/* Title */}
           <Field label={t("preview.titleLabel", "Title")}>
             {title || "--"}
@@ -454,13 +464,6 @@ export default function PreviewEvent() {
           {/* Description */}
           <Field label={t("preview.description", "Description")}>
             {description || "--"}
-          </Field>
-
-          {/* Response type */}
-          <Field label={t("preview.responseType", "Response type")}>
-            {eventType === "open"
-              ? t("preview.openEnded", "Open-ended")
-              : t("preview.singleChoice", "Multiple choice")}
           </Field>
 
           {/* Hashtag */}
@@ -473,6 +476,33 @@ export default function PreviewEvent() {
                   .join(" ")
               : "--"}
           </Field>
+
+          {/* Duration */}
+          <Field label={t("preview.duration", "Duration of this event")}>
+            {formatDuration(durationHours, t)}
+          </Field>
+
+          <Divider />
+
+          {/* Response type */}
+          <Field label={t("preview.responseType", "Response type")}>
+            {eventType === "open"
+              ? t("preview.openEnded", "Open-ended")
+              : t("preview.singleChoice", "Multiple choice")}
+          </Field>
+
+          {/* Single choice options */}
+          {eventType === "single_choice" && options.length > 0 && (
+            <Field label={t("preview.options", "Options")}>
+              <ol className="list-decimal space-y-1 pl-5">
+                {options.map((opt, idx) => (
+                  <li key={idx} className="tx-14 lh-20 text-primary">
+                    {opt || "--"}
+                  </li>
+                ))}
+              </ol>
+            </Field>
+          )}
 
           {/* Event type / Reward type */}
           <Field label={t("preview.rewardType", "Reward type")}>
@@ -499,30 +529,14 @@ export default function PreviewEvent() {
             </>
           )}
 
-          {/* Single choice options */}
-          {eventType === "single_choice" && options.length > 0 && (
-            <Field label={t("preview.options", "Options")}>
-              <ol className="list-decimal space-y-1 pl-5">
-                {options.map((opt, idx) => (
-                  <li key={idx} className="tx-14 lh-20 text-primary">
-                    {opt || "--"}
-                  </li>
-                ))}
-              </ol>
-            </Field>
-          )}
-
-          {/* Duration */}
-          <Field label={t("preview.duration", "Duration of this event")}>
-            {formatDuration(durationHours, t)}
-          </Field>
-
           {/* Platform fee（只有無獎金事件顯示） */}
           {!isRewarded && (
             <Field label={t("preview.platformFee", "Platform fee")}>
               {platformFeeDisplay}
             </Field>
           )}
+
+          <Divider />
 
           {/* Result visibility / unlock email / confirm unlock email / unlock price（paid_only 才顯示） */}
           {resultVisibility === "paid_only" && (
@@ -533,16 +547,16 @@ export default function PreviewEvent() {
               <Field label={t("preview.unlockEmail", "Unlock email")}>
                 <div>
                   <div>{creatorEmail || "--"}</div>
-                  <div className="tx-12 lh-18 mt-1 text-(--color-orange-500)">
+                  <div className="tx-12 lh-18 text-warning mt-1">
                     {t(
                       "preview.unlockEmailHint",
-                      "This email will be used by you to unlock this event's results.",
+                      "This address will be used by you to unlock this event's results.",
                     )}
                   </div>
                 </div>
               </Field>
-              <div className="space-y-1">
-                <div className="tx-12 lh-18 text-secondary">
+              <div className="mb-6 space-y-2">
+                <div className="lh-18 text-primary text-sm">
                   {t("preview.confirmUnlockEmail", "Confirm unlock email")}
                   <span className="text-(--color-orange-500)"> *</span>
                 </div>
@@ -559,7 +573,7 @@ export default function PreviewEvent() {
                     "preview.confirmUnlockEmail",
                     "Confirm unlock email",
                   )}
-                  className="tx-14 lh-20 placeholder:text-secondary border-border w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none"
+                  className="tx-14 lh-20 bg-form-bg text-primary border-border w-full rounded-xl border px-3 py-2 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600"
                 />
                 {confirmEmail && confirmEmail !== creatorEmail && (
                   <p className="tx-12 lh-18 text-red-500">
@@ -576,6 +590,8 @@ export default function PreviewEvent() {
             </>
           )}
 
+          <Divider />
+
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (
             <>
@@ -590,7 +606,7 @@ export default function PreviewEvent() {
           {/* Your Total */}
           <Field label={t("preview.yourTotal", "Your Total")}>
             <div className="flex flex-col gap-1">
-              <span>{totalFeeDisplay}</span>
+              <span className="text-xl">{totalFeeDisplay}</span>
               {showLowTotalWarning && (
                 <span className="mt-1 text-xs text-red-700 md:text-sm">
                   {t(
@@ -603,9 +619,11 @@ export default function PreviewEvent() {
           </Field>
         </div>
 
+        <Divider />
+
         {/* Terms */}
-        <div className="border-border mt-2 border-t pt-2">
-          <p className="tx-12 lh-18 text-secondary">
+        <div className="mt-2 pt-2">
+          <p className="tx-12 lh-18 text-primary">
             {t("preview.byProceeding", "By proceeding, you agree to the")}{" "}
             <Link to="/terms" className="text-(--color-orange-500) underline">
               {t("preview.termsOfService", "Terms of Service")}
@@ -670,9 +688,9 @@ export default function PreviewEvent() {
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="space-y-1">
+    <div className="mb-6 space-y-2">
       <div className="tx-12 lh-18 text-secondary">{label}</div>
-      <div className="tx-14 lh-20 text-primary break-words whitespace-pre-line">
+      <div className="tx-14 lh-20 text-primary wrap-break-word whitespace-pre-line">
         {children}
       </div>
     </div>
