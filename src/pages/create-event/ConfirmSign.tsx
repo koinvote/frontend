@@ -4,12 +4,13 @@ import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
+import { LegalLinks } from "@/components/base/LegalLinks";
 import { Loading } from "@/components/base/Loading";
 import { useToast } from "@/components/base/Toast/useToast";
 import { useHomeStore } from "@/stores/homeStore";
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -490,31 +491,7 @@ export default function ConfirmSign() {
 
         {/* Disclaimer */}
         <div className="border-border mt-6 border-t pt-4">
-          <p className="tx-12 lh-18 text-primary">
-            {t("confirmSign.byProceeding", "By proceeding, you agree to the")}{" "}
-            <Link to="/terms" className="text-(--color-orange-500) underline">
-              {t("confirmSign.termsOfService", "Terms of Service")}
-            </Link>
-            ,{" "}
-            <Link
-              to="/terms-reward-distribution"
-              className="text-(--color-orange-500) underline"
-            >
-              {t("confirmSign.rewardDistribution", "Reward Distribution")}
-            </Link>
-            ,{" "}
-            <Link to="/privacy" className="text-(--color-orange-500) underline">
-              {t("confirmSign.privacyPolicy", "Privacy Policy")}
-            </Link>{" "}
-            {t("confirmSign.and", "and")}{" "}
-            <Link
-              to="/charges-refunds"
-              className="text-(--color-orange-500) underline"
-            >
-              {t("confirmSign.chargesRefunds", "Charges & Refunds")}
-            </Link>
-            .
-          </p>
+          <LegalLinks />
         </div>
 
         {/* Action Buttons */}
