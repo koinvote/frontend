@@ -16,6 +16,7 @@ import type { UnlockDepositStatusRes } from "@/api/response";
 import { DepositStatus } from "@/api/types";
 import BTCIcon from "@/assets/icons/btc.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import WarningIcon from "@/assets/icons/warning.svg?react";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { LegalLinks } from "@/components/base/LegalLinks";
@@ -24,6 +25,7 @@ import CONSTS from "@/consts";
 import { formatDepositCountdown, satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { cn } from "@/utils/style";
+import { Divider } from "antd";
 
 dayjs.extend(utc);
 
@@ -328,7 +330,7 @@ export default function UnlockPayment() {
         )}
 
         {/* Title */}
-        <h1 className="tx-20 lh-24 fw-m mb-1 text-(--color-orange-500)">
+        <h1 className="lh-24 fw-m mb-1 text-lg text-orange-500">
           {paymentInitiated
             ? t("confirmPay.title", "Payment Instructions")
             : t("unlockPayment.title", "Unlock Result")}
@@ -372,112 +374,107 @@ export default function UnlockPayment() {
 
         {/* Payment instructions (after confirm & pay, not expired) */}
         {paymentInitiated && !isExpired && (
-          <div className="space-y-5">
+          <div className="mt-6 space-y-4">
             {/* Unlock key */}
-            <div className="space-y-1">
+            <div className="mb-6 space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.unlockKey", "Unlock key")}
               </div>
-              <div className="tx-14 text-primary leading-5">{email}</div>
+              <div className="tx-14 lh-20 text-primary">{email}</div>
             </div>
 
             {/* Divider */}
-            <hr className="border-border" />
+            <Divider className="bg-border" />
 
             {/* Send exactly */}
-            <div className="space-y-1">
-              <div className="tx-12 lh-18 text-secondary">
-                {t("confirmPay.sendExactly", "Send exactly")}
-              </div>
-              <div className="tx-20 lh-24 fw-m text-primary flex items-center gap-2">
-                {amountBtc} BTC
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleCopy(
-                      String(amountBtc),
-                      t("confirmPay.sendExactly", "Send exactly"),
-                    )
-                  }
-                  className="hover:bg-surface-hover text-secondary hover:text-primary flex shrink-0 cursor-pointer! items-center justify-center rounded p-1 transition-colors"
-                >
-                  <CopyIcon className="h-4 w-4 text-current" />
-                </button>
-              </div>
-            </div>
-
-            {/* Warning */}
-            <div className="tx-12 lh-18 text-secondary flex items-start gap-2">
-              <span
-                className="inline-block"
-                style={{ filter: "grayscale(100%)", opacity: 0.7 }}
-              >
-                ⚠️
-              </span>
-              <span>
-                {t(
-                  "unlockPayment.warning",
-                  "Pay the exact amount. Incorrect payment amount will fail to unlock and are non-refundable.",
-                )}
-              </span>
-            </div>
-
-            {/* To Creator Address */}
-            <div className="space-y-1">
-              <div className="tx-12 lh-18 text-secondary">
-                {t("unlockPayment.toCreatorAddress", "To Creator Address")}
-              </div>
-              <div className="bg-surface flex items-center gap-2 rounded-xl p-3">
-                <div className="bg-secondary flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
-                  <BTCIcon
-                    className="h-3 w-3 [&>path]:stroke-[#A1A1A1]"
-                    style={{ filter: "grayscale(100%) brightness(1.5)" }}
-                  />
+            <div className="space-y-4">
+              <div className="mb-2 space-y-2">
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("confirmPay.sendExactly", "Send exactly")}
                 </div>
-                <div className="text-primary tx-13 min-w-0 flex-1 font-mono leading-5 break-all">
-                  {depositAddress}
+                <div className="tx-20 lh-24 fw-m text-primary flex items-center">
+                  {amountBtc} BTC
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCopy(
+                        String(amountBtc),
+                        t("confirmPay.sendExactly", "Send exactly"),
+                      )
+                    }
+                    className="ml-2 cursor-pointer p-1 hover:opacity-70"
+                  >
+                    <CopyIcon className="text-primary h-6 w-6" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() =>
-                    handleCopy(
-                      depositAddress,
-                      t("unlockPayment.toCreatorAddress", "To Creator Address"),
-                    )
-                  }
-                  className="hover:bg-surface-hover text-secondary hover:text-primary flex shrink-0 cursor-pointer! items-center justify-center rounded p-1 transition-colors"
-                >
-                  <CopyIcon className="h-4 w-4 text-current" />
-                </button>
+              </div>
+
+              {/* Warning message */}
+              <div className="tx-12 lh-18 text-warning mb-6 flex items-start gap-1">
+                <WarningIcon />
+                <span>
+                  {t(
+                    "unlockPayment.warning",
+                    "Pay the exact amount. Incorrect payment amount will fail to unlock and are non-refundable.",
+                  )}
+                </span>
+              </div>
+
+              {/* To Creator Address */}
+              <div className="mb-6 space-y-2">
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("unlockPayment.toCreatorAddress", "To Creator Address")}
+                </div>
+                <div className="border-border bg-bg flex items-center gap-2 rounded-lg border p-3">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-orange-500">
+                    <BTCIcon
+                      className="h-3 w-3 [&>path]:stroke-[#000000]"
+                      style={{ filter: "grayscale(100%) brightness(1.5)" }}
+                    />
+                  </div>
+                  <div className="tx-14 lh-20 text-primary flex-1 font-mono break-all">
+                    {depositAddress}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleCopy(
+                        depositAddress,
+                        t("unlockPayment.toCreatorAddress", "To Creator Address"),
+                      )
+                    }
+                    className="shrink-0 cursor-pointer p-1 hover:opacity-70"
+                  >
+                    <CopyIcon className="text-primary h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Terms */}
+              <div className="mt-4">
+                <LegalLinks />
               </div>
             </div>
-
-            {/* Terms note */}
-            <LegalLinks
-              className="text-secondary"
-              linkClassName="text-(--color-orange-500) hover:underline"
-              target="_blank"
-            />
           </div>
         )}
 
         {/* Confirm form (before payment initiated) */}
         {!paymentInitiated && (
-          <div className="mt-4 space-y-5">
+          <div className="mt-4 space-y-6">
             {/* Event */}
             {eventTitle && (
-              <div className="space-y-1">
+              <div className="space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("unlockPayment.event", "Event")}
                 </div>
-                <div className="tx-16 lh-24 text-primary fw-m">
+                <div className="lh-24 text-primary fw-m text-xl">
                   {eventTitle}
                 </div>
               </div>
             )}
 
             {/* Unlock email */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.email", "Unlock email")}
               </div>
@@ -486,9 +483,9 @@ export default function UnlockPayment() {
 
             {/* Confirm unlock email */}
             <div className="space-y-2">
-              <div className="tx-12 lh-18 text-secondary flex items-center gap-1">
+              <div className="font-sm lh-18 text-primary flex items-center gap-1">
                 {t("unlockPayment.confirmEmail", "Confirm unlock email")}
-                <span className="ml-0.5 text-red-500">*</span>
+                <span className="ml-0.5 text-orange-500">*</span>
               </div>
               <input
                 ref={confirmEmailRef}
@@ -513,14 +510,14 @@ export default function UnlockPayment() {
             </div>
 
             {/* Divider */}
-            <hr className="border-border" />
+            <Divider />
 
             {/* Price */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("unlockPayment.price", "Price")}
               </div>
-              <div className="tx-16 lh-24 text-primary fw-m">
+              <div className="lh-24 text-primary fw-m text-xl">
                 {unlockPrice ?? "--"} BTC
               </div>
             </div>
@@ -528,7 +525,7 @@ export default function UnlockPayment() {
             {/* Terms checkbox */}
             <div
               className={cn(
-                "-mx-2 rounded-lg border p-2",
+                "-mx-2 rounded-lg p-2",
                 confirmTouched && !agreedToTerms
                   ? "border-2 border-red-500"
                   : "border-border",
