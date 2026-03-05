@@ -18,6 +18,7 @@ import BTCIcon from "@/assets/icons/btc.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
+import { LegalLinks } from "@/components/base/LegalLinks";
 import { useToast } from "@/components/base/Toast/useToast";
 import CONSTS from "@/consts";
 import { formatDepositCountdown, satsToBtc } from "@/utils/formatter";
@@ -452,44 +453,11 @@ export default function UnlockPayment() {
             </div>
 
             {/* Terms note */}
-            <p className="tx-12 lh-18 text-secondary">
-              {t(
-                "unlockPayment.byProceeding",
-                "By proceeding, you agree to the",
-              )}{" "}
-              <Link
-                to="/terms"
-                target="_blank"
-                className="text-(--color-orange-500) hover:underline"
-              >
-                {t("unlockPayment.termsOfService", "Terms of Service")}
-              </Link>
-              {", "}
-              <Link
-                to="/terms-reward-distribution"
-                target="_blank"
-                className="text-(--color-orange-500) hover:underline"
-              >
-                {t("unlockPayment.rewardDistribution", "Reward Distribution")}
-              </Link>
-              {", "}
-              <Link
-                to="/privacy"
-                target="_blank"
-                className="text-(--color-orange-500) hover:underline"
-              >
-                {t("unlockPayment.privacyPolicy", "Privacy Policy")}
-              </Link>{" "}
-              {t("unlockPayment.and", "and")}{" "}
-              <Link
-                to="/charges-refunds"
-                target="_blank"
-                className="text-(--color-orange-500) hover:underline"
-              >
-                {t("unlockPayment.chargesRefunds", "Charges & Refunds")}
-              </Link>
-              {"."}
-            </p>
+            <LegalLinks
+              className="text-secondary"
+              linkClassName="text-(--color-orange-500) hover:underline"
+              target="_blank"
+            />
           </div>
         )}
 
@@ -574,36 +542,33 @@ export default function UnlockPayment() {
                   className="checkbox-form-bg mt-0.5"
                 />
                 <span className="tx-13 lh-18 text-secondary">
-                  {t("unlockPayment.agreeToThe", "I agree to the")}{" "}
+                  {t("common.agreeToThe", "I agree to the")}{" "}
                   <Link
                     to="/terms"
                     className="text-(--color-orange-500) hover:underline"
                   >
-                    {t("unlockPayment.termsOfService", "Terms of Service")}
+                    {t("common.termsOfService", "Terms of Service")}
                   </Link>
                   {", "}
                   <Link
                     to="/terms-reward-distribution"
                     className="text-(--color-orange-500) hover:underline"
                   >
-                    {t(
-                      "unlockPayment.rewardDistribution",
-                      "Reward Distribution",
-                    )}
+                    {t("common.rewardDistribution", "Reward Distribution")}
                   </Link>
                   {", "}
                   <Link
                     to="/privacy"
                     className="text-(--color-orange-500) hover:underline"
                   >
-                    {t("unlockPayment.privacyPolicy", "Privacy Policy")}
+                    {t("common.privacyPolicy", "Privacy Policy")}
                   </Link>{" "}
-                  {t("unlockPayment.and", "and")}{" "}
+                  {t("common.and", "and")}{" "}
                   <Link
                     to="/charges-refunds"
                     className="text-(--color-orange-500) hover:underline"
                   >
-                    {t("unlockPayment.chargesRefunds", "Charges & Refunds")}
+                    {t("common.chargesRefunds", "Charges & Refunds")}
                   </Link>
                   {"."}
                 </span>

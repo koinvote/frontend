@@ -598,13 +598,13 @@ export default function CreateEvent() {
                   className="checkbox-form-bg mt-0.5"
                 />
                 <span>
-                  {t("createEvent.agreeToThe", "I agree to the")}{" "}
+                  {t("common.agreeToThe", "I agree to the")}{" "}
                   <Link
                     to="/terms"
                     target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
-                    {t("createEvent.termsOfService", "Terms of Service")}
+                    {t("common.termsOfService", "Terms of Service")}
                   </Link>
                   ,{" "}
                   <Link
@@ -612,7 +612,7 @@ export default function CreateEvent() {
                     target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
-                    {t("createEvent.rewardDistribution", "Reward Distribution")}
+                    {t("common.rewardDistribution", "Reward Distribution")}
                   </Link>
                   ,{" "}
                   <Link
@@ -620,15 +620,15 @@ export default function CreateEvent() {
                     target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
-                    {t("createEvent.privacyPolicy", "Privacy Policy")}
+                    {t("common.privacyPolicy", "Privacy Policy")}
                   </Link>{" "}
-                  {t("createEvent.and", "and")}{" "}
+                  {t("common.and", "and")}{" "}
                   <Link
                     to="/charges-refunds"
                     target="_blank"
                     className="text-(--color-orange-500) underline"
                   >
-                    {t("createEvent.chargesRefunds", "Charges & Refunds")}
+                    {t("common.chargesRefunds", "Charges & Refunds")}
                   </Link>
                   .
                 </span>

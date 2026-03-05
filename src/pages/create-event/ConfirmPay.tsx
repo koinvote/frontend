@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import type { ApiResponse } from "@/api";
 import { API } from "@/api";
@@ -15,6 +15,7 @@ import CopyIcon from "@/assets/icons/copy.svg?react";
 import WarningIcon from "@/assets/icons/warning.svg?react";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
+import { LegalLinks } from "@/components/base/LegalLinks";
 import { useToast } from "@/components/base/Toast/useToast";
 import CONSTS from "@/consts";
 import { useHomeStore } from "@/stores/homeStore";
@@ -753,37 +754,7 @@ export default function ConfirmPay() {
 
               {/* Terms */}
               <div className="mt-4">
-                <p className="tx-12 lh-18 text-primary">
-                  {t("preview.byProceeding", "By proceeding, you agree to the")}{" "}
-                  <Link
-                    to="/terms"
-                    className="text-(--color-orange-500) underline"
-                  >
-                    {t("preview.termsOfService", "Terms of Service")}
-                  </Link>
-                  ,{" "}
-                  <Link
-                    to="/terms-reward-distribution"
-                    className="text-(--color-orange-500) underline"
-                  >
-                    {t("preview.rewardDistribution", "Reward Distribution")}
-                  </Link>
-                  ,{" "}
-                  <Link
-                    to="/privacy"
-                    className="text-(--color-orange-500) underline"
-                  >
-                    {t("preview.privacyPolicy", "Privacy Policy")}
-                  </Link>{" "}
-                  {t("preview.and", "and")}{" "}
-                  <Link
-                    to="/charges-refunds"
-                    className="text-(--color-orange-500) underline"
-                  >
-                    {t("preview.chargesRefunds", "Charges & Refunds")}
-                  </Link>
-                  .
-                </p>
+                <LegalLinks />
               </div>
             </div>
           </div>

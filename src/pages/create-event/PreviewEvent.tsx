@@ -8,13 +8,14 @@ import {
   type ReactNode,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { API } from "@/api";
 import type { CreateEventReq } from "@/api/request";
 import type { EventType } from "@/api/types";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
+import { LegalLinks } from "@/components/base/LegalLinks";
 import { useToast } from "@/components/base/Toast/useToast";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
 import { satsToBtc } from "@/utils/formatter";
@@ -623,31 +624,7 @@ export default function PreviewEvent() {
 
         {/* Terms */}
         <div className="mt-2 pt-2">
-          <p className="tx-12 lh-18 text-primary">
-            {t("preview.byProceeding", "By proceeding, you agree to the")}{" "}
-            <Link to="/terms" className="text-(--color-orange-500) underline">
-              {t("preview.termsOfService", "Terms of Service")}
-            </Link>
-            ,{" "}
-            <Link
-              to="/terms-reward-distribution"
-              className="text-(--color-orange-500) underline"
-            >
-              {t("preview.rewardDistribution", "Reward Distribution")}
-            </Link>
-            ,{" "}
-            <Link to="/privacy" className="text-(--color-orange-500) underline">
-              {t("preview.privacyPolicy", "Privacy Policy")}
-            </Link>{" "}
-            {t("preview.and", "and")}{" "}
-            <Link
-              to="/charges-refunds"
-              className="text-(--color-orange-500) underline"
-            >
-              {t("preview.chargesRefunds", "Charges & Refunds")}
-            </Link>
-            .
-          </p>
+          <LegalLinks />
         </div>
 
         {/* 按鈕區塊 */}
