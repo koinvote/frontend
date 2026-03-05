@@ -718,7 +718,7 @@
     "backToCreate": "Back to Create Event",
     "resultVisibility": "Result visibility",
     "unlockEmail": "Unlock email",
-    "unlockEmailHint": "This email will be used by you to unlock this event's results.",
+    "unlockEmailHint": "This address will be used by you to unlock this event's results.",
     "confirmUnlockEmail": "Confirm unlock email",
     "confirmUnlockEmailMismatch": "Email does not match.",
     "unlockPrice": "Unlock price"
