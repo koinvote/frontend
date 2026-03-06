@@ -566,7 +566,7 @@ export default function CreateEvent() {
 
   // Calculate minimum reward based on duration and free hours
   // Rule 1: If duration_hours ≤ free_hours, min = satoshi_per_duration_hour
-  // Rule 2: If duration_hours > free_hours, min = max(min_reward_amount_satoshi, duration_hours × satoshi_per_duration_hour)
+  // Rule 2: If duration_hours > free_hours, min = max(min_reward_amount_satoshi, (duration_hours - free_hours) × satoshi_per_duration_hour)
   const minRewardBtc = useMemo(() => {
     if (!params) {
       return 0.000011; // Default fallback
@@ -588,9 +588,10 @@ export default function CreateEvent() {
       // Rule 1: duration_hours ≤ free_hours, min = satoshi_per_duration_hour
       minRewardSatoshi = satoshiPerDurationHour;
     } else {
-      // Rule 2: duration_hours > free_hours, min = max(min_reward_amount_satoshi, duration_hours × satoshi_per_duration_hour)
-      const durationBasedMin = durationHoursNum * satoshiPerDurationHour;
-      minRewardSatoshi = Math.max(minRewardAmountSatoshi, durationBasedMin);
+      // Rule 2: duration_hours > free_hours, min = min_reward_amount_satoshi + (duration_hours - free_hours) × satoshi_per_duration_hour
+      minRewardSatoshi =
+        minRewardAmountSatoshi +
+        (durationHoursNum - freeHours) * satoshiPerDurationHour;
     }
 
     // Convert to BTC
@@ -976,19 +977,19 @@ export default function CreateEvent() {
   };
 
   return (
-    <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
-      <div className="h-[50px] w-full relative">
+    <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
+      <div className="relative h-[50px] w-full">
         <button
           type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
+          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
           onClick={goBack}
         >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
+          <CircleLeftIcon className="h-8 w-8 fill-current" />
         </button>
       </div>
 
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500) mb-6">
+      <div className="border-admin-bg bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+        <h1 className="tx-20 lh-24 fw-m mb-6 text-(--color-orange-500)">
           {t("createEvent.formTitle")}
         </h1>
 
@@ -1002,7 +1003,7 @@ export default function CreateEvent() {
         >
           {/* Creator address */}
           <div>
-            <div className="flex items-center gap-1 mb-1">
+            <div className="mb-1 flex items-center gap-1">
               <label className="tx-14 lh-20 fw-m text-primary mr-1">
                 {t("createEvent.creatorAddress")}
               </label>
@@ -1018,12 +1019,12 @@ export default function CreateEvent() {
               >
                 <span
                   {...creatorAddressTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer flex items-center"
+                  className="tx-14 text-admin-text-main flex cursor-pointer items-center dark:text-white"
                 >
                   ⓘ
                 </span>
               </Tooltip>
-              <span className={`text-(--color-orange-500) ml-1`}>*</span>
+              <span className={`ml-1 text-(--color-orange-500)`}>*</span>
             </div>
             <input
               ref={creatorAddressRef}
@@ -1038,14 +1039,9 @@ export default function CreateEvent() {
               autoCapitalize="off"
               autoComplete="one-time-code"
               spellCheck="false"
-              className={`w-full rounded-xl border border-border bg-white px-3 py-2
-    tx-14 lh-20 text-black placeholder:text-secondary
-    focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-    ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""}
-    ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""}
-  `}
+              className={`border-border tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""} ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""} `}
             />
-            <div className="mt-1 tx-12 lh-18">
+            <div className="tx-12 lh-18 mt-1">
               {addrStatus === "checking" && (
                 <span className="text-secondary">
                   {t("createEvent.addressChecking", "Checking…")}
@@ -1068,7 +1064,7 @@ export default function CreateEvent() {
           </div>
           {/* Title */}
           <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
               {t("createEvent.title")}{" "}
               <span className="text-(--color-orange-500)">*</span>
             </label>
@@ -1085,13 +1081,13 @@ export default function CreateEvent() {
               }}
               placeholder={t("createEvent.titlePlaceholder")}
               className={cn(
-                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
+                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
                 titleError
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-(--color-orange-500)",
               )}
             />
-            <div className="flex justify-between mt-1">
+            <div className="mt-1 flex justify-between">
               {titleError && (
                 <span className="tx-12 lh-18 text-red-500">{titleError}</span>
               )}
@@ -1109,7 +1105,7 @@ export default function CreateEvent() {
 
           {/* Description */}
           <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
               {t("createEvent.description")}
             </label>
             <textarea
@@ -1123,19 +1119,14 @@ export default function CreateEvent() {
                 }
               }}
               placeholder={t("createEvent.descriptionPlaceholder")}
-              className={`w-full rounded-xl border border-border bg-white px-3 py-2
-                         tx-14 lh-20 text-black placeholder:text-secondary
-                         focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)
-                         resize-none h-auto min-h-[100px]
-                         ${
-                           description.length >= 500
-                             ? "border-red-500 focus:ring-red-500"
-                             : ""
-                         }`}
+              className={`border-border tx-14 lh-20 placeholder:text-secondary h-auto min-h-[100px] w-full resize-none rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none ${
+                description.length >= 500
+                  ? "border-red-500 focus:ring-red-500"
+                  : ""
+              }`}
             />
             <span
-              className={`tx-12 lh-18  block text-right 
-              ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
+              className={`tx-12 lh-18 block text-right ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
             >
               {500 - description.length}{" "}
               {t("createEvent.characterLeft", "characters left")}
@@ -1144,13 +1135,13 @@ export default function CreateEvent() {
 
           {/* Hashtags */}
           <div>
-            <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
               {t("createEvent.hashtags", "Hashtags")}
             </label>
 
             <div
               className={cn(
-                "w-full rounded-xl border border-border bg-white px-3 py-2",
+                "border-border w-full rounded-xl border bg-white px-3 py-2",
                 "flex flex-wrap items-center gap-2",
                 "focus-within:ring-2 focus-within:ring-(--color-orange-500)",
               )}
@@ -1170,8 +1161,8 @@ export default function CreateEvent() {
                   key={tag}
                   className={cn(
                     "inline-flex items-center gap-2 rounded-full",
-                    "bg-surface text-primary border border-border",
-                    "px-3 py-1 tx-12 lh-18",
+                    "bg-surface text-primary border-border border",
+                    "tx-12 lh-18 px-3 py-1",
                   )}
                 >
                   <span className="select-none">#{tag}</span>
@@ -1201,7 +1192,7 @@ export default function CreateEvent() {
                 className={cn(
                   "min-w-[120px] flex-1",
                   "bg-transparent outline-none",
-                  "tx-14 lh-20 text-black placeholder:text-secondary",
+                  "tx-14 lh-20 placeholder:text-secondary text-black",
                 )}
               />
             </div>
@@ -1225,8 +1216,8 @@ export default function CreateEvent() {
               <span className="text-(--color-orange-500)">*</span>
             </p>
             <div className="space-y-2">
-              <label className="flex tx-14 lh-20 text-primary">
-                <div className="flex items-center gap-2 cursor-pointer">
+              <label className="tx-14 lh-20 text-primary flex">
+                <div className="flex cursor-pointer items-center gap-2">
                   {" "}
                   <input
                     name="responseType"
@@ -1259,8 +1250,8 @@ export default function CreateEvent() {
                   </Tooltip>
                 </div>
               </label>
-              <label className="flex tx-14 lh-20 text-primary">
-                <div className="flex items-center gap-2 cursor-pointer">
+              <label className="tx-14 lh-20 text-primary flex">
+                <div className="flex cursor-pointer items-center gap-2">
                   <input
                     name="responseType"
                     type="radio"
@@ -1295,7 +1286,7 @@ export default function CreateEvent() {
           {/* Options（只有 single_choice 時顯示） */}
           {eventType === "single_choice" && (
             <div>
-              <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+              <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
                 {t("createEvent.options")}
                 <span className="text-(--color-orange-500)">*</span>
               </label>
@@ -1328,9 +1319,7 @@ export default function CreateEvent() {
                               n: index + 1,
                             },
                           )}
-                          className="w-full rounded-xl border border-border bg-white px-3 py-2
-                           tx-14 lh-20 text-black placeholder:text-secondary
-                           focus:outline-none focus:ring-2 focus:ring-(--color-orange-500)"
+                          className="border-border tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none"
                         />
                         <span
                           className={`tx-12 lh-18 absolute right-3 bottom-1 ${
@@ -1345,7 +1334,7 @@ export default function CreateEvent() {
                       {canRemove && (
                         <div
                           className={cn(
-                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
+                            "border-border flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border bg-white",
                           )}
                           onClick={() => handleRemoveOption(index)}
                         >
@@ -1357,7 +1346,7 @@ export default function CreateEvent() {
                       {isLast && options.length < 5 && (
                         <div
                           className={cn(
-                            "w-9 h-9 rounded-xl border border-border bg-white flex items-center justify-center cursor-pointer",
+                            "border-border flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border bg-white",
                           )}
                           onClick={handleAddOption}
                         >
@@ -1369,7 +1358,7 @@ export default function CreateEvent() {
                 })}
               </div>
               {optionsValidation.error && (
-                <p className="tx-12 lh-18 text-red-500 mt-1">
+                <p className="tx-12 lh-18 mt-1 text-red-500">
                   {optionsValidation.error}
                 </p>
               )}
@@ -1386,8 +1375,8 @@ export default function CreateEvent() {
               <span className="text-(--color-orange-500)">*</span>
             </p>
             <div className="space-y-2">
-              <label className="flex tx-14 lh-20 text-primary">
-                <div className="flex items-center gap-2 cursor-pointer">
+              <label className="tx-14 lh-20 text-primary flex">
+                <div className="flex cursor-pointer items-center gap-2">
                   <input
                     name="rewardType"
                     type="radio"
@@ -1398,8 +1387,8 @@ export default function CreateEvent() {
                   <span>{t("createEvent.rewarded", "Rewarded")}</span>
                 </div>
               </label>
-              <label className="flex tx-14 lh-20 text-primary">
-                <div className="flex items-center gap-2 cursor-pointer">
+              <label className="tx-14 lh-20 text-primary flex">
+                <div className="flex cursor-pointer items-center gap-2">
                   <input
                     name="rewardType"
                     type="radio"
@@ -1415,7 +1404,7 @@ export default function CreateEvent() {
 
           {/* Duration */}
           <div>
-            <div className="flex items-center justify-between mb-1">
+            <div className="mb-1 flex items-center justify-between">
               <label className="tx-14 lh-20 fw-m text-primary">
                 {t("createEvent.durationOfEvent", "Duration of this event")}
                 <span className="text-(--color-orange-500)">*</span>
@@ -1462,21 +1451,21 @@ export default function CreateEvent() {
                     )
               }
               className={cn(
-                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2",
+                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
                 durationError
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-(--color-orange-500)",
               )}
             />
             {durationError && (
-              <p className="tx-12 lh-18 text-red-500 mt-1">{durationError}</p>
+              <p className="tx-12 lh-18 mt-1 text-red-500">{durationError}</p>
             )}
           </div>
 
           {/* Reward (BTC) */}
           {isRewarded && (
             <div>
-              <label className="block tx-14 lh-20 fw-m text-primary mb-1">
+              <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
                 {t("createEvent.rewardBtc", "Reward (BTC)")}{" "}
                 <span className="text-(--color-orange-500)">*</span>
               </label>
@@ -1520,7 +1509,7 @@ export default function CreateEvent() {
                   //if enabled, the placeholder need to be change to Enter reward ( Min 0.000011 ), and the number Min xxxx need to have a state so I can update it dynamically
                   placeholder={rewardBtcPlaceholder}
                   className={cn(
-                    "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                    "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
                     rewardBtcValidation.error
                       ? "border-red-500 focus:ring-red-500"
                       : "border-border focus:ring-(--color-orange-500)",
@@ -1532,7 +1521,7 @@ export default function CreateEvent() {
                   appearance="solid"
                   tone="white"
                   text="sm"
-                  className="w-[125px] border-border rounded-xl"
+                  className="border-border w-[125px] rounded-xl"
                   onClick={() => {
                     setRewardBtc(minRewardBtc.toString());
                     setRewardBtcTouched(true); // Mark as touched when user clicks Minimum button
@@ -1543,7 +1532,7 @@ export default function CreateEvent() {
                 </Button>
               </div>
               {isRewarded && rewardBtcValidation.error && (
-                <p className="tx-12 lh-18 text-red-500 mt-1">
+                <p className="tx-12 lh-18 mt-1 text-red-500">
                   {rewardBtcValidation.error}
                 </p>
               )}
@@ -1580,7 +1569,7 @@ export default function CreateEvent() {
               <p className="tx-14 lh-20 fw-m text-primary mb-1">
                 {t("createEvent.platformFee", "Platform fee:")}
               </p>
-              <p className="tx-12 lh-18 dark:text-white text-black">
+              <p className="tx-12 lh-18 text-black dark:text-white">
                 {platformFeeDisplay}
               </p>
             </div>
@@ -1588,7 +1577,7 @@ export default function CreateEvent() {
 
           {/* Preheat */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 tx-14 lh-20 text-primary">
+            <div className="tx-14 lh-20 text-primary flex items-center gap-2">
               <input
                 id="enable-preheat"
                 name="enablePreheat"
@@ -1613,7 +1602,7 @@ export default function CreateEvent() {
               >
                 <span
                   {...enablePreheatTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main dark:text-white cursor-pointer"
+                  className="tx-14 text-admin-text-main cursor-pointer dark:text-white"
                 >
                   ⓘ
                 </span>
@@ -1643,7 +1632,7 @@ export default function CreateEvent() {
                 "Enter hours (max 720)",
               )}
               className={cn(
-                "w-full rounded-xl border bg-white px-3 py-2 tx-14 lh-20 text-black placeholder:text-secondary focus:outline-none focus:ring-2 disabled:opacity-60",
+                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
                 preheatHoursValidation.error
                   ? "border-red-500 focus:ring-red-500"
                   : "border-border focus:ring-(--color-orange-500)",
@@ -1651,7 +1640,7 @@ export default function CreateEvent() {
               disabled={!enablePreheat}
             />
             {enablePreheat && preheatHoursValidation.error && (
-              <p className="tx-12 lh-18 text-red-500 mt-1">
+              <p className="tx-12 lh-18 mt-1 text-red-500">
                 {preheatHoursValidation.error}
               </p>
             )}
@@ -1662,7 +1651,7 @@ export default function CreateEvent() {
             <p className="tx-14 lh-20 fw-m text-primary mb-1">
               {t("createEvent.preheatFee", "Preheat fee:")}
             </p>
-            <p className="tx-12 lh-18 dark:text-white text-black">
+            <p className="tx-12 lh-18 text-black dark:text-white">
               {preheatFeeDisplay}
             </p>
           </div>
@@ -1670,16 +1659,16 @@ export default function CreateEvent() {
           {/* Terms checkbox */}
           <div
             className={cn(
-              "pt-2 border-t rounded-lg p-2 -mx-2",
+              "-mx-2 rounded-lg border-t p-2 pt-2",
               agreeError ? "border-2 border-red-500" : "border-border",
             )}
           >
-            <label className="flex items-start gap-2 tx-12 lh-18 text-secondary">
+            <label className="tx-12 lh-18 text-secondary flex items-start gap-2">
               <input
                 name="agreeTerms"
                 ref={agreeRef}
                 type="checkbox"
-                className="mt-0.5 accent-(--color-orange-500) cursor-pointer"
+                className="mt-0.5 cursor-pointer accent-(--color-orange-500)"
                 checked={agree}
                 onChange={(e) => {
                   setAgree(e.target.checked);
@@ -1719,12 +1708,12 @@ export default function CreateEvent() {
               </span>
             </label>
             {agreeError && (
-              <p className="tx-12 lh-18 text-red-500 mt-1 ml-6">{agreeError}</p>
+              <p className="tx-12 lh-18 mt-1 ml-6 text-red-500">{agreeError}</p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="pt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
             <Button
               name="clearButton"
               type="button"
