@@ -21,7 +21,7 @@ export function RewardCountdown({
       {Number(totalRewardBtc) > 0 && (
         <span className="text-accent flex items-center gap-1 font-semibold">
           <BTCIcon />
-          {totalRewardBtc} BTC
+          {Number(totalRewardBtc)} BTC
         </span>
       )}
       <span className="tabular-nums">{countdown}</span>
