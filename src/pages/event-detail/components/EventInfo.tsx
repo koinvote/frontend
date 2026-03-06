@@ -614,7 +614,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
                 {t("eventInfo.rewardAmount", "Reward Amount:")}
               </span>
               <span className="text-primary ml-2 text-xs font-semibold md:text-sm">
-                {rewardAmountBtc} BTC ({event.winner_count}{" "}
+                {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
                 {event.winner_count === 1
                   ? t("eventInfo.address", "Address")
                   : t("eventInfo.addresses", "Addresses")}
