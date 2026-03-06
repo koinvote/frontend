@@ -63,7 +63,15 @@ const EventDetail = () => {
   >("snapshot");
 
   // Fetch top replies/options when balance display mode changes for completed/ended events
-  const { data: topRepliesData } = useQuery({
+  const isTopRepliesEnabled =
+    !!eventId &&
+    !!eventDetail &&
+    eventDetail.status !== EventStatus.PREHEAT &&
+    // For active events, wait until balanceDisplayMode is set to "on_chain" to avoid double fetch
+    (eventDetail.status !== EventStatus.ACTIVE ||
+      balanceDisplayMode === "on_chain");
+
+  const { data: topRepliesData, isLoading: isTopRepliesLoading } = useQuery({
     queryKey: [
       "completedTopReplies",
       eventId,
@@ -81,13 +89,7 @@ const EventDetail = () => {
       }
       return response.data;
     },
-    enabled:
-      !!eventId &&
-      !!eventDetail &&
-      eventDetail.status !== EventStatus.PREHEAT &&
-      // For active events, wait until balanceDisplayMode is set to "on_chain" to avoid double fetch
-      (eventDetail.status !== EventStatus.ACTIVE ||
-        balanceDisplayMode === "on_chain"),
+    enabled: isTopRepliesEnabled,
   });
 
   // Merge data from top replies API with event detail
@@ -229,7 +231,11 @@ const EventDetail = () => {
       </div>
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}
-        <EventInfo event={eventDetail} topReplies={displayTopReplies} />
+        <EventInfo
+          event={eventDetail}
+          topReplies={displayTopReplies}
+          isTopRepliesLoading={isTopRepliesEnabled && isTopRepliesLoading}
+        />
         {/* Divider */}
         <div className="my-6 md:my-8">
           <Divider />

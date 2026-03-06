@@ -1,5 +1,6 @@
 import type { TopReply } from "@/pages/create-event/types";
 import { satsToBtc } from "@/utils/formatter";
+import { useEffect, useState } from "react";
 
 interface TopReplyBarProps {
   reply: TopReply;
@@ -15,8 +16,15 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
   const weightPercent = reply.weight_percent || 0;
   const weightPercentDisplay = Number(weightPercent.toFixed(2));
 
-  // Calculate bar width based on weight percentage
-  const barWidth = `${Math.min(100, Math.max(0, weightPercent))}%`;
+  const targetWidth = `${Math.min(100, Math.max(0, weightPercent))}%`;
+  const [barWidth, setBarWidth] = useState("0%");
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setBarWidth(targetWidth));
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [targetWidth]);
 
   return (
     <div className="relative w-full h-12 rounded-lg border border-border bg-bg overflow-hidden">
