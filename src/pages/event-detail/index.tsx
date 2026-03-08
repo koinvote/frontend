@@ -26,7 +26,7 @@ const EventDetail = () => {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
-  >(ReplySortBy.BALANCE);
+  >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
 
   const {
