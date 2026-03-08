@@ -56,18 +56,18 @@
     "options": "Options",
     "optionsPlaceholder": "Enter option",
     "rewardType": "Reward Type",
-    "rewarded": "Rewarded",
-    "nonRewarded": "Non-Rewarded",
+    "rewarded": "Reward",
+    "nonRewarded": "No reward",
     "rewardBtc": "Reward (BTC)",
     "rewardBtcPlaceholder": "Set Duration First",
     "rewardTypeOptions": [
       {
         "value": "rewarded",
-        "label": "Rewarded"
+        "label": "Reward"
       },
       {
         "value": "non_reward",
-        "label": "Non-Rewarded"
+        "label": "No reward"
       }
     ],
     "numberOfRecipients": "Number of Recipients",
