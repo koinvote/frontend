@@ -22,7 +22,10 @@ const EventDetail = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const locationState = location.state as { unlockEmail?: string; fromUnlock?: boolean } | null;
+  const locationState = location.state as {
+    unlockEmail?: string;
+    fromUnlock?: boolean;
+  } | null;
   const initialUnlockEmail = locationState?.unlockEmail;
   const { t } = useTranslation();
   const hasRestoredScroll = useRef(false);
@@ -244,16 +247,18 @@ const EventDetail = () => {
           <Divider />
         </div>
 
-        {!isRepliesLocked && eventDetail.unlock_price_satoshi && (
-          <div className="mb-6">
-            <div className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.unlockPrice", "Unlock Price")}
+        {eventDetail.result_visibility === "paid_only" &&
+          !isRepliesLocked &&
+          eventDetail.unlock_price_satoshi && (
+            <div className="mb-6">
+              <div className="text-secondary text-xs md:text-sm">
+                {t("eventInfo.unlockPrice", "Unlock Price")}
+              </div>
+              <div className="text-primary mt-2 text-xs md:text-sm">
+                {eventDetail.unlock_price_satoshi / 100000000} BTC
+              </div>
             </div>
-            <div className="text-primary mt-2 text-xs md:text-sm">
-              {eventDetail.unlock_price_satoshi / 100000000} BTC
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Second Section: Search and Filter */}
         {!isRepliesLocked && (
