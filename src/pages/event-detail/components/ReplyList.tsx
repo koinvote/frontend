@@ -346,7 +346,7 @@ export function ReplyList({
     return (
       <div className="flex min-h-[200px] items-center justify-center">
         <p className="text-secondary">
-          {eventStatus === 5
+          {eventStatus === 4 || eventStatus === 5
             ? t("replyList.noReplies", "No replies")
             : t("replyList.noRepliesYet", "No replies yet")}
         </p>
