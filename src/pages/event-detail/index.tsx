@@ -26,7 +26,7 @@ const EventDetail = () => {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
-  >(ReplySortBy.BALANCE);
+  >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
 
   const {
@@ -62,17 +62,27 @@ const EventDetail = () => {
     "snapshot" | "on_chain"
   >("snapshot");
 
-  // Fetch top replies/options when balance display mode changes for completed/ended events
-  const { data: topRepliesData } = useQuery({
+  // For active events, always use on_chain without waiting for a useEffect to update state.
+  // This ensures the top-replies query fires immediately when eventDetail loads,
+  // preventing the stale 2-item preview from briefly showing.
+  const effectiveBalanceDisplayMode =
+    eventDetail?.status === EventStatus.ACTIVE ? "on_chain" : balanceDisplayMode;
+
+  const isTopRepliesEnabled =
+    !!eventId &&
+    !!eventDetail &&
+    eventDetail.status !== EventStatus.PREHEAT;
+
+  const { data: topRepliesData, isLoading: isTopRepliesLoading } = useQuery({
     queryKey: [
       "completedTopReplies",
       eventId,
-      balanceDisplayMode === "on_chain" ? "current" : "snapshot",
+      effectiveBalanceDisplayMode === "on_chain" ? "current" : "snapshot",
     ],
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
       const balanceType =
-        balanceDisplayMode === "on_chain" ? "current" : "snapshot";
+        effectiveBalanceDisplayMode === "on_chain" ? "current" : "snapshot";
       const response = (await API.getCompletedTopReplies(eventId)({
         balance_type: balanceType,
       })) as unknown as ApiResponse<GetCompletedTopRepliesRes>;
@@ -81,20 +91,16 @@ const EventDetail = () => {
       }
       return response.data;
     },
-    enabled:
-      !!eventId &&
-      !!eventDetail &&
-      eventDetail.status !== EventStatus.PREHEAT &&
-      // For active events, wait until balanceDisplayMode is set to "on_chain" to avoid double fetch
-      (eventDetail.status !== EventStatus.ACTIVE ||
-        balanceDisplayMode === "on_chain"),
+    enabled: isTopRepliesEnabled,
   });
 
-  // Merge data from top replies API with event detail
-  // Convert TopReplyRes to TopReply format using mapApiTopReply
+  // When the query is enabled but hasn't resolved yet, pass empty array to prevent
+  // stale eventDetail.top_replies (preview data) from flashing before real data arrives.
   const displayTopReplies = topRepliesData?.top_replies
     ? topRepliesData.top_replies.map(mapApiTopReply)
-    : (eventDetail?.top_replies ?? []);
+    : isTopRepliesEnabled
+      ? []
+      : (eventDetail?.top_replies ?? []);
 
   // Save scroll position on scroll
   useEffect(() => {
@@ -175,11 +181,6 @@ const EventDetail = () => {
     hasRestoredScroll.current = false;
   }, [eventId]);
 
-  useEffect(() => {
-    if (eventDetail?.status === EventStatus.ACTIVE) {
-      setBalanceDisplayMode("on_chain");
-    }
-  }, [eventDetail?.status]);
 
   useEffect(() => {
     if (eventDetail?.title) {
@@ -229,7 +230,11 @@ const EventDetail = () => {
       </div>
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}
-        <EventInfo event={eventDetail} topReplies={displayTopReplies} />
+        <EventInfo
+          event={eventDetail}
+          topReplies={displayTopReplies}
+          isTopRepliesLoading={isTopRepliesEnabled && isTopRepliesLoading}
+        />
         {/* Divider */}
         <div className="my-6 md:my-8">
           <Divider />
@@ -239,7 +244,7 @@ const EventDetail = () => {
         <SearchAndFilter
           eventId={eventId!}
           eventStatus={eventDetail.status}
-          balanceDisplayMode={balanceDisplayMode}
+          balanceDisplayMode={effectiveBalanceDisplayMode}
           onBalanceDisplayModeChange={setBalanceDisplayMode}
           onSearchChange={handleSearchChange}
           onSortChange={handleSortChange}
@@ -251,7 +256,7 @@ const EventDetail = () => {
         <ReplyList
           eventId={eventId!}
           eventStatus={eventDetail.status}
-          balanceDisplayMode={balanceDisplayMode}
+          balanceDisplayMode={effectiveBalanceDisplayMode}
           search={search}
           sortBy={sortBy}
           order={order}

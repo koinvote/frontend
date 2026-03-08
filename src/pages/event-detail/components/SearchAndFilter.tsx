@@ -35,7 +35,7 @@ export function SearchAndFilter({
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [sortBy, setSortBy] = useState<
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
-  >(ReplySortBy.BALANCE);
+  >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const sortDropdownRef = useRef<HTMLDivElement>(null);

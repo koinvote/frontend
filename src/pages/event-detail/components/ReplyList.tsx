@@ -75,7 +75,16 @@ export function ReplyList({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["replies", eventId, page, limit, search, sortBy, order, balanceDisplayMode],
+    queryKey: [
+      "replies",
+      eventId,
+      page,
+      limit,
+      search,
+      sortBy,
+      order,
+      balanceDisplayMode,
+    ],
     queryFn: async () => {
       const balanceType =
         balanceDisplayMode === "on_chain" ? "current" : "snapshot";
@@ -192,16 +201,10 @@ function ReplyItem({
   });
 
   const getDisplayBalance = () => {
-    if (eventStatus === EventStatus.ENDED) {
-      return reply.balance_at_current_satoshi;
-    }
-    if (eventStatus === EventStatus.COMPLETED) {
-      if (balanceDisplayMode === "on_chain") {
-        return reply.balance_at_current_satoshi;
-      }
+    if (eventStatus === EventStatus.COMPLETED && balanceDisplayMode !== "on_chain") {
       return reply.balance_at_snapshot_satoshi;
     }
-    return reply.balance_at_reply_satoshi;
+    return reply.balance_at_current_satoshi;
   };
 
   const balanceBtc = satsToBtc(getDisplayBalance(), {

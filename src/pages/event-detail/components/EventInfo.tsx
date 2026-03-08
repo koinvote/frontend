@@ -23,9 +23,14 @@ import { TopReplyBar } from "./TopReplyBar";
 interface EventInfoProps {
   event: EventDetailDataRes;
   topReplies?: TopReply[];
+  isTopRepliesLoading?: boolean;
 }
 
-export function EventInfo({ event, topReplies }: EventInfoProps) {
+export function EventInfo({
+  event,
+  topReplies,
+  isTopRepliesLoading,
+}: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -261,7 +266,11 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         : t("eventInfo.options", "Options");
       return {
         displayData:
-          topReplies && topReplies.length > 0 ? topReplies : convertedData,
+          topReplies && topReplies.length > 0
+            ? topReplies
+            : isTopRepliesLoading
+              ? []
+              : convertedData,
         displayTitle: title,
       };
     }
@@ -278,8 +287,13 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
       }
 
       // Sort by weight_percent descending, limit to 5
+      // When loading, don't fall back to stale event.top_replies
       const replies =
-        topReplies && topReplies.length > 0 ? topReplies : event.top_replies;
+        topReplies && topReplies.length > 0
+          ? topReplies
+          : isTopRepliesLoading
+            ? []
+            : event.top_replies;
       const sortedReplies = [...replies]
         .sort((a, b) => {
           const weightA = a.weight_percent || 0;
@@ -304,7 +318,17 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
     isOngoing,
     isCompleted,
     topReplies,
+    isTopRepliesLoading,
   ]);
+
+  // Show skeleton only on initial load (no existing data), not during refetch
+  const showSkeleton = !!isTopRepliesLoading && displayData.length === 0;
+
+  // For single_choice, use exact option count to prevent layout shift
+  const skeletonCount =
+    event.event_type === "single_choice" && event.options?.length
+      ? event.options.length
+      : 2;
 
   // Build field list for mobile (ordered list)
   const mobileFields = useMemo(() => {
@@ -321,7 +345,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
           <span className="text-primary text-xs font-semibold md:text-sm">
-            {rewardAmountBtc} BTC ({event.winner_count}{" "}
+            {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
             {event.winner_count === 1
               ? t("eventInfo.address", "Address")
               : t("eventInfo.addresses", "Addresses")}
@@ -590,15 +614,25 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
       )}
 
       {/* Top Reply / Options */}
-      {displayData.length > 0 && displayTitle && (
-        <div onClick={handleOptionsClick} className={isOngoing ? "cursor-pointer" : ""}>
+      {(showSkeleton || (displayData.length > 0 && !!displayTitle)) && (
+        <div
+          onClick={!showSkeleton && isOngoing ? handleOptionsClick : undefined}
+          className={!showSkeleton && isOngoing ? "cursor-pointer" : ""}
+        >
           <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
-            {displayTitle}
+            {showSkeleton ? t("eventInfo.topReply", "Top Reply") : displayTitle}
           </h2>
           <div className="space-y-2">
-            {displayData.map((reply, index) => (
-              <TopReplyBar key={reply.id || index} reply={reply} />
-            ))}
+            {showSkeleton
+              ? [...Array(skeletonCount)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="border-border bg-surface h-12 w-full animate-pulse rounded-lg border"
+                  />
+                ))
+              : displayData.map((reply, index) => (
+                  <TopReplyBar key={reply.id || index} reply={reply} />
+                ))}
           </div>
         </div>
       )}
@@ -614,7 +648,7 @@ export function EventInfo({ event, topReplies }: EventInfoProps) {
                 {t("eventInfo.rewardAmount", "Reward Amount:")}
               </span>
               <span className="text-primary ml-2 text-xs font-semibold md:text-sm">
-                {rewardAmountBtc} BTC ({event.winner_count}{" "}
+                {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
                 {event.winner_count === 1
                   ? t("eventInfo.address", "Address")
                   : t("eventInfo.addresses", "Addresses")}
