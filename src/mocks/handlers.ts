@@ -8,6 +8,8 @@ import {
   mockDepositStatus,
   mockEventDetail,
   mockEventList,
+  mockExchangeEventReplies,
+  mockExchangeTopReplies,
   mockGetEventListResponse,
   mockGetListRepliesResponse,
   mockGetReceiptVerifyPubKeysRes,
@@ -372,7 +374,9 @@ export const handlers = [
       );
     }
 
-    let replies = [...mockGetListRepliesResponse.replies];
+    let replies = eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
+      ? [...mockExchangeEventReplies]
+      : [...mockGetListRepliesResponse.replies];
 
     // Filter by search
     if (search) {
@@ -533,13 +537,23 @@ export const handlers = [
       const url = new URL(request.url);
       const balanceType = url.searchParams.get("balance_type") || "snapshot";
 
-      // Find event from list to get options
+      // Use real top-replies data for the exchange event
+      if (eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ") {
+        return HttpResponse.json<ApiResponse<any>>({
+          code: "000000",
+          success: true,
+          message: null,
+          data: {
+            event_id: eventId,
+            balance_type: balanceType,
+            top_replies: mockExchangeTopReplies,
+          },
+        });
+      }
+
+      // For other events: generate different weight percentages based on balance type
       const eventFromList = mockEventList.find((e) => e.event_id === eventId);
-
-      // Generate different weight percentages based on balance type
       const isSnapshot = balanceType === "snapshot";
-
-      // Generate different weight percentages for top_replies based on balance type
       const topReplies = eventFromList?.top_replies?.map((reply, index) => ({
         ...reply,
         weight_percent: isSnapshot

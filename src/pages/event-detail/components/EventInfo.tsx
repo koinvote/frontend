@@ -26,7 +26,11 @@ interface EventInfoProps {
   isTopRepliesLoading?: boolean;
 }
 
-export function EventInfo({ event, topReplies, isTopRepliesLoading }: EventInfoProps) {
+export function EventInfo({
+  event,
+  topReplies,
+  isTopRepliesLoading,
+}: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -319,6 +323,12 @@ export function EventInfo({ event, topReplies, isTopRepliesLoading }: EventInfoP
 
   // Show skeleton only on initial load (no existing data), not during refetch
   const showSkeleton = !!isTopRepliesLoading && displayData.length === 0;
+
+  // For single_choice, use exact option count to prevent layout shift
+  const skeletonCount =
+    event.event_type === "single_choice" && event.options?.length
+      ? event.options.length
+      : 2;
 
   // Build field list for mobile (ordered list)
   const mobileFields = useMemo(() => {
@@ -614,7 +624,7 @@ export function EventInfo({ event, topReplies, isTopRepliesLoading }: EventInfoP
           </h2>
           <div className="space-y-2">
             {showSkeleton
-              ? [...Array(3)].map((_, i) => (
+              ? [...Array(skeletonCount)].map((_, i) => (
                   <div
                     key={i}
                     className="border-border bg-surface h-12 w-full animate-pulse rounded-lg border"
