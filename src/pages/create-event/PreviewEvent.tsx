@@ -290,6 +290,12 @@ export default function PreviewEvent() {
               ? state.preheatHours
               : undefined,
           hashtags: hashtags.length > 0 ? hashtags : undefined,
+          result_visibility: state.resultVisibility,
+          creator_email: state.creatorEmail,
+          unlock_price:
+            state.resultVisibility === "paid_only" && state.unlockPriceBtc
+              ? Math.round(parseFloat(state.unlockPriceBtc) * 100000000)
+              : undefined,
         };
 
         // Create event
@@ -348,6 +354,12 @@ export default function PreviewEvent() {
               ? state.preheatHours
               : undefined,
           hashtags: hashtags.length > 0 ? hashtags : undefined,
+          result_visibility: state.resultVisibility,
+          creator_email: state.creatorEmail,
+          unlock_price:
+            state.resultVisibility === "paid_only" && state.unlockPriceBtc
+              ? Math.round(parseFloat(state.unlockPriceBtc) * 100000000)
+              : undefined,
         };
 
         // Create event

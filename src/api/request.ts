@@ -1,5 +1,5 @@
 // api/request.ts
-import type { EventType, EventRewardType } from "./types";
+import type { EventRewardType, EventType } from "./types";
 
 export interface CreateEventReq {
   title: string;
@@ -12,6 +12,9 @@ export interface CreateEventReq {
   options?: string[];
   preheat_hours?: number;
   hashtags?: string[];
+  result_visibility?: "public" | "paid_only" | "creator_only";
+  creator_email?: string;
+  unlock_price?: number;
 }
 
 export interface GetEventListReq {
