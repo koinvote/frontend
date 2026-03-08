@@ -268,24 +268,32 @@ export function ReplyList({
             </span>
           </p>
         )}
-        {participantsCount !== undefined && participantsCount > 0 && (
-          <div className="text-secondary tx-13 mb-6 flex items-center gap-4">
-            {participantsCount !== undefined && (
-              <span className="flex items-center gap-1">
-                <EventCardParticipantsIcon className="h-3 w-3" />
-                {t("replyList.participantsCount", "{{count}} Participants", {
-                  count: participantsCount,
-                })}
-              </span>
-            )}
-            {totalStakeSatoshi !== undefined && (
-              <span className="flex items-center gap-1">
-                <span>₿</span>
-                {Number(totalBtc)} {t("replyList.btcTotal", "BTC Total")}
-              </span>
-            )}
-          </div>
-        )}
+        <div className="text-secondary tx-13 mb-6 flex items-center gap-4">
+          {participantsCount !== undefined && participantsCount > 0 ? (
+            <>
+              {participantsCount !== undefined && (
+                <span className="flex items-center gap-1">
+                  <EventCardParticipantsIcon className="h-3 w-3" />
+                  {t("replyList.participantsCount", "{{count}} Participants", {
+                    count: participantsCount,
+                  })}
+                </span>
+              )}
+              {totalStakeSatoshi !== undefined && (
+                <span className="flex items-center gap-1">
+                  <span>₿</span>
+                  {Number(totalBtc)} {t("replyList.btcTotal", "BTC Total")}
+                </span>
+              )}
+            </>
+          ) : (
+            <div>
+              {eventStatus === 3
+                ? t("replyList.noRepliesYet", "No replies yet")
+                : t("replyList.noReplies", "No replies")}
+            </div>
+          )}
+        </div>
         <div className="w-full max-w-sm space-y-1">
           <input
             ref={unlockInputRef}
