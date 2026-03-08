@@ -101,7 +101,10 @@ export default function UnlockPayment() {
       const data = response.data;
       setDepositStatus(data);
 
-      if (data.status === DepositStatus.EXPIRED) {
+      if (
+        data.status === DepositStatus.EXPIRED ||
+        data.status === DepositStatus.FAILED
+      ) {
         if (statusCheckIntervalRef.current) {
           clearInterval(statusCheckIntervalRef.current);
           statusCheckIntervalRef.current = null;
@@ -123,7 +126,7 @@ export default function UnlockPayment() {
         return;
       }
 
-      if (data.status === DepositStatus.RECEIVED) {
+      if (data.status === DepositStatus.UNLOCKED) {
         if (statusCheckIntervalRef.current) {
           clearInterval(statusCheckIntervalRef.current);
           statusCheckIntervalRef.current = null;
@@ -218,7 +221,7 @@ export default function UnlockPayment() {
   const isUnconfirmed = depositStatus?.status === DepositStatus.UNCONFIRMED;
   const isExpired =
     depositStatus?.status === DepositStatus.EXPIRED ||
-    (depositStatus?.status as string)?.toUpperCase() === "EXPIRED";
+    depositStatus?.status === DepositStatus.FAILED;
 
   // Deposit address from API (fallback to placeholder)
   const depositAddress =

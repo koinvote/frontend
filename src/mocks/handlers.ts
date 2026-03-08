@@ -393,7 +393,7 @@ export const handlers = [
       (!unlockEmail || !PAID_UNLOCK_EMAILS.has(unlockEmail))
     ) {
       return HttpResponse.json<ApiResponse<any>>({
-        code: "000123",
+        code: "403101",
         success: false,
         message: "locked",
         data: {},
@@ -836,12 +836,23 @@ export const handlers = [
       UNLOCK_TIMEOUT_AT = null;
       UNLOCK_EMAIL = body.email ?? null;
 
+      const newUnlockId = `unlock_${String(eventId)}_${Date.now()}`;
+      const now = Date.now();
       return HttpResponse.json<ApiResponse<any>>({
         code: "000000",
         success: true,
         message: null,
         data: {
-          unlock_id: `unlock_${String(eventId)}_${Date.now()}`,
+          unlock_id: newUnlockId,
+          event_id: String(eventId),
+          unlock_email: body.email,
+          deposit_address:
+            "bc1qepehnttrsje​ed45kgz3hv79qqeg83m4s6dxjczzl45dls80hpxeq7rsewn",
+          expected_amount_satoshi: 950000,
+          received_amount_satoshi: 0,
+          status: "pending",
+          deposit_timeout_at: new Date(now + 15 * 60 * 1000).toISOString(),
+          is_creator: 0,
         },
       });
     },
@@ -864,13 +875,13 @@ export const handlers = [
 
       const elapsedMinutes = (now - UNLOCK_START_TIME) / (60 * 1000);
 
-      let status: DepositStatus;
+      let status: DepositStatus | "unlocked";
       if (elapsedMinutes < PENDING_TIME) {
         status = DepositStatus.PENDING;
       } else if (elapsedMinutes < CONFIRM_TIME) {
         status = DepositStatus.UNCONFIRMED;
       } else {
-        status = DepositStatus.RECEIVED;
+        status = "unlocked";
       }
 
       if (status === DepositStatus.UNCONFIRMED && !UNLOCK_FIRST_SEEN_AT) {
@@ -893,7 +904,7 @@ export const handlers = [
           : null;
 
       // Register email as paid once payment is confirmed
-      if (status === DepositStatus.RECEIVED && UNLOCK_EMAIL) {
+      if (status === "unlocked" && UNLOCK_EMAIL) {
         PAID_UNLOCK_EMAILS.add(UNLOCK_EMAIL);
       }
 

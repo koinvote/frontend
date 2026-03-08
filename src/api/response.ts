@@ -163,6 +163,7 @@ export interface DepositStatusRes {
 
 export interface GetListRepliesRes {
   replies: Reply[];
+  is_creator: 0 | 1;
   page: number;
   limit: number;
 }
@@ -322,18 +323,30 @@ export interface GetReceiptVerifyPubKeysRes {
 
 export interface UnlockEventRes {
   unlock_id: string;
+  event_id: string;
+  unlock_email: string;
+  deposit_address: string;
+  expected_amount_satoshi: number;
+  received_amount_satoshi: number;
+  status: "pending";
+  deposit_timeout_at: string;
+  is_creator: 0 | 1;
 }
 
 export interface UnlockDepositStatusRes {
   unlock_id: string;
   event_id: string;
+  unlock_email: string;
   deposit_address: string;
   expected_amount_satoshi: number;
+  received_amount_satoshi: number;
   status:
     | typeof DepositStatus.PENDING
     | typeof DepositStatus.UNCONFIRMED
-    | typeof DepositStatus.RECEIVED
-    | typeof DepositStatus.EXPIRED;
+    | typeof DepositStatus.UNLOCKED
+    | typeof DepositStatus.EXPIRED
+    | typeof DepositStatus.FAILED;
+  received_txid: string | null;
   deposit_timeout_at: string;
   first_seen_at: string | null;
   confirmed_at: string | null;
