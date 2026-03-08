@@ -138,7 +138,7 @@ export default function UnlockPayment() {
             "Payment confirmed! You can now view the results.",
           ),
         );
-        navigate(`/event/${eventId}`, { state: { unlockEmail: email } });
+        navigate(`/event/${eventId}`, { state: { unlockEmail: email, fromUnlock: true }, replace: true });
       }
     } catch (error) {
       console.error("Error checking unlock deposit status:", error);

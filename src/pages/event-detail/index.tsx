@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
 import type {
@@ -21,12 +21,16 @@ import { SearchAndFilter } from "./components/SearchAndFilter";
 const EventDetail = () => {
   const { eventId } = useParams<{ eventId: string }>();
   const location = useLocation();
-  const initialUnlockEmail = (location.state as { unlockEmail?: string } | null)
-    ?.unlockEmail;
+  const navigate = useNavigate();
+  const locationState = location.state as { unlockEmail?: string; fromUnlock?: boolean } | null;
+  const initialUnlockEmail = locationState?.unlockEmail;
   const { t } = useTranslation();
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
-  const goBack = useBackOrFallback("/");
+  const goBackDefault = useBackOrFallback("/");
+  const goBack = locationState?.fromUnlock
+    ? () => navigate("/", { replace: true })
+    : goBackDefault;
 
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
