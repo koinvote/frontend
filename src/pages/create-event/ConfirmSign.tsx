@@ -252,6 +252,7 @@ export default function ConfirmSign() {
         // Clear create event draft from sessionStorage
         const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
         sessionStorage.removeItem(CREATE_EVENT_DRAFT_KEY);
+        sessionStorage.setItem("koinvote:create-event-submitted", "true");
 
         // Pre-generate OG image for sharing
         API.preGenerateOgImage(eventId);
