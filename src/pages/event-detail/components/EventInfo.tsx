@@ -262,7 +262,11 @@ export function EventInfo({ event, topReplies, isTopRepliesLoading }: EventInfoP
         : t("eventInfo.options", "Options");
       return {
         displayData:
-          topReplies && topReplies.length > 0 ? topReplies : convertedData,
+          topReplies && topReplies.length > 0
+            ? topReplies
+            : isTopRepliesLoading
+              ? []
+              : convertedData,
         displayTitle: title,
       };
     }
