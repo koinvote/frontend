@@ -392,12 +392,15 @@ export const handlers = [
       eventDetail?.result_visibility === "paid_only" &&
       (!unlockEmail || !PAID_UNLOCK_EMAILS.has(unlockEmail))
     ) {
-      return HttpResponse.json<ApiResponse<any>>({
-        code: "403101",
-        success: false,
-        message: "locked",
-        data: {},
-      });
+      return HttpResponse.json<ApiResponse<any>>(
+        {
+          code: "403101",
+          success: false,
+          message: "locked",
+          data: {},
+        },
+        { status: 403 },
+      );
     }
 
     let replies =

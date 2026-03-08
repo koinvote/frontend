@@ -118,23 +118,34 @@ export function ReplyList({
     queryFn: async () => {
       const balanceType =
         balanceDisplayMode === "on_chain" ? "current" : "snapshot";
-      const response = (await API.getListReplies()({
-        event_id: eventId,
-        search: search || undefined,
-        sortBy,
-        order,
-        page,
-        limit,
-        balance_type: balanceType,
-        unlock_email: submittedEmail || undefined,
-      })) as unknown as ApiResponse<GetListRepliesRes>;
-      if (!response.success) {
-        if (response.message === "locked") {
+      try {
+        const response = (await API.getListReplies()({
+          event_id: eventId,
+          search: search || undefined,
+          sortBy,
+          order,
+          page,
+          limit,
+          balance_type: balanceType,
+          unlock_email: submittedEmail || undefined,
+        })) as unknown as ApiResponse<GetListRepliesRes>;
+        if (!response.success) {
+          throw new Error(response.message || "Failed to fetch replies");
+        }
+        return response.data;
+      } catch (err: unknown) {
+        // HTTP 403 with code 403101 means the event is locked
+        const axiosErr = err as {
+          response?: { status?: number; data?: { code?: string } };
+        };
+        if (
+          axiosErr?.response?.status === 403 ||
+          axiosErr?.response?.data?.code === "403101"
+        ) {
           return null; // locked sentinel
         }
-        throw new Error(response.message || "Failed to fetch replies");
+        throw err;
       }
-      return response.data;
     },
     enabled: !!eventId,
     placeholderData: keepPreviousData,
