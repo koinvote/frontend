@@ -1,5 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
 import type {
@@ -7,11 +9,10 @@ import type {
   GetCompletedTopRepliesRes,
 } from "@/api/response";
 import { EventStatus, ReplySortBy } from "@/api/types";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
 import { mapApiTopReply } from "@/utils/eventTransform";
-import { useQuery } from "@tanstack/react-query";
 import { Divider } from "./components/Divider";
 import { EventInfo } from "./components/EventInfo";
 import { ReplyList } from "./components/ReplyList";
@@ -19,15 +20,24 @@ import { SearchAndFilter } from "./components/SearchAndFilter";
 
 const EventDetail = () => {
   const { eventId } = useParams<{ eventId: string }>();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const locationState = location.state as { unlockEmail?: string; fromUnlock?: boolean } | null;
+  const initialUnlockEmail = locationState?.unlockEmail;
+  const { t } = useTranslation();
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
-  const goBack = useBackOrFallback("/");
+  const goBackDefault = useBackOrFallback("/");
+  const goBack = locationState?.fromUnlock
+    ? () => navigate("/", { replace: true })
+    : goBackDefault;
 
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState<
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
   >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
+  const [isRepliesLocked, setIsRepliesLocked] = useState(false);
 
   const {
     data: eventDetail,
@@ -66,12 +76,12 @@ const EventDetail = () => {
   // This ensures the top-replies query fires immediately when eventDetail loads,
   // preventing the stale 2-item preview from briefly showing.
   const effectiveBalanceDisplayMode =
-    eventDetail?.status === EventStatus.ACTIVE ? "on_chain" : balanceDisplayMode;
+    eventDetail?.status === EventStatus.ACTIVE
+      ? "on_chain"
+      : balanceDisplayMode;
 
   const isTopRepliesEnabled =
-    !!eventId &&
-    !!eventDetail &&
-    eventDetail.status !== EventStatus.PREHEAT;
+    !!eventId && !!eventDetail && eventDetail.status !== EventStatus.PREHEAT;
 
   const { data: topRepliesData, isLoading: isTopRepliesLoading } = useQuery({
     queryKey: [
@@ -181,7 +191,6 @@ const EventDetail = () => {
     hasRestoredScroll.current = false;
   }, [eventId]);
 
-
   useEffect(() => {
     if (eventDetail?.title) {
       document.title = `${eventDetail.title} | Koinvote`;
@@ -219,14 +228,8 @@ const EventDetail = () => {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={goBack}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={goBack} />
       </div>
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}
@@ -240,21 +243,35 @@ const EventDetail = () => {
           <Divider />
         </div>
 
+        {!isRepliesLocked && eventDetail.unlock_price_satoshi && (
+          <div className="mb-6">
+            <div className="text-secondary text-xs md:text-sm">
+              {t("eventInfo.unlockPrice", "Unlock Price")}
+            </div>
+            <div className="text-primary mt-2 text-xs md:text-sm">
+              {eventDetail.unlock_price_satoshi / 100000000} BTC
+            </div>
+          </div>
+        )}
+
         {/* Second Section: Search and Filter */}
-        <SearchAndFilter
-          eventId={eventId!}
-          eventStatus={eventDetail.status}
-          balanceDisplayMode={effectiveBalanceDisplayMode}
-          onBalanceDisplayModeChange={setBalanceDisplayMode}
-          onSearchChange={handleSearchChange}
-          onSortChange={handleSortChange}
-        />
+        {!isRepliesLocked && (
+          <SearchAndFilter
+            eventId={eventId!}
+            eventStatus={eventDetail.status}
+            balanceDisplayMode={effectiveBalanceDisplayMode}
+            onBalanceDisplayModeChange={setBalanceDisplayMode}
+            onSearchChange={handleSearchChange}
+            onSortChange={handleSortChange}
+          />
+        )}
 
         <div className="h-4" />
 
         {/* Third Section: Reply List */}
         <ReplyList
           eventId={eventId!}
+          initialUnlockEmail={initialUnlockEmail}
           eventStatus={eventDetail.status}
           balanceDisplayMode={effectiveBalanceDisplayMode}
           search={search}
@@ -262,6 +279,12 @@ const EventDetail = () => {
           order={order}
           options={eventDetail.options}
           eventType={eventDetail.event_type}
+          unlockPriceSatoshi={eventDetail.unlock_price_satoshi}
+          unlockCount={eventDetail.unlock_count}
+          participantsCount={eventDetail.participants_count}
+          totalStakeSatoshi={eventDetail.total_stake_satoshi}
+          eventTitle={eventDetail.title}
+          onLockedChange={setIsRepliesLocked}
         />
       </div>
     </div>

@@ -11,9 +11,11 @@ import type { DepositStatusRes } from "@/api/response";
 import type { EventType } from "@/api/types";
 import { DepositStatus } from "@/api/types";
 import BTCIcon from "@/assets/icons/btc.svg?react";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import WarningIcon from "@/assets/icons/warning.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
+import { LegalLinks } from "@/components/base/LegalLinks";
 import { useToast } from "@/components/base/Toast/useToast";
 import CONSTS from "@/consts";
 import { useHomeStore } from "@/stores/homeStore";
@@ -45,6 +47,9 @@ type PreviewEventState = {
   options?: string[];
   enablePreheat: boolean;
   preheatHours?: number;
+  resultVisibility?: "public" | "paid_only" | "creator_only";
+  creatorEmail?: string;
+  unlockPriceBtc?: string;
 };
 
 function formatBtcDisplay(btc: string): string {
@@ -497,17 +502,11 @@ export default function ConfirmPay() {
   const isUnconfirmed = depositStatus?.status === DepositStatus.UNCONFIRMED;
 
   return (
-    <div className="flex-col flex items-center justify-center w-full p-2 md:p-0">
-      <div className="h-[50px] w-full relative">
-        <button
-          type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
-        >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
-        </button>
+    <div className="flex w-full flex-col items-center justify-center p-2 md:p-0">
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={() => navigate(-1)} />
       </div>
-      <div className="relative w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+      <div className="border-gray-450 bg-bg relative w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         {isUnconfirmed && showExtendButton && (
           <Button
             name="extendButton"
@@ -515,7 +514,7 @@ export default function ConfirmPay() {
             appearance="outline"
             tone="primary"
             text="sm"
-            className="absolute right-4 top-6 sm:right-8 sm:top-8 sm:w-40"
+            className="absolute top-6 right-4 sm:top-8 sm:right-8 sm:w-40"
             onClick={handleExtendTimeout}
             disabled={isExtending || !canExtend}
           >
@@ -530,7 +529,7 @@ export default function ConfirmPay() {
           {t("confirmPay.title", "Payment Instructions")}
         </h1>
         {!isDonation && !isWaitForRefund && !isExpired && (
-          <p className="mt-1 tx-14 lh-20 text-secondary">
+          <p className="tx-14 lh-20 text-secondary mt-1">
             {isUnconfirmed
               ? t(
                   "confirmPay.waitingConfirmation",
@@ -540,7 +539,7 @@ export default function ConfirmPay() {
                   "confirmPay.completePaymentWithin",
                   "Please complete your payment within",
                 )}
-            <span className="text-(--color-orange-500) font-medium ml-2">
+            <span className="ml-2 font-medium text-(--color-orange-500)">
               {countdownDisplay}
             </span>
           </p>
@@ -605,9 +604,9 @@ export default function ConfirmPay() {
                 <button
                   type="button"
                   onClick={() => handleCopyAddress("support@koinvote.com")}
-                  className="p-1 hover:opacity-70 cursor-pointer"
+                  className="cursor-pointer p-1 hover:opacity-70"
                 >
-                  <CopyIcon className="w-4 h-4 text-secondary" />
+                  <CopyIcon className="text-primary h-6 w-6" />
                 </button>
               </span>
             </div>
@@ -618,7 +617,7 @@ export default function ConfirmPay() {
           <div className="mt-6 space-y-4">
             {/* Reward Amount (only if rewarded) */}
             {state.isRewarded && rewardAmountSatoshi > 0 && (
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.rewardAmount", "Reward Amount")}
                 </div>
@@ -632,7 +631,7 @@ export default function ConfirmPay() {
             {state.enablePreheat &&
               preheatFeeSatoshi !== null &&
               preheatFeeSatoshi > 0 && (
-                <div className="space-y-1">
+                <div className="mb-6 space-y-2">
                   <div className="tx-12 lh-18 text-secondary">
                     {t("confirmPay.preheatFee", "Preheat Fee")}
                   </div>
@@ -644,7 +643,7 @@ export default function ConfirmPay() {
 
             {/* Platform Fee (only for non-reward events with fees) */}
             {showPlatformFee && (
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.platformFee", "Platform Fee")}
                 </div>
@@ -655,7 +654,7 @@ export default function ConfirmPay() {
             )}
 
             {/* Total Amount */}
-            <div className="space-y-1">
+            <div className="mb-6 space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("confirmPay.totalAmount", "Total Amount")}
               </div>
@@ -665,48 +664,61 @@ export default function ConfirmPay() {
             </div>
 
             {/* Refund Address */}
-            <div className="space-y-1">
+            <div className="mb-6 space-y-2">
               <div className="tx-12 lh-18 text-secondary">
                 {t("confirmPay.refundAddress", "Refund Address")}
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
+                <div className="tx-14 lh-20 text-primary flex-1 font-mono break-all">
                   {refundAddress || "--"}
                 </div>
               </div>
             </div>
+
+            {/* Unlock key (only for paid_only result visibility) */}
+            {state.resultVisibility === "paid_only" && state.creatorEmail && (
+              <div className="mb-6 space-y-2">
+                <div className="tx-12 lh-18 text-secondary">
+                  {t("confirmPay.unlockKey", "Unlock key")}
+                </div>
+                <div className="tx-14 lh-20 text-primary">
+                  {state.creatorEmail}
+                </div>
+                <div className="tx-12 lh-18 text-warning">
+                  {t(
+                    "confirmPay.unlockKeyHint",
+                    "This address will be used by you to unlock this event's results.",
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Divider */}
             <Divider className="bg-border" />
 
             {/* Send exactly */}
             <div className="space-y-4">
-              <div className="space-y-1">
+              <div className="mb-2 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.sendExactly", "Send exactly")}
                 </div>
-                <div className="tx-20 lh-24 fw-m text-primary">
+                <div className="tx-20 lh-24 fw-m text-primary flex items-center">
                   {formatBtcDisplay(totalAmountBtc)} BTC
                   <button
                     type="button"
                     onClick={() =>
                       handleCopyAmount(formatBtcDisplay(totalAmountBtc))
                     }
-                    className="ml-2 p-1 hover:opacity-70 cursor-pointer"
+                    className="ml-2 cursor-pointer p-1 hover:opacity-70"
                   >
-                    <CopyIcon className="w-4 h-4 text-secondary" />
+                    <CopyIcon className="text-primary h-6 w-6" />
                   </button>
                 </div>
               </div>
 
               {/* Warning message */}
-              <div className="flex items-start gap-2 tx-12 lh-18 text-secondary">
-                <span
-                  className="text-secondary inline-block"
-                  style={{ filter: "grayscale(100%)", opacity: 0.7 }}
-                >
-                  ⚠️
-                </span>
+              <div className="tx-12 lh-18 text-warning mb-6 flex items-start gap-1">
+                <WarningIcon />
                 <span>
                   {t(
                     "confirmPay.warning",
@@ -716,38 +728,41 @@ export default function ConfirmPay() {
               </div>
 
               {/* To this address */}
-              <div className="space-y-1">
+              <div className="mb-6 space-y-2">
                 <div className="tx-12 lh-18 text-secondary">
                   {t("confirmPay.toThisAddress", "To this address")}
                 </div>
-                <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-bg">
-                  <div className="w-5 h-5 shrink-0 rounded-full bg-secondary flex items-center justify-center">
+                <div className="border-border bg-bg flex items-center gap-2 rounded-lg border p-3">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-orange-500">
                     <BTCIcon
-                      className="w-3 h-3 [&>path]:stroke-[#A1A1A1]"
-                      style={{
-                        filter: "grayscale(100%) brightness(1.5)",
-                      }}
+                      className="h-3 w-3 [&>path]:stroke-[#000000]"
+                      style={{ filter: "grayscale(100%) brightness(1.5)" }}
                     />
                   </div>
-                  <div className="flex-1 tx-14 lh-20 text-primary break-all font-mono">
+                  <div className="tx-14 lh-20 text-primary flex-1 font-mono break-all">
                     {depositAddress}
                   </div>
                   <button
                     type="button"
                     onClick={() => handleCopyAddress(depositAddress)}
-                    className="p-1 hover:opacity-70 shrink-0 cursor-pointer"
+                    className="shrink-0 cursor-pointer p-1 hover:opacity-70"
                   >
-                    <CopyIcon className="w-4 h-4 text-secondary" />
+                    <CopyIcon className="text-primary h-6 w-6" />
                   </button>
                 </div>
+              </div>
+
+              {/* Terms */}
+              <div className="mt-4">
+                <LegalLinks />
               </div>
             </div>
           </div>
         )}
 
         {/* Action buttons */}
-        <div className="mt-6 flex justify-center">
-          {isExpired && (
+        {isExpired && (
+          <div className="mt-6 flex justify-center">
             <Button
               type="button"
               appearance="solid"
@@ -758,8 +773,8 @@ export default function ConfirmPay() {
             >
               {t("confirmPay.backToPreview", "Back to Preview")}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

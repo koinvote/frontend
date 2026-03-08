@@ -1,5 +1,5 @@
 // api/request.ts
-import type { EventType, EventRewardType } from "./types";
+import type { EventRewardType, EventType } from "./types";
 
 export interface CreateEventReq {
   title: string;
@@ -12,6 +12,9 @@ export interface CreateEventReq {
   options?: string[];
   preheat_hours?: number;
   hashtags?: string[];
+  result_visibility?: "public" | "paid_only" | "creator_only";
+  creator_email?: string;
+  unlock_price_satoshi?: number;
 }
 
 export interface GetEventListReq {
@@ -32,6 +35,7 @@ export interface GetListRepliesReq {
   page?: number; // default: 1
   limit?: number; // default: 20, max: 100
   balance_type?: "snapshot" | "current";
+  unlock_email?: string;
 }
 
 // Admin API Request Types
@@ -94,4 +98,8 @@ export interface GetWithdrawalRecordReq {
   to_address?: string;
   start_time?: string;
   end_time?: string;
+}
+
+export interface UnlockEventReq {
+  email: string;
 }

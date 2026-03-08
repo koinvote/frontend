@@ -25,7 +25,7 @@ const API_BASE_URL = "/api/v1";
 // PENDING_TIME: 幾分鐘後變成 UNCONFIRMED
 // CONFIRM_TIME: 幾分鐘後變成 RECEIVED
 const PENDING_TIME = 0.5; // 0.5 分鐘 = 30 秒
-const CONFIRM_TIME = 10; // 10 分鐘
+const CONFIRM_TIME = 1; // 1 分鐘
 // ========================================================
 
 // Track deposit status timing
@@ -33,6 +33,16 @@ let DEPOSIT_START_TIME: number | null = null;
 let DEPOSIT_PENDING_TIMEOUT_AT: string | null = null; // 初始 PENDING 的到期時間
 let DEPOSIT_FIRST_SEEN_AT: string | null = null;
 let DEPOSIT_TIMEOUT_AT: string | null = null;
+
+// Track unlock deposit status timing (separate from event deposit)
+let UNLOCK_START_TIME: number | null = null;
+let UNLOCK_PENDING_TIMEOUT_AT: string | null = null;
+let UNLOCK_FIRST_SEEN_AT: string | null = null;
+let UNLOCK_TIMEOUT_AT: string | null = null;
+let UNLOCK_EMAIL: string | null = null;
+
+// Emails confirmed as paid — seeded with the test email, grows at runtime
+const PAID_UNLOCK_EMAILS = new Set(["paid@test.com"]);
 
 export const handlers = [
   // GET /system/parameters - Get system configuration
@@ -360,6 +370,7 @@ export const handlers = [
     const search = url.searchParams.get("search") || "";
     const sortBy = url.searchParams.get("sortBy") || "balance";
     const balanceType = url.searchParams.get("balance_type") || "snapshot";
+    const unlockEmail = url.searchParams.get("unlock_email") || "";
 
     // Return empty if no event_id
     if (!eventId) {
@@ -374,9 +385,28 @@ export const handlers = [
       );
     }
 
-    let replies = eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
-      ? [...mockExchangeEventReplies]
-      : [...mockGetListRepliesResponse.replies];
+    // Check if this event requires unlock (paid_only result visibility)
+    const eventDetail =
+      eventId === mockEventDetail.event_id ? mockEventDetail : null;
+    if (
+      eventDetail?.result_visibility === "paid_only" &&
+      (!unlockEmail || !PAID_UNLOCK_EMAILS.has(unlockEmail))
+    ) {
+      return HttpResponse.json<ApiResponse<any>>(
+        {
+          code: "403101",
+          success: false,
+          message: "locked",
+          data: {},
+        },
+        { status: 403 },
+      );
+    }
+
+    let replies =
+      eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
+        ? [...mockExchangeEventReplies]
+        : [...mockGetListRepliesResponse.replies];
 
     // Filter by search
     if (search) {
@@ -395,7 +425,8 @@ export const handlers = [
         );
       } else {
         replies.sort(
-          (a, b) => b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
+          (a, b) =>
+            b.balance_at_snapshot_satoshi - a.balance_at_snapshot_satoshi,
         );
       }
     } else if (sortBy === "time") {
@@ -792,4 +823,169 @@ export const handlers = [
       data: [...mockGetReceiptVerifyPubKeysRes],
     });
   }),
+
+  // POST /events/:eventId/unlock — initiate unlock payment, returns unlock_id
+  http.post(
+    `${API_BASE_URL}/events/:eventId/unlock`,
+    async ({ params, request }) => {
+      const { eventId } = params;
+      const body = (await request.json()) as { email: string };
+      console.log("[Mock] Unlock event:", eventId, body);
+
+      // Reset unlock deposit timing on each new unlock
+      UNLOCK_START_TIME = null;
+      UNLOCK_PENDING_TIMEOUT_AT = null;
+      UNLOCK_FIRST_SEEN_AT = null;
+      UNLOCK_TIMEOUT_AT = null;
+      UNLOCK_EMAIL = body.email ?? null;
+
+      const newUnlockId = `unlock_${String(eventId)}_${Date.now()}`;
+      const now = Date.now();
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: {
+          unlock_id: newUnlockId,
+          event_id: String(eventId),
+          unlock_email: body.email,
+          deposit_address:
+            "bc1qepehnttrsje​ed45kgz3hv79qqeg83m4s6dxjczzl45dls80hpxeq7rsewn",
+          expected_amount_satoshi: 950000,
+          received_amount_satoshi: 0,
+          status: "pending",
+          deposit_timeout_at: new Date(now + 15 * 60 * 1000).toISOString(),
+          is_creator: 0,
+        },
+      });
+    },
+  ),
+
+  // GET /events/unlock/:unlockId/deposit-status
+  http.get(
+    `${API_BASE_URL}/events/unlock/:unlockId/deposit-status`,
+    ({ params }) => {
+      const { unlockId } = params;
+      const now = Date.now();
+
+      // Initialize timing on first call (same pattern as event deposit-status)
+      if (!UNLOCK_START_TIME) {
+        UNLOCK_START_TIME = now;
+        UNLOCK_PENDING_TIMEOUT_AT = new Date(
+          now + 15 * 60 * 1000,
+        ).toISOString();
+      }
+
+      const elapsedMinutes = (now - UNLOCK_START_TIME) / (60 * 1000);
+
+      let status: DepositStatus | "unlocked";
+      if (elapsedMinutes < PENDING_TIME) {
+        status = DepositStatus.PENDING;
+      } else if (elapsedMinutes < CONFIRM_TIME) {
+        status = DepositStatus.UNCONFIRMED;
+      } else {
+        status = "unlocked";
+      }
+
+      if (status === DepositStatus.UNCONFIRMED && !UNLOCK_FIRST_SEEN_AT) {
+        UNLOCK_FIRST_SEEN_AT = new Date(
+          UNLOCK_START_TIME + PENDING_TIME * 60 * 1000,
+        ).toISOString();
+        UNLOCK_TIMEOUT_AT = new Date(
+          UNLOCK_START_TIME + PENDING_TIME * 60 * 1000 + 45 * 60 * 1000,
+        ).toISOString();
+      }
+
+      const depositTimeoutAt =
+        status === DepositStatus.PENDING
+          ? UNLOCK_PENDING_TIMEOUT_AT!
+          : UNLOCK_TIMEOUT_AT || new Date(now + 45 * 60 * 1000).toISOString();
+
+      const confirmedAt =
+        status === DepositStatus.RECEIVED
+          ? new Date(UNLOCK_START_TIME + CONFIRM_TIME * 60 * 1000).toISOString()
+          : null;
+
+      // Register email as paid once payment is confirmed
+      if (status === "unlocked" && UNLOCK_EMAIL) {
+        PAID_UNLOCK_EMAILS.add(UNLOCK_EMAIL);
+      }
+
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: {
+          unlock_id: unlockId,
+          event_id: String(unlockId).split("_")[1] ?? "unknown",
+          deposit_address:
+            "bc1qepehnttrsje​ed45kgz3hv79qqeg83m4s6dxjczzl45dls80hpxeq7rsewn",
+          expected_amount_satoshi: 950000,
+          status,
+          deposit_timeout_at: depositTimeoutAt,
+          first_seen_at:
+            status === DepositStatus.PENDING ? null : UNLOCK_FIRST_SEEN_AT,
+          confirmed_at: confirmedAt,
+        },
+      });
+    },
+  ),
+
+  // GET /events/unlock/:unlockId/deposit-extend
+  http.get(
+    `${API_BASE_URL}/events/unlock/:unlockId/deposit-extend`,
+    ({ params }) => {
+      const { unlockId } = params;
+
+      if (!UNLOCK_TIMEOUT_AT) {
+        return HttpResponse.json<ApiResponse<null>>(
+          {
+            code: "400000",
+            success: false,
+            message: "No deposit timeout to extend",
+            data: null,
+          },
+          { status: 400 },
+        );
+      }
+
+      const now = Date.now();
+      const currentTimeout = new Date(UNLOCK_TIMEOUT_AT).getTime();
+      const remainingMinutes = (currentTimeout - now) / (60 * 1000);
+
+      if (remainingMinutes >= CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES) {
+        return HttpResponse.json<ApiResponse<null>>(
+          {
+            code: "400000",
+            success: false,
+            message: `Remaining time must be less than ${CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES} minutes`,
+            data: null,
+          },
+          { status: 400 },
+        );
+      }
+
+      const newTimeout = new Date(
+        currentTimeout + CONSTS.DEPOSIT_EXTEND_TIME * 60 * 1000,
+      ).toISOString();
+      UNLOCK_TIMEOUT_AT = newTimeout;
+
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: {
+          unlock_id: unlockId,
+          event_id: String(unlockId).split("_")[1] ?? "unknown",
+          deposit_address:
+            "bc1qepehnttrsje​ed45kgz3hv79qqeg83m4s6dxjczzl45dls80hpxeq7rsewn",
+          expected_amount_satoshi: 950000,
+          status: DepositStatus.UNCONFIRMED,
+          deposit_timeout_at: newTimeout,
+          first_seen_at: UNLOCK_FIRST_SEEN_AT,
+          confirmed_at: null,
+        },
+      });
+    },
+  ),
 ];

@@ -338,6 +338,20 @@ export function EventInfo({
       key: string;
     }> = [];
 
+    fields.push({
+      key: "time-remaining",
+      label: t("eventInfo.timeRemaining", "Time Remaining:"),
+      value: isCompleted ? (
+        <div className="mt-1 text-xs font-semibold text-black md:text-sm dark:text-white">
+          {timeRemaining}
+        </div>
+      ) : (
+        <span className="text-accent text-xs font-semibold md:text-sm">
+          {timeRemaining}
+        </span>
+      ),
+    });
+
     // Only show rewards in ongoing or completed state
     if ((isOngoing || isCompleted) && isRewarded && rewardAmountBtc) {
       fields.push({
@@ -370,20 +384,6 @@ export function EventInfo({
         ),
       });
     }
-
-    fields.push({
-      key: "time-remaining",
-      label: t("eventInfo.timeRemaining", "Time Remaining:"),
-      value: isCompleted ? (
-        <div className="mt-1 text-xs font-semibold text-black md:text-sm dark:text-white">
-          {timeRemaining}
-        </div>
-      ) : (
-        <span className="text-accent text-xs font-semibold md:text-sm">
-          {timeRemaining}
-        </span>
-      ),
-    });
 
     // Only show event duration in ongoing or completed state
     if ((isOngoing || isCompleted || isPreheat) && eventDurationDisplay) {
@@ -471,6 +471,22 @@ export function EventInfo({
       ),
     });
 
+    if (event.result_visibility) {
+      fields.push({
+        key: "result-visibility",
+        label: t("eventInfo.resultVisibility", "Result visibility:"),
+        value: (
+          <span className="text-xs">
+            {event.result_visibility === "public"
+              ? t("reply.resultVisibilityPublic", "Public")
+              : event.result_visibility === "paid_only"
+                ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+          </span>
+        ),
+      });
+    }
+
     if (event.hashtags && event.hashtags.length > 0) {
       fields.push({
         key: "hashtags",
@@ -521,6 +537,7 @@ export function EventInfo({
     event.event_id,
     event.creator_address,
     event.event_type,
+    event.result_visibility,
     event.hashtags,
     handleAddressClick,
     handleHashtagClick,
@@ -627,7 +644,7 @@ export function EventInfo({
               ? [...Array(skeletonCount)].map((_, i) => (
                   <div
                     key={i}
-                    className="border-border bg-surface h-12 w-full animate-pulse rounded-lg border"
+                    className="border-border bg-surface h-14 w-full animate-pulse rounded-lg border"
                   />
                 ))
               : displayData.map((reply, index) => (
@@ -640,38 +657,7 @@ export function EventInfo({
       {/* Desktop: Two Column Layout */}
       <div className="hidden grid-cols-2 gap-4 md:grid md:gap-6">
         {/* Left Column */}
-        <div className="flex flex-col gap-3">
-          {/* Only show rewards in ongoing or completed state */}
-          {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.rewardAmount", "Reward Amount:")}
-              </span>
-              <span className="text-primary ml-2 text-xs font-semibold md:text-sm">
-                {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
-                {event.winner_count === 1
-                  ? t("eventInfo.address", "Address")
-                  : t("eventInfo.addresses", "Addresses")}
-                )
-              </span>
-            </div>
-          )}
-
-          {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.additionalReward", "Additional Reward:")}
-              </span>
-              <span className="text-primary ml-2 text-xs md:text-sm">
-                {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
-                {event.additional_winner_count === 1
-                  ? t("eventInfo.address", "Address")
-                  : t("eventInfo.addresses", "Addresses")}
-                )
-              </span>
-            </div>
-          )}
-
+        <div className="flex flex-col gap-6">
           <div>
             <span className="text-secondary text-xs md:text-sm">
               {t("eventInfo.timeRemaining", "Time Remaining:")}
@@ -681,19 +667,50 @@ export function EventInfo({
                 {timeRemaining}
               </div>
             ) : (
-              <span className="text-accent ml-2 text-xs font-semibold md:text-sm">
+              <div className="text-accent mt-2 text-xs font-semibold md:text-sm">
                 {timeRemaining}
-              </span>
+              </div>
             )}
           </div>
 
+          {/* Only show rewards in ongoing or completed state */}
+          {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
+            <div>
+              <div className="text-secondary text-xs md:text-sm">
+                {t("eventInfo.rewardAmount", "Reward Amount:")}
+              </div>
+              <div className="text-primary mt-2 text-xs font-semibold md:text-sm">
+                {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
+                {event.winner_count === 1
+                  ? t("eventInfo.address", "Address")
+                  : t("eventInfo.addresses", "Addresses")}
+                )
+              </div>
+            </div>
+          )}
+
+          {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
+            <div>
+              <div className="text-secondary text-xs md:text-sm">
+                {t("eventInfo.additionalReward", "Additional Reward:")}
+              </div>
+              <div className="text-primary mt-2 text-xs md:text-sm">
+                {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
+                {event.additional_winner_count === 1
+                  ? t("eventInfo.address", "Address")
+                  : t("eventInfo.addresses", "Addresses")}
+                )
+              </div>
+            </div>
+          )}
+
           {/* Show creator address in all states */}
           {(isPreheat || isOngoing || isCompleted) && event.creator_address && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col gap-2">
               <span className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.creatorAddress", "Creator address:")}
               </span>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleAddressClick}
@@ -725,53 +742,6 @@ export function EventInfo({
             </div>
           )}
 
-          <div>
-            <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.eventType", "Event Type:")}
-            </span>
-            <span className="ml-2 text-xs text-black md:text-sm dark:text-white">
-              {event.event_type === "open"
-                ? t("reply.openEnded", "Open-ended")
-                : t("reply.singleChoice", "Multiple choice")}
-            </span>
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="flex flex-col gap-3">
-          {/* Only show event duration in ongoing or completed state */}
-          {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.durationOfEvent", "Duration of This Event:")}
-              </span>
-              <span className="text-primary ml-2 text-xs md:text-sm">
-                {eventDurationDisplay}
-              </span>
-            </div>
-          )}
-
-          {/* Show preheat duration in all states if it exists */}
-          {preheatDurationDisplay && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.preheatDuration", "Preheat Duration:")}
-              </span>
-              <span className="text-primary ml-2 text-xs md:text-sm">
-                {preheatDurationDisplay}
-              </span>
-            </div>
-          )}
-
-          <div>
-            <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.eventId", "Event-ID:")}
-            </span>
-            <span className="text-primary ml-2 text-xs md:text-sm">
-              {event.event_id}
-            </span>
-          </div>
-
           {event.hashtags && event.hashtags.length > 0 && (
             <div>
               <span className="text-secondary text-xs md:text-sm">
@@ -779,7 +749,7 @@ export function EventInfo({
                   ? t("eventInfo.hashtags", "Hashtags:")
                   : t("eventInfo.hashtag", "Hashtag:")}
               </span>
-              <div className="mt-1 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-wrap gap-2">
                 {event.hashtags.map((tag, index) => {
                   const hashtagWithPrefix = tag.startsWith("#")
                     ? tag
@@ -800,6 +770,68 @@ export function EventInfo({
                     </button>
                   );
                 })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Column */}
+        <div className="flex flex-col gap-6">
+          {/* Only show event duration in ongoing or completed state */}
+          {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
+            <div>
+              <span className="text-secondary text-xs md:text-sm">
+                {t("eventInfo.durationOfEvent", "Duration of This Event:")}
+              </span>
+              <div className="text-primary mt-2 text-xs md:text-sm">
+                {eventDurationDisplay}
+              </div>
+            </div>
+          )}
+
+          {/* Show preheat duration in all states if it exists */}
+          {preheatDurationDisplay && (
+            <div>
+              <span className="text-secondary text-xs md:text-sm">
+                {t("eventInfo.preheatDuration", "Preheat Duration:")}
+              </span>
+              <div className="text-primary mt-2 text-xs md:text-sm">
+                {preheatDurationDisplay}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <span className="text-secondary text-xs md:text-sm">
+              {t("eventInfo.eventId", "Event-ID:")}
+            </span>
+            <div className="text-primary mt-2 text-xs md:text-sm">
+              {event.event_id}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-secondary text-xs md:text-sm">
+              {t("eventInfo.eventType", "Event Type:")}
+            </span>
+            <div className="mt-2 text-xs text-black md:text-sm dark:text-white">
+              {event.event_type === "open"
+                ? t("reply.openEnded", "Open-ended")
+                : t("reply.singleChoice", "Multiple choice")}
+            </div>
+          </div>
+
+          {event.result_visibility && (
+            <div>
+              <span className="text-secondary text-xs md:text-sm">
+                {t("eventInfo.resultVisibility", "Result visibility:")}
+              </span>
+              <div className="mt-2 text-xs text-black md:text-sm dark:text-white">
+                {event.result_visibility === "public"
+                  ? t("reply.resultVisibilityPublic", "Public")
+                  : event.result_visibility === "paid_only"
+                    ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                    : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
               </div>
             </div>
           )}

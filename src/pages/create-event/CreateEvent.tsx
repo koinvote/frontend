@@ -1,27 +1,11 @@
-import { Tooltip } from "antd";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from "react-router";
-// import { useMutation } from '@tanstack/react-query'
 
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
-import MinusIcon from "@/assets/icons/minus.svg?react";
-import PlusIcon from "@/assets/icons/plus.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { useBackIfInternal } from "@/hooks/useBack";
-import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { cn } from "@/utils/style";
-
-// import { API } from '@/api'
-// import type { CreateEventReq } from '@/api/request'
-import type { EventType } from "@/api/types";
 
 import {
   getAddressInfo,
@@ -32,75 +16,27 @@ import {
 
 import type { AddressValidationStatus } from "./types/index";
 
-import { useHomeStore } from "@/stores/homeStore";
-import { useSystemParametersStore } from "@/stores/systemParametersStore";
-import { satsToBtc } from "@/utils/formatter";
 import { useTranslation } from "react-i18next";
 
-type PreviewEventState = {
-  creatorAddress: string;
-  title: string;
-  description: string;
-  hashtag: string;
-  eventType: EventType; // 'open' | 'single_choice'
-  isRewarded: boolean;
-  rewardBtc?: string;
-  maxRecipient?: number;
-  durationHours: number;
-  options?: string[];
-  enablePreheat: boolean;
-  preheatHours?: number;
-};
+import {
+  CREATE_EVENT_DRAFT_KEY,
+  DEFAULT_VALUES,
+  type CreateEventDraft,
+  type CreateEventFormValues,
+  type PreviewEventState,
+} from "./formTypes";
 
-type CreateEventDraft = {
-  creatorAddress: string;
-  title: string;
-  description: string;
-  hashtags: string;
-  eventType: EventType;
-  isRewarded: boolean;
-  rewardBtc: string;
-  options: string[];
-  durationHours: string;
-  enablePreheat: boolean;
-  preheatHours: string;
-  agree: boolean;
-};
-
-const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
-
-const normalizeTag = (raw: string) => {
-  const v = raw.trim();
-  if (!v) return null;
-  const lowerCased = v.toLowerCase();
-
-  const noHash = lowerCased.replace(/^#+/, "");
-
-  const cleaned = noHash.replace(/[^\w]/g, "");
-
-  if (!cleaned) return null;
-  return cleaned.slice(0, 20);
-};
-
-const formatTooltipText = (text: string) => {
-  const parts = text.split(/(\.\s+)/);
-  const result: React.ReactNode[] = [];
-
-  parts.forEach((part, index) => {
-    if (part === "") return;
-
-    if (part.match(/^\.\s+$/)) {
-      result.push(".");
-      if (index < parts.length - 1) {
-        result.push(<br key={`br-${index}`} />);
-      }
-    } else {
-      result.push(<span key={`text-${index}`}>{part}</span>);
-    }
-  });
-
-  return <>{result}</>;
-};
+import { CreatorAddressField } from "./components/CreatorAddressField";
+import { DescriptionField } from "./components/DescriptionField";
+import { DurationField } from "./components/DurationField";
+import { HashtagField } from "./components/HashtagField";
+import { OptionsField } from "./components/OptionsField";
+import { PreheatField } from "./components/PreheatField";
+import { ResponseTypeField } from "./components/ResponseTypeField";
+import { ResultVisibilityField } from "./components/ResultVisibilityField";
+import { RewardBtcField } from "./components/RewardBtcField";
+import { RewardTypeField } from "./components/RewardTypeField";
+import { TitleField } from "./components/TitleField";
 
 export default function CreateEvent() {
   const { t } = useTranslation();
@@ -111,65 +47,67 @@ export default function CreateEvent() {
   const isProgrammaticRef = useRef(false);
   const goBack = useBackIfInternal("/");
 
-  const { isDesktop } = useHomeStore();
-
-  const singleChoiceTooltip = useTooltipWithClick({ singleLine: isDesktop });
-  const openEndedTooltip = useTooltipWithClick({ singleLine: isDesktop });
-  const creatorAddressTooltip = useTooltipWithClick({
-    singleLine: isDesktop,
-  });
-  const enablePreheatTooltip = useTooltipWithClick();
-
   const ACTIVE_BTC_NETWORK = Network.mainnet;
-
   const networkLabel =
     ACTIVE_BTC_NETWORK === Network.mainnet ? "mainnet" : "testnet";
 
-  /** 同意條款 */
-  const [agree, setAgree] = useState(false);
-
-  /** Validation error states for form fields */
-  const [titleError, setTitleError] = useState<string | null>(null);
-  const [durationError, setDurationError] = useState<string | null>(null);
-  const [agreeError, setAgreeError] = useState<string | null>(null);
-
-  /** 基本文字欄位 */
-  const [creatorAddress, setCreatorAddress] = useState<string>("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [hashtagInput, setHashtagInput] = useState("");
-  const [hashtagList, setHashtagList] = useState<string[]>([]);
-
-  /** Minimum duration hours */
-  // const [minimumDurationHours, setMinimumDurationHours] = useState<number>()
-  // address verification
+  // Address validation state (kept as local state due to async debounce logic)
   const [addrStatus, setAddrStatus] = useState<AddressValidationStatus>("idle");
   const [addrInfo, setAddrInfo] = useState<AddressInfo | null>(null);
   const [addrError, setAddrError] = useState<string>("");
 
-  /** 回覆類型：open / single_choice */
-  const [eventType, setEventType] = useState<EventType>("single_choice");
+  // Hashtag chip state (kept as local state — complex keydown/blur logic)
+  const [hashtagInput, setHashtagInput] = useState("");
+  const [hashtagList, setHashtagList] = useState<string[]>([]);
 
-  /** 是否有獎金 */
-  const [isRewarded, setIsRewarded] = useState(true);
-  const [rewardBtc, setRewardBtc] = useState(""); // 使用者輸入的 BTC 字串
-  const [rewardBtcTouched, setRewardBtcTouched] = useState(false); // Track if rewardBtc field has been interacted with
-
-  /** 單選題選項 */
-  const [options, setOptions] = useState<string[]>([""]);
-  const [optionsTouched, setOptionsTouched] = useState(false); // Track if options field has been interacted with
-
-  /** Duration + Preheat */
-  const [durationHours, setDurationHours] = useState(""); // 用字串綁 input，比較好處理空值
-  const [enablePreheat, setEnablePreheat] = useState(false);
-  const [preheatHours, setPreheatHours] = useState("");
-
-  // 回填資料後再次確認是否可預覽
-  const [checkPreview, setCheckPreview] = useState(false);
-  // 最後一個互動欄位
+  // Last field tracking for draft highlight
   const [lastField, setLastField] = useState<string>(
     sessionStorage.getItem("create-event-last-field") || "",
   );
+
+  // Options error (array-level: at-least-one + duplicate check)
+  const [optionsError, setOptionsError] = useState<string | null>(null);
+  const [optionsTouched, setOptionsTouched] = useState(false);
+
+  // -------- React Hook Form --------
+  const methods = useForm<CreateEventFormValues>({
+    mode: "onTouched",
+    defaultValues: DEFAULT_VALUES,
+  });
+
+  const {
+    handleSubmit,
+    watch,
+    reset,
+    setError,
+    clearErrors,
+    setFocus,
+    trigger,
+    formState: { errors, isSubmitting, touchedFields },
+  } = methods;
+
+  // Reactive watched values
+  const creatorAddress = watch("creatorAddress");
+  const durationHours = watch("durationHours");
+  const isRewarded = watch("isRewarded");
+  const enablePreheat = watch("enablePreheat");
+  const eventType = watch("eventType");
+  const title = watch("title");
+  const agree = watch("agree");
+  const resultVisibility = watch("resultVisibility");
+  const rewardBtc = watch("rewardBtc");
+  const creatorEmail = watch("creatorEmail");
+  const unlockPriceBtc = watch("unlockPriceBtc");
+
+  // Refs for current values used inside validate closures to avoid stale captures
+  const addrStatusRef = useRef(addrStatus);
+  addrStatusRef.current = addrStatus;
+  const addrErrorRef = useRef(addrError);
+  addrErrorRef.current = addrError;
+  const hashtagListRef = useRef(hashtagList);
+  hashtagListRef.current = hashtagList;
+
+  // -------- Effects --------
 
   useEffect(() => {
     const fromCreateEvent = sessionStorage.getItem("fromCreateEvent");
@@ -183,7 +121,13 @@ export default function CreateEvent() {
 
   const highlightLastField = useCallback(() => {
     const lastField = sessionStorage.getItem("create-event-last-field");
-    if (lastField && formRef.current) {
+    if (!lastField) return;
+
+    // Delay until after React commits DOM updates so dynamically rendered fields
+    // (e.g. useFieldArray options added by reset()) are present in the DOM.
+    requestAnimationFrame(() => {
+      if (!formRef.current) return;
+
       const el = formRef.current.querySelector<
         | HTMLInputElement
         | HTMLSelectElement
@@ -192,14 +136,18 @@ export default function CreateEvent() {
       >(`[name="${CSS.escape(lastField)}"]`);
 
       if (!el) return;
-      // radio / checkbox → highlight label
+
       if (
         el instanceof HTMLInputElement &&
         (el.type === "radio" || el.type === "checkbox")
       ) {
         let highLightEl: HTMLElement | null = el.closest("label");
 
-        if (lastField === "responseType" || lastField === "rewardType") {
+        if (
+          lastField === "responseType" ||
+          lastField === "rewardType" ||
+          lastField === "resultVisibility"
+        ) {
           highLightEl = formRef.current.querySelector<HTMLElement>(
             `#${CSS.escape(lastField)}Title`,
           );
@@ -208,26 +156,21 @@ export default function CreateEvent() {
         if (!highLightEl) return;
 
         highLightEl.classList.add("border-flash", "py-2");
-
-        const timer = setTimeout(() => {
-          highLightEl.classList.remove("border-flash", "py-2");
+        setTimeout(() => {
+          highLightEl!.classList.remove("border-flash", "py-2");
         }, 3000);
-
-        return () => clearTimeout(timer);
+        return;
       }
 
-      // 其他 el → focus
-      // workaround to focus disabled input
-      setTimeout(() => {
-        el.focus();
-      }, 0);
-    }
+      el.focus();
+    });
   }, []);
 
   useEffect(() => {
     sessionStorage.setItem("create-event-last-field", lastField);
   }, [lastField]);
 
+  // Address validation debounce
   useEffect(() => {
     const raw = creatorAddress.trim();
 
@@ -235,6 +178,7 @@ export default function CreateEvent() {
       setAddrStatus("idle");
       setAddrInfo(null);
       setAddrError("");
+      clearErrors("creatorAddress");
       return;
     }
 
@@ -245,11 +189,14 @@ export default function CreateEvent() {
       const ok = validate(raw, ACTIVE_BTC_NETWORK);
 
       if (!ok) {
+        const msg = t(
+          "createEvent.invalidBitcoinAddress",
+          "Invalid Bitcoin address.",
+        );
         setAddrStatus("invalid");
         setAddrInfo(null);
-        setAddrError(
-          t("createEvent.invalidBitcoinAddress", "Invalid Bitcoin address."),
-        );
+        setAddrError(msg);
+        setError("creatorAddress", { type: "manual", message: msg });
         return;
       }
 
@@ -257,714 +204,320 @@ export default function CreateEvent() {
         const info = getAddressInfo(raw);
 
         if (info.network !== ACTIVE_BTC_NETWORK) {
+          const msg = t(
+            "createEvent.addressWrongNetwork",
+            "Address is for {{network}}, not {{expected}}.",
+            {
+              network: info.network,
+              expected: networkLabel,
+            },
+          );
           setAddrStatus("invalid");
           setAddrInfo(null);
-          setAddrError(
-            t(
-              "createEvent.addressWrongNetwork",
-              "Address is for {{network}}, not {{expected}}.",
-              {
-                network: info.network,
-                expected: networkLabel,
-              },
-            ),
-          );
+          setAddrError(msg);
+          setError("creatorAddress", { type: "manual", message: msg });
           return;
         }
 
         setAddrStatus("valid");
         setAddrInfo(info);
         setAddrError("");
+        clearErrors("creatorAddress");
       } catch {
+        const msg = t(
+          "createEvent.invalidBitcoinAddressNetwork",
+          "Invalid Bitcoin address ({{network}}).",
+          {
+            network: networkLabel,
+          },
+        );
         setAddrStatus("invalid");
         setAddrInfo(null);
-        setAddrError(
-          t(
-            "createEvent.invalidBitcoinAddressNetwork",
-            "Invalid Bitcoin address ({{network}}).",
-            {
-              network: networkLabel,
-            },
-          ),
-        );
+        setAddrError(msg);
+        setError("creatorAddress", { type: "manual", message: msg });
       }
     }, 500);
 
     return () => window.clearTimeout(timer);
-  }, [creatorAddress, ACTIVE_BTC_NETWORK, networkLabel, t]);
+  }, [
+    creatorAddress,
+    ACTIVE_BTC_NETWORK,
+    networkLabel,
+    t,
+    clearErrors,
+    setError,
+  ]);
 
-  // 回寫表單
+  // Draft restore on mount
   useEffect(() => {
     const saved = sessionStorage.getItem(CREATE_EVENT_DRAFT_KEY);
     if (!saved) return;
 
     isProgrammaticRef.current = true;
+
     try {
       const draft: CreateEventDraft = JSON.parse(saved);
 
-      // Set flag to prevent clearing preheatHours during restore
-      isRestoringRef.current = true;
+      reset({
+        creatorAddress: draft.creatorAddress ?? "",
+        title: draft.title ?? "",
+        description: draft.description ?? "",
+        eventType: draft.eventType ?? "single_choice",
+        isRewarded: draft.isRewarded ?? true,
+        rewardBtc: draft.rewardBtc ?? "",
+        options:
+          draft.options && draft.options.length
+            ? draft.options.map((v) => ({ value: v }))
+            : [{ value: "" }],
+        durationHours: draft.durationHours ?? "",
+        enablePreheat: draft.enablePreheat ?? false,
+        preheatHours: draft.preheatHours ?? "",
+        agree: draft.agree ?? false,
+        resultVisibility: draft.resultVisibility ?? "public",
+        creatorEmail: draft.creatorEmail ?? "",
+        unlockPriceBtc: draft.unlockPriceBtc ?? "",
+      });
 
-      setCreatorAddress(draft.creatorAddress ?? "");
-      setTitle(draft.title ?? "");
-      setDescription(draft.description ?? "");
       setHashtagList(
         (draft.hashtags ?? "")
           .split(/[,\s]+/g)
           .map((s) => s.trim())
           .filter(Boolean),
       );
-      setEventType(draft.eventType ?? "single_choice");
-      setIsRewarded(draft.isRewarded ?? true);
-      setRewardBtc(draft.rewardBtc ?? "");
-      setOptions(draft.options && draft.options.length ? draft.options : [""]);
-      setDurationHours(draft.durationHours ?? "");
-      // Restore enablePreheat and preheatHours together to maintain consistency
-      setEnablePreheat(draft.enablePreheat ?? false);
-      setPreheatHours(draft.preheatHours ?? "");
-      setAgree(draft.agree ?? false);
 
-      if (draft.rewardBtc) {
-        setRewardBtcTouched(true);
-      }
-      setCheckPreview(true);
+      // Trigger validation after React re-renders with the restored values so
+      // that child-component refs (minRewardBtcRef, etc.) are up to date.
+      requestAnimationFrame(() => {
+        trigger();
+      });
 
       highlightLastField();
-
       isProgrammaticRef.current = false;
     } catch (e) {
       console.error("Failed to parse create-event draft", e);
+      isProgrammaticRef.current = false;
     }
-  }, [highlightLastField]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Clear preheat hours when preheat is disabled
-  // Use a ref to track if we're restoring from sessionStorage to avoid clearing during restore
-  const isRestoringRef = useRef(false);
-
-  // Refs for form field focus
-  const creatorAddressRef = useRef<HTMLInputElement>(null);
-  const titleRef = useRef<HTMLInputElement>(null);
-  const durationRef = useRef<HTMLInputElement>(null);
-  const optionRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const rewardBtcRef = useRef<HTMLInputElement>(null);
-  const preheatHoursRef = useRef<HTMLInputElement>(null);
-  const agreeRef = useRef<HTMLInputElement>(null);
-
+  // Draft save via watch subscription.
+  // Reads hashtagList through a ref so the subscription is set up once and never
+  // re-subscribes just because the user added/removed a hashtag.
   useEffect(() => {
-    // Don't clear if we're restoring from sessionStorage
-    if (isRestoringRef.current) {
-      isRestoringRef.current = false;
-      return;
-    }
-
-    if (!enablePreheat) {
-      setPreheatHours("");
-    }
-  }, [enablePreheat]);
-
-  // -------- Creator address handlers --------
-  const handleCreatorAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
-    //todo when user finish input, check if it is a valid btc address
-    //and call Get API to check if there any free ongoing event by this address
-    //so if yes, we change minumum duration hour above 25 hours
-    setCreatorAddress(e.target.value);
-  };
-
-  /** -------- Options handlers -------- */
-  const handleOptionChange = (index: number, value: string) => {
-    setOptions((prev) => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
+    const subscription = watch((values) => {
+      const draft: CreateEventDraft = {
+        creatorAddress: values.creatorAddress ?? "",
+        title: values.title ?? "",
+        description: values.description ?? "",
+        hashtags: hashtagListRef.current.join(","),
+        eventType: values.eventType ?? "single_choice",
+        isRewarded: values.isRewarded ?? true,
+        rewardBtc: values.rewardBtc ?? "",
+        options: values.options?.map((o) => o?.value ?? "") ?? [],
+        durationHours: values.durationHours ?? "",
+        enablePreheat: values.enablePreheat ?? false,
+        preheatHours: values.preheatHours ?? "",
+        agree: values.agree ?? false,
+        resultVisibility: values.resultVisibility ?? "public",
+        creatorEmail: values.creatorEmail ?? "",
+        unlockPriceBtc: values.unlockPriceBtc ?? "",
+      };
+      sessionStorage.setItem(CREATE_EVENT_DRAFT_KEY, JSON.stringify(draft));
     });
-  };
+    return () => subscription.unsubscribe();
+  }, [watch]);
 
-  const handleAddOption = () => {
-    // Maximum 5 options
-    if (options.length >= 5) return;
-    setOptions((prev) => [...prev, ""]);
-  };
-
-  const handleRemoveOption = (index: number) => {
-    setOptions((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  /** -------- Clear form handler -------- */
-  const handleClear = () => {
-    // Clear all form fields
-    setAgree(false);
-    setCreatorAddress("");
-    setTitle("");
-    setDescription("");
-    setHashtagInput("");
-    setHashtagList([]);
-    setAddrStatus("idle");
-    setAddrInfo(null);
-    setAddrError("");
-    setEventType("single_choice");
-    setIsRewarded(true);
-    setRewardBtc("");
-    setRewardBtcTouched(false); // Reset touched state
-    setOptions([""]);
-    setOptionsTouched(false); // Reset touched state
-    setDurationHours("");
-    setEnablePreheat(false);
-    setPreheatHours("");
-    setLastField("");
-  };
-
-  /** -------- Submit handler -------- */
-
-  // Helper to focus and scroll element into view
-  const focusAndScroll = (ref: React.RefObject<HTMLInputElement | null>) => {
-    ref.current?.focus();
-    ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // Clear all validation errors first
-    setTitleError(null);
-    setDurationError(null);
-    setAgreeError(null);
-
-    // Validate creator address
-    if (addrStatus !== "valid") {
-      focusAndScroll(creatorAddressRef);
-      return;
-    }
-
-    // Validate title
-    if (!title.trim()) {
-      setTitleError(
-        t("createEvent.alertTitleRequired", "Please enter a title."),
-      );
-      focusAndScroll(titleRef);
-      return;
-    }
-
-    // Validate options for single_choice events
-    let cleanedOptions: string[] | undefined;
-    if (eventType === "single_choice") {
-      const list = options.map((o) => o.trim()).filter(Boolean);
-      if (list.length === 0) {
-        setOptionsTouched(true);
-        optionRefs.current[0]?.focus();
-        optionRefs.current[0]?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        return;
-      }
-      // Check for duplicate options
-      const uniqueOptions = new Set(list);
-      if (uniqueOptions.size !== list.length) {
-        setOptionsTouched(true);
-        optionRefs.current[0]?.focus();
-        optionRefs.current[0]?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        return;
-      }
-      cleanedOptions = list;
-    }
-
-    // Validate duration
-    const duration = Number(durationHours || 0);
-    if (!duration || duration <= 0) {
-      setDurationError(
-        t("createEvent.alertInvalidDuration", "Please enter a valid duration."),
-      );
-      focusAndScroll(durationRef);
-      return;
-    }
-
-    // Validate reward BTC if rewarded
-    if (isRewarded && (!rewardBtcTouched || !rewardBtcValidation.isValid)) {
-      setRewardBtcTouched(true);
-      focusAndScroll(rewardBtcRef);
-      return;
-    }
-
-    // Validate preheat hours if enabled
-    let preheat = 0;
-    if (enablePreheat) {
-      preheat = Number(preheatHours || 0);
-      if (!preheat || preheat < 1 || preheat > 720) {
-        focusAndScroll(preheatHoursRef);
-        return;
-      }
-    }
-
-    // Validate agreement checkbox
-    if (!agree) {
-      setAgreeError(
-        t(
-          "createEvent.alertAgreeRequired",
-          "Please agree to the Terms of Service to continue.",
-        ),
-      );
-      // Scroll to the agree checkbox area
-      agreeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return;
-    }
-
-    const previewData: PreviewEventState = {
-      creatorAddress,
-      title: title.trim(),
-      description: description.trim(),
-      hashtag: hashtagList.join(","),
-      eventType,
-      isRewarded,
-      rewardBtc: isRewarded ? rewardBtc : undefined,
-      durationHours: duration,
-      options: cleanedOptions,
-      enablePreheat,
-      preheatHours: enablePreheat && preheat > 0 ? preheat : undefined,
-    };
-
-    navigate("/preview-event", { state: previewData });
-  };
-
-  const isSubmitting = false;
-
-  // 暫存表單
+  // Also save immediately when hashtagList changes because the watch subscription above
+  // only fires on form-field changes, so hashtag-only changes would otherwise be lost.
   useEffect(() => {
+    const values = watch();
     const draft: CreateEventDraft = {
-      creatorAddress,
-      title,
-      description,
+      creatorAddress: values.creatorAddress ?? "",
+      title: values.title ?? "",
+      description: values.description ?? "",
       hashtags: hashtagList.join(","),
-      eventType,
-      isRewarded,
-      rewardBtc,
-      options,
-      durationHours,
-      enablePreheat,
-      preheatHours,
-      agree,
+      eventType: values.eventType ?? "single_choice",
+      isRewarded: values.isRewarded ?? true,
+      rewardBtc: values.rewardBtc ?? "",
+      options: values.options?.map((o) => o?.value ?? "") ?? [],
+      durationHours: values.durationHours ?? "",
+      enablePreheat: values.enablePreheat ?? false,
+      preheatHours: values.preheatHours ?? "",
+      agree: values.agree ?? false,
+      resultVisibility: values.resultVisibility ?? "public",
+      creatorEmail: values.creatorEmail ?? "",
+      unlockPriceBtc: values.unlockPriceBtc ?? "",
     };
     sessionStorage.setItem(CREATE_EVENT_DRAFT_KEY, JSON.stringify(draft));
-  }, [
-    creatorAddress,
-    title,
-    description,
-    hashtagList,
-    eventType,
-    isRewarded,
-    rewardBtc,
-    options,
-    durationHours,
-    enablePreheat,
-    preheatHours,
-    agree,
-  ]);
+  }, [hashtagList, watch]);
 
-  const params = useSystemParametersStore((s) => s.params);
-
-  // Calculate minimum reward based on duration and free hours
-  // Rule 1: If duration_hours ≤ free_hours, min = satoshi_per_duration_hour
-  // Rule 2: If duration_hours > free_hours, min = max(min_reward_amount_satoshi, (duration_hours - free_hours) × satoshi_per_duration_hour)
-  const minRewardBtc = useMemo(() => {
-    if (!params) {
-      return 0.000011; // Default fallback
+  // Re-validate rewardBtc / unlockPriceBtc when minRewardBtc changes (durationHours changed)
+  useEffect(() => {
+    if (touchedFields.rewardBtc) {
+      trigger("rewardBtc");
     }
-
-    const durationHoursNum = Number(durationHours);
-    const freeHours = params.free_hours ?? 0;
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const minRewardAmountSatoshi = params.min_reward_amount_satoshi ?? 0;
-
-    // If duration is not set or invalid, return default
-    if (!Number.isFinite(durationHoursNum) || durationHoursNum <= 0) {
-      return minRewardAmountSatoshi / 100_000_000;
+    if (touchedFields.unlockPriceBtc) {
+      trigger("unlockPriceBtc");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [durationHours]);
 
-    let minRewardSatoshi: number;
+  // Re-validate preheatHours when enablePreheat changes
+  useEffect(() => {
+    if (touchedFields.preheatHours) {
+      trigger("preheatHours");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [enablePreheat]);
 
-    if (durationHoursNum <= freeHours) {
-      // Rule 1: duration_hours ≤ free_hours, min = satoshi_per_duration_hour
-      minRewardSatoshi = satoshiPerDurationHour;
+  // When switching away from paid_only, clear those errors; switching to paid_only,
+  // re-validate if already touched so errors appear immediately.
+  useEffect(() => {
+    if (resultVisibility !== "paid_only") {
+      clearErrors("creatorEmail");
+      clearErrors("unlockPriceBtc");
     } else {
-      // Rule 2: duration_hours > free_hours, min = min_reward_amount_satoshi + (duration_hours - free_hours) × satoshi_per_duration_hour
-      minRewardSatoshi =
-        minRewardAmountSatoshi +
-        (durationHoursNum - freeHours) * satoshiPerDurationHour;
+      if (touchedFields.creatorEmail) trigger("creatorEmail");
+      if (touchedFields.unlockPriceBtc) trigger("unlockPriceBtc");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultVisibility]);
 
-    // Convert to BTC
-    return minRewardSatoshi / 100_000_000;
-  }, [params, durationHours]);
-
-  const rewardBtcPlaceholder =
-    Number(durationHours) > 0
-      ? t(
-          "createEvent.rewardBtcPlaceholderEnabled",
-          "Enter reward (Min {{min}})",
-          {
-            min: minRewardBtc.toFixed(8),
-          },
-        )
-      : t("createEvent.rewardBtcPlaceholder", "Set Duration First");
-
-  // Calculate max recipients for rewarded events
-  // Formula: [用户输入的奖金金额] / [satoshi_per_extra_winner], 无条件舍去取整数
-  const maxRecipients = useMemo(() => {
-    if (!isRewarded || !rewardBtc) return null;
-
-    const rewardAmountSatoshi = Math.round(parseFloat(rewardBtc) * 100_000_000);
-    if (!Number.isFinite(rewardAmountSatoshi) || rewardAmountSatoshi <= 0) {
-      return null;
-    }
-
-    const satoshiPerExtraWinner = params?.satoshi_per_extra_winner ?? 0;
-    if (!satoshiPerExtraWinner || satoshiPerExtraWinner <= 0) {
-      return null;
-    }
-
-    // 无条件舍去取整数
-    return Math.floor(rewardAmountSatoshi / satoshiPerExtraWinner);
-  }, [isRewarded, rewardBtc, params?.satoshi_per_extra_winner]);
-
-  // Validate reward amount
-  const rewardBtcValidation = useMemo(() => {
-    if (!isRewarded) {
-      return { isValid: true, error: null };
-    }
-
-    if (!rewardBtcTouched) {
-      return { isValid: true, error: null };
-    }
-
-    // Check if reward is empty
-    if (!rewardBtc || rewardBtc.trim() === "") {
-      return {
-        isValid: false,
-        error: rewardBtcTouched
-          ? t(
-              "createEvent.errorEnterRewardAmount",
-              "Please enter reward amount",
-            )
-          : null,
-      };
-    }
-
-    const rewardAmount = parseFloat(rewardBtc);
-    if (!Number.isFinite(rewardAmount) || rewardAmount <= 0) {
-      return {
-        isValid: false,
-        error: rewardBtcTouched
-          ? t(
-              "createEvent.errorInvalidRewardAmount",
-              "Please enter a valid reward amount",
-            )
-          : null,
-      };
-    }
-
-    // Check if reward amount is less than minimum
-    if (rewardAmount < minRewardBtc) {
-      return {
-        isValid: false,
-        error: rewardBtcTouched
-          ? t("createEvent.errorMinimumReward", "Minimum {{min}} BTC", {
-              min: minRewardBtc.toFixed(8),
-            })
-          : null,
-      };
-    }
-
-    return { isValid: true, error: null };
-  }, [isRewarded, rewardBtc, minRewardBtc, rewardBtcTouched, t]);
-
-  // Calculate platform fee for non-reward events
-  // Formula: [Duration - free_hours] × satoshi_per_duration_hour × platform_fee_percentage
-  const platformFeeSatoshi = useMemo(() => {
-    // Only calculate for non-reward events
-    if (isRewarded) return null;
-
-    // Check if system parameters are loaded
-    if (!params) return null;
-
-    const duration = Number(durationHours);
-    const freeHours = params.free_hours ?? 0;
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = params.platform_fee_percentage ?? 0;
-
-    // If duration is invalid or not provided, return null
-    if (!Number.isFinite(duration) || duration <= 0) return null;
-
-    // If free_hours is 0, it means no free hours, calculate for full duration
-    // If duration <= free_hours, platform fee is 0
-    const billableHours =
-      freeHours > 0 ? Math.max(0, duration - freeHours) : duration;
-
-    // If no billable hours, platform fee is 0
-    if (billableHours <= 0) return 0;
-
-    // Calculate: billableHours × satoshi_per_duration_hour × platform_fee_percentage
-    const fee =
-      billableHours * satoshiPerDurationHour * (platformFeePercentage / 100);
-
-    // Round to nearest satoshi
-    return Math.round(fee);
-  }, [isRewarded, params, durationHours]);
-
-  // Format platform fee for display
-  const platformFeeDisplay = useMemo(() => {
-    return satsToBtc(platformFeeSatoshi);
-  }, [platformFeeSatoshi]);
-
-  // Calculate preheat fee
-  // Formula: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
-  const preheatFeeSatoshi = useMemo(() => {
-    // Only calculate if preheat is enabled
-    if (!enablePreheat) return null;
-
-    // Check if system parameters are loaded
-    if (!params) return null;
-
-    const preheatHoursNum = Number(preheatHours);
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = params.platform_fee_percentage ?? 0;
-
-    // Validate preheat hours (must be between 1 and 720)
-    if (
-      !Number.isFinite(preheatHoursNum) ||
-      preheatHoursNum < 1 ||
-      preheatHoursNum > 720
-    ) {
-      return null;
-    }
-
-    // Calculate: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
-    const multiplier = 0.2 + 0.8 * (preheatHoursNum / 720);
-    const fee =
-      preheatHoursNum *
-      satoshiPerDurationHour *
-      (platformFeePercentage / 100) *
-      multiplier;
-
-    // Round to nearest satoshi
-    return Math.round(fee);
-  }, [enablePreheat, params, preheatHours]);
-
-  // Format preheat fee for display
-  const preheatFeeDisplay = useMemo(() => {
-    return satsToBtc(preheatFeeSatoshi);
-  }, [preheatFeeSatoshi]);
-
-  // Validate preheat hours
-  const preheatHoursValidation = useMemo(() => {
-    if (!enablePreheat) {
-      return { isValid: true, error: null };
-    }
-
-    const preheatHoursNum = Number(preheatHours);
-
-    // Check if preheat hours is empty
-    if (!preheatHours || preheatHours.trim() === "") {
-      return {
-        isValid: false,
-        error: t(
-          "createEvent.errorEnterPreheatHours",
-          "Please enter preheat hours",
-        ),
-      };
-    }
-
-    // Check if preheat hours is a valid number
-    if (!Number.isFinite(preheatHoursNum)) {
-      return {
-        isValid: false,
-        error: t(
-          "createEvent.errorInvalidNumber",
-          "Please enter a valid number",
-        ),
-      };
-    }
-
-    // Check if preheat hours is greater than 720
-    if (preheatHoursNum > 720) {
-      return {
-        isValid: false,
-        error: t(
-          "createEvent.errorMaxPreheatHours",
-          "Maximum preheat hours is 720",
-        ),
-      };
-    }
-
-    // Check if preheat hours is less than 1
-    if (preheatHoursNum < 1) {
-      return {
-        isValid: false,
-        error: t(
-          "createEvent.errorMinPreheatHours",
-          "Minimum preheat hours is 1",
-        ),
-      };
-    }
-
-    return { isValid: true, error: null };
-  }, [enablePreheat, preheatHours, t]);
-
-  // Validate options for single_choice events
-  const optionsValidation = useMemo(() => {
-    if (eventType !== "single_choice") {
-      return { isValid: true, error: null };
-    }
-
-    const validOptions = options.map((o) => o.trim()).filter(Boolean);
-    const hasValidOptions = validOptions.length > 0;
-
-    // isValid always reflects the true validation state
-    // error message only shows after field has been touched
-    if (!hasValidOptions) {
-      return {
-        isValid: false,
-        error: optionsTouched
-          ? t(
-              "createEvent.errorAtLeastOneOption",
-              "At least one option is required",
-            )
-          : null,
-      };
-    }
-
-    // Check for duplicate options
-    const uniqueOptions = new Set(validOptions);
-    if (uniqueOptions.size !== validOptions.length) {
-      return {
-        isValid: false,
-        error: t(
+  // Options validation (array-level error)
+  const validateOptions = useCallback(
+    (fields: { value: string }[]): string | null => {
+      if (eventType !== "single_choice") return null;
+      const valid = fields.map((o) => o.value.trim()).filter(Boolean);
+      if (valid.length === 0)
+        return t(
+          "createEvent.errorAtLeastOneOption",
+          "At least one option is required",
+        );
+      const unique = new Set(valid);
+      if (unique.size !== valid.length)
+        return t(
           "createEvent.errorDuplicateOption",
           "Duplicate option already exists",
-        ),
-      };
+        );
+      return null;
+    },
+    [eventType, t],
+  );
+
+  // Update options error when fields change (and touched)
+  const optionValues = watch("options");
+  useEffect(() => {
+    if (optionsTouched) {
+      setOptionsError(validateOptions(optionValues));
     }
+  }, [optionValues, optionsTouched, validateOptions]);
 
-    return { isValid: true, error: null };
-  }, [eventType, options, optionsTouched, t]);
-
-  // Check if Preview button should be disabled
+  // -------- isPreviewDisabled --------
   const isPreviewDisabled = useMemo(() => {
-    const duration = Number(durationHours || 0);
+    const duration = Number(durationHours);
+    const hasOptionsError = !!validateOptions(optionValues);
     return (
       isSubmitting ||
       addrStatus !== "valid" ||
       !title.trim() ||
       !duration ||
       duration <= 0 ||
-      !preheatHoursValidation.isValid ||
-      (isRewarded && !rewardBtcTouched) ||
-      !rewardBtcValidation.isValid ||
-      !optionsValidation.isValid ||
+      (isRewarded && (!rewardBtc || !!errors.rewardBtc)) ||
+      (eventType === "single_choice" && hasOptionsError) ||
+      (enablePreheat && !!errors.preheatHours) ||
+      (resultVisibility === "paid_only" &&
+        (!creatorEmail || !!errors.creatorEmail)) ||
+      (resultVisibility === "paid_only" &&
+        (!unlockPriceBtc || !!errors.unlockPriceBtc)) ||
       !agree
     );
-    // checkPreview: need to check when user come from other page
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     agree,
     isSubmitting,
     title,
     durationHours,
-    preheatHoursValidation.isValid,
+    errors.preheatHours,
     isRewarded,
-    rewardBtcTouched,
-    rewardBtcValidation.isValid,
-    optionsValidation.isValid,
+    rewardBtc,
+    errors.rewardBtc,
+    optionValues,
+    eventType,
     addrStatus,
-    checkPreview,
+    enablePreheat,
+    validateOptions,
+    resultVisibility,
+    creatorEmail,
+    errors.creatorEmail,
+    unlockPriceBtc,
+    errors.unlockPriceBtc,
   ]);
 
-  // -------- Hashtags handlers -------- *
-  const MAX_TAGS = 3;
-  const MAX_TAG_LENGTH = 20; // exclude leading '#'
-  const addTag = (raw: string) => {
-    const tag = normalizeTag(raw);
-    if (!tag) return;
-
-    setHashtagList((prev) => {
-      // 最多 3 個
-      if (prev.length >= MAX_TAGS) return prev;
-      // 如果標籤已存在，不添加
-      if (prev.includes(tag)) return prev;
-
-      return [...prev, tag];
-    });
+  // -------- Clear handler --------
+  const handleClear = () => {
+    reset(DEFAULT_VALUES);
+    setHashtagList([]);
+    setHashtagInput("");
+    setAddrStatus("idle");
+    setAddrInfo(null);
+    setAddrError("");
+    setOptionsError(null);
+    setOptionsTouched(false);
+    setLastField("");
   };
 
-  const removeTag = (tag: string) => {
-    setHashtagList((prev) => prev.filter((t) => t !== tag));
-  };
-
-  const commitByDelimiters = (value: string) => {
-    const parts = value.split(/[,\s]+/g).filter(Boolean);
-    if (!parts.length) return;
-    parts.forEach(addTag);
-  };
-
-  const handleHashtagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.nativeEvent?.isComposing) return;
-
-    if (e.key === "Enter" || e.key === "," || e.key === " ") {
-      e.preventDefault();
-      commitByDelimiters(hashtagInput);
-      setHashtagInput("");
+  // -------- Submit handler --------
+  const onSubmit = handleSubmit((data) => {
+    // Address must be valid (setError handles live display; this is the final guard)
+    if (addrStatusRef.current !== "valid") {
+      setFocus("creatorAddress");
       return;
     }
 
-    // input 空時，Backspace 刪最後一顆
-    if (e.key === "Backspace" && !hashtagInput) {
-      setHashtagList((prev) => prev.slice(0, -1));
-    }
-  };
-
-  const handleHashtagBlur = () => {
-    if (hashtagInput.trim()) {
-      commitByDelimiters(hashtagInput);
-      setHashtagInput("");
-    }
-  };
-
-  const handleHashtagChange = (v: string) => {
-    // 已達最大 chips 數量時，直接不再接受新的輸入（維持空值），需先刪除既有標籤
-    if (hashtagList.length >= MAX_TAGS) {
-      setHashtagInput("");
-      return;
+    // Validate options
+    let cleanedOptions: string[] | undefined;
+    if (data.eventType === "single_choice") {
+      const list = data.options.map((o) => o.value.trim()).filter(Boolean);
+      const error = validateOptions(data.options);
+      if (error) {
+        setOptionsError(error);
+        setOptionsTouched(true);
+        return;
+      }
+      cleanedOptions = list;
     }
 
-    // 已達最大 chips 數量時，仍允許輸入但新增時會被跳過
-    // 如果用戶貼上「#a #b,#c 」這種，直接拆 chips
-    if (/[,\s]/.test(v)) {
-      commitByDelimiters(v);
-      setHashtagInput("");
-      return;
+    const duration = Number(data.durationHours);
+    let preheat = 0;
+    if (data.enablePreheat) {
+      preheat = Number(data.preheatHours || 0);
     }
 
-    // 計算新輸入的字符數（清理後，排除 # 和非字母數字字符）
-    const cleaned = v.replace(/^#+/g, "").replace(/[^\w]/g, "");
-    const truncated = cleaned.slice(0, MAX_TAG_LENGTH);
-    const prefix = v.startsWith("#") ? "#" : "";
-    setHashtagInput(prefix + truncated);
-  };
+    const previewData: PreviewEventState = {
+      creatorAddress: data.creatorAddress,
+      title: data.title.trim(),
+      description: data.description.trim(),
+      hashtag: hashtagList.join(","),
+      eventType: data.eventType,
+      isRewarded: data.isRewarded,
+      rewardBtc: data.isRewarded ? data.rewardBtc : undefined,
+      durationHours: duration,
+      options: cleanedOptions,
+      enablePreheat: data.enablePreheat,
+      preheatHours: data.enablePreheat && preheat > 0 ? preheat : undefined,
+      resultVisibility: data.resultVisibility,
+      creatorEmail:
+        data.resultVisibility === "paid_only" ? data.creatorEmail : undefined,
+      unlockPriceBtc:
+        data.resultVisibility === "paid_only" ? data.unlockPriceBtc : undefined,
+    };
 
-  const currentInputCleaned = useMemo(() => {
-    return hashtagInput.replace(/^#+/g, "").replace(/[^\w]/g, "");
-  }, [hashtagInput]);
-  const hashtagCharsLeft = useMemo(() => {
-    return Math.max(0, MAX_TAG_LENGTH - currentInputCleaned.length);
-  }, [currentInputCleaned]);
+    navigate("/preview-event", { state: previewData });
+  });
 
+  // -------- Form focus tracking (lastField) --------
   const handleFormItemFocus = (e: React.FocusEvent<HTMLFormElement>) => {
-    if (isProgrammaticRef.current) {
-      return;
-    }
+    if (isProgrammaticRef.current) return;
     const target = e.target;
-    // button 額外各自處理
     if (
       target instanceof HTMLInputElement ||
       target instanceof HTMLTextAreaElement ||
@@ -978,771 +531,147 @@ export default function CreateEvent() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={goBack}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={goBack} />
       </div>
-
-      <div className="border-admin-bg bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m mb-6 text-(--color-orange-500)">
+      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+        <h1 className="lh-24 fw-m mb-6 text-lg font-medium text-(--color-orange-500)">
           {t("createEvent.formTitle")}
         </h1>
 
-        {/* onSubmit 綁定 handleSubmit */}
-        <form
-          ref={formRef}
-          className="space-y-6"
-          onSubmit={handleSubmit}
-          autoComplete="off"
-          onFocus={handleFormItemFocus}
-        >
-          {/* Creator address */}
-          <div>
-            <div className="mb-1 flex items-center gap-1">
-              <label className="tx-14 lh-20 fw-m text-primary mr-1">
-                {t("createEvent.creatorAddress")}
-              </label>
-              <Tooltip
-                placement="topLeft"
-                title={t("createEvent.creatorAddressTooltip")}
-                color="white"
-                arrow={{ pointAtCenter: true }}
-                {...creatorAddressTooltip.tooltipProps}
-                overlayInnerStyle={{
-                  ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
-                }}
-              >
-                <span
-                  {...creatorAddressTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main flex cursor-pointer items-center dark:text-white"
-                >
-                  ⓘ
-                </span>
-              </Tooltip>
-              <span className={`ml-1 text-(--color-orange-500)`}>*</span>
-            </div>
-            <input
-              ref={creatorAddressRef}
-              type="text"
-              // avoid browser auto-fill
-              name="field_7x9abtca"
-              id="field_7x9abtca"
-              value={creatorAddress}
-              onChange={handleCreatorAddressChange}
-              placeholder={t("createEvent.creatorAddressPlaceholder")}
-              autoCorrect="off"
-              autoCapitalize="off"
-              autoComplete="one-time-code"
-              spellCheck="false"
-              className={`border-border tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""} ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""} `}
+        <FormProvider {...methods}>
+          <form
+            ref={formRef}
+            className="space-y-6"
+            onSubmit={onSubmit}
+            autoComplete="off"
+            onFocus={handleFormItemFocus}
+          >
+            <CreatorAddressField
+              addrStatus={addrStatus}
+              addrInfo={addrInfo}
+              addrError={addrError}
+              addrStatusRef={addrStatusRef}
+              addrErrorRef={addrErrorRef}
             />
-            <div className="tx-12 lh-18 mt-1">
-              {addrStatus === "checking" && (
-                <span className="text-secondary">
-                  {t("createEvent.addressChecking", "Checking…")}
-                </span>
-              )}
-              {addrStatus === "valid" && addrInfo && (
-                <span className="text-green-600">
-                  {t("createEvent.addressValid", "Valid ({{type}})", {
-                    type: addrInfo.type.toUpperCase(),
-                  })}
-                </span>
-              )}
-              {addrStatus === "invalid" && (
-                <span className="text-red-500">
-                  {addrError ||
-                    t("createEvent.addressInvalid", "Invalid address.")}
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Title */}
-          <div>
-            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
-              {t("createEvent.title")}{" "}
-              <span className="text-(--color-orange-500)">*</span>
-            </label>
-            <input
-              name="title"
-              autoComplete="one-time-code"
-              ref={titleRef}
-              type="text"
-              value={title}
-              maxLength={120}
-              onChange={(e) => {
-                setTitle(e.target.value);
-                if (titleError) setTitleError(null);
-              }}
-              placeholder={t("createEvent.titlePlaceholder")}
-              className={cn(
-                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
-                titleError
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-(--color-orange-500)",
-              )}
+            <TitleField />
+            <DescriptionField />
+            <HashtagField
+              hashtagList={hashtagList}
+              hashtagInput={hashtagInput}
+              setHashtagList={setHashtagList}
+              setHashtagInput={setHashtagInput}
+              setLastField={setLastField}
             />
-            <div className="mt-1 flex justify-between">
-              {titleError && (
-                <span className="tx-12 lh-18 text-red-500">{titleError}</span>
-              )}
-              <span
-                className={cn(
-                  "tx-12 lh-18 ml-auto",
-                  title.length >= 120 ? "text-red-500" : "text-secondary",
-                )}
-              >
-                {120 - title.length}{" "}
-                {t("createEvent.characterLeft", "characters left")}
-              </span>
-            </div>
-          </div>
+            <DurationField />
 
-          {/* Description */}
-          <div>
-            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
-              {t("createEvent.description")}
-            </label>
-            <textarea
-              name="description"
-              maxLength={500}
-              rows={3}
-              value={description}
-              onChange={(e) => {
-                if (e.target.value.length <= 500) {
-                  setDescription(e.target.value);
-                }
-              }}
-              placeholder={t("createEvent.descriptionPlaceholder")}
-              className={`border-border tx-14 lh-20 placeholder:text-secondary h-auto min-h-[100px] w-full resize-none rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none ${
-                description.length >= 500
-                  ? "border-red-500 focus:ring-red-500"
-                  : ""
-              }`}
+            <ResponseTypeField />
+            <OptionsField
+              optionsError={optionsError}
+              setOptionsError={setOptionsError}
+              setOptionsTouched={setOptionsTouched}
+              validateOptions={validateOptions}
             />
-            <span
-              className={`tx-12 lh-18 block text-right ${description.length >= 500 ? "text-red-500" : "text-secondary"}`}
-            >
-              {500 - description.length}{" "}
-              {t("createEvent.characterLeft", "characters left")}
-            </span>
-          </div>
+            <RewardTypeField />
+            <RewardBtcField setLastField={setLastField} />
+            <ResultVisibilityField />
+            <PreheatField />
 
-          {/* Hashtags */}
-          <div>
-            <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
-              {t("createEvent.hashtags", "Hashtags")}
-            </label>
-
+            {/* Terms checkbox */}
             <div
               className={cn(
-                "border-border w-full rounded-xl border bg-white px-3 py-2",
-                "flex flex-wrap items-center gap-2",
-                "focus-within:ring-2 focus-within:ring-(--color-orange-500)",
+                "-mx-2 rounded-lg p-2 pt-2",
+                errors.agree ? "border-2 border-red-500" : "border-border",
               )}
-              onMouseDown={(e) => {
-                // 點容器時讓 input focus（但不影響點 X）
-                const target = e.target as HTMLElement;
-                if (target.closest("[data-chip-remove]")) return;
-                (
-                  e.currentTarget.querySelector(
-                    "input",
-                  ) as HTMLInputElement | null
-                )?.focus();
-              }}
             >
-              {hashtagList.map((tag) => (
-                <span
-                  key={tag}
-                  className={cn(
-                    "inline-flex items-center gap-2 rounded-full",
-                    "bg-surface text-primary border-border border",
-                    "tx-12 lh-18 px-3 py-1",
-                  )}
-                >
-                  <span className="select-none">#{tag}</span>
-                  <button
-                    type="button"
-                    data-chip-remove
-                    aria-label={`Remove ${tag}`}
-                    className="inline-flex h-5 w-5 items-center justify-center rounded-full hover:bg-white/10"
-                    onClick={() => {
-                      removeTag(tag);
-                      setLastField("hashtags");
-                    }}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-
-              <input
-                name="hashtags"
-                autoComplete="one-time-code"
-                type="text"
-                value={hashtagInput}
-                onChange={(e) => handleHashtagChange(e.target.value)}
-                onKeyDown={handleHashtagKeyDown}
-                onBlur={handleHashtagBlur}
-                className={cn(
-                  "min-w-[120px] flex-1",
-                  "bg-transparent outline-none",
-                  "tx-14 lh-20 placeholder:text-secondary text-black",
-                )}
-              />
-            </div>
-
-            <span
-              className={cn("tx-12 lh-18 block text-right", "text-secondary")}
-            >
-              {hashtagList.length >= MAX_TAGS
-                ? t("createEvent.maxHashtags", "Max 3 hashtags")
-                : `${hashtagCharsLeft} ${t("createEvent.characterLeft", "characters left")}`}
-            </span>
-          </div>
-
-          {/* Response type */}
-          <div>
-            <p
-              id="responseTypeTitle"
-              className="tx-14 lh-20 fw-m text-primary mb-2"
-            >
-              {t("createEvent.responseType", "Response Type")}
-              <span className="text-(--color-orange-500)">*</span>
-            </p>
-            <div className="space-y-2">
-              <label className="tx-14 lh-20 text-primary flex">
-                <div className="flex cursor-pointer items-center gap-2">
-                  {" "}
-                  <input
-                    name="responseType"
-                    type="radio"
-                    className="radio-orange"
-                    checked={eventType === "single_choice"}
-                    onChange={() => setEventType("single_choice")}
-                  />
-                  <span>
-                    {t(
-                      "createEvent.responseTypeOptions.1.label",
-                      "Single-choice",
-                    )}
-                  </span>
-                  <Tooltip
-                    title={t(
-                      "createEvent.singleChoiceTooltip",
-                      "Participants choose one option from a list you create.",
-                    )}
-                    placement="top"
-                    color="white"
-                    {...singleChoiceTooltip.tooltipProps}
-                  >
-                    <span
-                      {...singleChoiceTooltip.triggerProps}
-                      className="cursor-pointer"
-                    >
-                      ⓘ
-                    </span>
-                  </Tooltip>
-                </div>
-              </label>
-              <label className="tx-14 lh-20 text-primary flex">
-                <div className="flex cursor-pointer items-center gap-2">
-                  <input
-                    name="responseType"
-                    type="radio"
-                    className="radio-orange"
-                    checked={eventType === "open"}
-                    onChange={() => setEventType("open")}
-                  />
-                  <span>
-                    {t("createEvent.responseTypeOptions.0.label", "Open-ended")}
-                  </span>
-                  <Tooltip
-                    title={t(
-                      "createEvent.openEndedTooltip",
-                      "Participants can submit their own responses.",
-                    )}
-                    placement="top"
-                    color="white"
-                    {...openEndedTooltip.tooltipProps}
-                  >
-                    <span
-                      {...openEndedTooltip.triggerProps}
-                      className="cursor-pointer"
-                    >
-                      ⓘ
-                    </span>
-                  </Tooltip>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {/* Options（只有 single_choice 時顯示） */}
-          {eventType === "single_choice" && (
-            <div>
-              <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
-                {t("createEvent.options")}
-                <span className="text-(--color-orange-500)">*</span>
-              </label>
-
-              <div className="space-y-2">
-                {options.map((opt, index) => {
-                  const isLast = index === options.length - 1;
-                  const canRemove = options.length > 1;
-
-                  return (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className="relative w-full">
-                        <input
-                          name="options"
-                          autoComplete="one-time-code"
-                          ref={(el) => {
-                            optionRefs.current[index] = el;
-                          }}
-                          type="text"
-                          value={opt}
-                          maxLength={20}
-                          onChange={(e) =>
-                            handleOptionChange(index, e.target.value)
-                          }
-                          onBlur={() => setOptionsTouched(true)}
-                          placeholder={t(
-                            "createEvent.optionPlaceholder",
-                            "Option {{n}}",
-                            {
-                              n: index + 1,
-                            },
-                          )}
-                          className="border-border tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none"
-                        />
-                        <span
-                          className={`tx-12 lh-18 absolute right-3 bottom-1 ${
-                            opt.length >= 20 ? "text-red-500" : "text-secondary"
-                          }`}
-                        >
-                          {opt.length}/20
-                        </span>
-                      </div>
-
-                      {/* 減號：有兩個以上 option 才顯示 */}
-                      {canRemove && (
-                        <div
-                          className={cn(
-                            "border-border flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border bg-white",
-                          )}
-                          onClick={() => handleRemoveOption(index)}
-                        >
-                          <MinusIcon />
-                        </div>
-                      )}
-
-                      {/* 加號：只在最後一列顯示，且選項數量少於5個時才顯示 */}
-                      {isLast && options.length < 5 && (
-                        <div
-                          className={cn(
-                            "border-border flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border bg-white",
-                          )}
-                          onClick={handleAddOption}
-                        >
-                          <PlusIcon />
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              {optionsValidation.error && (
-                <p className="tx-12 lh-18 mt-1 text-red-500">
-                  {optionsValidation.error}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Reward type */}
-          <div>
-            <p
-              id="rewardTypeTitle"
-              className="tx-14 lh-20 fw-m text-primary mb-2"
-            >
-              {t("createEvent.rewardType")}
-              <span className="text-(--color-orange-500)">*</span>
-            </p>
-            <div className="space-y-2">
-              <label className="tx-14 lh-20 text-primary flex">
-                <div className="flex cursor-pointer items-center gap-2">
-                  <input
-                    name="rewardType"
-                    type="radio"
-                    className="radio-orange"
-                    checked={isRewarded}
-                    onChange={() => setIsRewarded(true)}
-                  />
-                  <span>{t("createEvent.rewarded", "Rewarded")}</span>
-                </div>
-              </label>
-              <label className="tx-14 lh-20 text-primary flex">
-                <div className="flex cursor-pointer items-center gap-2">
-                  <input
-                    name="rewardType"
-                    type="radio"
-                    className="radio-orange"
-                    checked={!isRewarded}
-                    onChange={() => setIsRewarded(false)}
-                  />
-                  <span>{t("createEvent.nonRewarded", "Non-Rewarded")}</span>
-                </div>
-              </label>
-            </div>
-          </div>
-
-          {/* Duration */}
-          <div>
-            <div className="mb-1 flex items-center justify-between">
-              <label className="tx-14 lh-20 fw-m text-primary">
-                {t("createEvent.durationOfEvent", "Duration of this event")}
-                <span className="text-(--color-orange-500)">*</span>
-              </label>
-            </div>
-            <input
-              name="durationHours"
-              ref={durationRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={durationHours}
-              onChange={(e) => {
-                const v = e.target.value.replace(/[^0-9]/g, "");
-                setDurationHours(v);
-                if (durationError) setDurationError(null);
-                const n = Number(v);
-                if (!Number.isFinite(n) || n <= 0) {
-                  setRewardBtc("");
-                  setRewardBtcTouched(false);
-                }
-              }}
-              onPaste={(e) => {
-                e.preventDefault();
-                const pastedText = e.clipboardData.getData("text");
-                const numbersOnly = pastedText.replace(/[^0-9]/g, "");
-                if (numbersOnly) {
-                  setDurationHours(numbersOnly);
-                  if (durationError) setDurationError(null);
-                  const n = Number(numbersOnly);
-                  if (!Number.isFinite(n) || n <= 0) {
-                    setRewardBtc("");
-                    setRewardBtcTouched(false);
-                  }
-                }
-              }}
-              placeholder={
-                isRewarded
-                  ? t("createEvent.enterHoursMin", "Enter hours (Min 1)")
-                  : t(
-                      "createEvent.freeHours",
-                      "First {{hours}} hours are free",
-                      { hours: params?.free_hours },
-                    )
-              }
-              className={cn(
-                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none",
-                durationError
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-(--color-orange-500)",
-              )}
-            />
-            {durationError && (
-              <p className="tx-12 lh-18 mt-1 text-red-500">{durationError}</p>
-            )}
-          </div>
-
-          {/* Reward (BTC) */}
-          {isRewarded && (
-            <div>
-              <label className="tx-14 lh-20 fw-m text-primary mb-1 block">
-                {t("createEvent.rewardBtc", "Reward (BTC)")}{" "}
-                <span className="text-(--color-orange-500)">*</span>
-              </label>
-              <div className="flex items-center gap-2">
+              <label className="tx-12 lh-18 text-secondary flex items-start gap-2">
                 <input
-                  name="rewardBtc"
-                  ref={rewardBtcRef}
-                  disabled={Number(durationHours) <= 0}
-                  type="text"
-                  inputMode="decimal"
-                  value={rewardBtc}
-                  onChange={(e) => {
-                    const v = e.target.value.replace(/[^0-9.]/g, "");
-                    const parts = v.split(".");
-                    const cleaned =
-                      parts.length > 0
-                        ? parts[0] +
-                          (parts.length > 1
-                            ? "." + parts.slice(1).join("")
-                            : "")
-                        : "";
-                    setRewardBtc(cleaned);
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    const pastedText = e.clipboardData.getData("text");
-                    const cleaned = pastedText.replace(/[^0-9.]/g, "");
-                    const parts = cleaned.split(".");
-                    const numbersOnly =
-                      parts.length > 0
-                        ? parts[0] +
-                          (parts.length > 1
-                            ? "." + parts.slice(1).join("")
-                            : "")
-                        : "";
-                    if (numbersOnly) {
-                      setRewardBtc(numbersOnly);
-                    }
-                  }}
-                  onBlur={() => setRewardBtcTouched(true)}
-                  //if enabled, the placeholder need to be change to Enter reward ( Min 0.000011 ), and the number Min xxxx need to have a state so I can update it dynamically
-                  placeholder={rewardBtcPlaceholder}
-                  className={cn(
-                    "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
-                    rewardBtcValidation.error
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-border focus:ring-(--color-orange-500)",
-                  )}
+                  {...methods.register("agree", {
+                    validate: (v) =>
+                      v ||
+                      t(
+                        "createEvent.alertAgreeRequired",
+                        "Please agree to the Terms of Service to continue.",
+                      ),
+                  })}
+                  type="checkbox"
+                  className="checkbox-form-bg mt-0.5"
                 />
-                <Button
-                  disabled={Number(durationHours) <= 0}
-                  type="button"
-                  appearance="solid"
-                  tone="white"
-                  text="sm"
-                  className="border-border w-[125px] rounded-xl"
-                  onClick={() => {
-                    setRewardBtc(minRewardBtc.toString());
-                    setRewardBtcTouched(true); // Mark as touched when user clicks Minimum button
-                    setLastField("rewardBtc");
-                  }}
-                >
-                  {t("createEvent.minimum")}
-                </Button>
-              </div>
-              {isRewarded && rewardBtcValidation.error && (
-                <p className="tx-12 lh-18 mt-1 text-red-500">
-                  {rewardBtcValidation.error}
+                <span>
+                  {t("common.agreeToThe", "I agree to the")}{" "}
+                  <Link
+                    to="/terms"
+                    target="_blank"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("common.termsOfService", "Terms of Service")}
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/terms-reward-distribution"
+                    target="_blank"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("common.rewardDistribution", "Reward Distribution")}
+                  </Link>
+                  ,{" "}
+                  <Link
+                    to="/privacy"
+                    target="_blank"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("common.privacyPolicy", "Privacy Policy")}
+                  </Link>{" "}
+                  {t("common.and", "and")}{" "}
+                  <Link
+                    to="/charges-refunds"
+                    target="_blank"
+                    className="text-(--color-orange-500) underline"
+                  >
+                    {t("common.chargesRefunds", "Charges & Refunds")}
+                  </Link>
+                  .
+                </span>
+              </label>
+              {errors.agree && (
+                <p className="tx-12 lh-18 mt-1 ml-6 text-red-500">
+                  {errors.agree.message as string}
                 </p>
               )}
             </div>
-          )}
 
-          {/* Number of recipients */}
-          {isRewarded && (
-            <div>
-              <p className="tx-14 lh-20 fw-m text-primary mb-1">
-                {t("createEvent.numberOfRecipients")}
-              </p>
-              <p className="tx-12 lh-18 text-black dark:text-white">
-                {maxRecipients !== null && maxRecipients > 0
-                  ? maxRecipients === 1
-                    ? t(
-                        "createEvent.rewardDistributionText",
-                        "The reward will be distributed to up to {{count}} address",
-                        { count: maxRecipients },
-                      )
-                    : t(
-                        "createEvent.rewardDistributionTextPlural",
-                        "The reward will be distributed to up to {{count}} addresses",
-                        { count: maxRecipients },
-                      )
-                  : "--"}
-              </p>
-            </div>
-          )}
-
-          {/* Platform fee（只有 no reward 時顯示） */}
-          {!isRewarded && (
-            <div>
-              <p className="tx-14 lh-20 fw-m text-primary mb-1">
-                {t("createEvent.platformFee", "Platform fee:")}
-              </p>
-              <p className="tx-12 lh-18 text-black dark:text-white">
-                {platformFeeDisplay}
-              </p>
-            </div>
-          )}
-
-          {/* Preheat */}
-          <div className="space-y-2">
-            <div className="tx-14 lh-20 text-primary flex items-center gap-2">
-              <input
-                id="enable-preheat"
-                name="enablePreheat"
-                type="checkbox"
-                // check box color change to white
-                className="accent-(--color-orange-500)"
-                checked={enablePreheat}
-                onChange={(e) => setEnablePreheat(e.target.checked)}
-              />
-              <label
-                htmlFor="enable-preheat"
-                className="tx-14 lh-20 text-primary cursor-pointer"
+            {/* Actions */}
+            <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
+              <Button
+                name="clearButton"
+                type="button"
+                appearance="outline"
+                tone="primary"
+                text="sm"
+                className="sm:w-40"
+                onClick={handleClear}
               >
-                {t("createEvent.enablePreheat")}
-              </label>
-              <Tooltip
-                placement="topLeft"
-                title={formatTooltipText(t("createEvent.enablePreheatTooltip"))}
-                color="white"
-                arrow={{ pointAtCenter: true }}
-                {...enablePreheatTooltip.tooltipProps}
+                {t("createEvent.clear", "Clear")}
+              </Button>
+              <Button
+                name="previewButton"
+                type="submit"
+                appearance="solid"
+                tone="primary"
+                text="sm"
+                className={cn(
+                  "sm:w-40",
+                  isPreviewDisabled && !isSubmitting && "opacity-50",
+                )}
+                disabled={isSubmitting}
               >
-                <span
-                  {...enablePreheatTooltip.triggerProps}
-                  className="tx-14 text-admin-text-main cursor-pointer dark:text-white"
-                >
-                  ⓘ
-                </span>
-              </Tooltip>
+                {isSubmitting
+                  ? t("createEvent.submitting", "Submitting…")
+                  : t("createEvent.preview", "Preview")}
+              </Button>
             </div>
-            <input
-              name="preheatHours"
-              ref={preheatHoursRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              value={preheatHours}
-              onChange={(e) => {
-                const v = e.target.value.replace(/[^0-9]/g, "");
-                setPreheatHours(v);
-              }}
-              onPaste={(e) => {
-                e.preventDefault();
-                const pastedText = e.clipboardData.getData("text");
-                const numbersOnly = pastedText.replace(/[^0-9]/g, "");
-                if (numbersOnly) {
-                  setPreheatHours(numbersOnly);
-                }
-              }}
-              placeholder={t(
-                "createEvent.enterHoursMax",
-                "Enter hours (max 720)",
-              )}
-              className={cn(
-                "tx-14 lh-20 placeholder:text-secondary w-full rounded-xl border bg-white px-3 py-2 text-black focus:ring-2 focus:outline-none disabled:opacity-60",
-                preheatHoursValidation.error
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-(--color-orange-500)",
-              )}
-              disabled={!enablePreheat}
-            />
-            {enablePreheat && preheatHoursValidation.error && (
-              <p className="tx-12 lh-18 mt-1 text-red-500">
-                {preheatHoursValidation.error}
-              </p>
-            )}
-          </div>
-
-          {/* Preheat fee */}
-          <div>
-            <p className="tx-14 lh-20 fw-m text-primary mb-1">
-              {t("createEvent.preheatFee", "Preheat fee:")}
-            </p>
-            <p className="tx-12 lh-18 text-black dark:text-white">
-              {preheatFeeDisplay}
-            </p>
-          </div>
-
-          {/* Terms checkbox */}
-          <div
-            className={cn(
-              "-mx-2 rounded-lg border-t p-2 pt-2",
-              agreeError ? "border-2 border-red-500" : "border-border",
-            )}
-          >
-            <label className="tx-12 lh-18 text-secondary flex items-start gap-2">
-              <input
-                name="agreeTerms"
-                ref={agreeRef}
-                type="checkbox"
-                className="mt-0.5 cursor-pointer accent-(--color-orange-500)"
-                checked={agree}
-                onChange={(e) => {
-                  setAgree(e.target.checked);
-                  if (agreeError) setAgreeError(null);
-                }}
-              />
-              <span>
-                {t("createEvent.agreeToThe", "I agree to the")}{" "}
-                <Link
-                  to="/terms"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.termsOfService", "Terms of Service")}
-                </Link>
-                ,{" "}
-                <Link
-                  to="/terms-reward-distribution"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.rewardDistribution", "Reward Distribution")}
-                </Link>
-                ,{" "}
-                <Link
-                  to="/privacy"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.privacyPolicy", "Privacy Policy")}
-                </Link>{" "}
-                {t("createEvent.and", "and")}{" "}
-                <Link
-                  to="/charges-refunds"
-                  className="text-(--color-orange-500) underline"
-                >
-                  {t("createEvent.chargesRefunds", "Charges & Refunds")}
-                </Link>
-                .
-              </span>
-            </label>
-            {agreeError && (
-              <p className="tx-12 lh-18 mt-1 ml-6 text-red-500">{agreeError}</p>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
-            <Button
-              name="clearButton"
-              type="button"
-              appearance="outline"
-              tone="primary"
-              text="sm"
-              className="sm:w-40"
-              onClick={handleClear}
-            >
-              {t("createEvent.clear", "Clear")}
-            </Button>
-            <Button
-              name="previewButton"
-              type="submit"
-              appearance="solid"
-              tone="primary"
-              text="sm"
-              className={cn(
-                "sm:w-40",
-                isPreviewDisabled && !isSubmitting && "opacity-50",
-              )}
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? t("createEvent.submitting", "Submitting…")
-                : t("createEvent.preview", "Preview")}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );

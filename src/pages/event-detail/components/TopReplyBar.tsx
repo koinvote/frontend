@@ -27,7 +27,7 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
   }, [targetWidth]);
 
   return (
-    <div className="relative w-full h-12 rounded-lg border border-border bg-bg overflow-hidden">
+    <div className="border-border bg-bg relative h-14 w-full overflow-hidden rounded-lg border">
       {/* Background bar */}
       <div
         className="absolute inset-0"
@@ -39,15 +39,15 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
       />
 
       {/* Content */}
-      <div className="relative h-full flex items-center justify-between px-4 py-2">
-        <span className="text-sm md:text-base text-primary line-clamp-1 flex-1 pr-4">
+      <div className="relative flex h-full items-center justify-between px-4 py-2">
+        <span className="text-primary line-clamp-1 flex-1 pr-4 text-sm md:text-base">
           {reply.body}
         </span>
-        <div className="flex flex-col items-end gap-1 shrink-0 ml-1">
+        <div className="ml-1 flex shrink-0 flex-col items-end gap-1">
           <span className="text-xs md:text-sm dark:text-white">
             {amountBtc} BTC
           </span>
-          <span className="text-xs md:text-sm font-semibold">
+          <span className="text-secondary text-xs font-semibold">
             {weightPercentDisplay}%
           </span>
         </div>

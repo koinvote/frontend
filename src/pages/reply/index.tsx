@@ -7,12 +7,12 @@ import { useNavigate, useParams } from "react-router";
 import { API, type ApiResponse } from "@/api";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import HashIcon from "@/assets/icons/hash.svg?react";
 import TrophyIcon from "@/assets/icons/trophy.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { EventInfoBox } from "@/components/base/EventInfoBox";
 import { Loading } from "@/components/base/Loading";
@@ -366,14 +366,8 @@ export default function ReplyPage() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 pb-10 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={goBack}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={goBack} />
       </div>
 
       <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
@@ -443,6 +437,16 @@ export default function ReplyPage() {
               {event.event_type === "open"
                 ? t("reply.openEnded", "Open-ended")
                 : t("reply.singleChoice", "Single-choice")}
+            </span>
+            <span className="tx-14 text-secondary">
+              {t("reply.resultVisibility", "Result visibility")}:
+            </span>
+            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
             </span>
           </div>
         </div>

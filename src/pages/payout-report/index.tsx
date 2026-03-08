@@ -4,7 +4,7 @@ import { useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
 import type { PayoutReportRes } from "@/api/response";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
 import { useQuery } from "@tanstack/react-query";
@@ -72,13 +72,7 @@ const PayoutReport = () => {
     <div className="flex-col flex items-center justify-center w-full px-2 md:px-0">
       {/* Back button */}
       <div className="h-[50px] w-full relative">
-        <button
-          type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={goBack}
-        >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
-        </button>
+        <BackButton onClick={goBack} />
       </div>
 
       {/* Main content */}
