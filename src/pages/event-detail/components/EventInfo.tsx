@@ -332,19 +332,16 @@ export function EventInfo({
       ? event.options.length
       : 2;
 
-  // Build field list for mobile (ordered list)
-  const mobileFields = useMemo(() => {
-    const fields: Array<{
-      label: string;
-      value: React.ReactNode;
-      key: string;
-    }> = [];
+  // Build unified field list
+  const fields = useMemo(() => {
+    type Field = { label: string; value: React.ReactNode; key: string };
+    const result: Field[] = [];
 
-    fields.push({
+    result.push({
       key: "time-remaining",
       label: t("eventInfo.timeRemaining", "Time Remaining:"),
       value: isCompleted ? (
-        <div className="mt-1 text-xs font-semibold text-black md:text-sm dark:text-white">
+        <div className="text-xs font-semibold text-black md:text-sm dark:text-white">
           {timeRemaining}
         </div>
       ) : (
@@ -354,9 +351,8 @@ export function EventInfo({
       ),
     });
 
-    // Only show rewards in ongoing or completed state
     if ((isOngoing || isCompleted) && isRewarded && rewardAmountBtc) {
-      fields.push({
+      result.push({
         key: "reward-amount",
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
@@ -372,7 +368,7 @@ export function EventInfo({
     }
 
     if ((isOngoing || isCompleted) && isRewarded && additionalRewardBtc) {
-      fields.push({
+      result.push({
         key: "additional-reward",
         label: t("eventInfo.additionalReward", "Additional Reward:"),
         value: (
@@ -387,48 +383,12 @@ export function EventInfo({
       });
     }
 
-    // Only show event duration in ongoing or completed state
-    if ((isOngoing || isCompleted || isPreheat) && eventDurationDisplay) {
-      fields.push({
-        key: "duration",
-        label: t("eventInfo.durationOfEvent", "Duration of This Event:"),
-        value: (
-          <span className="text-primary text-xs md:text-sm">
-            {eventDurationDisplay}
-          </span>
-        ),
-      });
-    }
-
-    if (preheatDurationDisplay) {
-      fields.push({
-        key: "preheat-duration",
-        label: t("eventInfo.preheatDuration", "Preheat Duration:"),
-        value: (
-          <span className="text-primary text-xs md:text-sm">
-            {preheatDurationDisplay}
-          </span>
-        ),
-      });
-    }
-
-    fields.push({
-      key: "event-id",
-      label: t("eventInfo.eventId", "Event-ID:"),
-      value: (
-        <span className="text-primary text-xs md:text-sm">
-          {event.event_id}
-        </span>
-      ),
-    });
-
-    // Only show creator address in ongoing or completed state
     if ((isOngoing || isCompleted || isPreheat) && event.creator_address) {
-      fields.push({
+      result.push({
         key: "creator-address",
         label: t("eventInfo.creatorAddress", "Creator address:"),
         value: (
-          <div className="mt-1 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleAddressClick}
@@ -439,10 +399,7 @@ export function EventInfo({
               )}
             >
               {event.creator_address.length > 10
-                ? `${event.creator_address.slice(
-                    0,
-                    6,
-                  )}...${event.creator_address.slice(-4)}`
+                ? `${event.creator_address.slice(0, 6)}...${event.creator_address.slice(-4)}`
                 : event.creator_address}
             </button>
             <button
@@ -461,11 +418,45 @@ export function EventInfo({
       });
     }
 
-    fields.push({
+    if (preheatDurationDisplay) {
+      result.push({
+        key: "preheat-duration",
+        label: t("eventInfo.preheatDuration", "Preheat Duration:"),
+        value: (
+          <span className="text-primary text-xs md:text-sm">
+            {preheatDurationDisplay}
+          </span>
+        ),
+      });
+    }
+
+    if (eventDurationDisplay) {
+      result.push({
+        key: "duration",
+        label: t("eventInfo.durationOfEvent", "Duration of This Event:"),
+        value: (
+          <span className="text-primary text-xs md:text-sm">
+            {eventDurationDisplay}
+          </span>
+        ),
+      });
+    }
+
+    result.push({
+      key: "event-id",
+      label: t("eventInfo.eventId", "Event-ID:"),
+      value: (
+        <span className="text-primary text-xs md:text-sm">
+          {event.event_id}
+        </span>
+      ),
+    });
+
+    result.push({
       key: "response-type",
       label: t("eventInfo.eventType", "Response type:"),
       value: (
-        <span className="text-xs">
+        <span className="text-xs md:text-sm">
           {event.event_type === "open"
             ? t("reply.openEnded", "Open-ended")
             : t("reply.singleChoice", "Multiple choice")}
@@ -474,11 +465,11 @@ export function EventInfo({
     });
 
     if (event.result_visibility) {
-      fields.push({
+      result.push({
         key: "result-visibility",
         label: t("eventInfo.resultVisibility", "Result visibility:"),
         value: (
-          <span className="text-xs">
+          <span className="text-xs md:text-sm">
             {event.result_visibility === "public"
               ? t("reply.resultVisibilityPublic", "Public")
               : event.result_visibility === "paid_only"
@@ -490,14 +481,14 @@ export function EventInfo({
     }
 
     if (event.hashtags && event.hashtags.length > 0) {
-      fields.push({
+      result.push({
         key: "hashtags",
         label:
           event.hashtags.length > 1
             ? t("eventInfo.hashtags", "Hashtags:")
             : t("eventInfo.hashtag", "Hashtag:"),
         value: (
-          <div className="mt-1 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {event.hashtags.map((tag, index) => {
               const hashtagWithPrefix = tag.startsWith("#") ? tag : `#${tag}`;
               return (
@@ -509,9 +500,7 @@ export function EventInfo({
                   aria-label={t(
                     "eventInfo.filterByHashtag",
                     "Filter by {{hashtag}}",
-                    {
-                      hashtag: hashtagWithPrefix,
-                    },
+                    { hashtag: hashtagWithPrefix },
                   )}
                 >
                   {hashtagWithPrefix}
@@ -523,7 +512,7 @@ export function EventInfo({
       });
     }
 
-    return fields;
+    return result;
   }, [
     isOngoing,
     isCompleted,
@@ -634,10 +623,16 @@ export function EventInfo({
 
       {/* Top Reply / Options */}
       {/* When locked (non-public) + open: hide entirely. When locked + single_choice: show names only. */}
-      {!(isLocked && event.result_visibility !== "public" && event.event_type === "open") &&
+      {!(
+        isLocked &&
+        event.result_visibility !== "public" &&
+        event.event_type === "open"
+      ) &&
         (showSkeleton || (displayData.length > 0 && !!displayTitle)) && (
           <div
-            onClick={!showSkeleton && isOngoing ? handleOptionsClick : undefined}
+            onClick={
+              !showSkeleton && isOngoing ? handleOptionsClick : undefined
+            }
             className={!showSkeleton && isOngoing ? "cursor-pointer" : ""}
           >
             <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
@@ -671,195 +666,13 @@ export function EventInfo({
           </div>
         )}
 
-      {/* Desktop: Two Column Layout */}
-      <div className="hidden grid-cols-2 gap-4 md:grid md:gap-6">
-        {/* Left Column */}
-        <div className="flex flex-col gap-6">
-          <div>
+      {/* Responsive Two-Column Layout */}
+      <div className="flex flex-wrap gap-3 md:gap-6">
+        {fields.map((field) => (
+          <div key={field.key} className="w-full md:w-[calc(50%-0.75rem)]">
             <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.timeRemaining", "Time Remaining:")}
+              {field.label}
             </span>
-            {isCompleted ? (
-              <div className="mt-1 text-xs text-black md:text-sm dark:text-white">
-                {timeRemaining}
-              </div>
-            ) : (
-              <div className="text-accent mt-2 text-xs font-semibold md:text-sm">
-                {timeRemaining}
-              </div>
-            )}
-          </div>
-
-          {/* Only show rewards in ongoing or completed state */}
-          {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
-            <div>
-              <div className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.rewardAmount", "Reward Amount:")}
-              </div>
-              <div className="text-primary mt-2 text-xs font-semibold md:text-sm">
-                {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
-                {event.winner_count === 1
-                  ? t("eventInfo.address", "Address")
-                  : t("eventInfo.addresses", "Addresses")}
-                )
-              </div>
-            </div>
-          )}
-
-          {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
-            <div>
-              <div className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.additionalReward", "Additional Reward:")}
-              </div>
-              <div className="text-primary mt-2 text-xs md:text-sm">
-                {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
-                {event.additional_winner_count === 1
-                  ? t("eventInfo.address", "Address")
-                  : t("eventInfo.addresses", "Addresses")}
-                )
-              </div>
-            </div>
-          )}
-
-          {/* Show creator address in all states */}
-          {(isPreheat || isOngoing || isCompleted) && event.creator_address && (
-            <div className="flex flex-col gap-2">
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.creatorAddress", "Creator address:")}
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleAddressClick}
-                  className="cursor-pointer border-b border-dashed border-black font-mono text-xs text-black transition-colors hover:border-gray-500 hover:text-gray-500 md:text-sm dark:border-white dark:text-white dark:hover:border-gray-400 dark:hover:text-gray-400"
-                  aria-label={t(
-                    "eventInfo.searchByCreatorAddress",
-                    "Search events by creator address",
-                  )}
-                >
-                  {event.creator_address.length > 10
-                    ? `${event.creator_address.slice(
-                        0,
-                        6,
-                      )}...${event.creator_address.slice(-4)}`
-                    : event.creator_address}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopyCreatorAddress}
-                  className="hover:bg-surface-hover text-secondary hover:text-primary flex cursor-pointer! items-center justify-center rounded p-1 transition-colors"
-                  aria-label={t(
-                    "eventInfo.copyCreatorAddress",
-                    "Copy creator address",
-                  )}
-                >
-                  <CopyIcon className="h-4 w-4 text-current" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {event.hashtags && event.hashtags.length > 0 && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {event.hashtags.length > 1
-                  ? t("eventInfo.hashtags", "Hashtags:")
-                  : t("eventInfo.hashtag", "Hashtag:")}
-              </span>
-              <div className="mt-2 flex flex-wrap gap-2">
-                {event.hashtags.map((tag, index) => {
-                  const hashtagWithPrefix = tag.startsWith("#")
-                    ? tag
-                    : `#${tag}`;
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleHashtagClick(tag)}
-                      className="inline-flex cursor-pointer items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-black transition-colors hover:bg-gray-300 md:text-sm dark:bg-white dark:hover:bg-gray-100"
-                      aria-label={t(
-                        "eventInfo.filterByHashtag",
-                        "Filter by {{hashtag}}",
-                        { hashtag: hashtagWithPrefix },
-                      )}
-                    >
-                      {hashtagWithPrefix}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column */}
-        <div className="flex flex-col gap-6">
-          {/* Only show event duration in ongoing or completed state */}
-          {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.durationOfEvent", "Duration of This Event:")}
-              </span>
-              <div className="text-primary mt-2 text-xs md:text-sm">
-                {eventDurationDisplay}
-              </div>
-            </div>
-          )}
-
-          {/* Show preheat duration in all states if it exists */}
-          {preheatDurationDisplay && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.preheatDuration", "Preheat Duration:")}
-              </span>
-              <div className="text-primary mt-2 text-xs md:text-sm">
-                {preheatDurationDisplay}
-              </div>
-            </div>
-          )}
-
-          <div>
-            <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.eventId", "Event-ID:")}
-            </span>
-            <div className="text-primary mt-2 text-xs md:text-sm">
-              {event.event_id}
-            </div>
-          </div>
-
-          <div>
-            <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.eventType", "Event Type:")}
-            </span>
-            <div className="mt-2 text-xs text-black md:text-sm dark:text-white">
-              {event.event_type === "open"
-                ? t("reply.openEnded", "Open-ended")
-                : t("reply.singleChoice", "Multiple choice")}
-            </div>
-          </div>
-
-          {event.result_visibility && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.resultVisibility", "Result visibility:")}
-              </span>
-              <div className="mt-2 text-xs text-black md:text-sm dark:text-white">
-                {event.result_visibility === "public"
-                  ? t("reply.resultVisibilityPublic", "Public")
-                  : event.result_visibility === "paid_only"
-                    ? t("reply.resultVisibilityPaidOnly", "Paid-only")
-                    : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile: Ordered List */}
-      <div className="flex flex-col gap-3 md:hidden">
-        {mobileFields.map((field) => (
-          <div key={field.key}>
-            <span className="text-secondary text-xs">{field.label}</span>
             <div className="mt-1">{field.value}</div>
           </div>
         ))}

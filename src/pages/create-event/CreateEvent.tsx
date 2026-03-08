@@ -250,6 +250,12 @@ export default function CreateEvent() {
 
   // Draft restore on mount
   useEffect(() => {
+    // If returning after a successful submission, skip restore and validation
+    if (sessionStorage.getItem("koinvote:create-event-submitted") === "true") {
+      sessionStorage.removeItem("koinvote:create-event-submitted");
+      return;
+    }
+
     const saved = sessionStorage.getItem(CREATE_EVENT_DRAFT_KEY);
     if (!saved) return;
 
