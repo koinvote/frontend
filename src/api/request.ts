@@ -14,7 +14,7 @@ export interface CreateEventReq {
   hashtags?: string[];
   result_visibility?: "public" | "paid_only" | "creator_only";
   creator_email?: string;
-  unlock_price?: number;
+  unlock_price_satoshi?: number;
 }
 
 export interface GetEventListReq {

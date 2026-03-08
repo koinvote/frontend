@@ -548,7 +548,8 @@
     "hashtag": "標籤：",
     "filterByHashtag": "依 {{hashtag}} 篩選",
     "address": "地址",
-    "addresses": "地址"
+    "addresses": "地址",
+    "unlockPrice": "解鎖價格"
   },
   "replyList": {
     "searchPlaceholder": "搜尋比特幣地址或回覆內容",

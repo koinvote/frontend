@@ -31,7 +31,7 @@ dayjs.extend(utc);
 
 type UnlockPaymentState = {
   email: string;
-  unlockPrice?: string;
+  unlockPriceSatoshi?: number;
   eventTitle?: string;
 };
 
@@ -44,7 +44,7 @@ export default function UnlockPayment() {
 
   const state = location.state as UnlockPaymentState | undefined;
   const email = state?.email ?? "";
-  const unlockPrice = state?.unlockPrice;
+  const unlockPriceSatoshi = state?.unlockPriceSatoshi;
   const eventTitle = state?.eventTitle;
 
   // ── Form state ──────────────────────────────────────────────────────────
@@ -230,7 +230,7 @@ export default function UnlockPayment() {
         suffix: false,
         trimTrailingZeros: true,
       })
-    : (unlockPrice ?? "--");
+    : (unlockPriceSatoshi ?? "--");
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   const handleConfirmPay = async () => {
@@ -440,7 +440,10 @@ export default function UnlockPayment() {
                     onClick={() =>
                       handleCopy(
                         depositAddress,
-                        t("unlockPayment.toCreatorAddress", "To Creator Address"),
+                        t(
+                          "unlockPayment.toCreatorAddress",
+                          "To Creator Address",
+                        ),
                       )
                     }
                     className="shrink-0 cursor-pointer p-1 hover:opacity-70"
@@ -518,7 +521,7 @@ export default function UnlockPayment() {
                 {t("unlockPayment.price", "Price")}
               </div>
               <div className="lh-24 text-primary fw-m text-xl">
-                {unlockPrice ?? "--"} BTC
+                {unlockPriceSatoshi ? unlockPriceSatoshi / 100000000 : "--"} BTC
               </div>
             </div>
 

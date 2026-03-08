@@ -1,4 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
@@ -11,7 +13,6 @@ import BackButton from "@/components/base/BackButton";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
 import { mapApiTopReply } from "@/utils/eventTransform";
-import { useQuery } from "@tanstack/react-query";
 import { Divider } from "./components/Divider";
 import { EventInfo } from "./components/EventInfo";
 import { ReplyList } from "./components/ReplyList";
@@ -22,6 +23,7 @@ const EventDetail = () => {
   const location = useLocation();
   const initialUnlockEmail = (location.state as { unlockEmail?: string } | null)
     ?.unlockEmail;
+  const { t } = useTranslation();
   const hasRestoredScroll = useRef(false);
   const isRestoringRef = useRef(false);
   const goBack = useBackOrFallback("/");
@@ -70,12 +72,12 @@ const EventDetail = () => {
   // This ensures the top-replies query fires immediately when eventDetail loads,
   // preventing the stale 2-item preview from briefly showing.
   const effectiveBalanceDisplayMode =
-    eventDetail?.status === EventStatus.ACTIVE ? "on_chain" : balanceDisplayMode;
+    eventDetail?.status === EventStatus.ACTIVE
+      ? "on_chain"
+      : balanceDisplayMode;
 
   const isTopRepliesEnabled =
-    !!eventId &&
-    !!eventDetail &&
-    eventDetail.status !== EventStatus.PREHEAT;
+    !!eventId && !!eventDetail && eventDetail.status !== EventStatus.PREHEAT;
 
   const { data: topRepliesData, isLoading: isTopRepliesLoading } = useQuery({
     queryKey: [
@@ -185,7 +187,6 @@ const EventDetail = () => {
     hasRestoredScroll.current = false;
   }, [eventId]);
 
-
   useEffect(() => {
     if (eventDetail?.title) {
       document.title = `${eventDetail.title} | Koinvote`;
@@ -238,6 +239,17 @@ const EventDetail = () => {
           <Divider />
         </div>
 
+        {!isRepliesLocked && eventDetail.unlock_price_satoshi && (
+          <div className="mb-6">
+            <div className="text-secondary text-xs md:text-sm">
+              {t("eventInfo.unlockPrice", "Unlock Price")}
+            </div>
+            <div className="text-primary mt-2 text-xs md:text-sm">
+              {eventDetail.unlock_price_satoshi / 100000000} BTC
+            </div>
+          </div>
+        )}
+
         {/* Second Section: Search and Filter */}
         {!isRepliesLocked && (
           <SearchAndFilter
@@ -263,7 +275,7 @@ const EventDetail = () => {
           order={order}
           options={eventDetail.options}
           eventType={eventDetail.event_type}
-          unlockPrice={eventDetail.unlock_price}
+          unlockPriceSatoshi={eventDetail.unlock_price_satoshi}
           unlockCount={eventDetail.unlock_count}
           participantsCount={eventDetail.participants_count}
           totalStakeSatoshi={eventDetail.total_stake_satoshi}

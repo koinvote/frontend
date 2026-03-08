@@ -124,7 +124,7 @@ export interface EventDetailDataRes {
   hashtags: string[];
   preheat_hours: number;
   result_visibility?: "public" | "paid_only" | "creator_only";
-  unlock_price?: string;
+  unlock_price_satoshi?: number;
   unlock_count?: number;
 }
 

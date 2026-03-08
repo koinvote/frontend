@@ -545,7 +545,8 @@
     "hashtag": "Hashtag:",
     "filterByHashtag": "Filter by {{hashtag}}",
     "address": "Address",
-    "addresses": "Addresses"
+    "addresses": "Addresses",
+    "unlockPrice": "Unlock price"
   },
   "replyList": {
     "searchPlaceholder": "Search by address or content",

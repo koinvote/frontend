@@ -292,7 +292,7 @@ export default function PreviewEvent() {
           hashtags: hashtags.length > 0 ? hashtags : undefined,
           result_visibility: state.resultVisibility,
           creator_email: state.creatorEmail,
-          unlock_price:
+          unlock_price_satoshi:
             state.resultVisibility === "paid_only" && state.unlockPriceBtc
               ? Math.round(parseFloat(state.unlockPriceBtc) * 100000000)
               : undefined,
@@ -356,7 +356,7 @@ export default function PreviewEvent() {
           hashtags: hashtags.length > 0 ? hashtags : undefined,
           result_visibility: state.resultVisibility,
           creator_email: state.creatorEmail,
-          unlock_price:
+          unlock_price_satoshi:
             state.resultVisibility === "paid_only" && state.unlockPriceBtc
               ? Math.round(parseFloat(state.unlockPriceBtc) * 100000000)
               : undefined,

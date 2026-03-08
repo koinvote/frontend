@@ -39,7 +39,7 @@ interface ReplyListProps {
   eventType?: EventType;
   eventStatus?: number;
   balanceDisplayMode?: "snapshot" | "on_chain";
-  unlockPrice?: string;
+  unlockPriceSatoshi?: number;
   unlockCount?: number;
   participantsCount?: number;
   totalStakeSatoshi?: number;
@@ -75,7 +75,7 @@ export function ReplyList({
   eventType,
   eventStatus,
   balanceDisplayMode,
-  unlockPrice,
+  unlockPriceSatoshi,
   unlockCount,
   participantsCount,
   totalStakeSatoshi,
@@ -156,7 +156,7 @@ export function ReplyList({
       !isPaymentReturnRef.current
     ) {
       navigate(`/event/${eventId}/unlock-payment`, {
-        state: { email: submittedEmail, unlockPrice, eventTitle },
+        state: { email: submittedEmail, unlockPriceSatoshi, eventTitle },
       });
     }
   }, [
@@ -164,7 +164,7 @@ export function ReplyList({
     isLocked,
     isFetching,
     eventId,
-    unlockPrice,
+    unlockPriceSatoshi,
     eventTitle,
     navigate,
   ]);
@@ -185,7 +185,7 @@ export function ReplyList({
       // Same email already returned locked (e.g. back from payment, mock doesn't track state).
       // setSubmittedEmail won't change state, so navigate directly.
       navigate(`/event/${eventId}/unlock-payment`, {
-        state: { email: trimmedEmail, unlockPrice, eventTitle },
+        state: { email: trimmedEmail, unlockPriceSatoshi, eventTitle },
       });
       return;
     }
@@ -243,7 +243,7 @@ export function ReplyList({
             "replyList.unlockResultsWith",
             "Unlock Results with {{price}} BTC",
             {
-              price: unlockPrice ?? "?",
+              price: unlockPriceSatoshi ? unlockPriceSatoshi / 100000000 : "?",
             },
           )}
         </p>
@@ -257,22 +257,24 @@ export function ReplyList({
             </span>
           </p>
         )}
-        <div className="text-secondary tx-13 mb-6 flex items-center gap-4">
-          {participantsCount !== undefined && (
-            <span className="flex items-center gap-1">
-              <EventCardParticipantsIcon className="h-3 w-3" />
-              {t("replyList.participantsCount", "{{count}} Participants", {
-                count: participantsCount,
-              })}
-            </span>
-          )}
-          {totalStakeSatoshi !== undefined && (
-            <span className="flex items-center gap-1">
-              <span>₿</span>
-              {totalBtc} {t("replyList.btcTotal", "BTC Total")}
-            </span>
-          )}
-        </div>
+        {participantsCount !== undefined && participantsCount > 0 && (
+          <div className="text-secondary tx-13 mb-6 flex items-center gap-4">
+            {participantsCount !== undefined && (
+              <span className="flex items-center gap-1">
+                <EventCardParticipantsIcon className="h-3 w-3" />
+                {t("replyList.participantsCount", "{{count}} Participants", {
+                  count: participantsCount,
+                })}
+              </span>
+            )}
+            {totalStakeSatoshi !== undefined && (
+              <span className="flex items-center gap-1">
+                <span>₿</span>
+                {Number(totalBtc)} {t("replyList.btcTotal", "BTC Total")}
+              </span>
+            )}
+          </div>
+        )}
         <div className="w-full max-w-sm space-y-1">
           <input
             ref={unlockInputRef}
@@ -377,7 +379,10 @@ function ReplyItem({
   });
 
   const getDisplayBalance = () => {
-    if (eventStatus === EventStatus.COMPLETED && balanceDisplayMode !== "on_chain") {
+    if (
+      eventStatus === EventStatus.COMPLETED &&
+      balanceDisplayMode !== "on_chain"
+    ) {
       return reply.balance_at_snapshot_satoshi;
     }
     return reply.balance_at_current_satoshi;
