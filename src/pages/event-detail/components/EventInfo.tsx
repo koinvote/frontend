@@ -24,12 +24,14 @@ interface EventInfoProps {
   event: EventDetailDataRes;
   topReplies?: TopReply[];
   isTopRepliesLoading?: boolean;
+  isLocked?: boolean;
 }
 
 export function EventInfo({
   event,
   topReplies,
   isTopRepliesLoading,
+  isLocked,
 }: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -631,28 +633,43 @@ export function EventInfo({
       )}
 
       {/* Top Reply / Options */}
-      {(showSkeleton || (displayData.length > 0 && !!displayTitle)) && (
-        <div
-          onClick={!showSkeleton && isOngoing ? handleOptionsClick : undefined}
-          className={!showSkeleton && isOngoing ? "cursor-pointer" : ""}
-        >
-          <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
-            {showSkeleton ? t("eventInfo.topReply", "Top Reply") : displayTitle}
-          </h2>
-          <div className="space-y-2">
-            {showSkeleton
-              ? [...Array(skeletonCount)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="border-border bg-surface h-14 w-full animate-pulse rounded-lg border"
-                  />
-                ))
-              : displayData.map((reply, index) => (
-                  <TopReplyBar key={reply.id || index} reply={reply} />
-                ))}
+      {/* When locked (non-public) + open: hide entirely. When locked + single_choice: show names only. */}
+      {!(isLocked && event.result_visibility !== "public" && event.event_type === "open") &&
+        (showSkeleton || (displayData.length > 0 && !!displayTitle)) && (
+          <div
+            onClick={!showSkeleton && isOngoing ? handleOptionsClick : undefined}
+            className={!showSkeleton && isOngoing ? "cursor-pointer" : ""}
+          >
+            <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
+              {showSkeleton
+                ? t("eventInfo.topReply", "Top Reply")
+                : displayTitle}
+            </h2>
+            <div className="space-y-2">
+              {showSkeleton
+                ? [...Array(skeletonCount)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="border-border bg-surface h-14 w-full animate-pulse rounded-lg border"
+                    />
+                  ))
+                : displayData.map((reply, index) =>
+                    isLocked && event.result_visibility !== "public" ? (
+                      <div
+                        key={reply.id || index}
+                        className="border-border bg-bg flex h-14 w-full items-center rounded-lg border px-4"
+                      >
+                        <span className="text-primary line-clamp-1 flex-1 text-sm md:text-base">
+                          {reply.body}
+                        </span>
+                      </div>
+                    ) : (
+                      <TopReplyBar key={reply.id || index} reply={reply} />
+                    ),
+                  )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
       {/* Desktop: Two Column Layout */}
       <div className="hidden grid-cols-2 gap-4 md:grid md:gap-6">

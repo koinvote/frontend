@@ -237,6 +237,7 @@ const EventDetail = () => {
           event={eventDetail}
           topReplies={displayTopReplies}
           isTopRepliesLoading={isTopRepliesEnabled && isTopRepliesLoading}
+          isLocked={isRepliesLocked}
         />
         {/* Divider */}
         <div className="my-6 md:my-8">
