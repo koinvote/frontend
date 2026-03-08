@@ -331,7 +331,7 @@ export const mockEventDetail: EventDetailDataRes = {
   ],
   hashtags: ["bitcoin", "lightning", "scaling"],
   preheat_hours: 12,
-  result_visibility: "paid_only",
+  result_visibility: "creator_only",
   unlock_price_satoshi: 5000,
   unlock_count: 128,
 };

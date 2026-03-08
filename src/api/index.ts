@@ -6,6 +6,7 @@ import type {
   ContactUsReq,
   CreateEventReq,
   CreateWithdrawalReq,
+  GenerateChangeVisibilityPlaintextReq,
   GenerateReplyPlaintextReq,
   GetWithdrawalRecordReq,
   GetEventListReq,
@@ -13,6 +14,7 @@ import type {
   SubmitReplyReq,
   SubscribeReq,
   UnlockEventReq,
+  UpdateResultVisibilityReq,
   UpdateSystemParametersReq,
   VerifySignatureReq,
 } from "./request.ts";
@@ -23,6 +25,7 @@ import type {
   DepositStatusRes,
   EventDataRes,
   EventDetailDataRes,
+  GenerateChangeVisibilityPlaintextRes,
   GetCompletedTopRepliesRes,
   GetEventListRes,
   GetHotHashtagsRes,
@@ -205,6 +208,19 @@ export const API = {
   extendUnlockDepositTimeout: (unlockId: string) =>
     get<ApiResponse<UnlockDepositStatusRes>, void>(
       `/events/unlock/${unlockId}/deposit-extend`,
+    ),
+
+  // Generate plaintext for changing result visibility
+  generateChangeVisibilityPlaintext: (eventId: string) =>
+    post<
+      ApiResponse<GenerateChangeVisibilityPlaintextRes>,
+      GenerateChangeVisibilityPlaintextReq
+    >(`/events/${eventId}/result-visibility/generate-plaintext`),
+
+  // Update result visibility
+  updateResultVisibility: (eventId: string) =>
+    post<ApiResponse<void>, UpdateResultVisibilityReq>(
+      `/events/${eventId}/result-visibility`,
     ),
 };
 

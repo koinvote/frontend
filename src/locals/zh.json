@@ -550,6 +550,50 @@
     "addresses": "地址",
     "unlockPrice": "解鎖價格"
   },
+  "creatorSign": {
+    "subtitle": "使用您的創建者地址簽名以套用此變更",
+    "eventLabel": "活動",
+    "creatorAddressLabel": "創建者地址（唯讀）",
+    "step2Title": "生成明文",
+    "step3Title": "輸入簽名",
+    "generateBtn": "生成明文",
+    "generating": "生成中...",
+    "plaintextGenerated": "明文已生成",
+    "plaintextCopied": "明文已複製",
+    "failedToGenerate": "生成明文失敗",
+    "failedToCopy": "複製失敗",
+    "signatureLabel": "簽名",
+    "signaturePlaceholder": "在此貼上由您的 BTC 錢包為明文生成的簽名...",
+    "backToEvent": "返回活動",
+    "confirmAndSign": "確認並簽名",
+    "applying": "套用中...",
+    "priceMin": "解鎖費用必須大於 0。",
+    "priceMax": "解鎖費用必須小於 1,000,000 BTC。",
+    "errorGeneratePlaintext": "請先生成明文。",
+    "errorEnterSignature": "請輸入您的簽名。"
+  },
+  "changeVisibility": {
+    "title": "變更結果可見性",
+    "step1Title": "選擇結果可見性",
+    "unlockPriceLabel": "解鎖費用 (BTC)",
+    "confirmTitle": "確認不可逆的變更",
+    "confirmDescription": "您即將變更此活動的結果可見性。",
+    "resultVisibility": "結果可見性",
+    "irreversibleWarning": "此變更不可逆。",
+    "confirmAndApply": "確認並套用",
+    "successToast": "結果可見性已更新！",
+    "failedToUpdate": "更新可見性失敗",
+    "errorSelectVisibility": "請選擇結果可見性。"
+  },
+  "changeUnlockPrice": {
+    "title": "變更解鎖費用",
+    "currentPriceLabel": "目前解鎖費用",
+    "step1Title": "輸入新解鎖費用",
+    "newPriceLabel": "新解鎖費用 (BTC)",
+    "successToast": "解鎖費用已更新！",
+    "failedToUpdate": "更新解鎖費用失敗",
+    "errorEnterPrice": "請輸入有效的解鎖費用。"
+  },
   "replyList": {
     "searchPlaceholder": "搜尋比特幣地址或回覆內容",
     "copiedToClipboard": "{{label}}已複製到剪貼簿",
@@ -620,7 +664,8 @@
     "rewardDistribution": "獎勵分配條款",
     "privacyPolicy": "隱私權政策",
     "and": "和",
-    "chargesRefunds": "費用與退款"
+    "chargesRefunds": "費用與退款",
+    "change": "變更"
   },
   "homeToolbar": {
     "sortTime": "時間",

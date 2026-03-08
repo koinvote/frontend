@@ -41,6 +41,8 @@ const EventDetail = () => {
   >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [isRepliesLocked, setIsRepliesLocked] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
+  const [creatorEmail, setCreatorEmail] = useState(initialUnlockEmail ?? "");
 
   const {
     data: eventDetail,
@@ -242,6 +244,8 @@ const EventDetail = () => {
           topReplies={displayTopReplies}
           isTopRepliesLoading={isTopRepliesEnabled && isTopRepliesLoading}
           isLocked={isRepliesLocked}
+          isCreator={isCreator}
+          creatorEmail={creatorEmail}
         />
         {/* Divider */}
         <div className="my-6 md:my-8">
@@ -292,6 +296,10 @@ const EventDetail = () => {
           totalStakeSatoshi={eventDetail.total_stake_satoshi}
           eventTitle={eventDetail.title}
           onLockedChange={setIsRepliesLocked}
+          onCreatorChange={(creator, email) => {
+            setIsCreator(creator);
+            if (creator && email) setCreatorEmail(email);
+          }}
         />
       </div>
     </div>

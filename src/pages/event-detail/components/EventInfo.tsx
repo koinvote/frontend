@@ -1,4 +1,5 @@
 import { useToast } from "@/components/base/Toast/useToast";
+import { Button } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -25,6 +26,8 @@ interface EventInfoProps {
   topReplies?: TopReply[];
   isTopRepliesLoading?: boolean;
   isLocked?: boolean;
+  isCreator?: boolean;
+  creatorEmail?: string;
 }
 
 export function EventInfo({
@@ -32,6 +35,8 @@ export function EventInfo({
   topReplies,
   isTopRepliesLoading,
   isLocked,
+  isCreator,
+  creatorEmail,
 }: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -464,17 +469,41 @@ export function EventInfo({
     });
 
     if (event.result_visibility) {
+      const showChangeButton =
+        isCreator && event.result_visibility !== "public";
       result.push({
         key: "result-visibility",
         label: t("eventInfo.resultVisibility", "Result visibility:"),
         value: (
-          <span className="text-xs md:text-sm">
-            {event.result_visibility === "public"
-              ? t("reply.resultVisibilityPublic", "Public")
-              : event.result_visibility === "paid_only"
-                ? t("reply.resultVisibilityPaidOnly", "Paid-only")
-                : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs md:text-sm">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+            </span>
+            {showChangeButton && (
+              <Button
+                type="default"
+                className="h-6! px-2!"
+                autoInsertSpace={false}
+                onClick={() =>
+                  navigate(
+                    `/event/${event.event_id}/change-result-visibility`,
+                    {
+                      state: {
+                        creatorEmail,
+                        currentVisibility: event.result_visibility,
+                      },
+                    },
+                  )
+                }
+              >
+                {t("common.change", "Change")}
+              </Button>
+            )}
+          </div>
         ),
       });
     }

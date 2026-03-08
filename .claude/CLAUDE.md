@@ -106,6 +106,7 @@ src/
   // ❌ Wrong - never omit fallback
   t("createEvent.alertTitleRequired")
   ```
+- **IMPORTANT**: Reuse existing i18n keys whenever the wording is identical — don't duplicate strings across namespaces. Before adding a new key, check `common.*` and other relevant namespaces for an existing match. If the same wording is needed in multiple places, extract it to a shared namespace (e.g., `common`, `creatorSign`) rather than duplicating it. Example: `common.change` is used for "Change" buttons across pages; `creatorSign.*` holds shared strings for the creator signing flow.
 
 #### Toast Notifications
 - Custom toast system in `src/components/base/Toast/`

@@ -350,3 +350,7 @@ export interface UnlockDepositStatusRes {
   first_seen_at: string | null;
   confirmed_at: string | null;
 }
+
+export interface GenerateChangeVisibilityPlaintextRes {
+  plaintext: string;
+}

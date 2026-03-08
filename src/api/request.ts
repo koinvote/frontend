@@ -103,3 +103,17 @@ export interface GetWithdrawalRecordReq {
 export interface UnlockEventReq {
   email: string;
 }
+
+export interface GenerateChangeVisibilityPlaintextReq {
+  email: string;
+  result_visibility: "paid_only" | "public";
+  unlock_price_satoshi?: number; // required when result_visibility is "paid_only"
+}
+
+export interface UpdateResultVisibilityReq {
+  email: string;
+  result_visibility: "paid_only" | "public";
+  unlock_price_satoshi?: number; // required when result_visibility is "paid_only"
+  plaintext: string;
+  signature: string;
+}
