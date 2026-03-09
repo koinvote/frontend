@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Input, Modal } from "antd";
+import { Button, Input, Modal, Divider } from "antd";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -275,6 +275,8 @@ export default function Support() {
             )}
           </div>
         </div>
+
+        <Divider/>
 
         {/* Buttons */}
         <div className="mt-2 flex justify-end gap-3">
