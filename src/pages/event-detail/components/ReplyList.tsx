@@ -502,7 +502,7 @@ function ReplyItem({
                     triggerNode.parentElement || document.body
                   }
                 >
-                  <span className="text-xs text-green-500" {...triggerProps}>
+                  <span className="text-success text-xs" {...triggerProps}>
                     <ReplyValidateIcon className="h-4 w-4 text-current" />
                   </span>
                 </Tooltip>
