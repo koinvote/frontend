@@ -509,7 +509,7 @@ export default function UnlockPayment() {
                 autoCapitalize="off"
                 autoComplete="one-time-code"
                 spellCheck={false}
-                className="border-border bg-surface text-primary tx-14 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-(--color-orange-500)"
+                className="border-border bg-form-bg text-primary tx-14 w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 dark:placeholder:text-neutral-600 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none"
               />
               {confirmTouched && !emailMatches && (
                 <p className="tx-12 lh-18 text-red-500">

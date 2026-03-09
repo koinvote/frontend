@@ -30,6 +30,7 @@
   --color-accent: var(--color-orange-500);
   --color-primary-lightModeGray: var(--color-gray-50);
   --color-warning: #f2a000;
+  --color-success: #67c23a;
 
   /* admin color tokens */
   --color-admin-bg: #f3f3f5; /* 外層灰底 */
