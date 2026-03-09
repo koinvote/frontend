@@ -8,6 +8,7 @@ import type {
   CreateWithdrawalReq,
   GenerateChangeVisibilityPlaintextReq,
   GenerateReplyPlaintextReq,
+  GenerateUnlockPricePlaintextReq,
   GetWithdrawalRecordReq,
   GetEventListReq,
   GetListRepliesReq,
@@ -16,6 +17,7 @@ import type {
   UnlockEventReq,
   UpdateResultVisibilityReq,
   UpdateSystemParametersReq,
+  UpdateUnlockPriceReq,
   VerifySignatureReq,
 } from "./request.ts";
 
@@ -26,6 +28,7 @@ import type {
   EventDataRes,
   EventDetailDataRes,
   GenerateChangeVisibilityPlaintextRes,
+  GenerateUnlockPricePlaintextRes,
   GetCompletedTopRepliesRes,
   GetEventListRes,
   GetHotHashtagsRes,
@@ -221,6 +224,19 @@ export const API = {
   updateResultVisibility: (eventId: string) =>
     post<ApiResponse<void>, UpdateResultVisibilityReq>(
       `/events/${eventId}/result-visibility`,
+    ),
+
+  // Generate plaintext for changing unlock price
+  generateUnlockPricePlaintext: (eventId: string) =>
+    post<
+      ApiResponse<GenerateUnlockPricePlaintextRes>,
+      GenerateUnlockPricePlaintextReq
+    >(`/events/${eventId}/unlock-price/generate-plaintext`),
+
+  // Update unlock price
+  updateUnlockPrice: (eventId: string) =>
+    post<ApiResponse<void>, UpdateUnlockPriceReq>(
+      `/events/${eventId}/unlock-price`,
     ),
 };
 

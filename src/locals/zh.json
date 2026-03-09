@@ -587,7 +587,7 @@
   },
   "changeUnlockPrice": {
     "title": "變更解鎖費用",
-    "currentPriceLabel": "目前解鎖費用",
+    "currentPriceLabel": "目前費用：",
     "step1Title": "輸入新解鎖費用",
     "newPriceLabel": "新解鎖費用 (BTC)",
     "successToast": "解鎖費用已更新！",

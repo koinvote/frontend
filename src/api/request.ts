@@ -117,3 +117,15 @@ export interface UpdateResultVisibilityReq {
   plaintext: string;
   signature: string;
 }
+
+export interface GenerateUnlockPricePlaintextReq {
+  email: string;
+  unlock_price_satoshi: number;
+}
+
+export interface UpdateUnlockPriceReq {
+  email: string;
+  unlock_price_satoshi: number;
+  plaintext: string;
+  signature: string;
+}

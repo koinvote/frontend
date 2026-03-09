@@ -354,3 +354,5 @@ export interface UnlockDepositStatusRes {
 export interface GenerateChangeVisibilityPlaintextRes {
   plaintext: string;
 }
+
+export type GenerateUnlockPricePlaintextRes = GenerateChangeVisibilityPlaintextRes;

@@ -584,9 +584,9 @@
   },
   "changeUnlockPrice": {
     "title": "Change Unlock Price",
-    "currentPriceLabel": "Current unlock price",
-    "step1Title": "Enter New Unlock Price",
-    "newPriceLabel": "New Unlock Price (BTC)",
+    "currentPriceLabel": "Current: ",
+    "step1Title": "Enter new price",
+    "newPriceLabel": "New price (BTC)",
     "successToast": "Unlock price updated!",
     "failedToUpdate": "Failed to update unlock price",
     "errorEnterPrice": "Please enter a valid unlock price."

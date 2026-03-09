@@ -990,6 +990,47 @@ export const handlers = [
     },
   ),
 
+  // POST /events/:eventId/unlock-price/generate-plaintext
+  http.post(
+    `${API_BASE_URL}/events/:eventId/unlock-price/generate-plaintext`,
+    async ({ params, request }) => {
+      const { eventId } = params as { eventId: string };
+      const body = (await request.json()) as {
+        email: string;
+        unlock_price_satoshi: number;
+      };
+      const timestamp = Math.floor(Date.now() / 1000);
+      const randomCode = Math.random().toString(36).slice(2, 12);
+      const priceBtc = body.unlock_price_satoshi / 1e8;
+      const plaintext = `koinvote.com | event_id:${eventId} | action:update_unlock_price | unlock_price_satoshi:${body.unlock_price_satoshi} | price_btc:${priceBtc} | ts:${timestamp} | nonce:${randomCode}`;
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: { plaintext },
+      });
+    },
+  ),
+
+  // POST /events/:eventId/unlock-price
+  http.post(
+    `${API_BASE_URL}/events/:eventId/unlock-price`,
+    async ({ params, request }) => {
+      const { eventId } = params;
+      const body = (await request.json()) as {
+        email: string;
+        unlock_price_satoshi: number;
+      };
+      console.log("[Mock] Update unlock price:", eventId, body);
+      return HttpResponse.json<ApiResponse<null>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: null,
+      });
+    },
+  ),
+
   // GET /events/unlock/:unlockId/deposit-extend
   http.get(
     `${API_BASE_URL}/events/unlock/:unlockId/deposit-extend`,
