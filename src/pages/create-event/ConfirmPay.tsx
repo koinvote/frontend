@@ -507,7 +507,7 @@ export default function ConfirmPay() {
       <div className="relative h-[50px] w-full max-w-3xl">
         <BackButton onClick={() => navigate(-1)} />
       </div>
-      <div className="border-gray-450 bg-bg relative w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+      <div className="border-border bg-bg relative w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         {isUnconfirmed && showExtendButton && (
           <Button
             name="extendButton"

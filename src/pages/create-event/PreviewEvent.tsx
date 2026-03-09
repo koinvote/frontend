@@ -421,7 +421,7 @@ export default function PreviewEvent() {
         <div className="relative h-[50px] w-full max-w-3xl">
           <BackButton onClick={() => navigate(-1)} />
         </div>
-        <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+        <div className="border-border bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
           <p className="tx-14 lh-20 text-primary">
             {t(
               "preview.noEventData",
@@ -449,7 +449,7 @@ export default function PreviewEvent() {
         <BackButton onClick={() => navigate(-1)} />
       </div>
 
-      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
+      <div className="border-border bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           {t("preview.title", "Preview Your Event")}
         </h1>

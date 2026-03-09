@@ -234,7 +234,7 @@ const EventDetail = () => {
       <div className="relative h-[50px] w-full max-w-3xl">
         <BackButton onClick={goBack} />
       </div>
-      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
+      <div className="border-border bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* First Section: Event Info */}
         <EventInfo
           event={eventDetail}

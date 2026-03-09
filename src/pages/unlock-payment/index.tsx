@@ -315,7 +315,7 @@ export default function UnlockPayment() {
         <BackButton onClick={() => navigate(-1)} />
       </div>
 
-      <div className="border-gray-450 bg-bg relative w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
+      <div className="border-border bg-bg relative w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
         {/* Extend 30m button (top right, only when UNCONFIRMED + <30min) */}
         {paymentInitiated && isUnconfirmed && showExtendButton && (
           <Button
