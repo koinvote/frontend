@@ -172,7 +172,7 @@ export function ResultVisibilityField() {
                   : "border-border focus:ring-(--color-orange-500)",
               )}
             />
-            <p className="tx-12 lh-18 text-secondary mt-1">
+            <p className="tx-12 lh-18 text-secondary mt-2">
               {t(
                 "createEvent.creatorEmailHint",
                 "This email will be used by you to unlock this event's results.",

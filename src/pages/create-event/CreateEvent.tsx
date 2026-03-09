@@ -291,10 +291,15 @@ export default function CreateEvent() {
           .filter(Boolean),
       );
 
-      // Trigger validation after React re-renders with the restored values so
-      // that child-component refs (minRewardBtcRef, etc.) are up to date.
+      // Only re-validate fields that have restored values so that
+      // child-component refs (minRewardBtcRef, etc.) are up to date,
+      // without showing errors on empty required fields.
       requestAnimationFrame(() => {
-        trigger();
+        const toTrigger: (keyof CreateEventFormValues)[] = [];
+        if (draft.rewardBtc) toTrigger.push("rewardBtc");
+        if (draft.unlockPriceBtc) toTrigger.push("unlockPriceBtc");
+        if (draft.preheatHours) toTrigger.push("preheatHours");
+        if (toTrigger.length) trigger(toTrigger);
       });
 
       highlightLastField();
@@ -569,7 +574,6 @@ export default function CreateEvent() {
               setHashtagInput={setHashtagInput}
               setLastField={setLastField}
             />
-            <DurationField />
 
             <ResponseTypeField />
             <OptionsField
@@ -579,6 +583,7 @@ export default function CreateEvent() {
               validateOptions={validateOptions}
             />
             <RewardTypeField />
+            <DurationField />
             <RewardBtcField setLastField={setLastField} />
             <ResultVisibilityField />
             <PreheatField />

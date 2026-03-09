@@ -166,7 +166,7 @@ export function HashtagField({
         />
       </div>
 
-      <span className={cn("lh-18 mt-1 block text-xs", "text-secondary")}>
+      <span className={cn("lh-18 mt-2 block text-xs", "text-secondary")}>
         {hashtagList.length >= MAX_TAGS
           ? t("createEvent.maxHashtags", "Max 3 hashtags")
           : `${hashtagCharsLeft} ${t("createEvent.characterLeft", "characters left")}`}

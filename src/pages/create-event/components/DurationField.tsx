@@ -89,7 +89,7 @@ export function DurationField() {
           {errors.durationHours.message}
         </p>
       )}
-      <div className="text-secondary mt-1 text-xs">
+      <div className="text-secondary mt-2 text-xs">
         {t("createEvent.enterHoursHint", "Min. 1 hour")}
       </div>
     </div>
