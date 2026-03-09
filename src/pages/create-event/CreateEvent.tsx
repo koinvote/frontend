@@ -569,7 +569,6 @@ export default function CreateEvent() {
               setHashtagInput={setHashtagInput}
               setLastField={setLastField}
             />
-            <DurationField />
 
             <ResponseTypeField />
             <OptionsField
@@ -579,6 +578,7 @@ export default function CreateEvent() {
               validateOptions={validateOptions}
             />
             <RewardTypeField />
+            <DurationField />
             <RewardBtcField setLastField={setLastField} />
             <ResultVisibilityField />
             <PreheatField />

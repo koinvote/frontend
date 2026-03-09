@@ -188,7 +188,7 @@ export function PreheatField() {
             {errors.preheatHours.message}
           </p>
         )}
-        <div className="text-secondary mt-1 text-xs">
+        <div className="text-secondary mt-2 text-xs">
           {t(
             "createEvent.enterPreheatHoursHint",
             "Min. 1 hour, Max. 720 hours",

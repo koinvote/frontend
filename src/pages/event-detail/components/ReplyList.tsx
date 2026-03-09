@@ -245,7 +245,7 @@ export function ReplyList({
   if (isLocked) {
     const totalBtc = satsToBtc(totalStakeSatoshi ?? null, { suffix: false });
     return (
-      <div className="border-border bg-surface flex flex-col items-center rounded-xl border px-6 py-10 text-center">
+      <div className="border-border flex flex-col items-center rounded-xl border px-6 py-10 text-center">
         <div className="bg-surface-hover mb-4 flex h-14 w-14 items-center justify-center rounded-full">
           <UnlockIcon className="h-7 w-7" />
         </div>
@@ -311,7 +311,7 @@ export function ReplyList({
               "replyList.unlockEmailPlaceholder",
               "your@email.com",
             )}
-            className="border-border bg-bg text-primary tx-14 py-2outline-none w-full rounded-lg border px-3 py-2 outline-0 focus:ring-2 focus:ring-(--color-orange-500)"
+            className="border-border bg-surface text-primary tx-14 py-2outline-none w-full rounded-lg border px-3 py-2 outline-0 focus:ring-2 focus:ring-(--color-orange-500)"
           />
           {emailTouched && unlockEmail && !isUnlockEmailValid ? (
             <p className="tx-12 lh-18 text-left text-red-500">

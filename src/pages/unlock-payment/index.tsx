@@ -138,7 +138,10 @@ export default function UnlockPayment() {
             "Payment confirmed! You can now view the results.",
           ),
         );
-        navigate(`/event/${eventId}`, { state: { unlockEmail: email, fromUnlock: true }, replace: true });
+        navigate(`/event/${eventId}`, {
+          state: { unlockEmail: email, fromUnlock: true },
+          replace: true,
+        });
       }
     } catch (error) {
       console.error("Error checking unlock deposit status:", error);
@@ -506,7 +509,7 @@ export default function UnlockPayment() {
                 autoCapitalize="off"
                 autoComplete="one-time-code"
                 spellCheck={false}
-                className="border-border bg-bg text-primary tx-14 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-(--color-orange-500)"
+                className="border-border bg-surface text-primary tx-14 w-full rounded-lg border px-3 py-2 outline-none focus:ring-2 focus:ring-(--color-orange-500)"
               />
               {confirmTouched && !emailMatches && (
                 <p className="tx-12 lh-18 text-red-500">
