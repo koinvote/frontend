@@ -340,14 +340,10 @@ export function EventInfo({
     result.push({
       key: "time-remaining",
       label: t("eventInfo.timeRemaining", "Time Remaining:"),
-      value: isCompleted ? (
-        <div className="text-xs font-semibold text-black md:text-sm dark:text-white">
+      value: (
+        <div className="text-primary text-xs font-semibold md:text-sm">
           {timeRemaining}
         </div>
-      ) : (
-        <span className="text-accent text-xs font-semibold md:text-sm">
-          {timeRemaining}
-        </span>
       ),
     });
 
@@ -357,7 +353,10 @@ export function EventInfo({
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
           <span className="text-primary text-xs font-semibold md:text-sm">
-            {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
+            <span className="text-accent mr-2">
+              {Number(rewardAmountBtc)} BTC
+            </span>
+            ({event.winner_count}{" "}
             {event.winner_count === 1
               ? t("eventInfo.address", "Address")
               : t("eventInfo.addresses", "Addresses")}
