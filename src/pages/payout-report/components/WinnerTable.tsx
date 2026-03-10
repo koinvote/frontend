@@ -79,17 +79,17 @@ export function WinnerTable({
   };
 
   return (
-    <div className="rounded-xl border border-neutral-800 overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-neutral-800">
       {/* 定義捲軸顏色 */}
       <div
-        className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-neutral-500"
+        className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb:hover]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent"
         onScroll={handleScroll}
       >
-        <table className="w-full text-sm min-w-[800px]">
+        <table className="w-full min-w-[800px] text-sm">
           <thead>
             <tr className="border-b border-neutral-800">
               <th
-                className={`sticky left-0 bg-white dark:bg-black text-left py-3 px-2 text-xs font-medium z-10 transition-shadow ${
+                className={`sticky left-0 z-10 bg-white px-2 py-3 text-left text-xs font-medium transition-shadow dark:bg-black ${
                   isScrolled
                     ? "shadow-[inset_-4px_0_4px_-4px_rgba(0,0,0,0.3)] dark:shadow-[inset_-4px_0_4px_-4px_rgba(255,255,255,0.3)]"
                     : ""
@@ -97,22 +97,22 @@ export function WinnerTable({
               >
                 {t("payoutReport.address", "Address")}
               </th>
-              <th className="text-right py-3 px-2 text-xs font-medium whitespace-nowrap">
+              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.snapshotBalance", "Snapshot Balance")}
               </th>
-              <th className="text-right py-3 px-2 text-xs font-medium whitespace-nowrap">
+              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.oddsOfWinning", "Odds of winning")}
               </th>
-              <th className="text-right py-3 px-2 text-xs font-medium whitespace-nowrap">
+              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.distributableRatio", "Distributable")}
               </th>
-              <th className="text-right py-3 px-2 text-xs font-medium whitespace-nowrap">
+              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.estimatedReward", "Estimated reward")}
               </th>
-              <th className="text-right py-3 px-2 text-xs font-medium whitespace-nowrap">
+              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.paidSats", "Paid (Sats)")}
               </th>
-              <th className="text-center py-3 px-2 text-xs font-medium whitespace-nowrap">
+              <th className="px-2 py-3 text-center text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.state", "State")}
               </th>
             </tr>
@@ -121,46 +121,46 @@ export function WinnerTable({
             {displayedWinners.map((winner, index) => (
               <tr
                 key={index}
-                className="group hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-neutral-800 last:border-0"
+                className="group border-b border-neutral-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 <td
-                  className={`sticky left-0 bg-white dark:bg-black group-hover:bg-gray-50 dark:group-hover:bg-gray-800 py-3 px-2 z-10 transition-shadow ${
+                  className={`sticky left-0 z-10 bg-white px-2 py-3 transition-shadow group-hover:bg-gray-50 dark:bg-black dark:group-hover:bg-gray-800 ${
                     isScrolled
                       ? "shadow-[inset_-4px_0_4px_-4px_rgba(0,0,0,0.3)] dark:shadow-[inset_-4px_0_4px_-4px_rgba(255,255,255,0.3)]"
                       : ""
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-gray-500 dark:text-primary">
+                    <span className="dark:text-primary font-mono text-xs text-gray-500">
                       {truncateAddress(winner.winner_address)}
                     </span>
                     <button
                       onClick={() => handleCopyAddress(winner.winner_address)}
-                      className="shrink-0 text-secondary hover:text-primary transition-colors cursor-pointer"
+                      className="text-secondary hover:text-primary shrink-0 cursor-pointer transition-colors"
                     >
-                      <CopyIcon className="w-4 h-4" />
+                      <CopyIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </td>
-                <td className="py-3 px-2 text-right text-xs text-gray-500 dark:text-primary whitespace-nowrap">
+                <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
                   {satsToBtc(winner.balance_at_snapshot_satoshi)}
                 </td>
-                <td className="py-3 px-2 text-right text-xs text-gray-500 dark:text-primary whitespace-nowrap">
+                <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
                   {winner.win_probability_percent.toFixed(4)}%
                 </td>
-                <td className="py-3 px-2 text-right text-xs text-gray-500 dark:text-primary whitespace-nowrap">
+                <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
                   {winner.distributable_rate.toFixed(4)}%
                 </td>
-                <td className="py-3 px-2 text-right text-xs font-bold text-gray-500 dark:text-primary whitespace-nowrap">
+                <td className="dark:text-primary px-2 py-3 text-right text-xs font-bold whitespace-nowrap text-gray-500">
                   {winner.original_reward_satoshi.toLocaleString()} sats
                 </td>
-                <td className="py-3 px-2 text-right text-xs font-bold text-gray-500 dark:text-primary whitespace-nowrap">
+                <td className="dark:text-primary px-2 py-3 text-right text-xs font-bold whitespace-nowrap text-gray-500">
                   {winner.final_reward_satoshi.toLocaleString()} sats
                 </td>
-                <td className="py-3 px-4 text-center">
+                <td className="px-4 py-3 text-center">
                   <span className="inline-flex items-center gap-1">
                     <span
-                      className={`inline-block px-3 py-1 rounded-full text-xs whitespace-nowrap ${getStatusBadgeColor(
+                      className={`inline-block rounded-full px-3 py-1 text-xs whitespace-nowrap ${getStatusBadgeColor(
                         winner.status,
                       )} ${winner.status === "redistribute" ? "ml-4" : ""}`}
                     >
@@ -180,7 +180,7 @@ export function WinnerTable({
                           },
                         )}
                       >
-                        <InfoCircleOutlined className="text-gray-400 dark:text-primary cursor-pointer" />
+                        <InfoCircleOutlined className="dark:text-primary cursor-pointer text-gray-400" />
                       </Tooltip>
                     )}
                   </span>
