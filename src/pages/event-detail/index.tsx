@@ -79,7 +79,8 @@ const EventDetail = () => {
   // This ensures the top-replies query fires immediately when eventDetail loads,
   // preventing the stale 2-item preview from briefly showing.
   const effectiveBalanceDisplayMode =
-    eventDetail?.status === EventStatus.ACTIVE
+    eventDetail?.status === EventStatus.ACTIVE ||
+    eventDetail?.status === EventStatus.ENDED
       ? "on_chain"
       : balanceDisplayMode;
 
