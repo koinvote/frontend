@@ -24,15 +24,16 @@ const API_BASE_URL = "/api/v1";
 // ============ 調整這裡控制狀態變化時間（分鐘）============
 // PENDING_TIME: 幾分鐘後變成 UNCONFIRMED
 // CONFIRM_TIME: 幾分鐘後變成 RECEIVED
-const PENDING_TIME = 0.5; // 0.5 分鐘 = 30 秒
-const CONFIRM_TIME = 1; // 1 分鐘
+const PENDING_TIME = 0.1; // 0.5 分鐘 = 30 秒
+const CONFIRM_TIME = 10; // 1 分鐘
 // ========================================================
 
-// Track deposit status timing
+// Track deposit status timing (reset per eventId to simulate fresh sessions)
+let DEPOSIT_EVENT_ID: string | null = null;
 let DEPOSIT_START_TIME: number | null = null;
-let DEPOSIT_PENDING_TIMEOUT_AT: string | null = null; // 初始 PENDING 的到期時間
+let DEPOSIT_PENDING_TIMEOUT_AT: string | null = null; // 初始 PENDING 的到期時間（15 分鐘）
 let DEPOSIT_FIRST_SEEN_AT: string | null = null;
-let DEPOSIT_TIMEOUT_AT: string | null = null;
+let DEPOSIT_TIMEOUT_AT: string | null = null; // 偵測到 UNCONFIRMED 後的到期時間（+45 分鐘）
 
 // Track unlock deposit status timing (separate from event deposit)
 let UNLOCK_START_TIME: number | null = null;
@@ -246,10 +247,18 @@ export const handlers = [
     const { eventId } = params;
     const now = Date.now();
 
-    // Initialize start time and pending timeout on first call
+    // Reset timing state when a new eventId is detected (new payment session)
+    if (eventId !== DEPOSIT_EVENT_ID) {
+      DEPOSIT_EVENT_ID = eventId as string;
+      DEPOSIT_START_TIME = null;
+      DEPOSIT_PENDING_TIMEOUT_AT = null;
+      DEPOSIT_FIRST_SEEN_AT = null;
+      DEPOSIT_TIMEOUT_AT = null;
+    }
+
+    // Initialize on first call: set start time and 15-min PENDING timeout
     if (!DEPOSIT_START_TIME) {
       DEPOSIT_START_TIME = now;
-      // Set initial 15 min timeout for PENDING status
       DEPOSIT_PENDING_TIMEOUT_AT = new Date(now + 15 * 60 * 1000).toISOString();
     }
 
@@ -266,18 +275,14 @@ export const handlers = [
       status = DepositStatus.RECEIVED;
     }
 
-    // When transitioning to UNCONFIRMED, set first_seen_at and timeout (+45 min)
+    // When transitioning to UNCONFIRMED, record first_seen_at and set 45-min timeout
     if (status === DepositStatus.UNCONFIRMED && !DEPOSIT_FIRST_SEEN_AT) {
       DEPOSIT_FIRST_SEEN_AT = new Date(
         DEPOSIT_START_TIME + PENDING_TIME * 60 * 1000,
       ).toISOString();
-      DEPOSIT_TIMEOUT_AT = new Date(
-        DEPOSIT_START_TIME + PENDING_TIME * 60 * 1000 + 45 * 60 * 1000,
-      ).toISOString();
+      DEPOSIT_TIMEOUT_AT = new Date(now + 45 * 60 * 1000).toISOString();
     }
 
-    // For PENDING status, use stored pending timeout
-    // For UNCONFIRMED/RECEIVED, use the stored timeout
     const depositTimeoutAt =
       status === DepositStatus.PENDING
         ? DEPOSIT_PENDING_TIMEOUT_AT!

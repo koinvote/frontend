@@ -91,7 +91,6 @@ export default function ConfirmPay() {
   // });
   const [countdownDisplay, setCountdownDisplay] = useState<string>("00:00");
   const [isExtending, setIsExtending] = useState(false);
-  const [showExtendButton, setShowExtendButton] = useState(false);
   const [canExtend, setCanExtend] = useState(false);
   const isCheckingStatusRef = useRef(false);
   const statusCheckIntervalRef = useRef<number | null>(null);
@@ -159,6 +158,15 @@ export default function ConfirmPay() {
       }
 
       const statusData = response.data;
+      // Batch with canExtend to prevent flash: if new timeout > threshold, disable immediately
+      if (statusData.deposit_timeout_at) {
+        const remaining = dayjs
+          .utc(statusData.deposit_timeout_at)
+          .diff(dayjs(), "minute", true);
+        setCanExtend(
+          remaining > 0 && remaining < CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES,
+        );
+      }
       setDepositStatus(statusData);
 
       // Handle different statuses
@@ -284,10 +292,6 @@ export default function ConfirmPay() {
         remainingMinutes > 0 &&
         remainingMinutes < CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES;
 
-      // Show button once remaining < 30 min (and keep it visible)
-      if (isUnderThreshold) {
-        setShowExtendButton(true);
-      }
       setCanExtend(isUnderThreshold);
 
       // Check if countdown has reached 0
@@ -508,7 +512,7 @@ export default function ConfirmPay() {
         <BackButton onClick={() => navigate(-1)} />
       </div>
       <div className="border-border bg-bg relative w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
-        {isUnconfirmed && showExtendButton && (
+        {isUnconfirmed && (
           <Button
             name="extendButton"
             type="button"
