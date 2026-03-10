@@ -101,9 +101,6 @@ export function WinnerTable({
                 {t("payoutReport.snapshotBalance", "Snapshot Balance")}
               </th>
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
-                {t("payoutReport.oddsOfWinning", "Odds of winning")}
-              </th>
-              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.distributableRatio", "Distributable")}
               </th>
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
@@ -144,9 +141,6 @@ export function WinnerTable({
                 </td>
                 <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
                   {satsToBtc(winner.balance_at_snapshot_satoshi)}
-                </td>
-                <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
-                  {winner.win_probability_percent.toFixed(4)}%
                 </td>
                 <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
                   {winner.distributable_rate.toFixed(4)}%
