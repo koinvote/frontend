@@ -29,6 +29,9 @@ export function useHomeEvents() {
     activeHashtag,
     sortField,
     sortOrder,
+    filterRewardType,
+    filterEventType,
+    filterVisibility,
     events,
     hasMore,
     offset,
@@ -78,6 +81,15 @@ export function useHomeEvents() {
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
         order: sortOrder,
+        ...(filterRewardType.length > 0 && {
+          event_reward_type: filterRewardType,
+        }),
+        ...(filterEventType.length > 0 && {
+          event_type: filterEventType,
+        }),
+        ...(filterVisibility.length > 0 && {
+          result_visibility: filterVisibility,
+        }),
       })) as unknown as ApiResponse<GetEventListRes>;
 
       // Only update events if status hasn't changed since the request was made
@@ -89,7 +101,7 @@ export function useHomeEvents() {
         const transformedEvents = res.data.events.map(
           mapApiEventToEventSummary,
         );
-        const total = res.data.events.length; // Backend doesn't return total, use current page length
+        const total = res.data.events.length;
         const hasMoreData = res.data.events.length === limit;
         const newOffset = transformedEvents.length;
 
@@ -115,6 +127,9 @@ export function useHomeEvents() {
     activeHashtag,
     sortField,
     sortOrder,
+    filterRewardType,
+    filterEventType,
+    filterVisibility,
     limit,
     setEvents,
     setLoading,
@@ -152,6 +167,15 @@ export function useHomeEvents() {
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
         order: sortOrder,
+        ...(filterRewardType.length > 0 && {
+          event_reward_type: filterRewardType,
+        }),
+        ...(filterEventType.length > 0 && {
+          event_type: filterEventType,
+        }),
+        ...(filterVisibility.length > 0 && {
+          result_visibility: filterVisibility,
+        }),
       })) as unknown as ApiResponse<GetEventListRes>;
 
       // Only update events if status hasn't changed since the request was made
@@ -188,6 +212,9 @@ export function useHomeEvents() {
     activeHashtag,
     sortField,
     sortOrder,
+    filterRewardType,
+    filterEventType,
+    filterVisibility,
     offset,
     limit,
     isLoading,

@@ -11,6 +11,7 @@ import {
   type HomeSortOrder,
   type HomeStatusFilter,
 } from "@/pages/create-event/types/index";
+import { FilterButton } from "@/pages/home/component/FilterButton";
 import { useHomeStore } from "@/stores/homeStore";
 
 export function HomeToolbar() {
@@ -170,7 +171,7 @@ export function HomeToolbar() {
           )}
         </div>
 
-        {/* sort */}
+        {/* sort + filter */}
         <div className="flex items-center gap-2 w-full md:w-auto self-start md:self-auto">
           <button
             type="button"
@@ -225,6 +226,7 @@ export function HomeToolbar() {
               </svg>
             </div>
           </div>
+          <FilterButton />
         </div>
       </div>
 

@@ -67,6 +67,9 @@ export const handlers = [
     const tag = url.searchParams.get("tag");
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");
+    const eventRewardType = url.searchParams.getAll("event_reward_type");
+    const eventType = url.searchParams.getAll("event_type");
+    const resultVisibility = url.searchParams.getAll("result_visibility");
 
     // Filter events based on tab (status)
     let filteredEvents = [...mockEventList];
@@ -91,6 +94,27 @@ export const handlers = [
     // Filter by hashtag
     if (tag) {
       filteredEvents = filteredEvents.filter((e) => e.hashtags.includes(tag));
+    }
+
+    // Filter by reward type
+    if (eventRewardType.length > 0) {
+      filteredEvents = filteredEvents.filter((e) =>
+        eventRewardType.includes(e.event_reward_type),
+      );
+    }
+
+    // Filter by event type
+    if (eventType.length > 0) {
+      filteredEvents = filteredEvents.filter((e) =>
+        eventType.includes(e.event_type),
+      );
+    }
+
+    // Filter by result visibility
+    if (resultVisibility.length > 0) {
+      filteredEvents = filteredEvents.filter(
+        (e) => "result_visibility" in e && resultVisibility.includes((e as any).result_visibility),
+      );
     }
 
     // Paginate

@@ -25,6 +25,9 @@ export interface GetEventListReq {
   limit: string;
   sortBy: "time" | "reward" | "participation";
   order: "desc" | "asc";
+  event_reward_type?: string[]; // e.g. ["rewarded", "non_reward"]
+  event_type?: string[];         // e.g. ["single_choice", "open"]
+  result_visibility?: string[];  // e.g. ["public", "paid_only", "creator_only"]
 }
 
 export interface GetListRepliesReq {
