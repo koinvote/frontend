@@ -345,7 +345,10 @@ export function EventInfo({
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
           <span className="text-primary text-xs font-semibold md:text-sm">
-            {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
+            <span className="text-accent mr-2">
+              {Number(rewardAmountBtc)} BTC
+            </span>{" "}
+            ({event.winner_count}{" "}
             {event.winner_count === 1
               ? t("eventInfo.address", "Address")
               : t("eventInfo.addresses", "Addresses")}
@@ -374,14 +377,10 @@ export function EventInfo({
     fields.push({
       key: "time-remaining",
       label: t("eventInfo.timeRemaining", "Time Remaining:"),
-      value: isCompleted ? (
-        <div className="mt-1 text-xs font-semibold text-black md:text-sm dark:text-white">
+      value: (
+        <div className="text-primary mt-1 text-xs font-semibold md:text-sm">
           {timeRemaining}
         </div>
-      ) : (
-        <span className="text-accent text-xs font-semibold md:text-sm">
-          {timeRemaining}
-        </span>
       ),
     });
 
@@ -648,7 +647,10 @@ export function EventInfo({
                 {t("eventInfo.rewardAmount", "Reward Amount:")}
               </span>
               <span className="text-primary ml-2 text-xs font-semibold md:text-sm">
-                {Number(rewardAmountBtc)} BTC ({event.winner_count}{" "}
+                <span className="text-accent">
+                  {Number(rewardAmountBtc)} BTC
+                </span>{" "}
+                ({event.winner_count}{" "}
                 {event.winner_count === 1
                   ? t("eventInfo.address", "Address")
                   : t("eventInfo.addresses", "Addresses")}
@@ -676,15 +678,9 @@ export function EventInfo({
             <span className="text-secondary text-xs md:text-sm">
               {t("eventInfo.timeRemaining", "Time Remaining:")}
             </span>
-            {isCompleted ? (
-              <div className="mt-1 text-xs text-black md:text-sm dark:text-white">
-                {timeRemaining}
-              </div>
-            ) : (
-              <span className="text-accent ml-2 text-xs font-semibold md:text-sm">
-                {timeRemaining}
-              </span>
-            )}
+            <div className="text-primary mt-1 text-xs md:text-sm">
+              {timeRemaining}
+            </div>
           </div>
 
           {/* Show creator address in all states */}
