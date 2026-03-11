@@ -428,7 +428,7 @@ export default function ReplyPage() {
             />
             <EventInfoBox
               label={t("reply.maxRecipients", "Max Recipients")}
-              value={event.max_recipient || "-"}
+              value={event.winner_count || "-"}
               icon={
                 <EventCardParticipantsIcon className="h-3 w-3 text-[#AD46FF]" />
               }
