@@ -1,6 +1,8 @@
+import { Button } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import FilterIcon from "@/assets/icons/filter.svg?react";
 import { useHomeStore } from "@/stores/homeStore";
 
 type FilterDraft = {
@@ -25,9 +27,7 @@ function Checkbox({
     >
       <span
         className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors ${
-          checked
-            ? "border-accent bg-accent"
-            : "border-border bg-surface"
+          checked ? "border-accent bg-accent" : "border-border bg-surface"
         }`}
       >
         {checked && (
@@ -48,7 +48,7 @@ function Checkbox({
           </svg>
         )}
       </span>
-      <span className="text-sm text-primary">{label}</span>
+      <span className="text-primary text-sm">{label}</span>
     </label>
   );
 }
@@ -114,35 +114,27 @@ export function FilterButton() {
   };
 
   return (
-    <div className="relative flex-shrink-0">
+    <div className="relative shrink-0">
       <button
         ref={buttonRef}
         type="button"
         onClick={() => setIsOpen((v) => !v)}
-        className={`flex h-9 items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors ${
+        className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-xl border px-3 text-sm transition-colors ${
           isOpen || activeCount > 0
             ? "border-accent bg-accent text-accent-foreground"
             : "border-border bg-surface text-primary"
         }`}
       >
         {/* Filter icon */}
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 14 14"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="shrink-0"
-        >
-          <path
-            d="M1 2.5h12M3 7h8M5.5 11.5h3"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
+        {activeCount === 0 && (
+          <FilterIcon
+            className={`shrink-0 ${isOpen ? "text-primary" : "text-secondary"}`}
+            width="16"
+            height="16"
           />
-        </svg>
+        )}
         {activeCount > 0 && (
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold leading-none text-accent">
+          <span className="text-accent flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] leading-none font-bold">
             {activeCount}
           </span>
         )}
@@ -153,7 +145,7 @@ export function FilterButton() {
           viewBox="0 0 12 12"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className={`shrink-0 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          className={`shrink-0 transition-transform ${isOpen ? "text-primary rotate-180" : activeCount > 0 ? "text-primary" : "text-secondary"}`}
         >
           <path
             d="M3 4.5L6 7.5L9 4.5"
@@ -168,15 +160,15 @@ export function FilterButton() {
       {isOpen && (
         <div
           ref={panelRef}
-          className="border-border bg-bg absolute right-0 top-11 z-50 w-[360px] max-w-[360px] rounded-2xl border p-5 shadow-lg md:w-[512px] md:max-w-[512px]"
+          className="border-border bg-bg absolute top-11 right-0 z-50 w-[360px] max-w-[360px] rounded-2xl border p-5 shadow-lg md:w-lg md:max-w-lg"
         >
-          <p className="mb-4 text-base font-semibold text-primary">
+          <p className="text-primary mb-4 text-base font-semibold">
             {t("filter.title", "Filters")}
           </p>
 
           {/* Reward type */}
           <div className="mb-4">
-            <p className="mb-2 text-xs text-secondary">
+            <p className="text-secondary mb-2 text-xs">
               {t("filter.rewardType", "Reward type")}
             </p>
             <div className="flex flex-wrap gap-3">
@@ -205,7 +197,7 @@ export function FilterButton() {
 
           {/* Response type */}
           <div className="mb-4">
-            <p className="mb-2 text-xs text-secondary">
+            <p className="text-secondary mb-2 text-xs">
               {t("filter.responseType", "Response type")}
             </p>
             <div className="flex flex-wrap gap-3">
@@ -234,7 +226,7 @@ export function FilterButton() {
 
           {/* Visibility */}
           <div className="mb-5">
-            <p className="mb-2 text-xs text-secondary">
+            <p className="text-secondary mb-2 text-xs">
               {t("filter.visibility", "Visibility")}
             </p>
             <div className="flex flex-wrap gap-3">
@@ -273,21 +265,21 @@ export function FilterButton() {
 
           {/* Actions */}
           <div className="flex items-center justify-end gap-3">
-            <button
-              type="button"
+            <Button
+              type="default"
               onClick={handleClearAll}
               disabled={draftCount === 0}
-              className="text-sm text-secondary transition-colors hover:text-primary disabled:opacity-40"
+              className="text-secondary text-sm"
             >
               {t("filter.clearAll", "Clear all")}
-            </button>
-            <button
-              type="button"
+            </Button>
+            <Button
+              type="primary"
               onClick={handleApply}
-              className="rounded-xl bg-primary px-5 py-1.5 text-sm font-medium text-bg transition-opacity hover:opacity-80"
+              className="rounded-xl px-5 text-sm font-medium"
             >
               {t("filter.apply", "Apply")}
-            </button>
+            </Button>
           </div>
         </div>
       )}
