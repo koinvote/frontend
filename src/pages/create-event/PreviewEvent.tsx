@@ -198,7 +198,7 @@ export default function PreviewEvent() {
   }, [isRewarded, rewardAmountSatoshi, platformFeeSatoshi, preheatFeeSatoshi]);
 
   const totalFeeDisplay = useMemo(() => {
-    return satsToBtc(totalAmountSatoshi);
+    return satsToBtc(totalAmountSatoshi, { trimTrailingZeros: true });
   }, [totalAmountSatoshi]);
 
   const showLowTotalWarning = useMemo(() => {
@@ -600,10 +600,9 @@ export default function PreviewEvent() {
               <Field label={t("preview.unlockPrice", "Unlock price")}>
                 {unlockPriceBtc ? `${unlockPriceBtc} BTC` : "--"}
               </Field>
+              <Divider />
             </>
           )}
-
-          <Divider />
 
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (

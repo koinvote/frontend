@@ -66,7 +66,7 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
           "createEvent.rewardBtcPlaceholderEnabled",
           "Enter reward (Min {{min}})",
           {
-            min: minRewardBtc.toFixed(8),
+            min: Number(minRewardBtc.toFixed(8)),
           },
         )
       : t("createEvent.rewardBtcPlaceholder", "Set Duration First");
