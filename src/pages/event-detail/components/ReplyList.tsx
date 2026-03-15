@@ -9,12 +9,12 @@ import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 // import ReportIcon from "@/assets/icons/report.svg?react";
 import { Button } from "@/components/base/Button";
@@ -67,25 +67,27 @@ export function ReplyList({
 }: ReplyListProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
-  const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
   const limit = 20;
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const {
     data: repliesData,
     isLoading,
     error,
-  } = useQuery({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: [
       "replies",
       eventId,
-      page,
       limit,
       search,
       sortBy,
       order,
       balanceDisplayMode,
     ],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const balanceType =
         balanceDisplayMode === "on_chain" ? "current" : "snapshot";
       const response = (await API.getListReplies()({
@@ -93,7 +95,7 @@ export function ReplyList({
         search: search || undefined,
         sortBy,
         order,
-        page,
+        page: pageParam as number,
         limit,
         balance_type: balanceType,
       })) as unknown as ApiResponse<GetListRepliesRes>;
@@ -102,9 +104,30 @@ export function ReplyList({
       }
       return response.data;
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.replies.length < limit) return undefined;
+      return allPages.length + 1;
+    },
     enabled: !!eventId,
-    placeholderData: keepPreviousData,
   });
+
+  const allReplies = repliesData?.pages.flatMap((p) => p.replies) ?? [];
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {
     try {
@@ -145,7 +168,7 @@ export function ReplyList({
     );
   }
 
-  if (!repliesData || repliesData.replies.length === 0) {
+  if (!repliesData || allReplies.length === 0) {
     return (
       <div className="flex min-h-[200px] items-center justify-center">
         <p className="text-secondary">
@@ -159,7 +182,7 @@ export function ReplyList({
 
   return (
     <div className="flex flex-col gap-4">
-      {repliesData.replies.map((reply) => (
+      {allReplies.map((reply) => (
         <ReplyItem
           key={reply.id}
           reply={reply}
@@ -170,6 +193,8 @@ export function ReplyList({
           balanceDisplayMode={balanceDisplayMode}
         />
       ))}
+      <div ref={sentinelRef} className="h-1" />
+      {isFetchingNextPage && <PageLoading />}
     </div>
   );
 }
