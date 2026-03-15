@@ -44,6 +44,7 @@ interface ReplyListProps {
   participantsCount?: number;
   totalStakeSatoshi?: number;
   eventTitle?: string;
+  resultVisibility?: "public" | "paid_only" | "creator_only";
   onLockedChange?: (locked: boolean) => void;
   onCreatorChange?: (isCreator: boolean, email: string) => void;
   initialUnlockEmail?: string;
@@ -81,6 +82,7 @@ export function ReplyList({
   participantsCount,
   totalStakeSatoshi,
   eventTitle,
+  resultVisibility,
   onLockedChange,
   onCreatorChange,
   initialUnlockEmail,
@@ -165,27 +167,38 @@ export function ReplyList({
     }
   }, [isLoading, repliesData, submittedEmail, onCreatorChange]);
 
-  // When a submitted email still results in locked (and fetch is complete), redirect to unlock payment page.
+  // When a submitted email still results in locked (and fetch is complete):
+  // - creator_only: show a toast error
+  // - paid_only: redirect to unlock payment page
   // Skip redirect if the email was auto-applied from a payment return — the user just paid, no loop.
   useEffect(() => {
-    if (
-      submittedEmail &&
-      isLocked &&
-      !isFetching &&
-      !isPaymentReturnRef.current
-    ) {
-      navigate(`/event/${eventId}/unlock-payment`, {
-        state: { email: submittedEmail, unlockPriceSatoshi, eventTitle },
-      });
+    if (submittedEmail && isLocked && !isFetching) {
+      if (resultVisibility === "creator_only") {
+        setSubmittedEmail("");
+        showToast(
+          "error",
+          t(
+            "replyList.incorrectCreatorEmail",
+            "Please enter the correct creator email.",
+          ),
+        );
+      } else if (!isPaymentReturnRef.current) {
+        navigate(`/event/${eventId}/unlock-payment`, {
+          state: { email: submittedEmail, unlockPriceSatoshi, eventTitle },
+        });
+      }
     }
   }, [
     submittedEmail,
     isLocked,
     isFetching,
+    resultVisibility,
     eventId,
     unlockPriceSatoshi,
     eventTitle,
     navigate,
+    showToast,
+    t,
   ]);
 
   const isUnlockEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
@@ -201,11 +214,21 @@ export function ReplyList({
     const trimmedEmail = unlockEmail.trim();
     isPaymentReturnRef.current = false; // User manually triggered — re-enable redirect
     if (trimmedEmail === submittedEmail && isLocked) {
-      // Same email already returned locked (e.g. back from payment, mock doesn't track state).
-      // setSubmittedEmail won't change state, so navigate directly.
-      navigate(`/event/${eventId}/unlock-payment`, {
-        state: { email: trimmedEmail, unlockPriceSatoshi, eventTitle },
-      });
+      if (resultVisibility === "creator_only") {
+        showToast(
+          "error",
+          t(
+            "replyList.incorrectCreatorEmail",
+            "Please enter the correct creator email.",
+          ),
+        );
+      } else {
+        // Same email already returned locked (e.g. back from payment, mock doesn't track state).
+        // setSubmittedEmail won't change state, so navigate directly.
+        navigate(`/event/${eventId}/unlock-payment`, {
+          state: { email: trimmedEmail, unlockPriceSatoshi, eventTitle },
+        });
+      }
       return;
     }
     setSubmittedEmail(trimmedEmail);
@@ -258,15 +281,22 @@ export function ReplyList({
           <UnlockIcon className="h-7 w-7" />
         </div>
         <p className="tx-16 fw-m mb-1 text-(--color-orange-500)">
-          {t(
-            "replyList.unlockResultsWith",
-            "Unlock Results with {{price}} BTC",
-            {
-              price: unlockPriceSatoshi ? unlockPriceSatoshi / 100000000 : "?",
-            },
-          )}
+          {resultVisibility === "creator_only"
+            ? t(
+                "replyList.creatorOnlyResults",
+                "Results are visible to the creator only.",
+              )
+            : t(
+                "replyList.unlockResultsWith",
+                "Unlock Results with {{price}} BTC",
+                {
+                  price: unlockPriceSatoshi
+                    ? unlockPriceSatoshi / 100000000
+                    : "?",
+                },
+              )}
         </p>
-        {unlockCount !== undefined && (
+        {resultVisibility !== "creator_only" && unlockCount !== undefined && (
           <p className="tx-14 mb-4">
             <span className="fw-m text-(--color-orange-500)">
               {unlockCount}
@@ -282,9 +312,13 @@ export function ReplyList({
               {participantsCount !== undefined && (
                 <span className="flex items-center gap-1">
                   <EventCardParticipantsIcon className="h-3 w-3" />
-                  {t("replyList.participantsCount", "{{count}} Participants", {
-                    count: participantsCount,
-                  })}
+                  {participantsCount === 1
+                    ? t("replyList.participantsCountOne", "1 Participant")
+                    : t(
+                        "replyList.participantsCount",
+                        "{{count}} Participants",
+                        { count: participantsCount },
+                      )}
                 </span>
               )}
               {totalStakeSatoshi !== undefined && (
