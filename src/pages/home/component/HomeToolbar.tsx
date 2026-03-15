@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { API, type ApiResponse } from "@/api/index";
 import type { GetHotHashtagsRes } from "@/api/response";
+import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
 import SearchIcon from "@/assets/icons/search.svg?react";
+import SortAscIcon from "@/assets/icons/sort-asc.svg?react";
+import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
 import { Segmented } from "@/components/base/CustomSegmented";
 import {
   type HomeSortField,
@@ -48,6 +51,21 @@ export function HomeToolbar() {
   } = useHomeStore();
 
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+  const sortDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        sortDropdownRef.current &&
+        !sortDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsSortDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // debounce search 300ms
   useEffect(() => {
@@ -173,57 +191,72 @@ export function HomeToolbar() {
 
         {/* sort + filter */}
         <div className="flex items-center gap-2 w-full md:w-auto self-start md:self-auto">
-          <button
-            type="button"
-            onClick={toggleSortOrder}
-            className="cursor-pointer flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-surface text-xs flex-shrink-0"
+          <div
+            className="flex-1 md:flex-none flex items-center h-9 bg-white
+            dark:bg-surface rounded-lg border border-border"
           >
-            {sortOrder === "asc" ? "↑" : "↓"}
-          </button>
-          <div className="relative flex-1 md:flex-none">
-            <select
-              className="cursor-pointer w-full h-9 rounded-xl 
-              border border-border bg-surface px-3 pr-8 text-sm 
-              md:text-base text-center appearance-none 
-              outline-none transition-all"
-              style={{
-                textAlign: "center",
-                textAlignLast: "center",
-              }}
-              value={sortField}
-              onChange={(e) =>
-                handleSortChange(e.target.value as HomeSortField)
+            {/* Order Toggle */}
+            <button
+              type="button"
+              onClick={toggleSortOrder}
+              className="flex items-center justify-center w-9 h-full border-r
+              border-border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer"
+              aria-label={
+                sortOrder === "desc"
+                  ? t("searchFilter.sortDesc", "Sort descending")
+                  : t("searchFilter.sortAsc", "Sort ascending")
               }
             >
-              {SORT_OPTIONS.map((opt) => (
-                <option
-                  key={opt.value}
-                  value={opt.value}
-                  className="text-center"
-                  style={{ textAlign: "center" }}
-                >
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-            {/* 自定义下拉箭头 */}
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 12 12"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-secondary"
+              {sortOrder === "desc" ? (
+                <SortDescIcon className="w-4 h-4" />
+              ) : (
+                <SortAscIcon className="w-4 h-4" />
+              )}
+            </button>
+
+            {/* Sort Field Select */}
+            <div
+              className="relative h-full flex-1 md:text-center"
+              ref={sortDropdownRef}
+            >
+              <button
+                type="button"
+                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                className="w-full md:w-[120px] h-full flex items-center justify-center gap-2 px-3
+                hover:bg-black/[0.06] dark:hover:bg-white/10 transition-colors rounded-r-lg text-center cursor-pointer"
               >
-                <path
-                  d="M3 4.5L6 7.5L9 4.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <span className="text-sm font-medium text-primary capitalize">
+                  {SORT_OPTIONS.find((opt) => opt.value === sortField)?.label}
+                </span>
+                <ArrowDownIcon
+                  className={`w-2 h-2 text-secondary transition-transform duration-200 ${
+                    isSortDropdownOpen ? "rotate-180" : ""
+                  }`}
                 />
-              </svg>
+              </button>
+
+              {isSortDropdownOpen && (
+                <div className="absolute top-full right-0 mt-1 min-w-full w-28 bg-white dark:bg-surface border border-border rounded-lg shadow-lg z-10 overflow-hidden">
+                  {SORT_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        handleSortChange(opt.value);
+                        setIsSortDropdownOpen(false);
+                      }}
+                      className={`w-full text-center px-4 py-2 text-sm hover:bg-black/[0.06]
+                        dark:hover:bg-white/10 transition-colors ${
+                          sortField === opt.value
+                            ? "text-accent font-medium bg-accent/5"
+                            : "text-primary"
+                        }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <FilterButton />
