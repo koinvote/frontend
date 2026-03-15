@@ -165,8 +165,8 @@ export function SearchAndFilter({
             <button
               type="button"
               onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              className="w-full md:w-[90px] h-full flex items-center justify-center gap-2 px-3 
-              hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors rounded-r-lg text-center cursor-pointer"
+              className="w-full md:w-[90px] h-full flex items-center justify-center gap-2 px-3
+              hover:bg-black/[0.06] dark:hover:bg-white/10 transition-colors rounded-r-lg text-center cursor-pointer"
             >
               <span className="text-sm font-medium text-primary capitalize">
                 {sortBy === "balance"
@@ -186,8 +186,8 @@ export function SearchAndFilter({
                 <button
                   type="button"
                   onClick={() => handleSortFieldChange(ReplySortBy.BALANCE)}
-                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50
-                    dark:hover:bg-gray-900 transition-colors ${
+                  className={`w-full text-center px-4 py-2 text-sm hover:bg-black/[0.06]
+                    dark:hover:bg-white/10 transition-colors ${
                       sortBy === ReplySortBy.BALANCE
                         ? "text-accent font-medium bg-accent/5"
                         : "text-primary"
@@ -198,8 +198,8 @@ export function SearchAndFilter({
                 <button
                   type="button"
                   onClick={() => handleSortFieldChange(ReplySortBy.TIME)}
-                  className={`w-full text-center px-4 py-2 text-sm hover:bg-gray-50
-                    dark:hover:bg-gray-900 transition-colors ${
+                  className={`w-full text-center px-4 py-2 text-sm hover:bg-black/[0.06]
+                    dark:hover:bg-white/10 transition-colors ${
                       sortBy === ReplySortBy.TIME
                         ? "text-accent font-medium bg-accent/5"
                         : "text-primary"
