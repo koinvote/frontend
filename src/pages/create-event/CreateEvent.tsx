@@ -381,15 +381,16 @@ export default function CreateEvent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enablePreheat]);
 
-  // When switching away from paid_only, clear those errors; switching to paid_only,
+  // When switching away from paid_only/creator_only, clear those errors; switching to them,
   // re-validate if already touched so errors appear immediately.
   useEffect(() => {
-    if (resultVisibility !== "paid_only") {
+    if (resultVisibility !== "paid_only" && resultVisibility !== "creator_only") {
       clearErrors("creatorEmail");
       clearErrors("unlockPriceBtc");
     } else {
       if (touchedFields.creatorEmail) trigger("creatorEmail");
-      if (touchedFields.unlockPriceBtc) trigger("unlockPriceBtc");
+      if (resultVisibility === "paid_only" && touchedFields.unlockPriceBtc)
+        trigger("unlockPriceBtc");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultVisibility]);
@@ -436,7 +437,7 @@ export default function CreateEvent() {
       (isRewarded && (!rewardBtc || !!errors.rewardBtc)) ||
       (eventType === "single_choice" && hasOptionsError) ||
       (enablePreheat && !!errors.preheatHours) ||
-      (resultVisibility === "paid_only" &&
+      ((resultVisibility === "paid_only" || resultVisibility === "creator_only") &&
         (!creatorEmail || !!errors.creatorEmail)) ||
       (resultVisibility === "paid_only" &&
         (!unlockPriceBtc || !!errors.unlockPriceBtc)) ||
@@ -517,7 +518,10 @@ export default function CreateEvent() {
       preheatHours: data.enablePreheat && preheat > 0 ? preheat : undefined,
       resultVisibility: data.resultVisibility,
       creatorEmail:
-        data.resultVisibility === "paid_only" ? data.creatorEmail : undefined,
+        data.resultVisibility === "paid_only" ||
+        data.resultVisibility === "creator_only"
+          ? data.creatorEmail
+          : undefined,
       unlockPriceBtc:
         data.resultVisibility === "paid_only" ? data.unlockPriceBtc : undefined,
     };

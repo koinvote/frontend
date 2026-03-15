@@ -313,6 +313,7 @@ const EventDetail = () => {
           participantsCount={eventDetail.participants_count}
           totalStakeSatoshi={eventDetail.total_stake_satoshi}
           eventTitle={eventDetail.title}
+          resultVisibility={eventDetail.result_visibility}
           onLockedChange={setIsRepliesLocked}
           onCreatorChange={(creator, email) => {
             setIsCreator(creator);

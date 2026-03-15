@@ -47,7 +47,7 @@ export function TopReplyBar({ reply }: TopReplyBarProps) {
           <span className="text-xs md:text-sm dark:text-white">
             {amountBtc} BTC
           </span>
-          <span className="text-secondary text-xs font-semibold">
+          <span className="text-xs font-semibold text-gray-700 dark:text-gray-300">
             {weightPercentDisplay}%
           </span>
         </div>

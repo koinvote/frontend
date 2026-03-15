@@ -93,8 +93,10 @@ export function ResultVisibilityField() {
                     disabled={isDisabled}
                     onChange={() => {
                       field.onChange(value);
-                      if (value !== "paid_only") {
+                      if (value !== "paid_only" && value !== "creator_only") {
                         clearErrors("creatorEmail");
+                      }
+                      if (value !== "paid_only") {
                         clearErrors("unlockPriceBtc");
                       }
                     }}
@@ -131,8 +133,9 @@ export function ResultVisibilityField() {
         )}
       />
 
-      {/* Extra fields shown only when paid_only is selected */}
-      {resultVisibility === "paid_only" && (
+      {/* Extra fields shown when paid_only or creator_only is selected */}
+      {(resultVisibility === "paid_only" ||
+        resultVisibility === "creator_only") && (
         <div className="border-border mt-4 space-y-4 rounded-xl border p-4">
           {/* Creator email */}
           <div>
@@ -143,7 +146,11 @@ export function ResultVisibilityField() {
             <input
               {...register("creatorEmail", {
                 validate: (v) => {
-                  if (resultVisibilityRef.current !== "paid_only") return true;
+                  if (
+                    resultVisibilityRef.current !== "paid_only" &&
+                    resultVisibilityRef.current !== "creator_only"
+                  )
+                    return true;
                   if (!v || !v.trim())
                     return t(
                       "createEvent.creatorEmailRequired",
@@ -187,8 +194,8 @@ export function ResultVisibilityField() {
             )}
           </div>
 
-          {/* Unlock price (BTC) */}
-          <div>
+          {/* Unlock price (BTC) - only for paid_only */}
+          {resultVisibility === "paid_only" && <div>
             <label className="text-primary mb-1 block text-sm leading-5 font-medium">
               {t("createEvent.unlockPriceBtc", "Unlock price (BTC)")}
               <span className="text-(--color-orange-500)"> *</span>
@@ -269,7 +276,7 @@ export function ResultVisibilityField() {
                 {errors.unlockPriceBtc.message}
               </p>
             )}
-          </div>
+          </div>}
         </div>
       )}
     </div>

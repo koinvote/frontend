@@ -198,7 +198,7 @@ export default function PreviewEvent() {
   }, [isRewarded, rewardAmountSatoshi, platformFeeSatoshi, preheatFeeSatoshi]);
 
   const totalFeeDisplay = useMemo(() => {
-    return satsToBtc(totalAmountSatoshi);
+    return satsToBtc(totalAmountSatoshi, { trimTrailingZeros: true });
   }, [totalAmountSatoshi]);
 
   const showLowTotalWarning = useMemo(() => {
@@ -254,7 +254,8 @@ export default function PreviewEvent() {
   const handlePrimaryClick = useCallback(async () => {
     if (!state) return;
     if (
-      state.resultVisibility === "paid_only" &&
+      (state.resultVisibility === "paid_only" ||
+        state.resultVisibility === "creator_only") &&
       confirmEmail !== state.creatorEmail
     ) {
       confirmEmailRef.current?.focus();
@@ -551,11 +552,17 @@ export default function PreviewEvent() {
 
           <Divider />
 
-          {/* Result visibility / unlock email / confirm unlock email / unlock price（paid_only 才顯示） */}
-          {resultVisibility === "paid_only" && (
+          {/* Result visibility / unlock email / confirm unlock email / unlock price */}
+          {(resultVisibility === "paid_only" ||
+            resultVisibility === "creator_only") && (
             <>
               <Field label={t("preview.resultVisibility", "Result visibility")}>
-                {t("createEvent.resultVisibilityPaidOnly", "Paid-only")}
+                {resultVisibility === "paid_only"
+                  ? t("createEvent.resultVisibilityPaidOnly", "Paid-only")
+                  : t(
+                      "createEvent.resultVisibilityCreatorOnly",
+                      "Creator-only",
+                    )}
               </Field>
               <Field label={t("preview.unlockEmail", "Unlock email")}>
                 <div>
@@ -597,13 +604,14 @@ export default function PreviewEvent() {
                   </p>
                 )}
               </div>
-              <Field label={t("preview.unlockPrice", "Unlock price")}>
-                {unlockPriceBtc ? `${unlockPriceBtc} BTC` : "--"}
-              </Field>
+              {resultVisibility === "paid_only" && (
+                <Field label={t("preview.unlockPrice", "Unlock price")}>
+                  {unlockPriceBtc ? `${unlockPriceBtc} BTC` : "--"}
+                </Field>
+              )}
+              <Divider />
             </>
           )}
-
-          <Divider />
 
           {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
           {enablePreheat && preheatHours > 0 && (
@@ -658,7 +666,8 @@ export default function PreviewEvent() {
             text="sm"
             className={cn(
               "sm:w-40",
-              resultVisibility === "paid_only" &&
+              (resultVisibility === "paid_only" ||
+                resultVisibility === "creator_only") &&
                 confirmEmail !== creatorEmail &&
                 "opacity-50",
             )}
