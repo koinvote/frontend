@@ -25,6 +25,9 @@ export interface GetEventListReq {
   limit: string;
   sortBy: "time" | "reward" | "participation";
   order: "desc" | "asc";
+  event_reward_type?: string[]; // e.g. ["rewarded", "non_reward"]
+  event_type?: string[];         // e.g. ["single_choice", "open"]
+  result_visibility?: string[];  // e.g. ["public", "paid_only", "creator_only"]
 }
 
 export interface GetListRepliesReq {
@@ -102,4 +105,30 @@ export interface GetWithdrawalRecordReq {
 
 export interface UnlockEventReq {
   email: string;
+}
+
+export interface GenerateChangeVisibilityPlaintextReq {
+  email: string;
+  result_visibility: "paid_only" | "public";
+  unlock_price_satoshi?: number; // required when result_visibility is "paid_only"
+}
+
+export interface UpdateResultVisibilityReq {
+  email: string;
+  result_visibility: "paid_only" | "public";
+  unlock_price_satoshi?: number; // required when result_visibility is "paid_only"
+  plaintext: string;
+  signature: string;
+}
+
+export interface GenerateUnlockPricePlaintextReq {
+  email: string;
+  unlock_price_satoshi: number;
+}
+
+export interface UpdateUnlockPriceReq {
+  email: string;
+  unlock_price_satoshi: number;
+  plaintext: string;
+  signature: string;
 }

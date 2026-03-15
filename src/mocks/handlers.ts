@@ -43,7 +43,10 @@ let UNLOCK_TIMEOUT_AT: string | null = null;
 let UNLOCK_EMAIL: string | null = null;
 
 // Emails confirmed as paid — seeded with the test email, grows at runtime
-const PAID_UNLOCK_EMAILS = new Set(["paid@test.com"]);
+const PAID_UNLOCK_EMAILS = new Set(["paid@test.com", "creator@test.com"]);
+
+// Creator email for the mock event
+const CREATOR_EMAIL = "creator@test.com";
 
 export const handlers = [
   // GET /system/parameters - Get system configuration
@@ -64,6 +67,9 @@ export const handlers = [
     const tag = url.searchParams.get("tag");
     const page = parseInt(url.searchParams.get("page") || "1");
     const limit = parseInt(url.searchParams.get("limit") || "20");
+    const eventRewardType = url.searchParams.getAll("event_reward_type");
+    const eventType = url.searchParams.getAll("event_type");
+    const resultVisibility = url.searchParams.getAll("result_visibility");
 
     // Filter events based on tab (status)
     let filteredEvents = [...mockEventList];
@@ -88,6 +94,27 @@ export const handlers = [
     // Filter by hashtag
     if (tag) {
       filteredEvents = filteredEvents.filter((e) => e.hashtags.includes(tag));
+    }
+
+    // Filter by reward type
+    if (eventRewardType.length > 0) {
+      filteredEvents = filteredEvents.filter((e) =>
+        eventRewardType.includes(e.event_reward_type),
+      );
+    }
+
+    // Filter by event type
+    if (eventType.length > 0) {
+      filteredEvents = filteredEvents.filter((e) =>
+        eventType.includes(e.event_type),
+      );
+    }
+
+    // Filter by result visibility
+    if (resultVisibility.length > 0) {
+      filteredEvents = filteredEvents.filter(
+        (e) => "result_visibility" in e && resultVisibility.includes((e as any).result_visibility),
+      );
     }
 
     // Paginate
@@ -394,7 +421,8 @@ export const handlers = [
     const eventDetail =
       eventId === mockEventDetail.event_id ? mockEventDetail : null;
     if (
-      eventDetail?.result_visibility === "paid_only" &&
+      (eventDetail?.result_visibility === "paid_only" ||
+        eventDetail?.result_visibility === "creator_only") &&
       (!unlockEmail || !PAID_UNLOCK_EMAILS.has(unlockEmail))
     ) {
       return HttpResponse.json<ApiResponse<any>>(
@@ -445,12 +473,15 @@ export const handlers = [
     const start = (page - 1) * limit;
     const paginatedReplies = replies.slice(start, start + limit);
 
+    const isCreator = unlockEmail === CREATOR_EMAIL ? 1 : 0;
+
     return HttpResponse.json<ApiResponse<typeof mockGetListRepliesResponse>>({
       code: "200",
       success: true,
       message: null,
       data: {
         replies: paginatedReplies,
+        is_creator: isCreator,
         page,
         limit,
       },
@@ -932,6 +963,94 @@ export const handlers = [
             status === DepositStatus.PENDING ? null : UNLOCK_FIRST_SEEN_AT,
           confirmed_at: confirmedAt,
         },
+      });
+    },
+  ),
+
+  // POST /events/:eventId/result-visibility/generate-plaintext
+  http.post(
+    `${API_BASE_URL}/events/:eventId/result-visibility/generate-plaintext`,
+    async ({ params, request }) => {
+      const { eventId } = params as { eventId: string };
+      const body = (await request.json()) as {
+        email: string;
+        result_visibility: string;
+        unlock_price_satoshi?: number;
+      };
+      const timestamp = Math.floor(Date.now() / 1000);
+      const randomCode = Math.random().toString(36).slice(2, 12);
+      let plaintext = "";
+      if (body.result_visibility === "paid_only") {
+        const priceBtc = body.unlock_price_satoshi ? body.unlock_price_satoshi / 1e8 : 0;
+        plaintext = `koinvote.com | ${eventId} | paid_only | ${priceBtc} | ${timestamp} | ${randomCode}`;
+      } else {
+        plaintext = `koinvote.com | ${eventId} | public | ${timestamp} | ${randomCode}`;
+      }
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: { plaintext },
+      });
+    },
+  ),
+
+  // POST /events/:eventId/result-visibility
+  http.post(
+    `${API_BASE_URL}/events/:eventId/result-visibility`,
+    async ({ params, request }) => {
+      const { eventId } = params;
+      const body = (await request.json()) as {
+        result_visibility: string;
+        unlock_price_satoshi?: number;
+      };
+      console.log("[Mock] Change result visibility:", eventId, body);
+      return HttpResponse.json<ApiResponse<null>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: null,
+      });
+    },
+  ),
+
+  // POST /events/:eventId/unlock-price/generate-plaintext
+  http.post(
+    `${API_BASE_URL}/events/:eventId/unlock-price/generate-plaintext`,
+    async ({ params, request }) => {
+      const { eventId } = params as { eventId: string };
+      const body = (await request.json()) as {
+        email: string;
+        unlock_price_satoshi: number;
+      };
+      const timestamp = Math.floor(Date.now() / 1000);
+      const randomCode = Math.random().toString(36).slice(2, 12);
+      const priceBtc = body.unlock_price_satoshi / 1e8;
+      const plaintext = `koinvote.com | event_id:${eventId} | action:update_unlock_price | unlock_price_satoshi:${body.unlock_price_satoshi} | price_btc:${priceBtc} | ts:${timestamp} | nonce:${randomCode}`;
+      return HttpResponse.json<ApiResponse<any>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: { plaintext },
+      });
+    },
+  ),
+
+  // POST /events/:eventId/unlock-price
+  http.post(
+    `${API_BASE_URL}/events/:eventId/unlock-price`,
+    async ({ params, request }) => {
+      const { eventId } = params;
+      const body = (await request.json()) as {
+        email: string;
+        unlock_price_satoshi: number;
+      };
+      console.log("[Mock] Update unlock price:", eventId, body);
+      return HttpResponse.json<ApiResponse<null>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: null,
       });
     },
   ),

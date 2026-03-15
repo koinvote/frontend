@@ -45,6 +45,7 @@ interface ReplyListProps {
   totalStakeSatoshi?: number;
   eventTitle?: string;
   onLockedChange?: (locked: boolean) => void;
+  onCreatorChange?: (isCreator: boolean, email: string) => void;
   initialUnlockEmail?: string;
 }
 
@@ -81,6 +82,7 @@ export function ReplyList({
   totalStakeSatoshi,
   eventTitle,
   onLockedChange,
+  onCreatorChange,
   initialUnlockEmail,
 }: ReplyListProps) {
   const { t } = useTranslation();
@@ -156,6 +158,12 @@ export function ReplyList({
   useEffect(() => {
     onLockedChange?.(isLocked);
   }, [isLocked, onLockedChange]);
+
+  useEffect(() => {
+    if (!isLoading && repliesData !== null && repliesData !== undefined) {
+      onCreatorChange?.(repliesData.is_creator === 1, submittedEmail);
+    }
+  }, [isLoading, repliesData, submittedEmail, onCreatorChange]);
 
   // When a submitted email still results in locked (and fetch is complete), redirect to unlock payment page.
   // Skip redirect if the email was auto-applied from a payment return — the user just paid, no loop.

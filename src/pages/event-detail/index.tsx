@@ -10,6 +10,7 @@ import type {
 } from "@/api/response";
 import { EventStatus, ReplySortBy } from "@/api/types";
 import BackButton from "@/components/base/BackButton";
+import { Button } from "antd";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
 import { mapApiTopReply } from "@/utils/eventTransform";
@@ -41,6 +42,8 @@ const EventDetail = () => {
   >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
   const [isRepliesLocked, setIsRepliesLocked] = useState(false);
+  const [isCreator, setIsCreator] = useState(false);
+  const [creatorEmail, setCreatorEmail] = useState(initialUnlockEmail ?? "");
 
   const {
     data: eventDetail,
@@ -242,6 +245,8 @@ const EventDetail = () => {
           topReplies={displayTopReplies}
           isTopRepliesLoading={isTopRepliesEnabled && isTopRepliesLoading}
           isLocked={isRepliesLocked}
+          isCreator={isCreator}
+          creatorEmail={creatorEmail}
         />
         {/* Divider */}
         <div className="my-6 md:my-8">
@@ -255,8 +260,25 @@ const EventDetail = () => {
               <div className="text-secondary text-xs md:text-sm">
                 {t("eventInfo.unlockPrice", "Unlock Price")}
               </div>
-              <div className="text-primary mt-2 text-xs md:text-sm">
-                {eventDetail.unlock_price_satoshi / 100000000} BTC
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-primary text-xs md:text-sm">
+                  {eventDetail.unlock_price_satoshi / 100000000} BTC
+                </span>
+                {isCreator && (
+                  <Button
+                    type="default"
+                    className="h-6! px-2!"
+                    autoInsertSpace={false}
+                    onClick={() =>
+                      navigate(
+                        `/event/${eventId}/change-unlock-price`,
+                        { state: { creatorEmail } },
+                      )
+                    }
+                  >
+                    {t("common.change", "Change")}
+                  </Button>
+                )}
               </div>
             </div>
           )}
@@ -292,6 +314,10 @@ const EventDetail = () => {
           totalStakeSatoshi={eventDetail.total_stake_satoshi}
           eventTitle={eventDetail.title}
           onLockedChange={setIsRepliesLocked}
+          onCreatorChange={(creator, email) => {
+            setIsCreator(creator);
+            if (creator && email) setCreatorEmail(email);
+          }}
         />
       </div>
     </div>

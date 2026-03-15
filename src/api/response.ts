@@ -125,6 +125,7 @@ export interface EventDetailDataRes {
   result_visibility?: "public" | "paid_only" | "creator_only";
   unlock_price_satoshi?: number;
   unlock_count?: number;
+  last_unlock_confirmed_at?: string | null;
 }
 
 export interface GetSignaturePlainTextRes {
@@ -350,3 +351,9 @@ export interface UnlockDepositStatusRes {
   first_seen_at: string | null;
   confirmed_at: string | null;
 }
+
+export interface GenerateChangeVisibilityPlaintextRes {
+  plaintext: string;
+}
+
+export type GenerateUnlockPricePlaintextRes = GenerateChangeVisibilityPlaintextRes;

@@ -1,4 +1,5 @@
 import { useToast } from "@/components/base/Toast/useToast";
+import { Button, Tooltip } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -20,11 +21,15 @@ import { useDebouncedClick } from "@/utils/helper";
 import { EventCTAButton } from "./EventCTAButton";
 import { TopReplyBar } from "./TopReplyBar";
 
+const UNLOCK_LOCK_DURATION_MS = 24 * 60 * 60 * 1000;
+
 interface EventInfoProps {
   event: EventDetailDataRes;
   topReplies?: TopReply[];
   isTopRepliesLoading?: boolean;
   isLocked?: boolean;
+  isCreator?: boolean;
+  creatorEmail?: string;
 }
 
 export function EventInfo({
@@ -32,6 +37,8 @@ export function EventInfo({
   topReplies,
   isTopRepliesLoading,
   isLocked,
+  isCreator,
+  creatorEmail,
 }: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -464,17 +471,57 @@ export function EventInfo({
     });
 
     if (event.result_visibility) {
+      const isWithin24hOfUnlock = event.last_unlock_confirmed_at
+        ? Date.now() - new Date(event.last_unlock_confirmed_at).getTime() <=
+          UNLOCK_LOCK_DURATION_MS
+        : false;
+      const showChangeButton =
+        isCreator && event.result_visibility !== "public";
       result.push({
         key: "result-visibility",
         label: t("eventInfo.resultVisibility", "Result visibility:"),
         value: (
-          <span className="text-xs md:text-sm">
-            {event.result_visibility === "public"
-              ? t("reply.resultVisibilityPublic", "Public")
-              : event.result_visibility === "paid_only"
-                ? t("reply.resultVisibilityPaidOnly", "Paid-only")
-                : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs md:text-sm">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+            </span>
+            {showChangeButton && (
+              <Tooltip
+                title={
+                  isWithin24hOfUnlock
+                    ? t(
+                        "eventInfo.resultVisibilityLockedTooltip",
+                        "Visibility changes are locked for 24 hours after the most recent paid unlock.",
+                      )
+                    : undefined
+                }
+              >
+                <Button
+                  type="default"
+                  className="h-6! px-2!"
+                  autoInsertSpace={false}
+                  disabled={isWithin24hOfUnlock}
+                  onClick={() =>
+                    navigate(
+                      `/event/${event.event_id}/change-result-visibility`,
+                      {
+                        state: {
+                          creatorEmail,
+                          currentVisibility: event.result_visibility,
+                        },
+                      },
+                    )
+                  }
+                >
+                  {t("common.change", "Change")}
+                </Button>
+              </Tooltip>
+            )}
+          </div>
         ),
       });
     }

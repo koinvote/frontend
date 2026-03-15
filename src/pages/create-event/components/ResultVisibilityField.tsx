@@ -62,7 +62,9 @@ export function ResultVisibilityField() {
         name="resultVisibility"
         render={({ field }) => (
           <div className="flex gap-6">
-            {(["public", "paid_only"] as ResultVisibility[]).map((value) => {
+            {(
+              ["public", "paid_only", "creator_only"] as ResultVisibility[]
+            ).map((value) => {
               const isForRestricted =
                 value === "paid_only" || value === "creator_only";
               const isDisabledForNonRewarded = !isRewarded && isForRestricted;

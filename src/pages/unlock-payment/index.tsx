@@ -59,7 +59,6 @@ export default function UnlockPayment() {
   const [depositStatus, setDepositStatus] =
     useState<UnlockDepositStatusRes | null>(null);
   const [countdownDisplay, setCountdownDisplay] = useState("00:00");
-  const [showExtendButton, setShowExtendButton] = useState(false);
   const [canExtend, setCanExtend] = useState(false);
   const [isExtending, setIsExtending] = useState(false);
 
@@ -182,8 +181,6 @@ export default function UnlockPayment() {
         remainingMinutes > 0 &&
         remainingMinutes < CONSTS.EXTEND_BUTTON_THRESHOLD_MINUTES;
 
-      // Show button once remaining < 30 min (and keep it visible)
-      if (isUnderThreshold) setShowExtendButton(true);
       setCanExtend(isUnderThreshold);
 
       if (formatted === "00:00") {
@@ -316,8 +313,8 @@ export default function UnlockPayment() {
       </div>
 
       <div className="border-border bg-bg relative w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
-        {/* Extend 30m button (top right, only when UNCONFIRMED + <30min) */}
-        {paymentInitiated && isUnconfirmed && showExtendButton && (
+        {/* Extend 30m button (top right, only when UNCONFIRMED) */}
+        {paymentInitiated && isUnconfirmed && (
           <Button
             type="button"
             appearance="outline"

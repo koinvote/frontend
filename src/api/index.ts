@@ -6,14 +6,18 @@ import type {
   ContactUsReq,
   CreateEventReq,
   CreateWithdrawalReq,
+  GenerateChangeVisibilityPlaintextReq,
   GenerateReplyPlaintextReq,
+  GenerateUnlockPricePlaintextReq,
   GetWithdrawalRecordReq,
   GetEventListReq,
   GetListRepliesReq,
   SubmitReplyReq,
   SubscribeReq,
   UnlockEventReq,
+  UpdateResultVisibilityReq,
   UpdateSystemParametersReq,
+  UpdateUnlockPriceReq,
   VerifySignatureReq,
 } from "./request.ts";
 
@@ -23,6 +27,8 @@ import type {
   DepositStatusRes,
   EventDataRes,
   EventDetailDataRes,
+  GenerateChangeVisibilityPlaintextRes,
+  GenerateUnlockPricePlaintextRes,
   GetCompletedTopRepliesRes,
   GetEventListRes,
   GetHotHashtagsRes,
@@ -205,6 +211,32 @@ export const API = {
   extendUnlockDepositTimeout: (unlockId: string) =>
     get<ApiResponse<UnlockDepositStatusRes>, void>(
       `/events/unlock/${unlockId}/deposit-extend`,
+    ),
+
+  // Generate plaintext for changing result visibility
+  generateChangeVisibilityPlaintext: (eventId: string) =>
+    post<
+      ApiResponse<GenerateChangeVisibilityPlaintextRes>,
+      GenerateChangeVisibilityPlaintextReq
+    >(`/events/${eventId}/result-visibility/generate-plaintext`),
+
+  // Update result visibility
+  updateResultVisibility: (eventId: string) =>
+    post<ApiResponse<void>, UpdateResultVisibilityReq>(
+      `/events/${eventId}/result-visibility`,
+    ),
+
+  // Generate plaintext for changing unlock price
+  generateUnlockPricePlaintext: (eventId: string) =>
+    post<
+      ApiResponse<GenerateUnlockPricePlaintextRes>,
+      GenerateUnlockPricePlaintextReq
+    >(`/events/${eventId}/unlock-price/generate-plaintext`),
+
+  // Update unlock price
+  updateUnlockPrice: (eventId: string) =>
+    post<ApiResponse<void>, UpdateUnlockPriceReq>(
+      `/events/${eventId}/unlock-price`,
     ),
 };
 
