@@ -334,6 +334,10 @@ export const mockEventDetail: EventDetailDataRes = {
   result_visibility: "paid_only",
   unlock_price_satoshi: 5000,
   unlock_count: 128,
+  // Within UNLOCK_LOCK_DURATION_MS (24h) → locked; set to >24h ago or null to test unlocked
+  last_unlock_confirmed_at: new Date(
+    Date.now() - 2 * 60 * 60 * 1000,
+  ).toISOString(), // 2 hours ago → locked
 };
 
 // Hot Hashtags Mock

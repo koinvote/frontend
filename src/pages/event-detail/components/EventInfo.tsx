@@ -1,5 +1,5 @@
 import { useToast } from "@/components/base/Toast/useToast";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -20,6 +20,8 @@ import {
 import { useDebouncedClick } from "@/utils/helper";
 import { EventCTAButton } from "./EventCTAButton";
 import { TopReplyBar } from "./TopReplyBar";
+
+const UNLOCK_LOCK_DURATION_MS = 24 * 60 * 60 * 1000;
 
 interface EventInfoProps {
   event: EventDetailDataRes;
@@ -469,6 +471,10 @@ export function EventInfo({
     });
 
     if (event.result_visibility) {
+      const isWithin24hOfUnlock = event.last_unlock_confirmed_at
+        ? Date.now() - new Date(event.last_unlock_confirmed_at).getTime() <=
+          UNLOCK_LOCK_DURATION_MS
+        : false;
       const showChangeButton =
         isCreator && event.result_visibility !== "public";
       result.push({
@@ -484,24 +490,36 @@ export function EventInfo({
                   : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
             </span>
             {showChangeButton && (
-              <Button
-                type="default"
-                className="h-6! px-2!"
-                autoInsertSpace={false}
-                onClick={() =>
-                  navigate(
-                    `/event/${event.event_id}/change-result-visibility`,
-                    {
-                      state: {
-                        creatorEmail,
-                        currentVisibility: event.result_visibility,
-                      },
-                    },
-                  )
+              <Tooltip
+                title={
+                  isWithin24hOfUnlock
+                    ? t(
+                        "eventInfo.resultVisibilityLockedTooltip",
+                        "Visibility changes are locked for 24 hours after the most recent paid unlock.",
+                      )
+                    : undefined
                 }
               >
-                {t("common.change", "Change")}
-              </Button>
+                <Button
+                  type="default"
+                  className="h-6! px-2!"
+                  autoInsertSpace={false}
+                  disabled={isWithin24hOfUnlock}
+                  onClick={() =>
+                    navigate(
+                      `/event/${event.event_id}/change-result-visibility`,
+                      {
+                        state: {
+                          creatorEmail,
+                          currentVisibility: event.result_visibility,
+                        },
+                      },
+                    )
+                  }
+                >
+                  {t("common.change", "Change")}
+                </Button>
+              </Tooltip>
             )}
           </div>
         ),

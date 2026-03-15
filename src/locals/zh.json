@@ -539,6 +539,7 @@
     "creatorAddress": "建立者地址：",
     "eventType": "回覆類型：",
     "resultVisibility": "結果可見性：",
+    "resultVisibilityLockedTooltip": "最近一次付費解鎖後的 24 小時內，無法變更可見性設定。",
     "openEnded": "開放式",
     "singleChoice": "單選",
     "searchByCreatorAddress": "依建立者地址搜尋活動",

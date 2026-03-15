@@ -536,6 +536,7 @@
     "creatorAddress": "Creator address:",
     "eventType": "Response type:",
     "resultVisibility": "Result visibility:",
+    "resultVisibilityLockedTooltip": "Visibility changes are locked for 24 hours after the most recent paid unlock.",
     "openEnded": "Open-ended",
     "singleChoice": "Multiple choice",
     "searchByCreatorAddress": "Search events by creator address",
