@@ -10,13 +10,12 @@
  */
 
 import { writeFileSync } from "fs";
-import { resolve, dirname } from "path";
+import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const API_BASE_URL =
-  process.env.API_BASE_URL ?? "http://35.229.204.234:8080/api/v1";
+const API_BASE_URL = "http://35.229.204.234:8080/api/v1";
 const SITE_BASE_URL = process.env.SITE_BASE_URL ?? "https://koinvote.com";
 
 // Static routes with their SEO settings
@@ -30,7 +29,11 @@ const STATIC_URLS = [
   { path: "/verification-tool", changefreq: "monthly", priority: "0.6" },
   { path: "/privacy", changefreq: "monthly", priority: "0.5" },
   { path: "/terms", changefreq: "monthly", priority: "0.5" },
-  { path: "/terms-reward-distribution", changefreq: "monthly", priority: "0.5" },
+  {
+    path: "/terms-reward-distribution",
+    changefreq: "monthly",
+    priority: "0.5",
+  },
   { path: "/subscribe", changefreq: "monthly", priority: "0.5" },
 ];
 
@@ -51,7 +54,9 @@ async function fetchAllEvents(tab) {
 
     const res = await fetch(`${API_BASE_URL}/events?${params}`);
     if (!res.ok) {
-      console.warn(`  [warn] GET /events?tab=${tab}&page=${page} → ${res.status}`);
+      console.warn(
+        `  [warn] GET /events?tab=${tab}&page=${page} → ${res.status}`,
+      );
       break;
     }
 
@@ -72,7 +77,10 @@ function toW3CDate(dateStr) {
 }
 
 function escapeXml(str) {
-  return str.replace(/&/g, "&amp;").replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/'/g, "&apos;")
+    .replace(/"/g, "&quot;");
 }
 
 function buildUrl({ loc, lastmod, changefreq, priority }) {
@@ -94,7 +102,7 @@ async function main() {
   // Static URLs
   for (const { path, changefreq, priority } of STATIC_URLS) {
     urlEntries.push(
-      buildUrl({ loc: `${SITE_BASE_URL}${path}`, changefreq, priority })
+      buildUrl({ loc: `${SITE_BASE_URL}${path}`, changefreq, priority }),
     );
   }
 
@@ -118,7 +126,7 @@ async function main() {
             lastmod,
             changefreq,
             priority,
-          })
+          }),
         );
       }
     } catch (err) {

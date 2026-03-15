@@ -21,6 +21,7 @@ jobs:
           key: ${{ secrets.PROD_GCE_SSH_PRIVATE_KEY }}
           port: 22
           script: |
+            set -euo pipefail
             cd /var/www/koinvote
             git fetch origin
             git checkout main
