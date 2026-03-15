@@ -302,16 +302,16 @@ export default function ChangeUnlockPricePage() {
           (newPriceBtc === "" || priceError ? (
             <div className="text-secondary mt-6 text-xs">
               {t("changeUnlockPrice.currentPriceLabel", "Current: ")}
-              {currentPriceBtc} BTC
+              {Number(currentPriceBtc)} BTC
             </div>
           ) : (
             <div className="text-primary mt-6 text-xs">
               <span className="text-secondary">
                 {t("changeUnlockPrice.currentPriceLabel", "Current: ")}
-                {currentPriceBtc}
+                {Number(currentPriceBtc)}
               </span>
               {" → "}
-              {newPriceBtc} BTC
+              {Number(newPriceBtc)} BTC
             </div>
           ))}
       </div>
