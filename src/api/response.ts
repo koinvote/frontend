@@ -111,7 +111,6 @@ export interface EventDetailDataRes {
   total_reward_satoshi: number; //total reward指的是總獎金
   winner_count: number;
   additional_winner_count: number;
-  max_recipient?: number; // Added based on UI requirement
   duration_hours: number;
   creator_address: string;
   created_at: string;

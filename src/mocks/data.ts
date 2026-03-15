@@ -297,7 +297,6 @@ export const mockEventDetail: EventDetailDataRes = {
   total_reward_satoshi: 100000,
   winner_count: 5,
   additional_winner_count: 2,
-  max_recipient: 10,
   duration_hours: 96,
   creator_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
   created_at: "2026-01-10T10:00:00Z",
