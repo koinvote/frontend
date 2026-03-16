@@ -272,6 +272,7 @@ export default function ReplyPage() {
           setSubmittedReplyId(res.data.id);
         }
         setShowSuccessDialog(true);
+        API.preGenerateOgImage(eventId);
       } else {
         showToast(
           "error",
