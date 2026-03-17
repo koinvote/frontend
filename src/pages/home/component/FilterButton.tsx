@@ -160,7 +160,7 @@ export function FilterButton() {
       {isOpen && (
         <div
           ref={panelRef}
-          className="border-border bg-bg absolute top-11 right-0 z-50 w-[360px] max-w-[360px] rounded-2xl border p-5 shadow-lg md:w-lg md:max-w-lg"
+          className="border-border bg-bg absolute top-11 right-0 z-50 w-[360px] max-w-[90vw] rounded-2xl border p-5 shadow-lg md:w-lg md:max-w-lg"
         >
           <p className="text-primary mb-4 text-base font-semibold">
             {t("filter.title", "Filters")}
