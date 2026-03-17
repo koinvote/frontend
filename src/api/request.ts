@@ -121,6 +121,12 @@ export interface UpdateResultVisibilityReq {
   signature: string;
 }
 
+export interface VerifyChangeVisibilityPlaintextReq {
+  email: string;
+  plaintext: string;
+  signature: string;
+}
+
 export interface GenerateUnlockPricePlaintextReq {
   email: string;
   unlock_price_satoshi: number;
