@@ -995,6 +995,26 @@ export const handlers = [
     },
   ),
 
+  // POST /events/:eventId/result-visibility/verify-plaintext
+  http.post(
+    `${API_BASE_URL}/events/:eventId/result-visibility/verify-plaintext`,
+    async ({ params, request }) => {
+      const { eventId } = params as { eventId: string };
+      const body = (await request.json()) as {
+        email: string;
+        plaintext: string;
+        signature: string;
+      };
+      console.log("[Mock] Verify change visibility plaintext:", eventId, body);
+      return HttpResponse.json<ApiResponse<{ event_id: string; valid: boolean }>>({
+        code: "000000",
+        success: true,
+        message: null,
+        data: { event_id: eventId, valid: true },
+      });
+    },
+  ),
+
   // POST /events/:eventId/result-visibility
   http.post(
     `${API_BASE_URL}/events/:eventId/result-visibility`,

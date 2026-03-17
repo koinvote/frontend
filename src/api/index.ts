@@ -17,6 +17,7 @@ import type {
   UnlockEventReq,
   UpdateResultVisibilityReq,
   UpdateSystemParametersReq,
+  VerifyChangeVisibilityPlaintextReq,
   UpdateUnlockPriceReq,
   VerifySignatureReq,
 } from "./request.ts";
@@ -43,6 +44,7 @@ import type {
   SystemConfigRes,
   UnlockDepositStatusRes,
   UnlockEventRes,
+  VerifyChangeVisibilityPlaintextRes,
   VerifySignatureRes,
 } from "./response.ts";
 
@@ -219,6 +221,13 @@ export const API = {
       ApiResponse<GenerateChangeVisibilityPlaintextRes>,
       GenerateChangeVisibilityPlaintextReq
     >(`/events/${eventId}/result-visibility/generate-plaintext`),
+
+  // Verify plaintext + signature for changing result visibility
+  verifyChangeVisibilityPlaintext: (eventId: string) =>
+    post<
+      ApiResponse<VerifyChangeVisibilityPlaintextRes>,
+      VerifyChangeVisibilityPlaintextReq
+    >(`/events/${eventId}/result-visibility/verify-plaintext`),
 
   // Update result visibility
   updateResultVisibility: (eventId: string) =>

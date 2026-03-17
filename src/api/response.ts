@@ -356,4 +356,9 @@ export interface GenerateChangeVisibilityPlaintextRes {
   plaintext: string;
 }
 
+export interface VerifyChangeVisibilityPlaintextRes {
+  event_id: string;
+  valid: boolean;
+}
+
 export type GenerateUnlockPricePlaintextRes = GenerateChangeVisibilityPlaintextRes;
