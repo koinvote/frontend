@@ -21,7 +21,6 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 // import ReportIcon from "@/assets/icons/report.svg?react";
-import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
 import { formatRelativeTime } from "@/utils/formatter";
@@ -310,8 +309,7 @@ export function ReplyList({
           {participantsCount !== undefined && participantsCount > 0 ? (
             <>
               {participantsCount !== undefined && (
-                <span className="flex items-center gap-1">
-                  <EventCardParticipantsIcon className="h-3 w-3" />
+                <span>
                   {participantsCount === 1
                     ? t("replyList.participantsCountOne", "1 Participant")
                     : t(
@@ -322,8 +320,7 @@ export function ReplyList({
                 </span>
               )}
               {totalStakeSatoshi !== undefined && (
-                <span className="flex items-center gap-1">
-                  <span>₿</span>
+                <span>
                   {Number(totalBtc)} {t("replyList.btcTotal", "BTC Total")}
                 </span>
               )}
