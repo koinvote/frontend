@@ -276,8 +276,8 @@ export function ReplyList({
   if (isLocked) {
     const totalBtc = satsToBtc(totalStakeSatoshi ?? null, { suffix: false });
     return (
-      <div className="border-border flex flex-col items-center rounded-xl border px-6 py-10 text-center">
-        <div className="bg-surface-hover mb-4 flex h-14 w-14 items-center justify-center rounded-full">
+      <div className="border-border flex flex-col items-center rounded-xl border p-4 text-center sm:px-6 sm:py-10">
+        <div className="bg-surface mb-4 flex h-16 w-16 items-center justify-center rounded-full">
           <UnlockIcon className="h-7 w-7" />
         </div>
         <p className="tx-16 fw-m mb-1 text-(--color-orange-500)">
@@ -297,7 +297,7 @@ export function ReplyList({
               )}
         </p>
         {resultVisibility !== "creator_only" && unlockCount !== undefined && (
-          <p className="tx-14 mb-4">
+          <p className="tx-14">
             <span className="fw-m text-(--color-orange-500)">
               {unlockCount}
             </span>{" "}
@@ -306,7 +306,7 @@ export function ReplyList({
             </span>
           </p>
         )}
-        <div className="text-secondary tx-13 mb-6 flex items-center gap-4">
+        <div className="text-secondary tx-13 mt-4 mb-6 flex flex-col items-center gap-2 sm:flex-row sm:gap-4">
           {participantsCount !== undefined && participantsCount > 0 ? (
             <>
               {participantsCount !== undefined && (
@@ -336,7 +336,7 @@ export function ReplyList({
             </div>
           )}
         </div>
-        <div className="w-full max-w-sm space-y-1">
+        <div className="w-full max-w-sm space-y-2">
           <input
             ref={unlockInputRef}
             type="text"
