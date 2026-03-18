@@ -25,7 +25,7 @@ const API_BASE_URL = "/api/v1";
 // PENDING_TIME: 幾分鐘後變成 UNCONFIRMED
 // CONFIRM_TIME: 幾分鐘後變成 RECEIVED
 const PENDING_TIME = 0.1; // 0.5 分鐘 = 30 秒
-const CONFIRM_TIME = 10; // 1 分鐘
+const CONFIRM_TIME = 1; // 1 分鐘
 // ========================================================
 
 // Track deposit status timing (reset per eventId to simulate fresh sessions)
@@ -113,7 +113,9 @@ export const handlers = [
     // Filter by result visibility
     if (resultVisibility.length > 0) {
       filteredEvents = filteredEvents.filter(
-        (e) => "result_visibility" in e && resultVisibility.includes((e as any).result_visibility),
+        (e) =>
+          "result_visibility" in e &&
+          resultVisibility.includes((e as any).result_visibility),
       );
     }
 
@@ -121,12 +123,32 @@ export const handlers = [
     const start = (page - 1) * limit;
     const paginatedEvents = filteredEvents.slice(start, start + limit);
 
+    const maskedEvents = paginatedEvents.map((e) => {
+      const isRestricted =
+        (e as any).result_visibility === "paid_only" ||
+        (e as any).result_visibility === "creator_only";
+      if (!isRestricted) return e;
+      return {
+        ...e,
+        options: (e.options ?? []).map((opt) =>
+          typeof opt === "object" && opt !== null
+            ? { ...opt, weight_percent: 0, total_stake_satoshi: 0 }
+            : opt,
+        ),
+        top_replies: (e.top_replies ?? []).map((r) => ({
+          ...r,
+          weight_percent: 0,
+          amount_satoshi: 0,
+        })),
+      };
+    });
+
     return HttpResponse.json<ApiResponse<typeof mockGetEventListResponse>>({
       code: "200",
       success: true,
       message: null,
       data: {
-        events: paginatedEvents,
+        events: maskedEvents,
         page,
         limit,
       },
@@ -134,13 +156,20 @@ export const handlers = [
   }),
 
   // GET /events/:eventId - Get event detail
-  http.get(`${API_BASE_URL}/events/:eventId`, ({ params }) => {
+  http.get(`${API_BASE_URL}/events/:eventId`, ({ params, request }) => {
     const { eventId } = params;
+    const url = new URL(request.url);
+    const unlockEmail = url.searchParams.get("unlock_email") || "";
 
     // Find matching event from list or return default detail
     const eventFromList = mockEventList.find((e) => e.event_id === eventId);
 
     if (eventFromList) {
+      const isRestricted =
+        (eventFromList as any).result_visibility === "paid_only" ||
+        (eventFromList as any).result_visibility === "creator_only";
+      const isUnlocked = !isRestricted || PAID_UNLOCK_EMAILS.has(unlockEmail);
+
       // Create detail from list item, including status
       const detail = {
         ...mockEventDetail,
@@ -160,11 +189,29 @@ export const handlers = [
         started_at: eventFromList.started_at,
         deadline_at: eventFromList.deadline_at,
         ended_at: eventFromList.ended_at,
-        options: eventFromList.options,
-        top_replies: eventFromList.top_replies.map((reply) => ({
-          ...reply,
-          btc_address: `bc1q${Math.random().toString(36).substring(2, 15)}`,
-        })),
+        result_visibility: (eventFromList as any).result_visibility,
+        unlock_price_satoshi: (eventFromList as any).unlock_price_satoshi,
+        unlock_count: (eventFromList as any).unlock_count,
+        last_unlock_confirmed_at: (eventFromList as any)
+          .last_unlock_confirmed_at,
+        options: isUnlocked
+          ? eventFromList.options
+          : (eventFromList.options ?? []).map((opt) =>
+              typeof opt === "object" && opt !== null
+                ? { ...opt, weight_percent: 0, total_stake_satoshi: 0 }
+                : opt,
+            ),
+        top_replies: isUnlocked
+          ? eventFromList.top_replies.map((reply) => ({
+              ...reply,
+              btc_address: `bc1q${Math.random().toString(36).substring(2, 15)}`,
+            }))
+          : eventFromList.top_replies.map((reply) => ({
+              ...reply,
+              btc_address: `bc1q${Math.random().toString(36).substring(2, 15)}`,
+              weight_percent: 0,
+              amount_satoshi: 0,
+            })),
       };
 
       return HttpResponse.json<ApiResponse<typeof mockEventDetail>>({
@@ -603,6 +650,7 @@ export const handlers = [
       const { eventId } = params;
       const url = new URL(request.url);
       const balanceType = url.searchParams.get("balance_type") || "snapshot";
+      const unlockEmail = url.searchParams.get("unlock_email") || "";
 
       // Use real top-replies data for the exchange event
       if (eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ") {
@@ -620,16 +668,26 @@ export const handlers = [
 
       // For other events: generate different weight percentages based on balance type
       const eventFromList = mockEventList.find((e) => e.event_id === eventId);
+      const isRestricted =
+        (eventFromList as any)?.result_visibility === "paid_only" ||
+        (eventFromList as any)?.result_visibility === "creator_only";
+      const isUnlocked = !isRestricted || PAID_UNLOCK_EMAILS.has(unlockEmail);
       const isSnapshot = balanceType === "snapshot";
-      const topReplies = eventFromList?.top_replies?.map((reply, index) => ({
-        ...reply,
-        weight_percent: isSnapshot
-          ? reply.weight_percent
-          : Math.max(0, reply.weight_percent + (index % 2 === 0 ? 15 : -15)),
-        amount_satoshi: isSnapshot
-          ? reply.amount_satoshi
-          : reply.amount_satoshi + (index % 2 === 0 ? 30000 : -30000),
-      }));
+
+      const topReplies = eventFromList?.top_replies?.map((reply, index) => {
+        if (!isUnlocked) {
+          return { ...reply, weight_percent: 0, amount_satoshi: 0 };
+        }
+        return {
+          ...reply,
+          weight_percent: isSnapshot
+            ? reply.weight_percent
+            : Math.max(0, reply.weight_percent + (index % 2 === 0 ? 15 : -15)),
+          amount_satoshi: isSnapshot
+            ? reply.amount_satoshi
+            : reply.amount_satoshi + (index % 2 === 0 ? 30000 : -30000),
+        };
+      });
 
       return HttpResponse.json<ApiResponse<any>>({
         code: "000000",
@@ -981,7 +1039,9 @@ export const handlers = [
       const randomCode = Math.random().toString(36).slice(2, 12);
       let plaintext = "";
       if (body.result_visibility === "paid_only") {
-        const priceBtc = body.unlock_price_satoshi ? body.unlock_price_satoshi / 1e8 : 0;
+        const priceBtc = body.unlock_price_satoshi
+          ? body.unlock_price_satoshi / 1e8
+          : 0;
         plaintext = `koinvote.com | ${eventId} | paid_only | ${priceBtc} | ${timestamp} | ${randomCode}`;
       } else {
         plaintext = `koinvote.com | ${eventId} | public | ${timestamp} | ${randomCode}`;
@@ -1006,7 +1066,9 @@ export const handlers = [
         signature: string;
       };
       console.log("[Mock] Verify change visibility plaintext:", eventId, body);
-      return HttpResponse.json<ApiResponse<{ event_id: string; valid: boolean }>>({
+      return HttpResponse.json<
+        ApiResponse<{ event_id: string; valid: boolean }>
+      >({
         code: "000000",
         success: true,
         message: null,
