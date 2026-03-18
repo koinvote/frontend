@@ -610,7 +610,7 @@
     "bitcoinSignature": "Bitcoin Signature",
     "plaintext": "Plaintext",
     "unlockResultsWith": "Unlock Results with {{price}} BTC",
-    "creatorOnlyResults": "Results are visible to the creator only.",
+    "creatorOnlyResults": "Result visibility: Creator-only",
     "incorrectCreatorEmail": "Please enter the correct creator email.",
     "unlocked": "unlocked",
     "participantsCount": "{{count}} Participants",

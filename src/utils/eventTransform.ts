@@ -59,4 +59,5 @@ export const mapApiEventToEventSummary = (
   total_stake_btc: satsToBtcString(ev.total_stake_satoshi),
   top_replies: ev.top_replies.map(mapApiTopReply),
   options: ev.options ?? [],
+  result_visibility: ev.result_visibility ?? "public",
 });

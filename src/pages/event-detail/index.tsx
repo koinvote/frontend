@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -44,24 +44,26 @@ const EventDetail = () => {
   const [isRepliesLocked, setIsRepliesLocked] = useState(false);
   const [isCreator, setIsCreator] = useState(false);
   const [creatorEmail, setCreatorEmail] = useState(initialUnlockEmail ?? "");
+  const [unlockedEmail, setUnlockedEmail] = useState(initialUnlockEmail ?? "");
 
   const {
     data: eventDetail,
     isLoading: isLoadingEvent,
     error: eventError,
   } = useQuery({
-    queryKey: ["eventDetail", eventId],
+    queryKey: ["eventDetail", eventId, unlockedEmail],
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
-      const response = (await API.getEventDetail(
-        eventId,
-      )()) as unknown as ApiResponse<EventDetailDataRes>;
+      const response = (await API.getEventDetail(eventId)({
+        unlock_email: unlockedEmail || undefined,
+      })) as unknown as ApiResponse<EventDetailDataRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch event detail");
       }
       return response.data;
     },
     enabled: !!eventId,
+    placeholderData: keepPreviousData,
   });
 
   // Disable browser's automatic scroll restoration
@@ -95,6 +97,7 @@ const EventDetail = () => {
       "completedTopReplies",
       eventId,
       effectiveBalanceDisplayMode === "on_chain" ? "current" : "snapshot",
+      unlockedEmail,
     ],
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
@@ -102,6 +105,7 @@ const EventDetail = () => {
         effectiveBalanceDisplayMode === "on_chain" ? "current" : "snapshot";
       const response = (await API.getCompletedTopReplies(eventId)({
         balance_type: balanceType,
+        unlock_email: unlockedEmail || undefined,
       })) as unknown as ApiResponse<GetCompletedTopRepliesRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch top replies");
@@ -318,6 +322,7 @@ const EventDetail = () => {
           onCreatorChange={(creator, email) => {
             setIsCreator(creator);
             if (creator && email) setCreatorEmail(email);
+            if (email) setUnlockedEmail(email);
           }}
         />
       </div>

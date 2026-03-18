@@ -53,6 +53,7 @@ export const mockEventList: EventListDataRes[] = [
     participants_count: 23,
     total_stake_satoshi: 3200000,
     top_replies: [],
+    result_visibility: "paid_only",
     options: [
       {
         id: 1,
