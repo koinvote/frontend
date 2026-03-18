@@ -244,6 +244,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
           options={event.options}
           eventId={event.event_id}
           t={t}
+          resultVisibility={event.result_visibility}
         />
       ) : (
         (primaryReply || secondaryReply) && (
