@@ -138,6 +138,12 @@ export interface GetSignaturePlainTextRes {
   timestamp: number;
 }
 
+export interface GetEditPlaintextRes {
+  event_id: string;
+  plaintext: string;
+  timestamp: number;
+}
+
 export interface VerifySignatureRes {
   event_id: string;
   message: string;
