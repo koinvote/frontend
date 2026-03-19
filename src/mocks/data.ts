@@ -241,6 +241,48 @@ export const mockEventList: EventListDataRes[] = [
     ],
   },
   {
+    id: 5,
+    event_type: "open",
+    event_reward_type: "rewarded",
+    event_id: "evt_scroll_mock",
+    title: "What do you think will be the biggest Bitcoin use case by 2030?",
+    description:
+      "Share your prediction on how Bitcoin will be used most widely by the end of this decade — payments, store of value, DeFi, or something else entirely.",
+    status: 3, // active
+    hashtags: ["bitcoin", "future", "adoption"],
+    created_at: "2026-03-01T09:00:00Z",
+    preheat_start_at: "2026-03-01T12:00:00Z",
+    started_at: "2026-03-02T00:00:00Z",
+    deadline_at: "2026-04-15T00:00:00Z",
+    ended_at: "",
+    updated_at: "2026-03-10T00:00:00Z",
+    total_reward_satoshi: 200000,
+    participants_count: 25,
+    total_stake_satoshi: 18500000,
+    top_replies: [
+      {
+        id: 201,
+        body: "Store of value — digital gold for the next generation",
+        weight_percent: 32,
+        amount_satoshi: 5920000,
+      },
+      {
+        id: 202,
+        body: "Global payments via Lightning Network",
+        weight_percent: 28,
+        amount_satoshi: 5180000,
+      },
+      {
+        id: 203,
+        body: "Programmable finance via Bitcoin L2s",
+        weight_percent: 18,
+        amount_satoshi: 3330000,
+      },
+    ],
+    options: [],
+    result_visibility: "paid_only",
+  },
+  {
     id: 3,
     event_type: "open",
     event_reward_type: "rewarded",
@@ -1034,6 +1076,388 @@ export const mockExchangeTopReplies = [
   },
   { id: 123, body: "Kraken", weight_percent: 0, amount_satoshi: 0 },
   { id: 124, body: "OKX", weight_percent: 0, amount_satoshi: 0 },
+];
+
+// Scroll-test event replies (evt_scroll_mock) — 25 entries for pagination testing
+export const mockScrollEventReplies: Reply[] = [
+  {
+    id: 201,
+    btc_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    content: "Store of value — digital gold for the next generation",
+    content_hash:
+      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900001 | aa01bb",
+    signature:
+      "H1aAbBcCdDeEfF0011223344556677889900aabbccddeeff0011223344556677",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 5920000,
+    balance_at_snapshot_satoshi: 5920000,
+    balance_at_current_satoshi: 5920000,
+    created_at: "2026-03-02T01:00:00Z",
+  },
+  {
+    id: 202,
+    btc_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
+    content:
+      "Global payments via Lightning Network will dominate everyday commerce",
+    content_hash:
+      "b2c3d4e5f67890123456789012345678901234abcdef1234567890abcdef1234",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900002 | bb02cc",
+    signature: "H2bBcCdDeEfF0011223344556677889900aabbccddeeff0011223344556678",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 5180000,
+    balance_at_snapshot_satoshi: 5180000,
+    balance_at_current_satoshi: 5180000,
+    created_at: "2026-03-02T02:00:00Z",
+  },
+  {
+    id: 203,
+    btc_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    content: "Programmable finance via Bitcoin L2s like RGB and Taproot Assets",
+    content_hash:
+      "c3d4e5f678901234567890123456789012345bcdef1234567890abcdef12345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900003 | cc03dd",
+    signature: "H3cCdDeEfF0011223344556677889900aabbccddeeff0011223344556679",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3330000,
+    balance_at_snapshot_satoshi: 3330000,
+    balance_at_current_satoshi: 3330000,
+    created_at: "2026-03-02T03:00:00Z",
+  },
+  {
+    id: 204,
+    btc_address: "bc1qhwq3nwl8rp4h0lscqv7fugk5x7vh627q9nyw24",
+    content: "Remittances — sending money across borders without banks",
+    content_hash:
+      "d4e5f67890123456789012345678901234567cdef1234567890abcdef123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900004 | dd04ee",
+    signature: "H4dDeEfF0011223344556677889900aabbccddeeff0011223344556680",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 2100000,
+    balance_at_snapshot_satoshi: 2100000,
+    balance_at_current_satoshi: 2100000,
+    created_at: "2026-03-02T04:00:00Z",
+  },
+  {
+    id: 205,
+    btc_address: "bc1qmkwj22n9p9d9w33ep2s5zepss42097tfrpgndk",
+    content: "National reserve asset — more countries will follow El Salvador",
+    content_hash:
+      "e5f678901234567890123456789012345678def1234567890abcdef1234567",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900005 | ee05ff",
+    signature: "H5eEfF0011223344556677889900aabbccddeeff0011223344556681",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 1850000,
+    balance_at_snapshot_satoshi: 1850000,
+    balance_at_current_satoshi: 1850000,
+    created_at: "2026-03-02T05:00:00Z",
+  },
+  {
+    id: 206,
+    btc_address: "bc1qvnwj9nuhmntgnfhlc9pa3t4fce239dwxm4ah5x",
+    content: "Micropayments for content creators replacing ad-based models",
+    content_hash:
+      "f678901234567890123456789012345678901ef1234567890abcdef12345678",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900006 | ff06aa",
+    signature: "H6fF0011223344556677889900aabbccddeeff0011223344556682",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 1520000,
+    balance_at_snapshot_satoshi: 1520000,
+    balance_at_current_satoshi: 1520000,
+    created_at: "2026-03-02T06:00:00Z",
+  },
+  {
+    id: 207,
+    btc_address: "bc1qc0qtsc0wzsgj6jpk24fazfn2s2g5rsnmk5yq4k",
+    content: "Collateral for decentralized lending protocols",
+    content_hash:
+      "0789012345678901234567890123456789012f1234567890abcdef123456789",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900007 | aa07bb",
+    signature: "H7aA0011223344556677889900aabbccddeeff0011223344556683",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 1200000,
+    balance_at_snapshot_satoshi: 1200000,
+    balance_at_current_satoshi: 1200000,
+    created_at: "2026-03-02T07:00:00Z",
+  },
+  {
+    id: 208,
+    btc_address: "bc1qu5x9yltcluq4ltaaa5t5nk7g0g66d0n52qmeje",
+    content: "Energy monetization — miners selling excess power globally",
+    content_hash:
+      "089012345678901234567890123456789012341234567890abcdef1234567890",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900008 | bb08cc",
+    signature: "H8bB0011223344556677889900aabbccddeeff0011223344556684",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 980000,
+    balance_at_snapshot_satoshi: 980000,
+    balance_at_current_satoshi: 980000,
+    created_at: "2026-03-02T08:00:00Z",
+  },
+  {
+    id: 209,
+    btc_address: "bc1qphduhq9w97wpr67kqncy8pf43kgy9ahgc9jmg6",
+    content: "Smart contract platform once Taproot reaches full maturity",
+    content_hash:
+      "190123456789012345678901234567890123451234567890abcdef12345678901",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900009 | cc09dd",
+    signature: "H9cC0011223344556677889900aabbccddeeff0011223344556685",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 850000,
+    balance_at_snapshot_satoshi: 850000,
+    balance_at_current_satoshi: 850000,
+    created_at: "2026-03-02T09:00:00Z",
+  },
+  {
+    id: 210,
+    btc_address: "bc1qzjtvf7dwwahgevguaepj4szcuk0h8373423uk9",
+    content: "Humanitarian aid distribution bypassing corrupt intermediaries",
+    content_hash:
+      "2a1234567890123456789012345678901234561234567890abcdef123456789012",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900010 | dd10ee",
+    signature: "H10dD011223344556677889900aabbccddeeff0011223344556686",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 720000,
+    balance_at_snapshot_satoshi: 720000,
+    balance_at_current_satoshi: 720000,
+    created_at: "2026-03-02T10:00:00Z",
+  },
+  {
+    id: 211,
+    btc_address: "bc1qual0ccnxd8k40efvcrz4dhxguvl5zw9ledyejr",
+    content: "Machine-to-machine payments in the IoT economy",
+    content_hash:
+      "3b234567890123456789012345678901234567234567890abcdef1234567890123",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900011 | ee11ff",
+    signature: "H11eE011223344556677889900aabbccddeeff0011223344556687",
+    is_reply_valid: false,
+    balance_at_reply_satoshi: 600000,
+    balance_at_snapshot_satoshi: 600000,
+    balance_at_current_satoshi: 600000,
+    created_at: "2026-03-02T11:00:00Z",
+  },
+  {
+    id: 212,
+    btc_address: "bc1qx9vxu655zlj2fe0ssw5qr82y6auh2lku7yuwk2",
+    content: "Inflation hedge for citizens in hyperinflationary economies",
+    content_hash:
+      "4c345678901234567890123456789012345678345678901abcdef12345678901234",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900012 | ff12aa",
+    signature: "H12fF011223344556677889900aabbccddeeff0011223344556688",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 550000,
+    balance_at_snapshot_satoshi: 550000,
+    balance_at_current_satoshi: 550000,
+    created_at: "2026-03-02T12:00:00Z",
+  },
+  {
+    id: 213,
+    btc_address: "bc1qe2cey7xr72z296q0uylp6knzmdfjr3urd8w4pn",
+    content: "Crowdfunding platform for open-source development",
+    content_hash:
+      "5d456789012345678901234567890123456789456789012abcdef123456789012345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900013 | aa13bb",
+    signature: "H13aA011223344556677889900aabbccddeeff0011223344556689",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 480000,
+    balance_at_snapshot_satoshi: 480000,
+    balance_at_current_satoshi: 480000,
+    created_at: "2026-03-02T13:00:00Z",
+  },
+  {
+    id: 214,
+    btc_address: "bc1qn6yle9ae705ekvsq3xawp5ttyzqkr99pcsaa7z",
+    content: "Privacy-preserving transactions with future protocol upgrades",
+    content_hash:
+      "6e567890123456789012345678901234567890567890123abcdef1234567890123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900014 | bb14cc",
+    signature: "H14bB011223344556677889900aabbccddeeff0011223344556690",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 420000,
+    balance_at_snapshot_satoshi: 420000,
+    balance_at_current_satoshi: 420000,
+    created_at: "2026-03-02T14:00:00Z",
+  },
+  {
+    id: 215,
+    btc_address: "bc1qgj9s4z3u9w0p4d7fmpwccz08389slsl063h6fa",
+    content: "Timestamping and notarization of legal documents on-chain",
+    content_hash:
+      "7f678901234567890123456789012345678901678901234abcdef12345678901234567",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900015 | cc15dd",
+    signature: "H15cC011223344556677889900aabbccddeeff0011223344556691",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 370000,
+    balance_at_snapshot_satoshi: 370000,
+    balance_at_current_satoshi: 370000,
+    created_at: "2026-03-02T15:00:00Z",
+  },
+  {
+    id: 216,
+    btc_address: "bc1qabc123def456ghi789jkl012mno345pqr678stu",
+    content: "Decentralized identity — self-sovereign IDs anchored in Bitcoin",
+    content_hash:
+      "8078901234567890123456789012345678901278901234abcdef123456789012345678",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900016 | dd16ee",
+    signature: "H16dD011223344556677889900aabbccddeeff0011223344556692",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 320000,
+    balance_at_snapshot_satoshi: 320000,
+    balance_at_current_satoshi: 320000,
+    created_at: "2026-03-02T16:00:00Z",
+  },
+  {
+    id: 217,
+    btc_address: "bc1qdef456ghi789jkl012mno345pqr678stu901vwx",
+    content: "Corporate treasury reserve alongside traditional assets",
+    content_hash:
+      "9189012345678901234567890123456789012389012345abcdef1234567890123456789",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900017 | ee17ff",
+    signature: "H17eE011223344556677889900aabbccddeeff0011223344556693",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 280000,
+    balance_at_snapshot_satoshi: 280000,
+    balance_at_current_satoshi: 280000,
+    created_at: "2026-03-02T17:00:00Z",
+  },
+  {
+    id: 218,
+    btc_address: "bc1qghi789jkl012mno345pqr678stu901vwx234yz5",
+    content: "Supply chain provenance tracking using OP_RETURN data",
+    content_hash:
+      "a290123456789012345678901234567890123490123456abcdef12345678901234567890",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900018 | ff18aa",
+    signature: "H18fF011223344556677889900aabbccddeeff0011223344556694",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 240000,
+    balance_at_snapshot_satoshi: 240000,
+    balance_at_current_satoshi: 240000,
+    created_at: "2026-03-02T18:00:00Z",
+  },
+  {
+    id: 219,
+    btc_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc8",
+    content: "Gaming economies with true ownership of in-game assets",
+    content_hash:
+      "b3a1234567890123456789012345678901234a1234567abcdef123456789012345678901",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900019 | aa19bb",
+    signature: "H19aA011223344556677889900aabbccddeeff0011223344556695",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 200000,
+    balance_at_snapshot_satoshi: 200000,
+    balance_at_current_satoshi: 200000,
+    created_at: "2026-03-02T19:00:00Z",
+  },
+  {
+    id: 220,
+    btc_address: "bc1qmno345pqr678stu901vwx234yz567abc890def1",
+    content: "Prediction markets without intermediaries or censorship",
+    content_hash:
+      "c4b234567890123456789012345678901234b1234567abcdef1234567890123456789012",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900020 | bb20cc",
+    signature: "H20bB011223344556677889900aabbccddeeff0011223344556696",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 170000,
+    balance_at_snapshot_satoshi: 170000,
+    balance_at_current_satoshi: 170000,
+    created_at: "2026-03-02T20:00:00Z",
+  },
+  {
+    id: 221,
+    btc_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi4",
+    content: "Tokenizing real-world assets like real estate on Bitcoin L2s",
+    content_hash:
+      "d5c34567890123456789012345678901234c1234567abcdef12345678901234567890123",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900021 | cc21dd",
+    signature: "H21cC011223344556677889900aabbccddeeff0011223344556697",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 145000,
+    balance_at_snapshot_satoshi: 145000,
+    balance_at_current_satoshi: 145000,
+    created_at: "2026-03-02T21:00:00Z",
+  },
+  {
+    id: 222,
+    btc_address: "bc1qstu901vwx234yz567abc890def123ghi456jkl7",
+    content: "Charitable donations with full transparency and auditability",
+    content_hash:
+      "e6d456789012345678901234567890123d1234567abcdef123456789012345678901234",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900022 | dd22ee",
+    signature: "H22dD011223344556677889900aabbccddeeff0011223344556698",
+    is_reply_valid: false,
+    balance_at_reply_satoshi: 120000,
+    balance_at_snapshot_satoshi: 120000,
+    balance_at_current_satoshi: 120000,
+    created_at: "2026-03-02T22:00:00Z",
+  },
+  {
+    id: 223,
+    btc_address: "bc1qvwx234yz567abc890def123ghi456jkl789mno0",
+    content: "Digital voting infrastructure secured by proof-of-work",
+    content_hash:
+      "f7e56789012345678901234567890123e1234567abcdef1234567890123456789012345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900023 | ee23ff",
+    signature: "H23eE011223344556677889900aabbccddeeff0011223344556699",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 95000,
+    balance_at_snapshot_satoshi: 95000,
+    balance_at_current_satoshi: 95000,
+    created_at: "2026-03-02T23:00:00Z",
+  },
+  {
+    id: 224,
+    btc_address: "bc1qyz567abc890def123ghi456jkl789mno012pqr3",
+    content: "Education funding in developing countries via Bitcoin grants",
+    content_hash:
+      "08f6789012345678901234567890123f1234567abcdef12345678901234567890123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900024 | ff24aa",
+    signature: "H24fF011223344556677889900aabbccddeeff0011223344556700",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 72000,
+    balance_at_snapshot_satoshi: 72000,
+    balance_at_current_satoshi: 72000,
+    created_at: "2026-03-03T00:00:00Z",
+  },
+  {
+    id: 225,
+    btc_address: "bc1qabc890def123ghi456jkl789mno012pqr345stu",
+    content: "Climate finance — tokenized carbon credits settled in BTC",
+    content_hash:
+      "190789012345678901234567890120123456789abcdef123456789012345678901234567",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900025 | aa25bb",
+    signature: "H25aA011223344556677889900aabbccddeeff0011223344556701",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 50000,
+    balance_at_snapshot_satoshi: 50000,
+    balance_at_current_satoshi: 50000,
+    created_at: "2026-03-03T01:00:00Z",
+  },
 ];
 
 export const mockGetReceiptVerifyPubKeysRes: GetReceiptVerifyPubKeysRes[] = [

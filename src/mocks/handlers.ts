@@ -10,6 +10,7 @@ import {
   mockEventList,
   mockExchangeEventReplies,
   mockExchangeTopReplies,
+  mockScrollEventReplies,
   mockGetEventListResponse,
   mockGetListRepliesResponse,
   mockGetReceiptVerifyPubKeysRes,
@@ -465,11 +466,15 @@ export const handlers = [
     }
 
     // Check if this event requires unlock (paid_only result visibility)
-    const eventDetail =
-      eventId === mockEventDetail.event_id ? mockEventDetail : null;
+    const eventFromList = mockEventList.find((e) => e.event_id === eventId);
+    const eventResultVisibility =
+      (eventFromList as any)?.result_visibility ??
+      (eventId === mockEventDetail.event_id
+        ? mockEventDetail.result_visibility
+        : null);
     if (
-      (eventDetail?.result_visibility === "paid_only" ||
-        eventDetail?.result_visibility === "creator_only") &&
+      (eventResultVisibility === "paid_only" ||
+        eventResultVisibility === "creator_only") &&
       (!unlockEmail || !PAID_UNLOCK_EMAILS.has(unlockEmail))
     ) {
       return HttpResponse.json<ApiResponse<any>>(
@@ -486,7 +491,9 @@ export const handlers = [
     let replies =
       eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
         ? [...mockExchangeEventReplies]
-        : [...mockGetListRepliesResponse.replies];
+        : eventId === "evt_scroll_mock"
+          ? [...mockScrollEventReplies]
+          : [...mockGetListRepliesResponse.replies];
 
     // Filter by search
     if (search) {
