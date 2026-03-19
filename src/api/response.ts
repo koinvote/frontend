@@ -78,6 +78,10 @@ export interface EventListDataRes {
   total_stake_satoshi: number;
   top_replies: TopReplyRes[];
   options: EventOption[] | string[]; // Allow both for compatibility or if backend changes
+  result_visibility?: "public" | "paid_only" | "creator_only";
+  unlock_price_satoshi?: number;
+  unlock_count?: number;
+  last_unlock_confirmed_at?: string | null;
 }
 
 export interface GetEventListRes {
