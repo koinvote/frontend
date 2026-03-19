@@ -871,10 +871,10 @@
     "responseType": "回應類型",
     "multipleChoice": "單選題",
     "openEnded": "開放式",
-    "visibility": "可見範圍",
+    "visibility": "結果可見性",
     "public": "公開",
-    "paidOnly": "付費限定",
-    "creatorOnly": "創作者限定",
+    "paidOnly": "僅付費",
+    "creatorOnly": "僅創建者",
     "clearAll": "清除",
     "apply": "套用"
   },
