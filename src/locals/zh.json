@@ -863,6 +863,21 @@
   "backendMessage": {
     "eventActivated": "事件建立成功"
   },
+  "filter": {
+    "title": "篩選條件",
+    "rewardType": "獎勵類型",
+    "reward": "有獎勵",
+    "noReward": "無獎勵",
+    "responseType": "回應類型",
+    "multipleChoice": "單選題",
+    "openEnded": "開放式",
+    "visibility": "可見範圍",
+    "public": "公開",
+    "paidOnly": "付費限定",
+    "creatorOnly": "創作者限定",
+    "clearAll": "清除",
+    "apply": "套用"
+  },
   "formatter": {
     "w": " 週",
     "d": " 天",

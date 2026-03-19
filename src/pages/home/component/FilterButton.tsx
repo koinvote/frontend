@@ -270,6 +270,7 @@ export function FilterButton() {
               onClick={handleClearAll}
               disabled={draftCount === 0}
               className="text-secondary text-sm"
+              autoInsertSpace={false}
             >
               {t("filter.clearAll", "Clear all")}
             </Button>
@@ -277,6 +278,7 @@ export function FilterButton() {
               type="primary"
               onClick={handleApply}
               className="rounded-xl px-5 text-sm font-medium"
+              autoInsertSpace={false}
             >
               {t("filter.apply", "Apply")}
             </Button>

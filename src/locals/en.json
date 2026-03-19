@@ -860,6 +860,21 @@
   "backendMessage": {
     "eventActivated": "Event successfully activated"
   },
+  "filter": {
+    "title": "Filters",
+    "rewardType": "Reward type",
+    "reward": "Reward",
+    "noReward": "No reward",
+    "responseType": "Response type",
+    "multipleChoice": "Multiple choice",
+    "openEnded": "Open-ended",
+    "visibility": "Visibility",
+    "public": "Public",
+    "paidOnly": "Paid-only",
+    "creatorOnly": "Creator-only",
+    "clearAll": "Clear all",
+    "apply": "Apply"
+  },
   "formatter": {
     "w": "w",
     "d": "d",
