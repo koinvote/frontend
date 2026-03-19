@@ -16,6 +16,9 @@ interface HomeStoreState {
   sortOrder: HomeSortOrder;
   isSortActive: boolean;
   activeHashtag: string | null;
+  filterRewardType: string[];   // "rewarded" | "non_reward"
+  filterEventType: string[];    // "single_choice" | "open"
+  filterVisibility: string[];   // "public" | "paid_only" | "creator_only"
 
   // data
   events: EventSummary[];
@@ -40,6 +43,7 @@ interface HomeStoreState {
   setIsSortActive: (active: boolean) => void;
   setActiveHashtag: (tag: string | null) => void;
   setCollapsed: (collapsed: boolean) => void;
+  setFilters: (rewardType: string[], eventType: string[], visibility: string[]) => void;
 
   setEvents: (
     events: EventSummary[],
@@ -74,6 +78,9 @@ export const useHomeStore = create<HomeStoreState>()(
         sortOrder: "asc",
         isSortActive: false,
         activeHashtag: null,
+        filterRewardType: [],
+        filterEventType: [],
+        filterVisibility: [],
 
         events: [],
         hasMore: true,
@@ -189,6 +196,21 @@ export const useHomeStore = create<HomeStoreState>()(
           set(() => ({ scrollY: y }), false, "home/setScrollY"),
         setIsDesktop: (isDesktop) =>
           set(() => ({ isDesktop }), false, "home/setIsDesktop"),
+        setFilters: (rewardType, eventType, visibility) =>
+          set(
+            () => ({
+              filterRewardType: rewardType,
+              filterEventType: eventType,
+              filterVisibility: visibility,
+              offset: 0,
+              events: [],
+              hasMore: true,
+              total: 0,
+            }),
+            false,
+            "home/setFilters",
+          ),
+
         resetFilters: () =>
           set(
             () => ({
@@ -196,7 +218,10 @@ export const useHomeStore = create<HomeStoreState>()(
               debouncedSearch: "",
               activeHashtag: null,
               sortField: "time",
-              sortOrder: "asc", // 升序：事件快结束的排第一
+              sortOrder: "asc",
+              filterRewardType: [],
+              filterEventType: [],
+              filterVisibility: [],
               offset: 0,
             }),
             false,

@@ -1,4 +1,5 @@
 import { useToast } from "@/components/base/Toast/useToast";
+import { Button, Tooltip } from "antd";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -20,16 +21,24 @@ import { useDebouncedClick } from "@/utils/helper";
 import { EventCTAButton } from "./EventCTAButton";
 import { TopReplyBar } from "./TopReplyBar";
 
+const UNLOCK_LOCK_DURATION_MS = 24 * 60 * 60 * 1000;
+
 interface EventInfoProps {
   event: EventDetailDataRes;
   topReplies?: TopReply[];
   isTopRepliesLoading?: boolean;
+  isLocked?: boolean;
+  isCreator?: boolean;
+  creatorEmail?: string;
 }
 
 export function EventInfo({
   event,
   topReplies,
   isTopRepliesLoading,
+  isLocked,
+  isCreator,
+  creatorEmail,
 }: EventInfoProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -330,24 +339,30 @@ export function EventInfo({
       ? event.options.length
       : 2;
 
-  // Build field list for mobile (ordered list)
-  const mobileFields = useMemo(() => {
-    const fields: Array<{
-      label: string;
-      value: React.ReactNode;
-      key: string;
-    }> = [];
+  // Build unified field list
+  const fields = useMemo(() => {
+    type Field = { label: string; value: React.ReactNode; key: string };
+    const result: Field[] = [];
 
-    // Only show rewards in ongoing or completed state
+    result.push({
+      key: "time-remaining",
+      label: t("eventInfo.timeRemaining", "Time Remaining:"),
+      value: (
+        <div className="text-primary text-xs font-semibold md:text-sm">
+          {timeRemaining}
+        </div>
+      ),
+    });
+
     if ((isOngoing || isCompleted) && isRewarded && rewardAmountBtc) {
-      fields.push({
+      result.push({
         key: "reward-amount",
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
         value: (
           <span className="text-primary text-xs font-semibold md:text-sm">
             <span className="text-accent mr-2">
               {Number(rewardAmountBtc)} BTC
-            </span>{" "}
+            </span>
             ({event.winner_count}{" "}
             {event.winner_count === 1
               ? t("eventInfo.address", "Address")
@@ -359,7 +374,7 @@ export function EventInfo({
     }
 
     if ((isOngoing || isCompleted) && isRewarded && additionalRewardBtc) {
-      fields.push({
+      result.push({
         key: "additional-reward",
         label: t("eventInfo.additionalReward", "Additional Reward:"),
         value: (
@@ -374,58 +389,12 @@ export function EventInfo({
       });
     }
 
-    fields.push({
-      key: "time-remaining",
-      label: t("eventInfo.timeRemaining", "Time Remaining:"),
-      value: (
-        <div className="text-primary mt-1 text-xs font-semibold md:text-sm">
-          {timeRemaining}
-        </div>
-      ),
-    });
-
-    // Only show event duration in ongoing or completed state
-    if ((isOngoing || isCompleted || isPreheat) && eventDurationDisplay) {
-      fields.push({
-        key: "duration",
-        label: t("eventInfo.durationOfEvent", "Duration of This Event:"),
-        value: (
-          <span className="text-primary text-xs md:text-sm">
-            {eventDurationDisplay}
-          </span>
-        ),
-      });
-    }
-
-    if (preheatDurationDisplay) {
-      fields.push({
-        key: "preheat-duration",
-        label: t("eventInfo.preheatDuration", "Preheat Duration:"),
-        value: (
-          <span className="text-primary text-xs md:text-sm">
-            {preheatDurationDisplay}
-          </span>
-        ),
-      });
-    }
-
-    fields.push({
-      key: "event-id",
-      label: t("eventInfo.eventId", "Event-ID:"),
-      value: (
-        <span className="text-primary text-xs md:text-sm">
-          {event.event_id}
-        </span>
-      ),
-    });
-
-    // Only show creator address in ongoing or completed state
     if ((isOngoing || isCompleted || isPreheat) && event.creator_address) {
-      fields.push({
+      result.push({
         key: "creator-address",
         label: t("eventInfo.creatorAddress", "Creator address:"),
         value: (
-          <div className="mt-1 flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleAddressClick}
@@ -436,10 +405,7 @@ export function EventInfo({
               )}
             >
               {event.creator_address.length > 10
-                ? `${event.creator_address.slice(
-                    0,
-                    6,
-                  )}...${event.creator_address.slice(-4)}`
+                ? `${event.creator_address.slice(0, 6)}...${event.creator_address.slice(-4)}`
                 : event.creator_address}
             </button>
             <button
@@ -458,11 +424,45 @@ export function EventInfo({
       });
     }
 
-    fields.push({
+    if (preheatDurationDisplay) {
+      result.push({
+        key: "preheat-duration",
+        label: t("eventInfo.preheatDuration", "Preheat Duration:"),
+        value: (
+          <span className="text-primary text-xs md:text-sm">
+            {preheatDurationDisplay}
+          </span>
+        ),
+      });
+    }
+
+    if (eventDurationDisplay) {
+      result.push({
+        key: "duration",
+        label: t("eventInfo.durationOfEvent", "Duration of This Event:"),
+        value: (
+          <span className="text-primary text-xs md:text-sm">
+            {eventDurationDisplay}
+          </span>
+        ),
+      });
+    }
+
+    result.push({
+      key: "event-id",
+      label: t("eventInfo.eventId", "Event-ID:"),
+      value: (
+        <span className="text-primary text-xs md:text-sm">
+          {event.event_id}
+        </span>
+      ),
+    });
+
+    result.push({
       key: "response-type",
       label: t("eventInfo.eventType", "Response type:"),
       value: (
-        <span className="text-xs">
+        <span className="text-xs md:text-sm">
           {event.event_type === "open"
             ? t("reply.openEnded", "Open-ended")
             : t("reply.singleChoice", "Multiple choice")}
@@ -470,15 +470,71 @@ export function EventInfo({
       ),
     });
 
+    if (event.result_visibility) {
+      const isWithin24hOfUnlock = event.last_unlock_confirmed_at
+        ? Date.now() - new Date(event.last_unlock_confirmed_at).getTime() <=
+          UNLOCK_LOCK_DURATION_MS
+        : false;
+      const showChangeButton =
+        isCreator && event.result_visibility !== "public";
+      result.push({
+        key: "result-visibility",
+        label: t("eventInfo.resultVisibility", "Result visibility:"),
+        value: (
+          <div className="flex items-center gap-2">
+            <span className="text-xs md:text-sm">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+            </span>
+            {showChangeButton && (
+              <Tooltip
+                title={
+                  isWithin24hOfUnlock
+                    ? t(
+                        "eventInfo.resultVisibilityLockedTooltip",
+                        "Visibility changes are locked for 24 hours after the most recent paid unlock.",
+                      )
+                    : undefined
+                }
+              >
+                <Button
+                  type="default"
+                  className="h-6! px-2!"
+                  autoInsertSpace={false}
+                  disabled={isWithin24hOfUnlock}
+                  onClick={() =>
+                    navigate(
+                      `/event/${event.event_id}/change-result-visibility`,
+                      {
+                        state: {
+                          creatorEmail,
+                          currentVisibility: event.result_visibility,
+                        },
+                      },
+                    )
+                  }
+                >
+                  {t("common.change", "Change")}
+                </Button>
+              </Tooltip>
+            )}
+          </div>
+        ),
+      });
+    }
+
     if (event.hashtags && event.hashtags.length > 0) {
-      fields.push({
+      result.push({
         key: "hashtags",
         label:
           event.hashtags.length > 1
             ? t("eventInfo.hashtags", "Hashtags:")
             : t("eventInfo.hashtag", "Hashtag:"),
         value: (
-          <div className="mt-1 flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2">
             {event.hashtags.map((tag, index) => {
               const hashtagWithPrefix = tag.startsWith("#") ? tag : `#${tag}`;
               return (
@@ -490,9 +546,7 @@ export function EventInfo({
                   aria-label={t(
                     "eventInfo.filterByHashtag",
                     "Filter by {{hashtag}}",
-                    {
-                      hashtag: hashtagWithPrefix,
-                    },
+                    { hashtag: hashtagWithPrefix },
                   )}
                 >
                   {hashtagWithPrefix}
@@ -504,7 +558,7 @@ export function EventInfo({
       });
     }
 
-    return fields;
+    return result;
   }, [
     isOngoing,
     isCompleted,
@@ -520,6 +574,7 @@ export function EventInfo({
     event.event_id,
     event.creator_address,
     event.event_type,
+    event.result_visibility,
     event.hashtags,
     handleAddressClick,
     handleHashtagClick,
@@ -613,200 +668,57 @@ export function EventInfo({
       )}
 
       {/* Top Reply / Options */}
-      {(showSkeleton || (displayData.length > 0 && !!displayTitle)) && (
-        <div
-          onClick={!showSkeleton && isOngoing ? handleOptionsClick : undefined}
-          className={!showSkeleton && isOngoing ? "cursor-pointer" : ""}
-        >
-          <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
-            {showSkeleton ? t("eventInfo.topReply", "Top Reply") : displayTitle}
-          </h2>
-          <div className="space-y-2">
-            {showSkeleton
-              ? [...Array(skeletonCount)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="border-border bg-surface h-12 w-full animate-pulse rounded-lg border"
-                  />
-                ))
-              : displayData.map((reply, index) => (
-                  <TopReplyBar key={reply.id || index} reply={reply} />
-                ))}
-          </div>
-        </div>
-      )}
-
-      {/* Desktop: Two Column Layout */}
-      <div className="hidden grid-cols-2 gap-4 md:grid md:gap-6">
-        {/* Left Column */}
-        <div className="flex flex-col gap-3">
-          {/* Only show rewards in ongoing or completed state */}
-          {(isOngoing || isCompleted) && isRewarded && rewardAmountBtc && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.rewardAmount", "Reward Amount:")}
-              </span>
-              <span className="text-primary ml-2 text-xs font-semibold md:text-sm">
-                <span className="text-accent">
-                  {Number(rewardAmountBtc)} BTC
-                </span>{" "}
-                ({event.winner_count}{" "}
-                {event.winner_count === 1
-                  ? t("eventInfo.address", "Address")
-                  : t("eventInfo.addresses", "Addresses")}
-                )
-              </span>
-            </div>
-          )}
-
-          {(isOngoing || isCompleted) && isRewarded && additionalRewardBtc && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.additionalReward", "Additional Reward:")}
-              </span>
-              <span className="text-primary ml-2 text-xs md:text-sm">
-                {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
-                {event.additional_winner_count === 1
-                  ? t("eventInfo.address", "Address")
-                  : t("eventInfo.addresses", "Addresses")}
-                )
-              </span>
-            </div>
-          )}
-
-          <div>
-            <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.timeRemaining", "Time Remaining:")}
-            </span>
-            <div className="text-primary mt-1 text-xs md:text-sm">
-              {timeRemaining}
-            </div>
-          </div>
-
-          {/* Show creator address in all states */}
-          {(isPreheat || isOngoing || isCompleted) && event.creator_address && (
-            <div className="flex items-center gap-2">
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.creatorAddress", "Creator address:")}
-              </span>
-              <div className="mt-1 flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleAddressClick}
-                  className="cursor-pointer border-b border-dashed border-black font-mono text-xs text-black transition-colors hover:border-gray-500 hover:text-gray-500 md:text-sm dark:border-white dark:text-white dark:hover:border-gray-400 dark:hover:text-gray-400"
-                  aria-label={t(
-                    "eventInfo.searchByCreatorAddress",
-                    "Search events by creator address",
+      {/* When locked (non-public) + open: hide entirely. When locked + single_choice: show names only. */}
+      {!(
+        isLocked &&
+        event.result_visibility !== "public" &&
+        event.event_type === "open"
+      ) &&
+        (showSkeleton || (displayData.length > 0 && !!displayTitle)) && (
+          <div
+            onClick={
+              !showSkeleton && isOngoing ? handleOptionsClick : undefined
+            }
+            className={!showSkeleton && isOngoing ? "cursor-pointer" : ""}
+          >
+            <h2 className="text-primary mb-3 text-sm font-semibold md:text-base">
+              {showSkeleton
+                ? t("eventInfo.topReply", "Top Reply")
+                : displayTitle}
+            </h2>
+            <div className="space-y-2">
+              {showSkeleton
+                ? [...Array(skeletonCount)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="border-border bg-surface h-14 w-full animate-pulse rounded-lg border"
+                    />
+                  ))
+                : displayData.map((reply, index) =>
+                    isLocked && event.result_visibility !== "public" ? (
+                      <div
+                        key={reply.id || index}
+                        className="border-border bg-bg flex h-14 w-full items-center rounded-lg border px-4"
+                      >
+                        <span className="text-primary line-clamp-1 flex-1 text-sm md:text-base">
+                          {reply.body}
+                        </span>
+                      </div>
+                    ) : (
+                      <TopReplyBar key={reply.id || index} reply={reply} />
+                    ),
                   )}
-                >
-                  {event.creator_address.length > 10
-                    ? `${event.creator_address.slice(
-                        0,
-                        6,
-                      )}...${event.creator_address.slice(-4)}`
-                    : event.creator_address}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCopyCreatorAddress}
-                  className="hover:bg-surface-hover text-secondary hover:text-primary flex cursor-pointer! items-center justify-center rounded p-1 transition-colors"
-                  aria-label={t(
-                    "eventInfo.copyCreatorAddress",
-                    "Copy creator address",
-                  )}
-                >
-                  <CopyIcon className="h-4 w-4 text-current" />
-                </button>
-              </div>
             </div>
-          )}
-
-          <div>
-            <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.eventType", "Event Type:")}
-            </span>
-            <span className="ml-2 text-xs text-black md:text-sm dark:text-white">
-              {event.event_type === "open"
-                ? t("reply.openEnded", "Open-ended")
-                : t("reply.singleChoice", "Multiple choice")}
-            </span>
           </div>
-        </div>
+        )}
 
-        {/* Right Column */}
-        <div className="flex flex-col gap-3">
-          {/* Only show event duration in ongoing or completed state */}
-          {(isOngoing || isCompleted || isPreheat) && eventDurationDisplay && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.durationOfEvent", "Duration of This Event:")}
-              </span>
-              <span className="text-primary ml-2 text-xs md:text-sm">
-                {eventDurationDisplay}
-              </span>
-            </div>
-          )}
-
-          {/* Show preheat duration in all states if it exists */}
-          {preheatDurationDisplay && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {t("eventInfo.preheatDuration", "Preheat Duration:")}
-              </span>
-              <span className="text-primary ml-2 text-xs md:text-sm">
-                {preheatDurationDisplay}
-              </span>
-            </div>
-          )}
-
-          <div>
+      {/* Responsive Two-Column Layout */}
+      <div className="flex flex-wrap gap-3 md:gap-6">
+        {fields.map((field) => (
+          <div key={field.key} className="w-full md:w-[calc(50%-0.75rem)]">
             <span className="text-secondary text-xs md:text-sm">
-              {t("eventInfo.eventId", "Event-ID:")}
+              {field.label}
             </span>
-            <span className="text-primary ml-2 text-xs md:text-sm">
-              {event.event_id}
-            </span>
-          </div>
-
-          {event.hashtags && event.hashtags.length > 0 && (
-            <div>
-              <span className="text-secondary text-xs md:text-sm">
-                {event.hashtags.length > 1
-                  ? t("eventInfo.hashtags", "Hashtags:")
-                  : t("eventInfo.hashtag", "Hashtag:")}
-              </span>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {event.hashtags.map((tag, index) => {
-                  const hashtagWithPrefix = tag.startsWith("#")
-                    ? tag
-                    : `#${tag}`;
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleHashtagClick(tag)}
-                      className="inline-flex cursor-pointer items-center rounded-full bg-gray-200 px-3 py-1 text-xs text-black transition-colors hover:bg-gray-300 md:text-sm dark:bg-white dark:hover:bg-gray-100"
-                      aria-label={t(
-                        "eventInfo.filterByHashtag",
-                        "Filter by {{hashtag}}",
-                        { hashtag: hashtagWithPrefix },
-                      )}
-                    >
-                      {hashtagWithPrefix}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Mobile: Ordered List */}
-      <div className="flex flex-col gap-3 md:hidden">
-        {mobileFields.map((field) => (
-          <div key={field.key}>
-            <span className="text-secondary text-xs">{field.label}</span>
             <div className="mt-1">{field.value}</div>
           </div>
         ))}

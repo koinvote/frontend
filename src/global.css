@@ -24,10 +24,13 @@
   --color-secondary: var(--color-gray-400);
   --color-tertiary: var(--color-gray-200);
   --color-bg: #000000;
-  --color-surface: #111214;
+  --color-surface: #141414;
+  --color-form-bg: #141414;
   --color-border: #232428;
   --color-accent: var(--color-orange-500);
   --color-primary-lightModeGray: var(--color-gray-50);
+  --color-warning: #f2a000;
+  --color-success: #67c23a;
 
   /* admin color tokens */
   --color-admin-bg: #f3f3f5; /* 外層灰底 */
@@ -75,6 +78,7 @@
   --color-secondary: #717182;
   --color-bg: #ffffff;
   --color-surface: #f3f3f5;
+  --color-form-bg: #ffffff;
   --color-border: #e6e6ea;
   --color-primary-lightModeGray: var(--color-gray-600);
   --color-gray-450: #f3f3f5; /* 浅色模式下的背景色 */
@@ -276,16 +280,17 @@
 
 .radio-orange {
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 9999px;
   background-color: #ffffff;
-  border: 2px solid #000000;
+  border: 1px solid #e6e6ea;
   display: inline-grid;
   place-content: center;
 }
 .dark .radio-orange {
-  border-color: #ffffff;
+  border-color: #292929;
+  background-color: #141414;
 }
 .radio-orange::after {
   content: "";
@@ -298,6 +303,43 @@
 }
 .radio-orange:checked::after {
   transform: scale(1);
+}
+
+.checkbox-form-bg {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  border-radius: 4px;
+  background-color: #ffffff;
+  border: 1.5px solid #e6e6ea;
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition:
+    background-color 120ms ease-in-out,
+    border-color 120ms ease-in-out;
+}
+.dark .checkbox-form-bg {
+  border-color: #292929;
+  background-color: #141414;
+}
+.checkbox-form-bg:checked {
+  background-color: var(--color-orange-500);
+  border-color: var(--color-orange-500);
+}
+.checkbox-form-bg::after {
+  content: "";
+  width: 9px;
+  height: 5px;
+  border-left: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  transform: rotate(-45deg) translate(1px, -1px);
+  transition: border-color 120ms ease-in-out;
+}
+.checkbox-form-bg:checked::after {
+  border-left-color: #ffffff;
+  border-bottom-color: #ffffff;
 }
 
 /* EventCard tooltip responsive styles */

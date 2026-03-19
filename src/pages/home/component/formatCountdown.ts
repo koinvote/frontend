@@ -17,6 +17,7 @@ type TranslateFunction = (
 
 export function formatCountdown(event: EventSummary, t: TranslateFunction) {
   if (event.status === EventStatus.ACTIVE) {
+    if (!event.deadline_at) return "--";
     return formatOngoingCountdown(event.deadline_at, t);
   }
 
@@ -25,9 +26,9 @@ export function formatCountdown(event: EventSummary, t: TranslateFunction) {
     const now = dayjs();
     // 確保將服務器返回的 UTC 時間正確解析為 UTC
     // 預熱階段應倒數至 started_at（事件進入 Ongoing 的時間）
-    const startAt = event.started_at
-      ? dayjs.utc(event.started_at)
-      : dayjs.utc(event.deadline_at); // fallback 防呆
+    const rawRef = event.started_at ?? event.deadline_at;
+    if (!rawRef) return "--";
+    const startAt = dayjs.utc(rawRef);
     if (startAt.isBefore(now))
       return t("eventCard.startingSoon", "Starting soon");
     const diffMs = startAt.diff(now);
@@ -65,9 +66,9 @@ export function formatCountdown(event: EventSummary, t: TranslateFunction) {
 
   // COMPLETED
   if (event.status === EventStatus.COMPLETED) {
-    const ref = event.ended_at
-      ? dayjs.utc(event.ended_at)
-      : dayjs.utc(event.deadline_at);
+    const rawRef = event.ended_at ?? event.deadline_at;
+    if (!rawRef) return "--";
+    const ref = dayjs.utc(rawRef);
     const now = dayjs();
 
     if (ref.isAfter(now)) {

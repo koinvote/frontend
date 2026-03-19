@@ -78,6 +78,10 @@ export interface EventListDataRes {
   total_stake_satoshi: number;
   top_replies: TopReplyRes[];
   options: EventOption[] | string[]; // Allow both for compatibility or if backend changes
+  result_visibility?: "public" | "paid_only" | "creator_only";
+  unlock_price_satoshi?: number;
+  unlock_count?: number;
+  last_unlock_confirmed_at?: string | null;
 }
 
 export interface GetEventListRes {
@@ -111,7 +115,6 @@ export interface EventDetailDataRes {
   total_reward_satoshi: number; //total reward指的是總獎金
   winner_count: number;
   additional_winner_count: number;
-  max_recipient?: number; // Added based on UI requirement
   duration_hours: number;
   creator_address: string;
   created_at: string;
@@ -123,6 +126,10 @@ export interface EventDetailDataRes {
   top_replies: TopReply[];
   hashtags: string[];
   preheat_hours: number;
+  result_visibility?: "public" | "paid_only" | "creator_only";
+  unlock_price_satoshi?: number;
+  unlock_count?: number;
+  last_unlock_confirmed_at?: string | null;
 }
 
 export interface GetSignaturePlainTextRes {
@@ -160,6 +167,7 @@ export interface DepositStatusRes {
 
 export interface GetListRepliesRes {
   replies: Reply[];
+  is_creator: 0 | 1;
   page: number;
   limit: number;
 }
@@ -182,6 +190,7 @@ export interface Reply {
   balance_at_current_satoshi: number; //Current real-time balance
   balance_last_updated_at: string;
   is_hidden: boolean;
+  is_creator?: 0 | 1;
   created_at: string;
   created_by_ip: string;
   updated_at: string;
@@ -315,3 +324,45 @@ export interface GetReceiptVerifyPubKeysRes {
   active: boolean;
   created_at: string;
 }
+
+export interface UnlockEventRes {
+  unlock_id: string;
+  event_id: string;
+  unlock_email: string;
+  deposit_address: string;
+  expected_amount_satoshi: number;
+  received_amount_satoshi: number;
+  status: "pending";
+  deposit_timeout_at: string;
+  is_creator: 0 | 1;
+}
+
+export interface UnlockDepositStatusRes {
+  unlock_id: string;
+  event_id: string;
+  unlock_email: string;
+  deposit_address: string;
+  expected_amount_satoshi: number;
+  received_amount_satoshi: number;
+  status:
+    | typeof DepositStatus.PENDING
+    | typeof DepositStatus.UNCONFIRMED
+    | typeof DepositStatus.UNLOCKED
+    | typeof DepositStatus.EXPIRED
+    | typeof DepositStatus.FAILED;
+  received_txid: string | null;
+  deposit_timeout_at: string;
+  first_seen_at: string | null;
+  confirmed_at: string | null;
+}
+
+export interface GenerateChangeVisibilityPlaintextRes {
+  plaintext: string;
+}
+
+export interface VerifyChangeVisibilityPlaintextRes {
+  event_id: string;
+  valid: boolean;
+}
+
+export type GenerateUnlockPricePlaintextRes = GenerateChangeVisibilityPlaintextRes;

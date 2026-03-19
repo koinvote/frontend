@@ -6,13 +6,19 @@ import type {
   ContactUsReq,
   CreateEventReq,
   CreateWithdrawalReq,
+  GenerateChangeVisibilityPlaintextReq,
   GenerateReplyPlaintextReq,
+  GenerateUnlockPricePlaintextReq,
   GetWithdrawalRecordReq,
   GetEventListReq,
   GetListRepliesReq,
   SubmitReplyReq,
   SubscribeReq,
+  UnlockEventReq,
+  UpdateResultVisibilityReq,
   UpdateSystemParametersReq,
+  VerifyChangeVisibilityPlaintextReq,
+  UpdateUnlockPriceReq,
   VerifySignatureReq,
 } from "./request.ts";
 
@@ -22,6 +28,8 @@ import type {
   DepositStatusRes,
   EventDataRes,
   EventDetailDataRes,
+  GenerateChangeVisibilityPlaintextRes,
+  GenerateUnlockPricePlaintextRes,
   GetCompletedTopRepliesRes,
   GetEventListRes,
   GetHotHashtagsRes,
@@ -34,6 +42,9 @@ import type {
   GetSignaturePlainTextRes,
   PayoutReportRes,
   SystemConfigRes,
+  UnlockDepositStatusRes,
+  UnlockEventRes,
+  VerifyChangeVisibilityPlaintextRes,
   VerifySignatureRes,
 } from "./response.ts";
 
@@ -105,7 +116,9 @@ export const API = {
   getEventList: get<ApiResponse<GetEventListRes>, GetEventListReq>("/events"),
 
   getEventDetail: (eventId: string) =>
-    get<ApiResponse<EventDetailDataRes>, void>(`/events/${eventId}`),
+    get<ApiResponse<EventDetailDataRes>, { unlock_email?: string }>(
+      `/events/${eventId}`,
+    ),
 
   getHotHashtags: get<
     ApiResponse<GetHotHashtagsRes>,
@@ -157,7 +170,7 @@ export const API = {
   getCompletedTopReplies: (eventId: string) =>
     get<
       ApiResponse<GetCompletedTopRepliesRes>,
-      { balance_type?: "snapshot" | "current" }
+      { balance_type?: "snapshot" | "current"; unlock_email?: string }
     >(`/events/${eventId}/completed/top-replies`),
 
   // Verification CSV API - Returns CSV file as blob
@@ -185,6 +198,57 @@ export const API = {
   getReceiptVerifyPubKeys: get<ApiResponse<GetReceiptVerifyPubKeysRes[]>, void>(
     "/receipt/pub-keys",
   ),
+
+  // Unlock event result (paid_only) — returns unlock_id
+  unlockEvent: (eventId: string) =>
+    post<ApiResponse<UnlockEventRes>, UnlockEventReq>(
+      `/events/${eventId}/unlock`,
+    ),
+
+  // Get unlock deposit status
+  getUnlockDepositStatus: (unlockId: string) =>
+    get<ApiResponse<UnlockDepositStatusRes>, void>(
+      `/events/unlock/${unlockId}/deposit-status`,
+    ),
+
+  // Extend unlock deposit timeout by 30 minutes
+  extendUnlockDepositTimeout: (unlockId: string) =>
+    get<ApiResponse<UnlockDepositStatusRes>, void>(
+      `/events/unlock/${unlockId}/deposit-extend`,
+    ),
+
+  // Generate plaintext for changing result visibility
+  generateChangeVisibilityPlaintext: (eventId: string) =>
+    post<
+      ApiResponse<GenerateChangeVisibilityPlaintextRes>,
+      GenerateChangeVisibilityPlaintextReq
+    >(`/events/${eventId}/result-visibility/generate-plaintext`),
+
+  // Verify plaintext + signature for changing result visibility
+  verifyChangeVisibilityPlaintext: (eventId: string) =>
+    post<
+      ApiResponse<VerifyChangeVisibilityPlaintextRes>,
+      VerifyChangeVisibilityPlaintextReq
+    >(`/events/${eventId}/result-visibility/verify-plaintext`),
+
+  // Update result visibility
+  updateResultVisibility: (eventId: string) =>
+    post<ApiResponse<void>, UpdateResultVisibilityReq>(
+      `/events/${eventId}/result-visibility`,
+    ),
+
+  // Generate plaintext for changing unlock price
+  generateUnlockPricePlaintext: (eventId: string) =>
+    post<
+      ApiResponse<GenerateUnlockPricePlaintextRes>,
+      GenerateUnlockPricePlaintextReq
+    >(`/events/${eventId}/unlock-price/generate-plaintext`),
+
+  // Update unlock price
+  updateUnlockPrice: (eventId: string) =>
+    post<ApiResponse<void>, UpdateUnlockPriceReq>(
+      `/events/${eventId}/unlock-price`,
+    ),
 };
 
 // Admin API (requires Bearer token authentication)

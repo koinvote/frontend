@@ -106,6 +106,7 @@ src/
   // ❌ Wrong - never omit fallback
   t("createEvent.alertTitleRequired")
   ```
+- **IMPORTANT**: Reuse existing i18n keys whenever the wording is identical — don't duplicate strings across namespaces. Before adding a new key, check `common.*` and other relevant namespaces for an existing match. If the same wording is needed in multiple places, extract it to a shared namespace (e.g., `common`, `creatorSign`) rather than duplicating it. Example: `common.change` is used for "Change" buttons across pages; `creatorSign.*` holds shared strings for the creator signing flow.
 
 #### Toast Notifications
 - Custom toast system in `src/components/base/Toast/`
@@ -149,3 +150,4 @@ These pages likely pass data via route state or query params.
 - Use `class-variance-authority` (cva) and `tailwind-merge` (twMerge) for dynamic styling
 - Split components into separate files whenever possible — avoid large single-file pages with many inline components
 - Admin (backend) and public (frontend) pages should use consistent, similar styling patterns
+- **Prefer Tailwind utility classes over custom CSS classes whenever possible.** When you encounter custom/shorthand classes (e.g. `tx-14`, `fw-m`, `lh-20`), replace them with their Tailwind equivalents (e.g. `text-sm`, `font-medium`, `leading-5`). Only use custom classes (defined in `global.css`) when there is no suitable Tailwind equivalent.

@@ -21,6 +21,7 @@ export interface EventSummary {
     | typeof EventStatus.COMPLETED;
 
   hashtags: string[];
+  result_visibility: "public" | "paid_only" | "creator_only";
 
   created_at: string;
   deadline_at: string;

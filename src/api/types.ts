@@ -29,9 +29,11 @@ export const DepositStatus = {
   PENDING: "pending",
   UNCONFIRMED: "unconfirmed",
   RECEIVED: "received",
+  UNLOCKED: "unlocked",
   DONATION: "donation",
   WAIT_FOR_REFUND: "wait_for_refund",
   EXPIRED: "expired",
+  FAILED: "failed",
   FROZEN: "frozen",
 } as const;
 

@@ -8,12 +8,14 @@ export interface SingleChoiceOptionsProps {
   options: EventOption[] | string[];
   eventId: string;
   t: (key: string, defaultValue: string) => string;
+  resultVisibility?: "public" | "paid_only" | "creator_only";
 }
 
 export function SingleChoiceOptions({
   options,
   eventId,
   t,
+  resultVisibility,
 }: SingleChoiceOptionsProps) {
   const navigate = useNavigate();
 
@@ -72,14 +74,15 @@ export function SingleChoiceOptions({
       {displayOptions.map((opt, index) => (
         <div key={index}>
           {index > 0 && <div className="border-border my-1 border-t" />}
-          <div className="py-1">
+          <div className="flex min-h-11 flex-col justify-center py-1">
             <p className="text-primary line-clamp-1 wrap-break-word">
               {typeof opt === "string" ? opt : opt.option_text}
             </p>
-            <div className="text-secondary mt-1 flex flex-col gap-1 text-[11px] md:flex-row md:items-center md:justify-end">
-              <div className="flex items-center justify-end gap-2 md:gap-2">
-                {typeof opt !== "string" && (
-                  <>
+            {typeof opt !== "string" &&
+              resultVisibility !== "paid_only" &&
+              resultVisibility !== "creator_only" && (
+                <div className="text-secondary mt-1 flex flex-col gap-1 text-[11px] md:flex-row md:items-center md:justify-end">
+                  <div className="flex items-center justify-end gap-2 md:gap-2">
                     <span>
                       {t("eventCard.weight", "Weight:")}{" "}
                       {Number(opt.weight_percent.toFixed(2))}%
@@ -91,10 +94,9 @@ export function SingleChoiceOptions({
                       })}{" "}
                       BTC
                     </span>
-                  </>
-                )}
-              </div>
-            </div>
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       ))}

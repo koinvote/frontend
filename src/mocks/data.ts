@@ -53,6 +53,7 @@ export const mockEventList: EventListDataRes[] = [
     participants_count: 23,
     total_stake_satoshi: 3200000,
     top_replies: [],
+    result_visibility: "paid_only",
     options: [
       {
         id: 1,
@@ -188,16 +189,98 @@ export const mockEventList: EventListDataRes[] = [
     participants_count: 15,
     total_stake_satoshi: 37216784,
     top_replies: [
-      { id: 120, body: "Binance", weight_percent: 50.463868462014304, amount_satoshi: 18753296 },
-      { id: 121, body: "Coinbase", weight_percent: 49.31754164515266, amount_satoshi: 18327300 },
+      {
+        id: 120,
+        body: "Binance",
+        weight_percent: 50.463868462014304,
+        amount_satoshi: 18753296,
+      },
+      {
+        id: 121,
+        body: "Coinbase",
+        weight_percent: 49.31754164515266,
+        amount_satoshi: 18327300,
+      },
     ],
     options: [
-      { id: 120, option_text: "Binance", order: 1, total_stake_satoshi: 18753296, weight_percent: 50.463868462014304 },
-      { id: 121, option_text: "Coinbase", order: 2, total_stake_satoshi: 18327300, weight_percent: 49.31754164515266 },
-      { id: 122, option_text: "Hyperliquid", order: 3, total_stake_satoshi: 81232, weight_percent: 0.21858989283304364 },
-      { id: 123, option_text: "Kraken", order: 4, total_stake_satoshi: 0, weight_percent: 0 },
-      { id: 124, option_text: "OKX", order: 5, total_stake_satoshi: 0, weight_percent: 0 },
+      {
+        id: 120,
+        option_text: "Binance",
+        order: 1,
+        total_stake_satoshi: 18753296,
+        weight_percent: 50.463868462014304,
+      },
+      {
+        id: 121,
+        option_text: "Coinbase",
+        order: 2,
+        total_stake_satoshi: 18327300,
+        weight_percent: 49.31754164515266,
+      },
+      {
+        id: 122,
+        option_text: "Hyperliquid",
+        order: 3,
+        total_stake_satoshi: 81232,
+        weight_percent: 0.21858989283304364,
+      },
+      {
+        id: 123,
+        option_text: "Kraken",
+        order: 4,
+        total_stake_satoshi: 0,
+        weight_percent: 0,
+      },
+      {
+        id: 124,
+        option_text: "OKX",
+        order: 5,
+        total_stake_satoshi: 0,
+        weight_percent: 0,
+      },
     ],
+  },
+  {
+    id: 5,
+    event_type: "open",
+    event_reward_type: "rewarded",
+    event_id: "evt_scroll_mock",
+    title: "What do you think will be the biggest Bitcoin use case by 2030?",
+    description:
+      "Share your prediction on how Bitcoin will be used most widely by the end of this decade — payments, store of value, DeFi, or something else entirely.",
+    status: 3, // active
+    hashtags: ["bitcoin", "future", "adoption"],
+    created_at: "2026-03-01T09:00:00Z",
+    preheat_start_at: "2026-03-01T12:00:00Z",
+    started_at: "2026-03-02T00:00:00Z",
+    deadline_at: "2026-04-15T00:00:00Z",
+    ended_at: "",
+    updated_at: "2026-03-10T00:00:00Z",
+    total_reward_satoshi: 200000,
+    participants_count: 25,
+    total_stake_satoshi: 18500000,
+    top_replies: [
+      {
+        id: 201,
+        body: "Store of value — digital gold for the next generation",
+        weight_percent: 32,
+        amount_satoshi: 5920000,
+      },
+      {
+        id: 202,
+        body: "Global payments via Lightning Network",
+        weight_percent: 28,
+        amount_satoshi: 5180000,
+      },
+      {
+        id: 203,
+        body: "Programmable finance via Bitcoin L2s",
+        weight_percent: 18,
+        amount_satoshi: 3330000,
+      },
+    ],
+    options: [],
+    result_visibility: "paid_only",
   },
   {
     id: 3,
@@ -257,7 +340,6 @@ export const mockEventDetail: EventDetailDataRes = {
   total_reward_satoshi: 100000,
   winner_count: 5,
   additional_winner_count: 2,
-  max_recipient: 10,
   duration_hours: 96,
   creator_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
   created_at: "2026-01-10T10:00:00Z",
@@ -292,6 +374,13 @@ export const mockEventDetail: EventDetailDataRes = {
   ],
   hashtags: ["bitcoin", "lightning", "scaling"],
   preheat_hours: 12,
+  result_visibility: "paid_only",
+  unlock_price_satoshi: 5000,
+  unlock_count: 128,
+  // Within UNLOCK_LOCK_DURATION_MS (24h) → locked; set to >24h ago or null to test unlocked
+  last_unlock_confirmed_at: new Date(
+    Date.now() - 2 * 60 * 60 * 1000,
+  ).toISOString(), // 2 hours ago → locked
 };
 
 // Hot Hashtags Mock
@@ -602,30 +691,773 @@ export const mockVerificationCsvContent = `plan_id,deposit_id,event_id,winner_ad
 
 // Exchange event replies (01KK0NP9AV6CQWG3TM4DJ5RFEZ)
 export const mockExchangeEventReplies: Reply[] = [
-  { id: 111, btc_address: "bc1qmkwj22n9p9d9w33ep2s5zepss42097tfrpgndk", option_id: 120, option_hash: "f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772908729 | 4e7cf6291e", signature: "ICuIpIbOsms1zEUO9xbBQkxuy1SghgKs1MSZlztvTdOWPxnLphsfWGOss/Vxy/CdkkF0cSEnVOF+wjcL01u7Lso=", nonce_timestamp: "1772908729", random_code: "4e7cf6291e", is_reply_valid: true, balance_at_reply_satoshi: 3396718, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 3396718, balance_last_updated_at: "2026-03-08T05:47:06.637073Z", is_hidden: false, created_at: "2026-03-07T18:39:09.688Z", created_by_ip: "99.228.76.52", updated_at: "2026-03-08T05:47:06.638Z" },
-  { id: 110, btc_address: "1B79oEYhhw3KocT1L8dhY4HbMuanzNVffq", option_id: 121, option_hash: "8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772902922 | 1ac49d292e", signature: "IO33M/zdwSzzFfDJJtSLCpulnP8wQd2kMM+E6naqjTdhd/QPUPJMovbEivANLXUT5v2abEpMePcOrfRnBXnmkrM=", nonce_timestamp: "1772902922", random_code: "1ac49d292e", is_reply_valid: true, balance_at_reply_satoshi: 3251200, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 3251200, balance_last_updated_at: "2026-03-08T05:46:47.031934Z", is_hidden: false, created_at: "2026-03-07T17:04:01.124Z", created_by_ip: "104.234.53.231", updated_at: "2026-03-08T05:46:47.033Z" },
-  { id: 109, btc_address: "1GDznPQsDQTp5Kzmn1HApchULn7bpJ4LZ", option_id: 121, option_hash: "8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772852695 | b007e14a1a", signature: "H8kn/BtXnOIlr7d1e3DBeJiCdB3Lio7NiWTo9uesoEjdOFz07Uvi3ZJaagEOJGukAsr+jXPLELqZVGkItMyY6a0=", nonce_timestamp: "1772852695", random_code: "b007e14a1a", is_reply_valid: true, balance_at_reply_satoshi: 15076100, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 15076100, balance_last_updated_at: "2026-03-08T05:46:49.869154Z", is_hidden: false, created_at: "2026-03-07T03:07:54.652Z", created_by_ip: "99.228.76.52", updated_at: "2026-03-08T05:46:49.87Z" },
-  { id: 108, btc_address: "bc1qhwq3nwl8rp4h0lscqv7fugk5x7vh627q9nyw24", option_id: 120, option_hash: "f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772828543 | 083af4270e", signature: "IAP7YALtQUbUhQv/ytcFTMTvwrqb1SgFv+SPhfpw3ldBZp16akHCxen8dtUiSMvlOweN/rgQg6qrlJOYlI7yRBA=", nonce_timestamp: "1772828543", random_code: "083af4270e", is_reply_valid: true, balance_at_reply_satoshi: 15349744, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 15349744, balance_last_updated_at: "2026-03-08T05:47:02.189134Z", is_hidden: false, created_at: "2026-03-06T20:22:45.073Z", created_by_ip: "99.228.76.52", updated_at: "2026-03-08T05:47:02.19Z" },
-  { id: 107, btc_address: "bc1qvnwj9nuhmntgnfhlc9pa3t4fce239dwxm4ah5x", option_id: 122, option_hash: "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821970 | ce24101b9f", signature: "HzaqdOeU3zqbnHL2UQIYFwSYVTY166p3oFhm8koQhWl4IFaxElrVrzK6a8M3lwACmFuHoS8vM78dzfeX8P93aJA=", nonce_timestamp: "1772821970", random_code: "ce24101b9f", is_reply_valid: true, balance_at_reply_satoshi: 11505, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:12.604199Z", is_hidden: false, created_at: "2026-03-06T18:33:05.173Z", created_by_ip: "104.28.156.241", updated_at: "2026-03-08T05:47:12.605Z" },
-  { id: 106, btc_address: "bc1qc0qtsc0wzsgj6jpk24fazfn2s2g5rsnmk5yq4k", option_id: 122, option_hash: "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821397 | 1f5f8a3a0b", signature: "H28JmZ9AHxH2OuTWGlpVsG+cOsO02LvvniANtFjLq2XlcpF2s+obFZVHDDEN8Jg5f/7wlow3J9iPUetOO80PHs4=", nonce_timestamp: "1772821397", random_code: "1f5f8a3a0b", is_reply_valid: true, balance_at_reply_satoshi: 3000, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:46:57.542191Z", is_hidden: false, created_at: "2026-03-06T18:23:26.425Z", created_by_ip: "104.28.156.244", updated_at: "2026-03-08T05:46:57.543Z" },
-  { id: 105, btc_address: "bc1qu5x9yltcluq4ltaaa5t5nk7g0g66d0n52qmeje", option_id: 122, option_hash: "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821368 | 68c789a301", signature: "HyAck2/xgBnB8MAVd+vszTJNIW6YVbu7vICzLKT/AszkP/+6Tsv+AQq7tolDKgkdOvtOgSWvdgqeDj8dEvFU6Pw=", nonce_timestamp: "1772821368", random_code: "68c789a301", is_reply_valid: true, balance_at_reply_satoshi: 3165, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:10.657805Z", is_hidden: false, created_at: "2026-03-06T18:23:09.749Z", created_by_ip: "104.28.160.168", updated_at: "2026-03-08T05:47:10.659Z" },
-  { id: 104, btc_address: "bc1qphduhq9w97wpr67kqncy8pf43kgy9ahgc9jmg6", option_id: 122, option_hash: "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821343 | 38e3b8da0c", signature: "IGkWsjTlJuy9GyrAd4Ex0/iDSzbOVVkyUceO3X2N1DhXKTip+HqH0kmYfY9O4N/Ub9ztyXNAIugNcxvaMRoR/zc=", nonce_timestamp: "1772821343", random_code: "38e3b8da0c", is_reply_valid: true, balance_at_reply_satoshi: 2890, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:09.020598Z", is_hidden: false, created_at: "2026-03-06T18:22:42.743Z", created_by_ip: "104.28.156.244", updated_at: "2026-03-08T05:47:09.021Z" },
-  { id: 103, btc_address: "bc1qzjtvf7dwwahgevguaepj4szcuk0h8373423uk9", option_id: 122, option_hash: "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821327 | 7065fe89b4", signature: "H3iCuG4bHT63rvIoAOlTXftyKdm52pslskhZt75vVibZYCglwRa42RyKLU4DDpLf5obcPIx1iDSF3wQF627HUeY=", nonce_timestamp: "1772821327", random_code: "7065fe89b4", is_reply_valid: true, balance_at_reply_satoshi: 2890, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:16.461805Z", is_hidden: false, created_at: "2026-03-06T18:22:12.107Z", created_by_ip: "104.28.156.244", updated_at: "2026-03-08T05:47:16.463Z" },
-  { id: 102, btc_address: "bc1qual0ccnxd8k40efvcrz4dhxguvl5zw9ledyejr", option_id: 124, option_hash: "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772820353 | fbd16012dd", signature: "HzLcTEwMHTuNnKY6VvvmRnZfRg41n/5k2NO9zl1+VLUHFjvZPqfHsxMGO0WH4vhLHGqvutvTOrWgwYfY3JDtlH4=", nonce_timestamp: "1772820353", random_code: "fbd16012dd", is_reply_valid: true, balance_at_reply_satoshi: 3000, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:11.671275Z", is_hidden: false, created_at: "2026-03-06T18:05:58.03Z", created_by_ip: "104.28.156.244", updated_at: "2026-03-08T05:47:11.672Z" },
-  { id: 101, btc_address: "bc1qx9vxu655zlj2fe0ssw5qr82y6auh2lku7yuwk2", option_id: 124, option_hash: "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772820320 | 8c25b47b2a", signature: "IBzpDd2OvjZZo4DdsjvZH0rRhVUlHKsgHNyr9kW2DIOUb/Cst+3hdLK0yRaTJG0z3Zl3vcZMspH2Mg1Yc6rg8qQ=", nonce_timestamp: "1772820320", random_code: "8c25b47b2a", is_reply_valid: true, balance_at_reply_satoshi: 3000, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:13.482289Z", is_hidden: false, created_at: "2026-03-06T18:05:40.862Z", created_by_ip: "104.28.159.154", updated_at: "2026-03-08T05:47:13.483Z" },
-  { id: 100, btc_address: "bc1pxk4lvef0pa2329u8kml2w42vlxkk39y8gk5760hp5gd0v3uhtuhqqe7ccv", option_id: 120, option_hash: "f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772816574 | b00b15aabd", signature: "H4mylg1sGPKTBXsBFftJzIXbE2tBIscbGl+iQGRdkIXfXuj6IaXq5VzLJIj314Mdbu7EVjPxAPghiYaVfdeTvbA=", nonce_timestamp: "1772816574", random_code: "b00b15aabd", is_reply_valid: true, balance_at_reply_satoshi: 6834, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 6834, balance_last_updated_at: "2026-03-08T05:46:54.342046Z", is_hidden: false, created_at: "2026-03-06T17:03:21.012Z", created_by_ip: "118.166.25.162", updated_at: "2026-03-08T05:46:54.343Z" },
-  { id: 99, btc_address: "bc1qgj9s4z3u9w0p4d7fmpwccz08389slsl063h6fa", option_id: 124, option_hash: "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772815354 | 9ed7f1616a", signature: "H1M9dh1U5ns6i/onBx9IvqU+UpfSqZJNffyRNnt23J8YDeaL5l8uHBlw2RqQW2OfvcYpDT0U5bXZI9GVoVHqcMg=", nonce_timestamp: "1772815354", random_code: "9ed7f1616a", is_reply_valid: true, balance_at_reply_satoshi: 12698, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:47:00.676418Z", is_hidden: false, created_at: "2026-03-06T16:42:42.854Z", created_by_ip: "104.28.160.187", updated_at: "2026-03-08T05:47:00.678Z" },
-  { id: 98, btc_address: "bc1qe2cey7xr72z296q0uylp6knzmdfjr3urd8w4pn", option_id: 124, option_hash: "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772814149 | d05136ad19", signature: "HwUg5PCAzI/0E86J1NRzZrxlJDON8F0fjdwRia4ZglFSfPvA6ITKPo/e67D+Wyyi86Xf6yxQ92PqYYWnnhSb/Nk=", nonce_timestamp: "1772814149", random_code: "d05136ad19", is_reply_valid: true, balance_at_reply_satoshi: 12808, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 0, balance_last_updated_at: "2026-03-08T05:46:59.289674Z", is_hidden: false, created_at: "2026-03-06T16:22:36.302Z", created_by_ip: "104.28.156.240", updated_at: "2026-03-08T05:46:59.291Z" },
-  { id: 97, btc_address: "bc1qn6yle9ae705ekvsq3xawp5ttyzqkr99pcsaa7z", option_id: 122, option_hash: "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7", content: null, content_hash: null, plaintext: "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772807020 | e523b31ac9", signature: "KBBMmqmH1MKHizxQ5zzE/1AivZQU5Z44DIqNaV0sljUlIfYv51fqAHfLW/RX1WHUrAX5wAdT0dPXZmc0cmT0JGg=", nonce_timestamp: "1772807020", random_code: "e523b31ac9", is_reply_valid: true, balance_at_reply_satoshi: 81232, balance_at_snapshot_satoshi: null, balance_at_current_satoshi: 81232, balance_last_updated_at: "2026-03-08T05:47:07.587821Z", is_hidden: false, created_at: "2026-03-06T14:24:01.519Z", created_by_ip: "223.138.242.0", updated_at: "2026-03-08T05:47:07.589Z" },
+  {
+    id: 111,
+    btc_address: "bc1qmkwj22n9p9d9w33ep2s5zepss42097tfrpgndk",
+    option_id: 120,
+    option_hash:
+      "f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772908729 | 4e7cf6291e",
+    signature:
+      "ICuIpIbOsms1zEUO9xbBQkxuy1SghgKs1MSZlztvTdOWPxnLphsfWGOss/Vxy/CdkkF0cSEnVOF+wjcL01u7Lso=",
+    nonce_timestamp: "1772908729",
+    random_code: "4e7cf6291e",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3396718,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 3396718,
+    balance_last_updated_at: "2026-03-08T05:47:06.637073Z",
+    is_hidden: false,
+    created_at: "2026-03-07T18:39:09.688Z",
+    created_by_ip: "99.228.76.52",
+    updated_at: "2026-03-08T05:47:06.638Z",
+  },
+  {
+    id: 110,
+    btc_address: "1B79oEYhhw3KocT1L8dhY4HbMuanzNVffq",
+    option_id: 121,
+    option_hash:
+      "8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772902922 | 1ac49d292e",
+    signature:
+      "IO33M/zdwSzzFfDJJtSLCpulnP8wQd2kMM+E6naqjTdhd/QPUPJMovbEivANLXUT5v2abEpMePcOrfRnBXnmkrM=",
+    nonce_timestamp: "1772902922",
+    random_code: "1ac49d292e",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3251200,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 3251200,
+    balance_last_updated_at: "2026-03-08T05:46:47.031934Z",
+    is_hidden: false,
+    created_at: "2026-03-07T17:04:01.124Z",
+    created_by_ip: "104.234.53.231",
+    updated_at: "2026-03-08T05:46:47.033Z",
+  },
+  {
+    id: 109,
+    btc_address: "1GDznPQsDQTp5Kzmn1HApchULn7bpJ4LZ",
+    option_id: 121,
+    option_hash:
+      "8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(8266deca6c65b39468e6fb8596869a231b9582ee3818d12ba7240cb126ebfb44) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772852695 | b007e14a1a",
+    signature:
+      "H8kn/BtXnOIlr7d1e3DBeJiCdB3Lio7NiWTo9uesoEjdOFz07Uvi3ZJaagEOJGukAsr+jXPLELqZVGkItMyY6a0=",
+    nonce_timestamp: "1772852695",
+    random_code: "b007e14a1a",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 15076100,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 15076100,
+    balance_last_updated_at: "2026-03-08T05:46:49.869154Z",
+    is_hidden: false,
+    created_at: "2026-03-07T03:07:54.652Z",
+    created_by_ip: "99.228.76.52",
+    updated_at: "2026-03-08T05:46:49.87Z",
+  },
+  {
+    id: 108,
+    btc_address: "bc1qhwq3nwl8rp4h0lscqv7fugk5x7vh627q9nyw24",
+    option_id: 120,
+    option_hash:
+      "f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772828543 | 083af4270e",
+    signature:
+      "IAP7YALtQUbUhQv/ytcFTMTvwrqb1SgFv+SPhfpw3ldBZp16akHCxen8dtUiSMvlOweN/rgQg6qrlJOYlI7yRBA=",
+    nonce_timestamp: "1772828543",
+    random_code: "083af4270e",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 15349744,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 15349744,
+    balance_last_updated_at: "2026-03-08T05:47:02.189134Z",
+    is_hidden: false,
+    created_at: "2026-03-06T20:22:45.073Z",
+    created_by_ip: "99.228.76.52",
+    updated_at: "2026-03-08T05:47:02.19Z",
+  },
+  {
+    id: 107,
+    btc_address: "bc1qvnwj9nuhmntgnfhlc9pa3t4fce239dwxm4ah5x",
+    option_id: 122,
+    option_hash:
+      "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821970 | ce24101b9f",
+    signature:
+      "HzaqdOeU3zqbnHL2UQIYFwSYVTY166p3oFhm8koQhWl4IFaxElrVrzK6a8M3lwACmFuHoS8vM78dzfeX8P93aJA=",
+    nonce_timestamp: "1772821970",
+    random_code: "ce24101b9f",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 11505,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:12.604199Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:33:05.173Z",
+    created_by_ip: "104.28.156.241",
+    updated_at: "2026-03-08T05:47:12.605Z",
+  },
+  {
+    id: 106,
+    btc_address: "bc1qc0qtsc0wzsgj6jpk24fazfn2s2g5rsnmk5yq4k",
+    option_id: 122,
+    option_hash:
+      "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821397 | 1f5f8a3a0b",
+    signature:
+      "H28JmZ9AHxH2OuTWGlpVsG+cOsO02LvvniANtFjLq2XlcpF2s+obFZVHDDEN8Jg5f/7wlow3J9iPUetOO80PHs4=",
+    nonce_timestamp: "1772821397",
+    random_code: "1f5f8a3a0b",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3000,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:46:57.542191Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:23:26.425Z",
+    created_by_ip: "104.28.156.244",
+    updated_at: "2026-03-08T05:46:57.543Z",
+  },
+  {
+    id: 105,
+    btc_address: "bc1qu5x9yltcluq4ltaaa5t5nk7g0g66d0n52qmeje",
+    option_id: 122,
+    option_hash:
+      "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821368 | 68c789a301",
+    signature:
+      "HyAck2/xgBnB8MAVd+vszTJNIW6YVbu7vICzLKT/AszkP/+6Tsv+AQq7tolDKgkdOvtOgSWvdgqeDj8dEvFU6Pw=",
+    nonce_timestamp: "1772821368",
+    random_code: "68c789a301",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3165,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:10.657805Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:23:09.749Z",
+    created_by_ip: "104.28.160.168",
+    updated_at: "2026-03-08T05:47:10.659Z",
+  },
+  {
+    id: 104,
+    btc_address: "bc1qphduhq9w97wpr67kqncy8pf43kgy9ahgc9jmg6",
+    option_id: 122,
+    option_hash:
+      "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821343 | 38e3b8da0c",
+    signature:
+      "IGkWsjTlJuy9GyrAd4Ex0/iDSzbOVVkyUceO3X2N1DhXKTip+HqH0kmYfY9O4N/Ub9ztyXNAIugNcxvaMRoR/zc=",
+    nonce_timestamp: "1772821343",
+    random_code: "38e3b8da0c",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 2890,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:09.020598Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:22:42.743Z",
+    created_by_ip: "104.28.156.244",
+    updated_at: "2026-03-08T05:47:09.021Z",
+  },
+  {
+    id: 103,
+    btc_address: "bc1qzjtvf7dwwahgevguaepj4szcuk0h8373423uk9",
+    option_id: 122,
+    option_hash:
+      "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772821327 | 7065fe89b4",
+    signature:
+      "H3iCuG4bHT63rvIoAOlTXftyKdm52pslskhZt75vVibZYCglwRa42RyKLU4DDpLf5obcPIx1iDSF3wQF627HUeY=",
+    nonce_timestamp: "1772821327",
+    random_code: "7065fe89b4",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 2890,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:16.461805Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:22:12.107Z",
+    created_by_ip: "104.28.156.244",
+    updated_at: "2026-03-08T05:47:16.463Z",
+  },
+  {
+    id: 102,
+    btc_address: "bc1qual0ccnxd8k40efvcrz4dhxguvl5zw9ledyejr",
+    option_id: 124,
+    option_hash:
+      "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772820353 | fbd16012dd",
+    signature:
+      "HzLcTEwMHTuNnKY6VvvmRnZfRg41n/5k2NO9zl1+VLUHFjvZPqfHsxMGO0WH4vhLHGqvutvTOrWgwYfY3JDtlH4=",
+    nonce_timestamp: "1772820353",
+    random_code: "fbd16012dd",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3000,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:11.671275Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:05:58.03Z",
+    created_by_ip: "104.28.156.244",
+    updated_at: "2026-03-08T05:47:11.672Z",
+  },
+  {
+    id: 101,
+    btc_address: "bc1qx9vxu655zlj2fe0ssw5qr82y6auh2lku7yuwk2",
+    option_id: 124,
+    option_hash:
+      "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772820320 | 8c25b47b2a",
+    signature:
+      "IBzpDd2OvjZZo4DdsjvZH0rRhVUlHKsgHNyr9kW2DIOUb/Cst+3hdLK0yRaTJG0z3Zl3vcZMspH2Mg1Yc6rg8qQ=",
+    nonce_timestamp: "1772820320",
+    random_code: "8c25b47b2a",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3000,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:13.482289Z",
+    is_hidden: false,
+    created_at: "2026-03-06T18:05:40.862Z",
+    created_by_ip: "104.28.159.154",
+    updated_at: "2026-03-08T05:47:13.483Z",
+  },
+  {
+    id: 100,
+    btc_address:
+      "bc1pxk4lvef0pa2329u8kml2w42vlxkk39y8gk5760hp5gd0v3uhtuhqqe7ccv",
+    option_id: 120,
+    option_hash:
+      "f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(f1624fcc63b615ac0e95daf9ab78434ec2e8ffe402144dc631b055f711225191) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772816574 | b00b15aabd",
+    signature:
+      "H4mylg1sGPKTBXsBFftJzIXbE2tBIscbGl+iQGRdkIXfXuj6IaXq5VzLJIj314Mdbu7EVjPxAPghiYaVfdeTvbA=",
+    nonce_timestamp: "1772816574",
+    random_code: "b00b15aabd",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 6834,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 6834,
+    balance_last_updated_at: "2026-03-08T05:46:54.342046Z",
+    is_hidden: false,
+    created_at: "2026-03-06T17:03:21.012Z",
+    created_by_ip: "118.166.25.162",
+    updated_at: "2026-03-08T05:46:54.343Z",
+  },
+  {
+    id: 99,
+    btc_address: "bc1qgj9s4z3u9w0p4d7fmpwccz08389slsl063h6fa",
+    option_id: 124,
+    option_hash:
+      "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772815354 | 9ed7f1616a",
+    signature:
+      "H1M9dh1U5ns6i/onBx9IvqU+UpfSqZJNffyRNnt23J8YDeaL5l8uHBlw2RqQW2OfvcYpDT0U5bXZI9GVoVHqcMg=",
+    nonce_timestamp: "1772815354",
+    random_code: "9ed7f1616a",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 12698,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:47:00.676418Z",
+    is_hidden: false,
+    created_at: "2026-03-06T16:42:42.854Z",
+    created_by_ip: "104.28.160.187",
+    updated_at: "2026-03-08T05:47:00.678Z",
+  },
+  {
+    id: 98,
+    btc_address: "bc1qe2cey7xr72z296q0uylp6knzmdfjr3urd8w4pn",
+    option_id: 124,
+    option_hash:
+      "ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(ebf3aed6e794a2112b253356a5a062baddff1b7ffb08aae34755436f17c85847) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772814149 | d05136ad19",
+    signature:
+      "HwUg5PCAzI/0E86J1NRzZrxlJDON8F0fjdwRia4ZglFSfPvA6ITKPo/e67D+Wyyi86Xf6yxQ92PqYYWnnhSb/Nk=",
+    nonce_timestamp: "1772814149",
+    random_code: "d05136ad19",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 12808,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 0,
+    balance_last_updated_at: "2026-03-08T05:46:59.289674Z",
+    is_hidden: false,
+    created_at: "2026-03-06T16:22:36.302Z",
+    created_by_ip: "104.28.156.240",
+    updated_at: "2026-03-08T05:46:59.291Z",
+  },
+  {
+    id: 97,
+    btc_address: "bc1qn6yle9ae705ekvsq3xawp5ttyzqkr99pcsaa7z",
+    option_id: 122,
+    option_hash:
+      "597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7",
+    content: null,
+    content_hash: null,
+    plaintext:
+      "koinvote.com | type:single | SHA256(597242c4be37dc3d734a8b5578eac0b877f31724da7e43ad5cd526ec98a220a7) | 01KK0NP9AV6CQWG3TM4DJ5RFEZ | 1772807020 | e523b31ac9",
+    signature:
+      "KBBMmqmH1MKHizxQ5zzE/1AivZQU5Z44DIqNaV0sljUlIfYv51fqAHfLW/RX1WHUrAX5wAdT0dPXZmc0cmT0JGg=",
+    nonce_timestamp: "1772807020",
+    random_code: "e523b31ac9",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 81232,
+    balance_at_snapshot_satoshi: null,
+    balance_at_current_satoshi: 81232,
+    balance_last_updated_at: "2026-03-08T05:47:07.587821Z",
+    is_hidden: false,
+    created_at: "2026-03-06T14:24:01.519Z",
+    created_by_ip: "223.138.242.0",
+    updated_at: "2026-03-08T05:47:07.589Z",
+  },
 ];
 
 // Full top-replies for exchange event (all 5 options with weights)
 export const mockExchangeTopReplies = [
-  { id: 120, body: "Binance", weight_percent: 50.463868462014304, amount_satoshi: 18753296 },
-  { id: 121, body: "Coinbase", weight_percent: 49.31754164515266, amount_satoshi: 18327300 },
-  { id: 122, body: "Hyperliquid", weight_percent: 0.21858989283304364, amount_satoshi: 81232 },
+  {
+    id: 120,
+    body: "Binance",
+    weight_percent: 50.463868462014304,
+    amount_satoshi: 18753296,
+  },
+  {
+    id: 121,
+    body: "Coinbase",
+    weight_percent: 49.31754164515266,
+    amount_satoshi: 18327300,
+  },
+  {
+    id: 122,
+    body: "Hyperliquid",
+    weight_percent: 0.21858989283304364,
+    amount_satoshi: 81232,
+  },
   { id: 123, body: "Kraken", weight_percent: 0, amount_satoshi: 0 },
   { id: 124, body: "OKX", weight_percent: 0, amount_satoshi: 0 },
+];
+
+// Scroll-test event replies (evt_scroll_mock) — 25 entries for pagination testing
+export const mockScrollEventReplies: Reply[] = [
+  {
+    id: 201,
+    btc_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    content: "Store of value — digital gold for the next generation",
+    content_hash:
+      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900001 | aa01bb",
+    signature:
+      "H1aAbBcCdDeEfF0011223344556677889900aabbccddeeff0011223344556677",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 5920000,
+    balance_at_snapshot_satoshi: 5920000,
+    balance_at_current_satoshi: 5920000,
+    created_at: "2026-03-02T01:00:00Z",
+  },
+  {
+    id: 202,
+    btc_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
+    content:
+      "Global payments via Lightning Network will dominate everyday commerce",
+    content_hash:
+      "b2c3d4e5f67890123456789012345678901234abcdef1234567890abcdef1234",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900002 | bb02cc",
+    signature: "H2bBcCdDeEfF0011223344556677889900aabbccddeeff0011223344556678",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 5180000,
+    balance_at_snapshot_satoshi: 5180000,
+    balance_at_current_satoshi: 5180000,
+    created_at: "2026-03-02T02:00:00Z",
+  },
+  {
+    id: 203,
+    btc_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    content: "Programmable finance via Bitcoin L2s like RGB and Taproot Assets",
+    content_hash:
+      "c3d4e5f678901234567890123456789012345bcdef1234567890abcdef12345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900003 | cc03dd",
+    signature: "H3cCdDeEfF0011223344556677889900aabbccddeeff0011223344556679",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 3330000,
+    balance_at_snapshot_satoshi: 3330000,
+    balance_at_current_satoshi: 3330000,
+    created_at: "2026-03-02T03:00:00Z",
+  },
+  {
+    id: 204,
+    btc_address: "bc1qhwq3nwl8rp4h0lscqv7fugk5x7vh627q9nyw24",
+    content: "Remittances — sending money across borders without banks",
+    content_hash:
+      "d4e5f67890123456789012345678901234567cdef1234567890abcdef123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900004 | dd04ee",
+    signature: "H4dDeEfF0011223344556677889900aabbccddeeff0011223344556680",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 2100000,
+    balance_at_snapshot_satoshi: 2100000,
+    balance_at_current_satoshi: 2100000,
+    created_at: "2026-03-02T04:00:00Z",
+  },
+  {
+    id: 205,
+    btc_address: "bc1qmkwj22n9p9d9w33ep2s5zepss42097tfrpgndk",
+    content: "National reserve asset — more countries will follow El Salvador",
+    content_hash:
+      "e5f678901234567890123456789012345678def1234567890abcdef1234567",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900005 | ee05ff",
+    signature: "H5eEfF0011223344556677889900aabbccddeeff0011223344556681",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 1850000,
+    balance_at_snapshot_satoshi: 1850000,
+    balance_at_current_satoshi: 1850000,
+    created_at: "2026-03-02T05:00:00Z",
+  },
+  {
+    id: 206,
+    btc_address: "bc1qvnwj9nuhmntgnfhlc9pa3t4fce239dwxm4ah5x",
+    content: "Micropayments for content creators replacing ad-based models",
+    content_hash:
+      "f678901234567890123456789012345678901ef1234567890abcdef12345678",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900006 | ff06aa",
+    signature: "H6fF0011223344556677889900aabbccddeeff0011223344556682",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 1520000,
+    balance_at_snapshot_satoshi: 1520000,
+    balance_at_current_satoshi: 1520000,
+    created_at: "2026-03-02T06:00:00Z",
+  },
+  {
+    id: 207,
+    btc_address: "bc1qc0qtsc0wzsgj6jpk24fazfn2s2g5rsnmk5yq4k",
+    content: "Collateral for decentralized lending protocols",
+    content_hash:
+      "0789012345678901234567890123456789012f1234567890abcdef123456789",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900007 | aa07bb",
+    signature: "H7aA0011223344556677889900aabbccddeeff0011223344556683",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 1200000,
+    balance_at_snapshot_satoshi: 1200000,
+    balance_at_current_satoshi: 1200000,
+    created_at: "2026-03-02T07:00:00Z",
+  },
+  {
+    id: 208,
+    btc_address: "bc1qu5x9yltcluq4ltaaa5t5nk7g0g66d0n52qmeje",
+    content: "Energy monetization — miners selling excess power globally",
+    content_hash:
+      "089012345678901234567890123456789012341234567890abcdef1234567890",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900008 | bb08cc",
+    signature: "H8bB0011223344556677889900aabbccddeeff0011223344556684",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 980000,
+    balance_at_snapshot_satoshi: 980000,
+    balance_at_current_satoshi: 980000,
+    created_at: "2026-03-02T08:00:00Z",
+  },
+  {
+    id: 209,
+    btc_address: "bc1qphduhq9w97wpr67kqncy8pf43kgy9ahgc9jmg6",
+    content: "Smart contract platform once Taproot reaches full maturity",
+    content_hash:
+      "190123456789012345678901234567890123451234567890abcdef12345678901",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900009 | cc09dd",
+    signature: "H9cC0011223344556677889900aabbccddeeff0011223344556685",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 850000,
+    balance_at_snapshot_satoshi: 850000,
+    balance_at_current_satoshi: 850000,
+    created_at: "2026-03-02T09:00:00Z",
+  },
+  {
+    id: 210,
+    btc_address: "bc1qzjtvf7dwwahgevguaepj4szcuk0h8373423uk9",
+    content: "Humanitarian aid distribution bypassing corrupt intermediaries",
+    content_hash:
+      "2a1234567890123456789012345678901234561234567890abcdef123456789012",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900010 | dd10ee",
+    signature: "H10dD011223344556677889900aabbccddeeff0011223344556686",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 720000,
+    balance_at_snapshot_satoshi: 720000,
+    balance_at_current_satoshi: 720000,
+    created_at: "2026-03-02T10:00:00Z",
+  },
+  {
+    id: 211,
+    btc_address: "bc1qual0ccnxd8k40efvcrz4dhxguvl5zw9ledyejr",
+    content: "Machine-to-machine payments in the IoT economy",
+    content_hash:
+      "3b234567890123456789012345678901234567234567890abcdef1234567890123",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900011 | ee11ff",
+    signature: "H11eE011223344556677889900aabbccddeeff0011223344556687",
+    is_reply_valid: false,
+    balance_at_reply_satoshi: 600000,
+    balance_at_snapshot_satoshi: 600000,
+    balance_at_current_satoshi: 600000,
+    created_at: "2026-03-02T11:00:00Z",
+  },
+  {
+    id: 212,
+    btc_address: "bc1qx9vxu655zlj2fe0ssw5qr82y6auh2lku7yuwk2",
+    content: "Inflation hedge for citizens in hyperinflationary economies",
+    content_hash:
+      "4c345678901234567890123456789012345678345678901abcdef12345678901234",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900012 | ff12aa",
+    signature: "H12fF011223344556677889900aabbccddeeff0011223344556688",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 550000,
+    balance_at_snapshot_satoshi: 550000,
+    balance_at_current_satoshi: 550000,
+    created_at: "2026-03-02T12:00:00Z",
+  },
+  {
+    id: 213,
+    btc_address: "bc1qe2cey7xr72z296q0uylp6knzmdfjr3urd8w4pn",
+    content: "Crowdfunding platform for open-source development",
+    content_hash:
+      "5d456789012345678901234567890123456789456789012abcdef123456789012345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900013 | aa13bb",
+    signature: "H13aA011223344556677889900aabbccddeeff0011223344556689",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 480000,
+    balance_at_snapshot_satoshi: 480000,
+    balance_at_current_satoshi: 480000,
+    created_at: "2026-03-02T13:00:00Z",
+  },
+  {
+    id: 214,
+    btc_address: "bc1qn6yle9ae705ekvsq3xawp5ttyzqkr99pcsaa7z",
+    content: "Privacy-preserving transactions with future protocol upgrades",
+    content_hash:
+      "6e567890123456789012345678901234567890567890123abcdef1234567890123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900014 | bb14cc",
+    signature: "H14bB011223344556677889900aabbccddeeff0011223344556690",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 420000,
+    balance_at_snapshot_satoshi: 420000,
+    balance_at_current_satoshi: 420000,
+    created_at: "2026-03-02T14:00:00Z",
+  },
+  {
+    id: 215,
+    btc_address: "bc1qgj9s4z3u9w0p4d7fmpwccz08389slsl063h6fa",
+    content: "Timestamping and notarization of legal documents on-chain",
+    content_hash:
+      "7f678901234567890123456789012345678901678901234abcdef12345678901234567",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900015 | cc15dd",
+    signature: "H15cC011223344556677889900aabbccddeeff0011223344556691",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 370000,
+    balance_at_snapshot_satoshi: 370000,
+    balance_at_current_satoshi: 370000,
+    created_at: "2026-03-02T15:00:00Z",
+  },
+  {
+    id: 216,
+    btc_address: "bc1qabc123def456ghi789jkl012mno345pqr678stu",
+    content: "Decentralized identity — self-sovereign IDs anchored in Bitcoin",
+    content_hash:
+      "8078901234567890123456789012345678901278901234abcdef123456789012345678",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900016 | dd16ee",
+    signature: "H16dD011223344556677889900aabbccddeeff0011223344556692",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 320000,
+    balance_at_snapshot_satoshi: 320000,
+    balance_at_current_satoshi: 320000,
+    created_at: "2026-03-02T16:00:00Z",
+  },
+  {
+    id: 217,
+    btc_address: "bc1qdef456ghi789jkl012mno345pqr678stu901vwx",
+    content: "Corporate treasury reserve alongside traditional assets",
+    content_hash:
+      "9189012345678901234567890123456789012389012345abcdef1234567890123456789",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900017 | ee17ff",
+    signature: "H17eE011223344556677889900aabbccddeeff0011223344556693",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 280000,
+    balance_at_snapshot_satoshi: 280000,
+    balance_at_current_satoshi: 280000,
+    created_at: "2026-03-02T17:00:00Z",
+  },
+  {
+    id: 218,
+    btc_address: "bc1qghi789jkl012mno345pqr678stu901vwx234yz5",
+    content: "Supply chain provenance tracking using OP_RETURN data",
+    content_hash:
+      "a290123456789012345678901234567890123490123456abcdef12345678901234567890",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900018 | ff18aa",
+    signature: "H18fF011223344556677889900aabbccddeeff0011223344556694",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 240000,
+    balance_at_snapshot_satoshi: 240000,
+    balance_at_current_satoshi: 240000,
+    created_at: "2026-03-02T18:00:00Z",
+  },
+  {
+    id: 219,
+    btc_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc8",
+    content: "Gaming economies with true ownership of in-game assets",
+    content_hash:
+      "b3a1234567890123456789012345678901234a1234567abcdef123456789012345678901",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900019 | aa19bb",
+    signature: "H19aA011223344556677889900aabbccddeeff0011223344556695",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 200000,
+    balance_at_snapshot_satoshi: 200000,
+    balance_at_current_satoshi: 200000,
+    created_at: "2026-03-02T19:00:00Z",
+  },
+  {
+    id: 220,
+    btc_address: "bc1qmno345pqr678stu901vwx234yz567abc890def1",
+    content: "Prediction markets without intermediaries or censorship",
+    content_hash:
+      "c4b234567890123456789012345678901234b1234567abcdef1234567890123456789012",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900020 | bb20cc",
+    signature: "H20bB011223344556677889900aabbccddeeff0011223344556696",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 170000,
+    balance_at_snapshot_satoshi: 170000,
+    balance_at_current_satoshi: 170000,
+    created_at: "2026-03-02T20:00:00Z",
+  },
+  {
+    id: 221,
+    btc_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi4",
+    content: "Tokenizing real-world assets like real estate on Bitcoin L2s",
+    content_hash:
+      "d5c34567890123456789012345678901234c1234567abcdef12345678901234567890123",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900021 | cc21dd",
+    signature: "H21cC011223344556677889900aabbccddeeff0011223344556697",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 145000,
+    balance_at_snapshot_satoshi: 145000,
+    balance_at_current_satoshi: 145000,
+    created_at: "2026-03-02T21:00:00Z",
+  },
+  {
+    id: 222,
+    btc_address: "bc1qstu901vwx234yz567abc890def123ghi456jkl7",
+    content: "Charitable donations with full transparency and auditability",
+    content_hash:
+      "e6d456789012345678901234567890123d1234567abcdef123456789012345678901234",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900022 | dd22ee",
+    signature: "H22dD011223344556677889900aabbccddeeff0011223344556698",
+    is_reply_valid: false,
+    balance_at_reply_satoshi: 120000,
+    balance_at_snapshot_satoshi: 120000,
+    balance_at_current_satoshi: 120000,
+    created_at: "2026-03-02T22:00:00Z",
+  },
+  {
+    id: 223,
+    btc_address: "bc1qvwx234yz567abc890def123ghi456jkl789mno0",
+    content: "Digital voting infrastructure secured by proof-of-work",
+    content_hash:
+      "f7e56789012345678901234567890123e1234567abcdef1234567890123456789012345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900023 | ee23ff",
+    signature: "H23eE011223344556677889900aabbccddeeff0011223344556699",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 95000,
+    balance_at_snapshot_satoshi: 95000,
+    balance_at_current_satoshi: 95000,
+    created_at: "2026-03-02T23:00:00Z",
+  },
+  {
+    id: 224,
+    btc_address: "bc1qyz567abc890def123ghi456jkl789mno012pqr3",
+    content: "Education funding in developing countries via Bitcoin grants",
+    content_hash:
+      "08f6789012345678901234567890123f1234567abcdef12345678901234567890123456",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900024 | ff24aa",
+    signature: "H24fF011223344556677889900aabbccddeeff0011223344556700",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 72000,
+    balance_at_snapshot_satoshi: 72000,
+    balance_at_current_satoshi: 72000,
+    created_at: "2026-03-03T00:00:00Z",
+  },
+  {
+    id: 225,
+    btc_address: "bc1qabc890def123ghi456jkl789mno012pqr345stu",
+    content: "Climate finance — tokenized carbon credits settled in BTC",
+    content_hash:
+      "190789012345678901234567890120123456789abcdef123456789012345678901234567",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900025 | aa25bb",
+    signature: "H25aA011223344556677889900aabbccddeeff0011223344556701",
+    is_reply_valid: true,
+    balance_at_reply_satoshi: 50000,
+    balance_at_snapshot_satoshi: 50000,
+    balance_at_current_satoshi: 50000,
+    created_at: "2026-03-03T01:00:00Z",
+  },
 ];
 
 export const mockGetReceiptVerifyPubKeysRes: GetReceiptVerifyPubKeysRes[] = [

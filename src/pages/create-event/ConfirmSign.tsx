@@ -1,15 +1,16 @@
-import { Link, useLocation, useNavigate, useParams } from "react-router";
-import { useEffect, useState, useCallback } from "react";
-import { useTranslation } from "react-i18next";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
-import { Button } from "@/components/base/Button";
-import { Loading } from "@/components/base/Loading";
-import { useToast } from "@/components/base/Toast/useToast";
 import { API } from "@/api";
 import type { EventType } from "@/api/types";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import BackButton from "@/components/base/BackButton";
+import { Button } from "@/components/base/Button";
+import { LegalLinks } from "@/components/base/LegalLinks";
+import { Loading } from "@/components/base/Loading";
+import { useToast } from "@/components/base/Toast/useToast";
 import { useHomeStore } from "@/stores/homeStore";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 type PreviewEventState = {
   creatorAddress: string;
@@ -108,7 +109,7 @@ export default function ConfirmSign() {
 
         // Get signature plaintext using eventId from URL
         const plaintextRes = (await API.getSignaturePlainText(
-          eventId
+          eventId,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
         )()) as any;
         const plaintextEnvelope =
@@ -118,7 +119,7 @@ export default function ConfirmSign() {
 
         if (!plaintextEnvelope?.success || !plaintextEnvelope?.data) {
           throw new Error(
-            plaintextEnvelope?.message || "Failed to get plaintext"
+            plaintextEnvelope?.message || "Failed to get plaintext",
           );
         }
 
@@ -160,28 +161,46 @@ export default function ConfirmSign() {
 
     try {
       navigator.clipboard.writeText(plaintext);
-      showToast("success", t("confirmSign.plaintextCopied", "Plaintext copied to clipboard"));
+      showToast(
+        "success",
+        t("confirmSign.plaintextCopied", "Plaintext copied to clipboard"),
+      );
     } catch (error) {
       console.error("Failed to copy:", error);
-      showToast("error", t("confirmSign.failedToCopyPlaintext", "Failed to copy plaintext"));
+      showToast(
+        "error",
+        t("confirmSign.failedToCopyPlaintext", "Failed to copy plaintext"),
+      );
     }
   }, [plaintext, showToast, t]);
 
   const handleSubmit = useCallback(async () => {
     if (!signature.trim()) {
-      showToast("error", t("confirmSign.pleaseEnterSignature", "Please enter a signature"));
+      showToast(
+        "error",
+        t("confirmSign.pleaseEnterSignature", "Please enter a signature"),
+      );
       return;
     }
 
     if (!eventId) {
-      showToast("error", t("confirmSign.eventNotInitialized", "Event not initialized. Please refresh the page."));
+      showToast(
+        "error",
+        t(
+          "confirmSign.eventNotInitialized",
+          "Event not initialized. Please refresh the page.",
+        ),
+      );
       return;
     }
 
     if (countdown <= 0) {
       showToast(
         "error",
-        t("confirmSign.plaintextExpiredToast", "Plaintext has expired. Please go back and try again.")
+        t(
+          "confirmSign.plaintextExpiredToast",
+          "Plaintext has expired. Please go back and try again.",
+        ),
       );
       return;
     }
@@ -219,8 +238,10 @@ export default function ConfirmSign() {
 
         // Show success message in green
         // TODO: 示範 後端 message
-        const successMessage =
-          t(verifyData.message, "Event successfully activated");
+        const successMessage = t(
+          verifyData.message,
+          "Event successfully activated",
+        );
 
         // Set success message (green)
         setSignatureSuccess(successMessage);
@@ -231,6 +252,7 @@ export default function ConfirmSign() {
         // Clear create event draft from sessionStorage
         const CREATE_EVENT_DRAFT_KEY = "koinvote:create-event-draft";
         sessionStorage.removeItem(CREATE_EVENT_DRAFT_KEY);
+        sessionStorage.setItem("koinvote:create-event-submitted", "true");
 
         // Pre-generate OG image for sharing
         API.preGenerateOgImage(eventId);
@@ -306,31 +328,30 @@ export default function ConfirmSign() {
   }
 
   return (
-    <div className="flex-col flex items-center justify-center w-full">
-      <div className="h-[50px] w-full relative">
-        <button
-          type="button"
-          className="text-black dark:text-white hover:text-admin-text-sub cursor-pointer absolute left-0"
-          onClick={() => navigate(-1)}
-        >
-          <CircleLeftIcon className="w-8 h-8 fill-current" />
-        </button>
+    <div className="flex w-full flex-col items-center justify-center">
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={() => navigate(-1)} />
       </div>
 
-      <div className="w-full max-w-3xl rounded-3xl border border-admin-bg bg-bg px-4 py-6 md:px-8 md:py-8">
+      <div className="border-border bg-bg w-full max-w-3xl rounded-3xl border px-4 py-6 md:px-8 md:py-8">
         <h1 className="tx-20 lh-24 fw-m text-(--color-orange-500)">
           {t("confirmSign.title", "Confirm & Sign")}
         </h1>
-        <p className="mt-1 tx-14 lh-20 text-white">{t("confirmSign.subtitle", "Sign to submit your event")}</p>
-        <p className="mt-1 tx-12 lh-18 text-secondary">
-          {t("confirmSign.verifyBitcoiner", "This step verifies you are a Bitcoiner")}
+        <p className="tx-14 lh-20 mt-1 text-white">
+          {t("confirmSign.subtitle", "Sign to submit your event")}
+        </p>
+        <p className="tx-12 lh-18 text-secondary mt-1">
+          {t(
+            "confirmSign.verifyBitcoiner",
+            "This step verifies you are a Bitcoiner",
+          )}
         </p>
 
         <div className="mt-6 space-y-6">
           {/* Section 1: Enter BTC Address */}
-          <div className="rounded-xl border border-admin-bg bg-surface p-4 md:p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-6 rounded-full bg-admin-bg border border-border flex items-center justify-center shrink-0">
+          <div className="border-admin-bg bg-surface rounded-xl border p-4 md:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="bg-admin-bg border-border flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
                 <span className="tx-12 lh-18 fw-m text-black">1</span>
               </div>
               <h2 className="tx-16 lh-20 fw-m text-primary">
@@ -342,17 +363,20 @@ export default function ConfirmSign() {
                 type="text"
                 value={btcAddress}
                 onChange={(e) => setBtcAddress(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 lh-20 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-60"
-                placeholder={t("confirmSign.enterBtcAddress", "Enter your BTC address")}
+                className="border-border bg-bg text-primary tx-14 lh-20 w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                placeholder={t(
+                  "confirmSign.enterBtcAddress",
+                  "Enter your BTC address",
+                )}
                 disabled={true}
               />
             </div>
           </div>
 
           {/* Section 2: Generate the Plaintext */}
-          <div className="rounded-xl border border-admin-bg bg-surface p-4 md:p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-6 rounded-full bg-admin-bg border border-border flex items-center justify-center shrink-0">
+          <div className="border-admin-bg bg-surface rounded-xl border p-4 md:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="bg-admin-bg border-border flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
                 <span className="tx-12 lh-18 fw-m text-black">2</span>
               </div>
               <h2 className="tx-16 lh-20 fw-m text-primary">
@@ -363,60 +387,77 @@ export default function ConfirmSign() {
             {isLoadingPlaintext ? (
               <div className="flex items-center justify-center py-8">
                 <Loading size="md" />
-                <span className="ml-2 tx-14 text-secondary">
-                  {t("confirmSign.generatingPlaintext", "Generating plaintext...")}
+                <span className="tx-14 text-secondary ml-2">
+                  {t(
+                    "confirmSign.generatingPlaintext",
+                    "Generating plaintext...",
+                  )}
                 </span>
               </div>
             ) : plaintext ? (
               <div className="space-y-3">
                 <div className="relative">
-                  <div className="px-3 py-2 rounded-lg border border-border bg-bg">
+                  <div className="border-border bg-bg rounded-lg border px-3 py-2">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="tx-14 lh-20 text-green-500 break-all font-mono flex-1">
+                      <p className="tx-14 lh-20 flex-1 font-mono break-all text-green-500">
                         {plaintext}
                       </p>
                       <button
                         type="button"
                         onClick={handleCopyPlaintext}
-                        className="flex-shrink-0 text-secondary hover:text-primary transition-colors cursor-pointer"
+                        className="text-secondary hover:text-primary flex-shrink-0 cursor-pointer transition-colors"
                         aria-label="Copy plaintext"
                       >
-                        <CopyIcon className="w-4 h-4" />
+                        <CopyIcon className="h-4 w-4" />
                       </button>
                     </div>
                   </div>
                 </div>
                 {countdown > 0 ? (
-                  <div className="flex items-center gap-2 text-green-500 tx-12 lh-18">
-                    <ClockIcon className="w-4 h-4" />
-                    <span>{t("confirmSign.expiredIn", "Expired in {{time}}", { time: formatTimeRemaining(countdown) })}</span>
+                  <div className="tx-12 lh-18 flex items-center gap-2 text-green-500">
+                    <ClockIcon className="h-4 w-4" />
+                    <span>
+                      {t("confirmSign.expiredIn", "Expired in {{time}}", {
+                        time: formatTimeRemaining(countdown),
+                      })}
+                    </span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-red-500 tx-12 lh-18">
-                    <ClockIcon className="w-4 h-4" />
+                  <div className="tx-12 lh-18 flex items-center gap-2 text-red-500">
+                    <ClockIcon className="h-4 w-4" />
                     <span>
-                      {t("confirmSign.plaintextExpired", "This plaintext has expired. Please generate a new one.")}
+                      {t(
+                        "confirmSign.plaintextExpired",
+                        "This plaintext has expired. Please generate a new one.",
+                      )}
                     </span>
                   </div>
                 )}
               </div>
             ) : (
               <div className="tx-14 text-secondary">
-                {t("confirmSign.failedPlaintext", "Failed to generate plaintext. Please try again.")}
+                {t(
+                  "confirmSign.failedPlaintext",
+                  "Failed to generate plaintext. Please try again.",
+                )}
               </div>
             )}
           </div>
 
           {/* Section 3: Enter Signature */}
-          <div className="rounded-xl border border-admin-bg bg-surface p-4 md:p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-6 rounded-full bg-admin-bg border border-border flex items-center justify-center shrink-0">
+          <div className="border-admin-bg bg-surface rounded-xl border p-4 md:p-6">
+            <div className="mb-4 flex items-center gap-3">
+              <div className="bg-admin-bg border-border flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
                 <span className="tx-12 lh-18 fw-m text-black">3</span>
               </div>
-              <h2 className="tx-16 lh-20 fw-m text-primary">{t("confirmSign.enterSignatureTitle", "Enter Signature")}</h2>
+              <h2 className="tx-16 lh-20 fw-m text-primary">
+                {t("confirmSign.enterSignatureTitle", "Enter Signature")}
+              </h2>
             </div>
             <div className="space-y-2">
-              <label className="tx-12 lh-18 text-secondary">{t("confirmSign.signatureLabel", "Signature")} *</label>
+              <label className="tx-12 lh-18 text-secondary">
+                {t("confirmSign.signatureLabel", "Signature")} *
+              </label>
               <input
                 type="text"
                 value={signature}
@@ -430,9 +471,11 @@ export default function ConfirmSign() {
                     setSignatureSuccess("");
                   }
                 }}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-bg text-primary tx-14 lh-20
-                focus:outline-none focus:ring-1 focus:ring-orange-500 font-mono"
-                placeholder={t("confirmSign.enterSignature", "Enter your signature")}
+                className="border-border bg-bg text-primary tx-14 lh-20 w-full rounded-lg border px-3 py-2 font-mono focus:ring-1 focus:ring-orange-500 focus:outline-none"
+                placeholder={t(
+                  "confirmSign.enterSignature",
+                  "Enter your signature",
+                )}
                 disabled={!plaintext || countdown <= 0}
               />
               {signatureError && (
@@ -448,32 +491,8 @@ export default function ConfirmSign() {
         </div>
 
         {/* Disclaimer */}
-        <div className="mt-6 pt-4 border-t border-border">
-          <p className="tx-12 lh-18 text-secondary">
-            {t("confirmSign.byProceeding", "By proceeding, you agree to the")}{" "}
-            <Link to="/terms" className="text-(--color-orange-500) underline">
-              {t("confirmSign.termsOfService", "Terms of Service")}
-            </Link>
-            ,{" "}
-            <Link
-              to="/terms-reward-distribution"
-              className="text-(--color-orange-500) underline"
-            >
-              {t("confirmSign.rewardDistribution", "Reward Distribution")}
-            </Link>
-            ,{" "}
-            <Link to="/privacy" className="text-(--color-orange-500) underline">
-              {t("confirmSign.privacyPolicy", "Privacy Policy")}
-            </Link>{" "}
-            {t("confirmSign.and", "and")}{" "}
-            <Link
-              to="/charges-refunds"
-              className="text-(--color-orange-500) underline"
-            >
-              {t("confirmSign.chargesRefunds", "Charges & Refunds")}
-            </Link>
-            .
-          </p>
+        <div className="border-border mt-6 border-t pt-4">
+          <LegalLinks />
         </div>
 
         {/* Action Buttons */}

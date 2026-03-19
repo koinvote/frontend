@@ -1,5 +1,5 @@
 // api/request.ts
-import type { EventType, EventRewardType } from "./types";
+import type { EventRewardType, EventType } from "./types";
 
 export interface CreateEventReq {
   title: string;
@@ -12,6 +12,9 @@ export interface CreateEventReq {
   options?: string[];
   preheat_hours?: number;
   hashtags?: string[];
+  result_visibility?: "public" | "paid_only" | "creator_only";
+  creator_email?: string;
+  unlock_price_satoshi?: number;
 }
 
 export interface GetEventListReq {
@@ -22,6 +25,9 @@ export interface GetEventListReq {
   limit: string;
   sortBy: "time" | "reward" | "participation";
   order: "desc" | "asc";
+  event_reward_type?: string[]; // e.g. ["rewarded", "non_reward"]
+  event_type?: string[];         // e.g. ["single_choice", "open"]
+  result_visibility?: string[];  // e.g. ["public", "paid_only", "creator_only"]
 }
 
 export interface GetListRepliesReq {
@@ -32,6 +38,7 @@ export interface GetListRepliesReq {
   page?: number; // default: 1
   limit?: number; // default: 20, max: 100
   balance_type?: "snapshot" | "current";
+  unlock_email?: string;
 }
 
 // Admin API Request Types
@@ -94,4 +101,40 @@ export interface GetWithdrawalRecordReq {
   to_address?: string;
   start_time?: string;
   end_time?: string;
+}
+
+export interface UnlockEventReq {
+  email: string;
+}
+
+export interface GenerateChangeVisibilityPlaintextReq {
+  email: string;
+  result_visibility: "paid_only" | "public";
+  unlock_price_satoshi?: number; // required when result_visibility is "paid_only"
+}
+
+export interface UpdateResultVisibilityReq {
+  email: string;
+  result_visibility: "paid_only" | "public";
+  unlock_price_satoshi?: number; // required when result_visibility is "paid_only"
+  plaintext: string;
+  signature: string;
+}
+
+export interface VerifyChangeVisibilityPlaintextReq {
+  email: string;
+  plaintext: string;
+  signature: string;
+}
+
+export interface GenerateUnlockPricePlaintextReq {
+  email: string;
+  unlock_price_satoshi: number;
+}
+
+export interface UpdateUnlockPriceReq {
+  email: string;
+  unlock_price_satoshi: number;
+  plaintext: string;
+  signature: string;
 }

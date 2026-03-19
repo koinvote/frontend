@@ -7,12 +7,12 @@ import { useNavigate, useParams } from "react-router";
 import { API, type ApiResponse } from "@/api";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
-import CircleLeftIcon from "@/assets/icons/circle-left.svg?react";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import HashIcon from "@/assets/icons/hash.svg?react";
 import TrophyIcon from "@/assets/icons/trophy.svg?react";
+import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { EventInfoBox } from "@/components/base/EventInfoBox";
 import { Loading } from "@/components/base/Loading";
@@ -41,17 +41,13 @@ const ChecklistItem = ({
     <div
       className={cn(
         "h-2 w-2 rounded-full",
-        isValid ? "bg-green-500" : isError ? "bg-red-500" : "bg-white/20",
+        isValid ? "bg-success" : isError ? "bg-red-500" : "bg-white/20",
       )}
     />
     <span
       className={cn(
         "text-sm",
-        isValid
-          ? "text-green-500"
-          : isError
-            ? "text-red-500"
-            : "text-secondary",
+        isValid ? "text-success" : isError ? "text-red-500" : "text-secondary",
       )}
     >
       {label}
@@ -367,390 +363,384 @@ export default function ReplyPage() {
 
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 pb-10 md:px-0">
-      <div className="relative h-[50px] w-full">
-        <button
-          type="button"
-          className="hover:text-admin-text-sub absolute left-0 cursor-pointer text-black dark:text-white"
-          onClick={goBack}
-        >
-          <CircleLeftIcon className="h-8 w-8 fill-current" />
-        </button>
+      <div className="relative h-[50px] w-full max-w-3xl">
+        <BackButton onClick={goBack} />
       </div>
 
-      <div className="border-gray-450 bg-bg w-full max-w-3xl rounded-3xl border px-6 py-6 md:px-8 md:py-8">
-        <h1 className="tx-20 lh-24 fw-m text-primary">
-          {event.event_reward_type === "rewarded"
-            ? t("reply.title", "Reply to Win BTC")
-            : t("reply.titleFree", "Submit Your Reply")}
-        </h1>
-        <p className="tx-14 lh-20 text-secondary mt-1">
-          {event.event_reward_type === "rewarded"
-            ? t(
-                "reply.subtitle",
-                "Complete the steps below to submit your reply and enter the draw.",
-              )
-            : t(
-                "reply.subtitleFree",
-                "Complete the steps below to submit your reply.",
-              )}
+      {/* 1. Event Information */}
+      <div className="border-border bg-bg mt-6 w-full max-w-3xl rounded-xl border p-4 md:p-6">
+        <div className="mb-6">
+          <h1 className="tx-20 lh-24 fw-m text-accent">
+            {event.event_reward_type === "rewarded"
+              ? t("reply.title", "Reply to Win BTC")
+              : t("reply.titleFree", "Submit Your Reply")}
+          </h1>
+          <p className="tx-14 lh-20 text-secondary mt-1">
+            {event.event_reward_type === "rewarded"
+              ? t(
+                  "reply.subtitle",
+                  "Complete the steps below to submit your reply and enter the draw.",
+                )
+              : t(
+                  "reply.subtitleFree",
+                  "Complete the steps below to submit your reply.",
+                )}
+          </p>
+        </div>
+        <div className="mb-4 flex items-center gap-2">
+          <span className="text-accent text-lg">
+            <TrophyIcon className="h-4 w-4" />
+          </span>
+          <h2 className="tx-16 lh-20 fw-m text-primary">
+            {t("reply.eventInfo", "Event Information")}
+          </h2>
+        </div>
+
+        <h3 className="tx-16 lh-24 fw-m text-primary mb-2">{event.title}</h3>
+        <p className="tx-14 lh-20 text-secondary mb-4 whitespace-pre-line">
+          {event.description}
         </p>
 
-        {/* 1. Event Information */}
-        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="text-accent text-lg">
-              <TrophyIcon className="h-4 w-4" />
-            </span>
-            <h2 className="tx-16 lh-20 fw-m text-primary">
-              {t("reply.eventInfo", "Event Information")}
-            </h2>
-          </div>
-
-          <h3 className="tx-16 lh-24 fw-m text-primary mb-2">{event.title}</h3>
-          <p className="tx-14 lh-20 text-secondary mb-4 whitespace-pre-line">
-            {event.description}
-          </p>
-
-          <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-            <EventInfoBox
-              label={t("reply.timeRemaining", "Time Remaining")}
-              value={eventCountdown}
-              icon={<ClockIcon className="h-3 w-3 text-[#2B7FFF]" />}
-            />
-            <EventInfoBox
-              label={t("reply.eventId", "Event-ID")}
-              value={event.event_id}
-              icon={<HashIcon className="h-3 w-3 text-[#00C950]" />}
-            />
-            <EventInfoBox
-              label={t("reply.rewardAmount", "Reward Amount")}
-              value={Number(rewardText)}
-              icon={<TrophyIcon className="h-3 w-3 text-[#AD46FF]" />}
-            />
-            <EventInfoBox
-              label={t("reply.maxRecipients", "Max Recipients")}
-              value={event.winner_count || "-"}
-              icon={
-                <EventCardParticipantsIcon className="h-3 w-3 text-[#AD46FF]" />
-              }
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="tx-14 text-secondary">
-              {t("reply.eventType", "Response type")}:
-            </span>
-            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
-              {event.event_type === "open"
-                ? t("reply.openEnded", "Open-ended")
-                : t("reply.singleChoice", "Single-choice")}
-            </span>
-          </div>
+        <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+          <EventInfoBox
+            label={t("reply.timeRemaining", "Time Remaining")}
+            value={eventCountdown}
+            icon={<ClockIcon className="h-3 w-3 text-[#2B7FFF]" />}
+          />
+          <EventInfoBox
+            label={t("reply.eventId", "Event-ID")}
+            value={event.event_id}
+            icon={<HashIcon className="h-3 w-3 text-[#00C950]" />}
+          />
+          <EventInfoBox
+            label={t("reply.rewardAmount", "Reward Amount")}
+            value={Number(rewardText)}
+            icon={<TrophyIcon className="h-3 w-3 text-[#AD46FF]" />}
+          />
+          <EventInfoBox
+            label={t("reply.maxRecipients", "Max Recipients")}
+            value={event.winner_count || "-"}
+            icon={
+              <EventCardParticipantsIcon className="h-3 w-3 text-[#AD46FF]" />
+            }
+          />
         </div>
 
-        {/* 2. Enter BTC Address */}
-        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
-              <span className="tx-12 md:tx-14 text-black">1</span>
-            </div>
-            <h2 className="tx-16 fw-m text-primary">
-              {t("reply.enterBtcAddressTitle", "Enter BTC Address")}
-            </h2>
-          </div>
+        <div className="flex items-center gap-2">
+          <span className="tx-14 text-secondary">
+            {t("reply.eventType", "Response type")}:
+          </span>
+          <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+            {event.event_type === "open"
+              ? t("reply.openEnded", "Open-ended")
+              : t("reply.singleChoice", "Single-choice")}
+          </span>
+          <span className="tx-14 text-secondary">
+            {t("reply.resultVisibility", "Result visibility")}:
+          </span>
+          <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+            {event.result_visibility === "public"
+              ? t("reply.resultVisibilityPublic", "Public")
+              : event.result_visibility === "paid_only"
+                ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+          </span>
+        </div>
+      </div>
 
+      {/* 2. Enter BTC Address */}
+      <div className="border-border bg-bg mt-6 w-full max-w-3xl rounded-xl border p-4 md:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+            <span className="tx-12 md:tx-14 text-black">1</span>
+          </div>
+          <h2 className="tx-16 fw-m text-primary">
+            {t("reply.enterBtcAddressTitle", "Enter BTC Address")}
+          </h2>
+        </div>
+
+        <div className="space-y-2">
+          <label className="tx-14 fw-m text-primary">
+            {t("reply.btcAddressLabel", "BTC Address")}{" "}
+            <span className="text-accent">*</span>
+          </label>
+          <input
+            type="text"
+            value={btcAddress}
+            onChange={(e) => setBtcAddress(e.target.value)}
+            placeholder={t(
+              "reply.enterBtcAddress",
+              "Please enter your BTC address",
+            )}
+            autoComplete="new-password"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck="false"
+            className={cn(
+              "bg-form-bg text-primary tx-14 mt-2 w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none dark:placeholder:text-neutral-600",
+              btcAddress && !isAddressValid
+                ? "border-red-500 focus:ring-red-500"
+                : "border-border focus:ring-(--color-orange-500)",
+            )}
+          />
+          {btcAddress && !isAddressValid && (
+            <p className="text-xs text-red-500">
+              {t("reply.invalidBtcAddress", "Invalid BTC address")}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* 3. Enter/Select Reply */}
+      <div className="border-border bg-bg mt-6 w-full max-w-3xl rounded-xl border p-4 md:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+            <span className="tx-12 md:tx-14 text-black">2</span>
+          </div>
+          <h2 className="tx-16 fw-m text-primary">
+            {event.event_type === "open"
+              ? t("reply.enterYourReply", "Enter your reply")
+              : t("reply.selectYourReply", "Select your reply")}
+          </h2>
+        </div>
+
+        {event.event_type === "open" ? (
           <div className="space-y-2">
             <label className="tx-14 fw-m text-primary">
-              {t("reply.btcAddressLabel", "BTC Address")}{" "}
+              {t("reply.enterReplyMessage", "Enter your reply message")}{" "}
               <span className="text-accent">*</span>
             </label>
-            <input
-              type="text"
-              value={btcAddress}
-              onChange={(e) => setBtcAddress(e.target.value)}
-              placeholder={t(
-                "reply.enterBtcAddress",
-                "Please enter your BTC address",
-              )}
-              autoComplete="new-password"
-              autoCorrect="off"
-              autoCapitalize="off"
-              spellCheck="false"
+            <textarea
+              value={replyContent}
+              onChange={(e) => {
+                if (e.target.value.length <= 500) {
+                  setReplyContent(e.target.value);
+                }
+              }}
+              onBlur={(e) => {
+                setReplyContent(e.target.value.trim());
+              }}
+              placeholder={t("reply.replyPlaceholder", "Enter your reply...")}
+              rows={4}
               className={cn(
-                "bg-bg text-primary tx-14 w-full rounded-lg border px-3 py-2 transition-all outline-none focus:ring-2",
-                btcAddress && !isAddressValid
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-border focus:ring-accent",
+                "bg-form-bg text-primary tx-14 w-full resize-none rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600",
+                "border-border",
               )}
             />
-            {btcAddress && !isAddressValid && (
-              <p className="text-xs text-red-500">
-                {t("reply.invalidBtcAddress", "Invalid BTC address")}
-              </p>
-            )}
+            <div className="flex justify-end">
+              <span
+                className={cn(
+                  "text-xs",
+                  replyContent.length >= 500
+                    ? "text-red-500"
+                    : "text-secondary",
+                )}
+              >
+                {replyContent.length}/500
+              </span>
+            </div>
           </div>
+        ) : (
+          <div className="space-y-2">
+            <label className="tx-14 fw-m text-primary">
+              {t("reply.selectOneOption", "Please select one option")}{" "}
+              <span className="text-accent">*</span>
+            </label>
+            <div className="mt-2 flex flex-col gap-3">
+              {event.options?.map((option, index) => {
+                const optionText =
+                  typeof option === "string" ? option : option.option_text;
+                const optionId =
+                  typeof option === "string" ? index + 1 : option.id;
+
+                return (
+                  <label
+                    key={optionId}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-2 rounded-lg border p-3 transition-all hover:bg-white/5",
+                      selectedOptionId === optionId
+                        ? "border-accent bg-accent/5"
+                        : "border-border bg-surface",
+                    )}
+                  >
+                    <input
+                      type="radio"
+                      name="reply-option"
+                      className="radio-orange"
+                      checked={selectedOptionId === optionId}
+                      onChange={() => setSelectedOptionId(optionId)}
+                    />
+                    <span
+                      className="text-primary wrap-break-word whitespace-normal"
+                      style={{
+                        wordBreak: "break-word",
+                        overflowWrap: "anywhere",
+                      }}
+                    >
+                      {optionText}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 4. Generate Plaintext */}
+      <div className="border-border bg-bg mt-6 w-full max-w-3xl rounded-xl border p-4 md:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+            <span className="tx-12 md:tx-14 text-black">3</span>
+          </div>
+          <h2 className="tx-16 fw-m text-primary">
+            {t("reply.generatePlaintext", "Generate the Plaintext")}
+          </h2>
         </div>
 
-        {/* 3. Enter/Select Reply */}
-        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
-              <span className="tx-12 md:tx-14 text-black">2</span>
-            </div>
-            <h2 className="tx-16 fw-m text-primary">
-              {event.event_type === "open"
-                ? t("reply.enterYourReply", "Enter your reply")
-                : t("reply.selectYourReply", "Select your reply")}
-            </h2>
-          </div>
+        <Button
+          appearance="solid"
+          tone={canGeneratePlaintext ? "primary" : "white"} // Use white/grey when disabled-ish visually
+          disabled={!canGeneratePlaintext || isGeneratingPlaintext}
+          onClick={handleGeneratePlaintext}
+          className="w-full"
+        >
+          {isGeneratingPlaintext
+            ? t("reply.generating", "Generating...")
+            : t("reply.generatePlaintextBtn", "Generate Plaintext")}
+        </Button>
 
-          {event.event_type === "open" ? (
-            <div className="space-y-2">
-              <label className="tx-14 fw-m text-primary">
-                {t("reply.enterReplyMessage", "Enter your reply message")}{" "}
-                <span className="text-accent">*</span>
-              </label>
-              <textarea
-                value={replyContent}
-                onChange={(e) => {
-                  if (e.target.value.length <= 500) {
-                    setReplyContent(e.target.value);
-                  }
-                }}
-                onBlur={(e) => {
-                  setReplyContent(e.target.value.trim());
-                }}
-                placeholder={t("reply.replyPlaceholder", "Enter your reply...")}
-                rows={4}
-                className={cn(
-                  "bg-bg text-primary tx-14 w-full resize-none rounded-lg border px-3 py-2 transition-all outline-none focus:ring-2",
-                  "border-border focus:ring-accent",
-                )}
-              />
-              <div className="flex justify-end">
-                <span
-                  className={cn(
-                    "text-xs",
-                    replyContent.length >= 500
-                      ? "text-red-500"
-                      : "text-secondary",
-                  )}
-                >
-                  {replyContent.length}/500
+        {plaintext && (
+          <div className="mt-4 space-y-2">
+            <div className="relative">
+              <div className="border-border bg-surface rounded-lg border px-3 py-2">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="tx-12 lh-18 text-success flex-1 font-mono break-all">
+                    {plaintext}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCopyPlaintext}
+                    className="text-secondary hover:text-primary shrink-0 cursor-pointer transition-colors"
+                    aria-label="Copy plaintext"
+                  >
+                    <CopyIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {countdown > 0 ? (
+              <div className="text-success flex items-center gap-2 text-xs">
+                <ClockIcon className="h-4 w-4" />
+                <span>
+                  {t("reply.expiredIn", "Expired in {{time}}", {
+                    time: formatTimeRemaining(countdown),
+                  })}
                 </span>
               </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <label className="tx-14 fw-m text-primary">
-                {t("reply.selectOneOption", "Please select one option")}{" "}
-                <span className="text-accent">*</span>
-              </label>
-              <div className="flex flex-col gap-3">
-                {event.options?.map((option, index) => {
-                  const optionText =
-                    typeof option === "string" ? option : option.option_text;
-                  const optionId =
-                    typeof option === "string" ? index + 1 : option.id;
-
-                  return (
-                    <label
-                      key={optionId}
-                      className={cn(
-                        "flex cursor-pointer items-center rounded-lg border p-3 transition-all hover:bg-white/5",
-                        selectedOptionId === optionId
-                          ? "border-accent bg-accent/5"
-                          : "border-border bg-bg",
-                      )}
-                    >
-                      <input
-                        type="radio"
-                        name="reply-option"
-                        className="radio-orange mr-3"
-                        checked={selectedOptionId === optionId}
-                        onChange={() => setSelectedOptionId(optionId)}
-                      />
-                      <span
-                        className="text-primary wrap-break-word whitespace-normal"
-                        style={{
-                          wordBreak: "break-word",
-                          overflowWrap: "anywhere",
-                        }}
-                      >
-                        {optionText}
-                      </span>
-                    </label>
-                  );
-                })}
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-red-500">
+                <ClockIcon className="h-4 w-4" />
+                <span>
+                  {t(
+                    "reply.plaintextExpired",
+                    "This plaintext has expired. Please generate a new one.",
+                  )}
+                </span>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 5. Enter Signature */}
+      <div className="border-border bg-bg mt-6 w-full max-w-3xl rounded-xl border p-4 md:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+            <span className="tx-12 md:tx-14 text-black">4</span>
+          </div>
+          <h2 className="tx-16 fw-m text-primary">
+            {t("reply.enterSignatureTitle", "Enter Signature")}
+          </h2>
         </div>
 
-        {/* 4. Generate Plaintext */}
-        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
-              <span className="tx-12 md:tx-14 text-black">3</span>
-            </div>
-            <h2 className="tx-16 fw-m text-primary">
-              {t("reply.generatePlaintext", "Generate the Plaintext")}
-            </h2>
+        <div className="space-y-2">
+          <label className="tx-14 fw-m text-primary">
+            {t("reply.signatureLabel", "Signature")}{" "}
+            <span className="text-accent">*</span>
+          </label>
+          <input
+            type="text"
+            value={signature}
+            onChange={(e) => setSignature(e.target.value)}
+            placeholder={t(
+              "reply.signaturePlaceholder",
+              "Paste the signature generated by your BTC wallet for the plaintext here...",
+            )}
+            className="border-border bg-form-bg text-primary tx-14 mt-2 w-full rounded-xl border px-3 py-2 font-mono leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600"
+          />
+        </div>
+      </div>
+
+      {/* 6. Submit Reply */}
+      <div className="border-border bg-bg mt-6 w-full max-w-3xl rounded-xl border p-4 md:p-6">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
+            <span className="tx-12 md:tx-14 text-black">5</span>
           </div>
-
-          <Button
-            appearance="solid"
-            tone={canGeneratePlaintext ? "primary" : "white"} // Use white/grey when disabled-ish visually
-            disabled={!canGeneratePlaintext || isGeneratingPlaintext}
-            onClick={handleGeneratePlaintext}
-            className="w-full"
-          >
-            {isGeneratingPlaintext
-              ? t("reply.generating", "Generating...")
-              : t("reply.generatePlaintextBtn", "Generate Plaintext")}
-          </Button>
-
-          {plaintext && (
-            <div className="mt-4 space-y-2">
-              <div className="relative">
-                <div className="border-border bg-bg rounded-lg border px-3 py-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="tx-12 lh-18 flex-1 font-mono break-all text-green-500">
-                      {plaintext}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={handleCopyPlaintext}
-                      className="text-secondary hover:text-primary shrink-0 cursor-pointer transition-colors"
-                      aria-label="Copy plaintext"
-                    >
-                      <CopyIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {countdown > 0 ? (
-                <div className="flex items-center gap-2 text-xs text-green-500">
-                  <ClockIcon className="h-4 w-4" />
-                  <span>
-                    {t("reply.expiredIn", "Expired in {{time}}", {
-                      time: formatTimeRemaining(countdown),
-                    })}
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 text-xs text-red-500">
-                  <ClockIcon className="h-4 w-4" />
-                  <span>
-                    {t(
-                      "reply.plaintextExpired",
-                      "This plaintext has expired. Please generate a new one.",
-                    )}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+          <h2 className="tx-16 fw-m text-primary">
+            {t("reply.submitReply", "Submit Reply")}
+          </h2>
         </div>
 
-        {/* 5. Enter Signature */}
-        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
-              <span className="tx-12 md:tx-14 text-black">4</span>
-            </div>
-            <h2 className="tx-16 fw-m text-primary">
-              {t("reply.enterSignatureTitle", "Enter Signature")}
-            </h2>
+        <div className="bg-surface mb-6 rounded-xl p-4">
+          <div className="text-primary mb-3 text-sm font-medium">
+            {t("reply.preSubmitChecklist", "Pre-submit checklist")} :
           </div>
-
           <div className="space-y-2">
-            <label className="tx-14 fw-m text-primary">
-              {t("reply.signatureLabel", "Signature")}{" "}
-              <span className="text-accent">*</span>
-            </label>
-            <input
-              type="text"
-              value={signature}
-              onChange={(e) => setSignature(e.target.value)}
-              placeholder={t(
-                "reply.signaturePlaceholder",
-                "Paste the signature generated by your BTC wallet for the plaintext here...",
-              )}
-              className="border-border bg-bg text-primary tx-14 focus:ring-accent w-full rounded-lg border px-3 py-2 font-mono transition-all outline-none focus:ring-2"
+            <ChecklistItem
+              label={t("reply.checkBtcAddress", "BTC address format is valid")}
+              isValid={isAddressValid}
+              isError={!!btcAddress && !isAddressValid}
+            />
+            <ChecklistItem
+              label={t("reply.checkReplyContent", "Reply content is filled in")}
+              isValid={isContentFilled}
+            />
+            <ChecklistItem
+              label={t("reply.checkPlaintext", "Plaintext has been generated")}
+              isValid={isPlaintextGenerated}
+            />
+            <ChecklistItem
+              label={t("reply.checkSignature", "Signature has been entered")}
+              isValid={isSignatureEntered}
             />
           </div>
         </div>
 
-        {/* 6. Submit Reply */}
-        <div className="border-border bg-surface mt-6 rounded-xl border p-4 md:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="border-border fw-m bg-primary-lightModeGray flex h-5 w-5 shrink-0 items-center justify-center rounded-full border md:h-6 md:w-6">
-              <span className="tx-12 md:tx-14 text-black">5</span>
-            </div>
-            <h2 className="tx-16 fw-m text-primary">
-              {t("reply.submitReply", "Submit Reply")}
-            </h2>
-          </div>
-
-          <div className="bg-bg mb-6 rounded-xl p-4">
-            <div className="text-primary mb-3 text-sm font-medium">
-              {t("reply.preSubmitChecklist", "Pre-submit checklist")} :
-            </div>
-            <div className="space-y-2">
-              <ChecklistItem
-                label={t(
-                  "reply.checkBtcAddress",
-                  "BTC address format is valid",
-                )}
-                isValid={isAddressValid}
-                isError={!!btcAddress && !isAddressValid}
-              />
-              <ChecklistItem
-                label={t(
-                  "reply.checkReplyContent",
-                  "Reply content is filled in",
-                )}
-                isValid={isContentFilled}
-              />
-              <ChecklistItem
-                label={t(
-                  "reply.checkPlaintext",
-                  "Plaintext has been generated",
-                )}
-                isValid={isPlaintextGenerated}
-              />
-              <ChecklistItem
-                label={t("reply.checkSignature", "Signature has been entered")}
-                isValid={isSignatureEntered}
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <Button
-              type="button"
-              appearance="outline"
-              tone="white"
-              className="border-border flex-1 text-black hover:bg-white/5 dark:border-white dark:text-white"
-              onClick={goBack}
-            >
-              {t("reply.cancel", "Cancel")}
-            </Button>
-            <Button
-              type="button"
-              appearance="solid"
-              tone="primary"
-              className="flex-1"
-              disabled={!canSubmit || isSubmitting}
-              onClick={handleSubmit}
-            >
-              {isSubmitting
-                ? t("reply.submitting", "Submitting...")
-                : t("reply.submit", "Submit")}
-            </Button>
-          </div>
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            appearance="outline"
+            tone="white"
+            className="border-border flex-1 text-black hover:bg-white/5 dark:border-white dark:text-white"
+            onClick={goBack}
+          >
+            {t("reply.cancel", "Cancel")}
+          </Button>
+          <Button
+            type="button"
+            appearance="solid"
+            tone="primary"
+            className="flex-1"
+            disabled={!canSubmit || isSubmitting}
+            onClick={handleSubmit}
+          >
+            {isSubmitting
+              ? t("reply.submitting", "Submitting...")
+              : t("reply.submit", "Submit")}
+          </Button>
         </div>
       </div>
 

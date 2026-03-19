@@ -9,7 +9,10 @@ import ConfirmPay from "@/pages/create-event/ConfirmPay";
 import ConfirmSign from "@/pages/create-event/ConfirmSign";
 import CreateEvent from "@/pages/create-event/CreateEvent";
 import PreviewEvent from "@/pages/create-event/PreviewEvent";
+import ChangeResultVisibility from "@/pages/change-result-visibility";
+import ChangeUnlockPrice from "@/pages/change-unlock-price";
 import EventDetail from "@/pages/event-detail";
+import UnlockPayment from "@/pages/unlock-payment";
 import HelpnFaq from "@/pages/helpnFaq";
 import Home from "@/pages/home";
 import PayoutReport from "@/pages/payout-report";
@@ -63,7 +66,10 @@ const publicChildren = isComingSoonMode
       { path: "confirm-pay/:eventId/payment", element: <ConfirmPay />, handle: { title: "Confirm Payment | Koinvote" } },
       // title: null → event detail page sets its own title from event data
       { path: "event/:eventId", element: <EventDetail />, handle: { title: null } },
+      { path: "event/:eventId/unlock-payment", element: <UnlockPayment />, handle: { title: "Unlock Payment | Koinvote" } },
       { path: "event/:eventId/reply", element: <ReplyPage />, handle: { title: "Reply | Koinvote" } },
+      { path: "event/:eventId/change-result-visibility", element: <ChangeResultVisibility />, handle: { title: "Change Result Visibility | Koinvote" } },
+      { path: "event/:eventId/change-unlock-price", element: <ChangeUnlockPrice />, handle: { title: "Change Unlock Price | Koinvote" } },
       { path: "event/:eventId/report", element: <PayoutReport />, handle: { title: "Payout Report | Koinvote" } },
 
       // TODO: test route, remove later
