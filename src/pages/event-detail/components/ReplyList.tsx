@@ -1,3 +1,12 @@
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Tooltip } from "antd";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
+import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
+
 import { API, type ApiResponse } from "@/api";
 import type { EventOption, GetListRepliesRes, Reply } from "@/api/response";
 import { EventStatus, ReplySortBy, type EventType } from "@/api/types";
@@ -12,14 +21,6 @@ import { PageLoading } from "@/components/PageLoading";
 import { satsToBtc } from "@/utils/formatter";
 import { useDebouncedClick } from "@/utils/helper";
 import { cn } from "@/utils/style";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Tooltip } from "antd";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import utc from "dayjs/plugin/utc";
-import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 // import ReportIcon from "@/assets/icons/report.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
@@ -89,8 +90,8 @@ export function ReplyList({
   const { t } = useTranslation();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const [page] = useState(1); // TODO: 实现分页功能时使用 setPage
   const limit = 20;
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const [unlockEmail, setUnlockEmail] = useState(initialUnlockEmail ?? "");
   const [submittedEmail, setSubmittedEmail] = useState(
@@ -106,11 +107,13 @@ export function ReplyList({
     isLoading,
     isFetching,
     error,
-  } = useQuery({
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: [
       "replies",
       eventId,
-      page,
       limit,
       search,
       sortBy,
@@ -118,7 +121,7 @@ export function ReplyList({
       balanceDisplayMode,
       submittedEmail,
     ],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const balanceType =
         balanceDisplayMode === "on_chain" ? "current" : "snapshot";
       try {
@@ -127,7 +130,7 @@ export function ReplyList({
           search: search || undefined,
           sortBy,
           order,
-          page,
+          page: pageParam as number,
           limit,
           balance_type: balanceType,
           unlock_email: submittedEmail || undefined,
@@ -150,19 +153,24 @@ export function ReplyList({
         throw err;
       }
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (!lastPage || lastPage.replies.length < limit) return undefined;
+      return allPages.length + 1;
+    },
     enabled: !!eventId,
-    placeholderData: keepPreviousData,
   });
 
-  const isLocked = !isLoading && !error && repliesData === null;
+  const isLocked = !isLoading && !error && repliesData?.pages[0] === null;
 
   useEffect(() => {
     onLockedChange?.(isLocked);
   }, [isLocked, onLockedChange]);
 
   useEffect(() => {
-    if (!isLoading && repliesData !== null && repliesData !== undefined) {
-      onCreatorChange?.(repliesData.is_creator === 1, submittedEmail);
+    const firstPage = repliesData?.pages[0];
+    if (!isLoading && firstPage != null) {
+      onCreatorChange?.(firstPage.is_creator === 1, submittedEmail);
     }
   }, [isLoading, repliesData, submittedEmail, onCreatorChange]);
 
@@ -232,6 +240,23 @@ export function ReplyList({
     }
     setSubmittedEmail(trimmedEmail);
   };
+
+  const allReplies = repliesData?.pages.flatMap((p) => p?.replies ?? []) ?? [];
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   const handleCopy = useDebouncedClick(async (text: string, label: string) => {
     try {
@@ -381,7 +406,7 @@ export function ReplyList({
     );
   }
 
-  if (!repliesData || repliesData.replies.length === 0) {
+  if (!repliesData || allReplies.length === 0) {
     return (
       <div className="flex min-h-[200px] items-center justify-center">
         <p className="text-secondary">
@@ -395,7 +420,7 @@ export function ReplyList({
 
   return (
     <div className="flex flex-col gap-4">
-      {repliesData.replies.map((reply) => (
+      {allReplies.map((reply) => (
         <ReplyItem
           key={reply.id}
           reply={reply}
@@ -406,6 +431,8 @@ export function ReplyList({
           balanceDisplayMode={balanceDisplayMode}
         />
       ))}
+      <div ref={sentinelRef} className="h-1" />
+      {isFetchingNextPage && <PageLoading />}
     </div>
   );
 }
