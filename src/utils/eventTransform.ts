@@ -56,7 +56,7 @@ export const mapApiEventToEventSummary = (
   ended_at: undefined, // API doesn't return ended_at for list endpoint
   total_reward_btc: satsToBtcString(ev.total_reward_satoshi),
   participants_count: ev.participants_count,
-  total_stake_btc: satsToBtcString(ev.total_stake_satoshi),
+  total_stake_btc: satsToBtc(ev.total_stake_satoshi, { suffix: false, trimTrailingZeros: true }),
   top_replies: ev.top_replies.map(mapApiTopReply),
   options: ev.options ?? [],
   result_visibility: ev.result_visibility ?? "public",

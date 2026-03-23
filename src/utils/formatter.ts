@@ -19,16 +19,29 @@ export const btcToSats = (value: string) => {
 };
 
 /**
- * Convert Satoshi to BTC string for display
- * @param satoshi - Satoshi value (number or null/undefined)
+ * Convert Satoshi to BTC string for display.
+ *
+ * @param satoshi - Satoshi amount to format. Accepts:
+ *   - `number` — satoshi value directly (e.g. `100000`)
+ *   - `string` — numeric string of satoshi value (e.g. `"100000"`); non-numeric strings return `"--"`
+ *   - `null | undefined` — returns `"--"`
  * @param options - Formatting options
- * @param options.decimals - Number of decimal places (default: 8)
- * @param options.suffix - Whether to append " BTC" suffix (default: true)
- * @param options.showZero - Whether to show "0 BTC" for zero values (default: true)
- * @returns Formatted BTC string (e.g., "0.00012345 BTC") or "--" for invalid/null values
+ * @param options.decimals - Number of decimal places (default: `8`)
+ * @param options.suffix - Whether to append `" BTC"` suffix (default: `true`)
+ * @param options.showZero - Whether to show `"0 BTC"` for zero values; `false` returns `"--"` (default: `true`)
+ * @param options.trimTrailingZeros - Strip trailing fractional zeros, e.g. `"0.00100000"` → `"0.001"` (default: `false`)
+ * @returns Formatted BTC string (e.g. `"0.00012345 BTC"`) or `"--"` for invalid / null values
+ *
+ * @example
+ * satsToBtc(100000)                                // "0.00100000 BTC"
+ * satsToBtc(100000, { trimTrailingZeros: true })   // "0.001 BTC"
+ * satsToBtc(100000, { suffix: false })             // "0.00100000"
+ * satsToBtc("100000", { trimTrailingZeros: true }) // "0.001 BTC"
+ * satsToBtc(null)                                  // "--"
+ * satsToBtc("abc")                                 // "--"
  */
 export const satsToBtc = (
-  satoshi: number | null | undefined,
+  satoshi: string | number | null | undefined,
   options?: {
     decimals?: number;
     suffix?: boolean;
@@ -48,18 +61,21 @@ export const satsToBtc = (
     return "--";
   }
 
+  // Coerce string → number; reject non-numeric strings
+  const satoshi_ = typeof satoshi === "string" ? Number(satoshi) : satoshi;
+
   // Handle invalid numbers
-  if (!Number.isFinite(satoshi)) {
+  if (!Number.isFinite(satoshi_)) {
     return "--";
   }
 
   // Handle zero
-  if (satoshi === 0) {
+  if (satoshi_ === 0) {
     return showZero ? (suffix ? "0 BTC" : "0") : "--";
   }
 
   // Convert to BTC
-  const btc = satoshi / SATS_PER_BTC;
+  const btc = satoshi_ / SATS_PER_BTC;
   const fixed = btc.toFixed(decimals);
 
   const formatted = trimTrailingZeros
