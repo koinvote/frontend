@@ -102,9 +102,9 @@ export function ReplyItem({ reply, t }: ReplyItemProps) {
           <span>
             {t("eventCard.amount", "Amount:")}{" "}
             {satsToBtc(parseFloat(reply.amount_satoshi || "0"), {
-              suffix: false,
-            })}{" "}
-            BTC
+              suffix: true,
+              trimTrailingZeros: true,
+            })}
           </span>
         </div>
       </div>

@@ -119,10 +119,7 @@ export function ResponseTypeField() {
                     onChange={() => field.onChange("open")}
                   />
                   <span>
-                    {t(
-                      "createEvent.responseTypeOptions.0.label",
-                      "Open-ended",
-                    )}
+                    {t("createEvent.responseTypeOptions.0.label", "Open-ended")}
                   </span>
                   <Tooltip
                     title={t(
