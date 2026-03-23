@@ -386,7 +386,10 @@ export function ReplyList({
             </p>
           ) : (
             <p className="text-secondary tx-12 text-left">
-              {t("replyList.enterUnlockEmail", "Enter your unlock email")}
+              {t(
+                "replyList.enterUnlockEmail",
+                "Enter your email to access this event",
+              )}
             </p>
           )}
         </div>

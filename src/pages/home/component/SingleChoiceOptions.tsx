@@ -90,9 +90,9 @@ export function SingleChoiceOptions({
                     <span>
                       {t("eventCard.amount", "Amount:")}{" "}
                       {satsToBtc(opt.total_stake_satoshi, {
-                        suffix: false,
-                      })}{" "}
-                      BTC
+                        suffix: true,
+                        trimTrailingZeros: true,
+                      })}
                     </span>
                   </div>
                 </div>

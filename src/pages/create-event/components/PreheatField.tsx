@@ -109,16 +109,16 @@ export function PreheatField() {
           >
             {t("createEvent.enablePreheat")}
           </label>
+
           <Tooltip
-            placement="topLeft"
             title={formatTooltipText(t("createEvent.enablePreheatTooltip"))}
+            placement="bottom"
             color="white"
-            arrow={{ pointAtCenter: true }}
             {...enablePreheatTooltip.tooltipProps}
           >
             <span
               {...enablePreheatTooltip.triggerProps}
-              className="tx-14 text-admin-text-main cursor-pointer dark:text-white"
+              className="cursor-pointer"
             >
               <InfoIcon />
             </span>
