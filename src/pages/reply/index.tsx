@@ -426,25 +426,29 @@ export default function ReplyPage() {
           />
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="tx-14 text-secondary">
-            {t("reply.eventType", "Response type")}:
-          </span>
-          <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
-            {event.event_type === "open"
-              ? t("reply.openEnded", "Open-ended")
-              : t("reply.singleChoice", "Single-choice")}
-          </span>
-          <span className="tx-14 text-secondary">
-            {t("reply.resultVisibility", "Result visibility")}:
-          </span>
-          <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
-            {event.result_visibility === "public"
-              ? t("reply.resultVisibilityPublic", "Public")
-              : event.result_visibility === "paid_only"
-                ? t("reply.resultVisibilityPaidOnly", "Paid-only")
-                : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
-          </span>
+        <div className="flex flex-wrap items-start gap-4">
+          <div>
+            <span className="tx-14 text-secondary">
+              {t("reply.eventType", "Response type")}
+            </span>
+            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+              {event.event_type === "open"
+                ? t("reply.openEnded", "Open-ended")
+                : t("reply.singleChoice", "Single-choice")}
+            </span>
+          </div>
+          <div>
+            <span className="tx-14 text-secondary">
+              {t("reply.resultVisibility", "Result visibility")}
+            </span>
+            <span className="border-border rounded-full border bg-white px-3 py-1 text-xs font-medium text-black">
+              {event.result_visibility === "public"
+                ? t("reply.resultVisibilityPublic", "Public")
+                : event.result_visibility === "paid_only"
+                  ? t("reply.resultVisibilityPaidOnly", "Paid-only")
+                  : t("reply.resultVisibilityCreatorOnly", "Creator-only")}
+            </span>
+          </div>
         </div>
       </div>
 
