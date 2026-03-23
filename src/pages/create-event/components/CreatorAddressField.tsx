@@ -39,18 +39,22 @@ export function CreatorAddressField({
         </label>
         <span className={`mr-1 ml-1 text-(--color-orange-500)`}>*</span>
         <Tooltip
-          placement="topLeft"
-          title={t("createEvent.creatorAddressTooltip")}
+          title={t(
+            "createEvent.creatorAddressTooltip",
+            "This address will also be used for refunds.",
+          )}
+          placement="bottom"
           color="white"
-          arrow={{ pointAtCenter: true }}
           {...creatorAddressTooltip.tooltipProps}
-          overlayInnerStyle={{
-            ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
+          styles={{
+            container: {
+              ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
+            },
           }}
         >
           <span
             {...creatorAddressTooltip.triggerProps}
-            className="tx-14 text-admin-text-main flex cursor-pointer items-center dark:text-white"
+            className="cursor-pointer"
           >
             <InfoIcon />
           </span>

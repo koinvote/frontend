@@ -58,7 +58,7 @@ export function ResponseTypeField() {
                     "createEvent.singleChoiceTooltip",
                     "Participants choose one option from a list you create.",
                   )}
-                  placement="top"
+                  placement="bottom"
                   color="white"
                   {...singleChoiceTooltip.tooltipProps}
                 >
@@ -77,7 +77,7 @@ export function ResponseTypeField() {
               <Tooltip
                 title={mustBePublicTooltip}
                 color="white"
-                placement="top"
+                placement="bottom"
               >
                 <span>
                   <label
@@ -119,17 +119,14 @@ export function ResponseTypeField() {
                     onChange={() => field.onChange("open")}
                   />
                   <span>
-                    {t(
-                      "createEvent.responseTypeOptions.0.label",
-                      "Open-ended",
-                    )}
+                    {t("createEvent.responseTypeOptions.0.label", "Open-ended")}
                   </span>
                   <Tooltip
                     title={t(
                       "createEvent.openEndedTooltip",
                       "Participants can submit their own responses.",
                     )}
-                    placement="top"
+                    placement="bottom"
                     color="white"
                     {...openEndedTooltip.tooltipProps}
                   >
