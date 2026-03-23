@@ -131,43 +131,13 @@ export default function PreviewEvent() {
     return Math.round(fee);
   }, [isRewarded, params, durationHours]);
 
-  // Calculate preheat fee
-  // Formula: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
-  const preheatFeeSatoshi = useMemo(() => {
-    // Only calculate if preheat is enabled
-    if (!enablePreheat || !preheatHours || preheatHours <= 0) return null;
-
-    // Check if system parameters are loaded
-    if (!params) return null;
-
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = params.platform_fee_percentage ?? 0;
-
-    // Validate preheat hours (must be between 1 and 720)
-    if (preheatHours < 1 || preheatHours > 720) {
-      return null;
-    }
-
-    // Calculate: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
-    const multiplier = 0.2 + 0.8 * (preheatHours / 720);
-    const fee =
-      preheatHours *
-      satoshiPerDurationHour *
-      (platformFeePercentage / 100) *
-      multiplier;
-
-    // Round to nearest satoshi
-    return Math.round(fee);
-  }, [enablePreheat, params, preheatHours]);
+  // Preheat is free — no fee calculation needed
+  const preheatFeeSatoshi = null;
 
   // Format fees for display
   const platformFeeDisplay = useMemo(() => {
     return satsToBtc(platformFeeSatoshi);
   }, [platformFeeSatoshi]);
-
-  const preheatFeeDisplay = useMemo(() => {
-    return satsToBtc(preheatFeeSatoshi);
-  }, [preheatFeeSatoshi]);
 
   // Calculate reward amount in satoshi (for rewarded events)
   const rewardAmountSatoshi = useMemo(() => {
@@ -175,27 +145,21 @@ export default function PreviewEvent() {
     return Math.round(parseFloat(state.rewardBtc) * 100_000_000);
   }, [isRewarded, state?.rewardBtc]);
 
-  // Calculate total amount
-  // For rewarded events: total = reward amount + preheat fee (if enabled)
-  // For non-rewarded events: total = platform fee + preheat fee (if enabled)
+  // Calculate total amount (preheat is free, not included)
+  // For rewarded events: total = reward amount
+  // For non-rewarded events: total = platform fee
   const totalAmountSatoshi = useMemo(() => {
-    const preheat = preheatFeeSatoshi ?? 0;
-
     if (isRewarded) {
-      // For rewarded events, total = reward amount + preheat fee
-      return rewardAmountSatoshi + preheat;
+      return rewardAmountSatoshi;
     }
 
-    // For non-rewarded events, calculate platform fee + preheat fee
-    // If both are null, return null
-    if (platformFeeSatoshi === null && preheatFeeSatoshi === null) {
+    // For non-rewarded events, total is just the platform fee
+    if (platformFeeSatoshi === null) {
       return null;
     }
 
-    // Sum up the fees (treat null as 0)
-    const platform = platformFeeSatoshi ?? 0;
-    return platform + preheat;
-  }, [isRewarded, rewardAmountSatoshi, platformFeeSatoshi, preheatFeeSatoshi]);
+    return platformFeeSatoshi;
+  }, [isRewarded, rewardAmountSatoshi, platformFeeSatoshi]);
 
   const totalFeeDisplay = useMemo(() => {
     return satsToBtc(totalAmountSatoshi, { trimTrailingZeros: true });
@@ -214,14 +178,12 @@ export default function PreviewEvent() {
 
   // ----- FREE / PAID 判斷 -----
   const { isFree, primaryButtonLabel, headerSubTitle } = useMemo(() => {
-    const hasPreheat = enablePreheat && preheatHours > 0;
     const freeHours = params?.free_hours ?? 24; // Use system parameter or default to 24
     const isDurationWithinFree = !isRewarded && durationHours <= freeHours;
 
     const free =
       !isRewarded && // 無獎金
-      !hasPreheat && // 沒預熱
-      isDurationWithinFree; // 時數在免費時數內
+      isDurationWithinFree; // 時數在免費時數內（preheat 免費，不影響判斷）
 
     const primaryLabel = free
       ? t("preview.confirmSign", "Confirm & Sign")
@@ -236,7 +198,7 @@ export default function PreviewEvent() {
       primaryButtonLabel: primaryLabel,
       headerSubTitle: subTitle,
     };
-  }, [enablePreheat, preheatHours, isRewarded, durationHours, params, t]);
+  }, [isRewarded, durationHours, params, t]);
 
   const {
     creatorAddress,
@@ -613,16 +575,11 @@ export default function PreviewEvent() {
             </>
           )}
 
-          {/* Preheat + Preheat fee（有開啟 Preheat 才顯示） */}
+          {/* Preheat（有開啟 Preheat 才顯示，免費不顯示費用） */}
           {enablePreheat && preheatHours > 0 && (
-            <>
-              <Field label={t("preview.preheat", "Preheat")}>
-                {t("common.hours", "{{hours}} hours", { hours: preheatHours })}
-              </Field>
-              <Field label={t("preview.preheatFee", "Preheat fee")}>
-                {preheatFeeDisplay}
-              </Field>
-            </>
+            <Field label={t("preview.preheat", "Preheat")}>
+              {t("common.hours", "{{hours}} hours", { hours: preheatHours })}
+            </Field>
           )}
           {/* Your Total */}
           <Field label={t("preview.yourTotal", "Your Total")}>
