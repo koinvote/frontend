@@ -60,12 +60,8 @@ export function ResponseTypeField() {
                   )}
                   placement="bottom"
                   color="white"
-                  {...singleChoiceTooltip.tooltipProps}
                 >
-                  <span
-                    {...singleChoiceTooltip.triggerProps}
-                    className="cursor-pointer"
-                  >
+                  <span className="cursor-pointer">
                     <InfoIcon />
                   </span>
                 </Tooltip>
@@ -128,12 +124,8 @@ export function ResponseTypeField() {
                     )}
                     placement="bottom"
                     color="white"
-                    {...openEndedTooltip.tooltipProps}
                   >
-                    <span
-                      {...openEndedTooltip.triggerProps}
-                      className="cursor-pointer"
-                    >
+                    <span className="cursor-pointer">
                       <InfoIcon />
                     </span>
                   </Tooltip>
