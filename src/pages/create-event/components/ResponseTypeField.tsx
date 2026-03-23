@@ -58,8 +58,9 @@ export function ResponseTypeField() {
                     "createEvent.singleChoiceTooltip",
                     "Participants choose one option from a list you create.",
                   )}
-                  placement="bottom"
+                  placement="top"
                   color="white"
+                  getPopupContainer={() => document.body}
                 >
                   <span className="cursor-pointer">
                     <InfoIcon />
@@ -72,8 +73,9 @@ export function ResponseTypeField() {
             {isOpenEndedDisabled ? (
               <Tooltip
                 title={mustBePublicTooltip}
+                placement="top"
                 color="white"
-                placement="bottom"
+                getPopupContainer={() => document.body}
               >
                 <span>
                   <label
@@ -122,8 +124,9 @@ export function ResponseTypeField() {
                       "createEvent.openEndedTooltip",
                       "Participants can submit their own responses.",
                     )}
-                    placement="bottom"
+                    placement="top"
                     color="white"
+                    getPopupContainer={() => document.body}
                   >
                     <span className="cursor-pointer">
                       <InfoIcon />
