@@ -43,14 +43,9 @@ export function CreatorAddressField({
             "createEvent.creatorAddressTooltip",
             "This address will also be used for refunds.",
           )}
-          placement="bottom"
+          placement="top"
           color="white"
           {...creatorAddressTooltip.tooltipProps}
-          styles={{
-            container: {
-              ...creatorAddressTooltip.tooltipProps.overlayInnerStyle,
-            },
-          }}
         >
           <span
             {...creatorAddressTooltip.triggerProps}
