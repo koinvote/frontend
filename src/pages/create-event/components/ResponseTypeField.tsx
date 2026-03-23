@@ -60,9 +60,12 @@ export function ResponseTypeField() {
                   )}
                   placement="top"
                   color="white"
-                  getPopupContainer={() => document.body}
+                  {...singleChoiceTooltip.tooltipProps}
                 >
-                  <span className="cursor-pointer">
+                  <span
+                    {...singleChoiceTooltip.triggerProps}
+                    className="cursor-pointer"
+                  >
                     <InfoIcon />
                   </span>
                 </Tooltip>
@@ -73,9 +76,8 @@ export function ResponseTypeField() {
             {isOpenEndedDisabled ? (
               <Tooltip
                 title={mustBePublicTooltip}
-                placement="top"
                 color="white"
-                getPopupContainer={() => document.body}
+                placement="top"
               >
                 <span>
                   <label
@@ -126,9 +128,12 @@ export function ResponseTypeField() {
                     )}
                     placement="top"
                     color="white"
-                    getPopupContainer={() => document.body}
+                    {...openEndedTooltip.tooltipProps}
                   >
-                    <span className="cursor-pointer">
+                    <span
+                      {...openEndedTooltip.triggerProps}
+                      className="cursor-pointer"
+                    >
                       <InfoIcon />
                     </span>
                   </Tooltip>
