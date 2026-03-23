@@ -112,7 +112,7 @@ export function PreheatField() {
 
           <Tooltip
             title={formatTooltipText(t("createEvent.enablePreheatTooltip"))}
-            placement="bottom"
+            placement="top"
             color="white"
             {...enablePreheatTooltip.tooltipProps}
           >
