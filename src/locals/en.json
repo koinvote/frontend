@@ -617,7 +617,7 @@
     "participantsCountOne": "1 Participant",
     "btcTotal": "BTC Total",
     "unlockEmailPlaceholder": "your@email.com",
-    "enterUnlockEmail": "Enter your unlock email",
+    "enterUnlockEmail": "Enter your email to access this event",
     "invalidEmailFormat": "Please enter a valid email address",
     "unlock": "Unlock"
   },
