@@ -25,7 +25,9 @@
     "terms": "TERMS",
     "help": "Help / FAQ",
     "light": "Light Theme",
-    "dark": "Dark Theme"
+    "dark": "Dark Theme",
+    "socialMedias": "SOCIAL MEDIAS",
+    "x": "X (Twitter)"
   },
   "createEvent": {
     "creatorAddressTooltip": "This address will also be used for refunds.",
