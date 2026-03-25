@@ -110,7 +110,9 @@ export function RewardBtcField({ setLastField }: RewardBtcFieldProps) {
   }, [isRewarded, params, durationHours]);
 
   const platformFeeDisplay = useMemo(() => {
-    return satsToBtc(platformFeeSatoshi);
+    return satsToBtc(platformFeeSatoshi, {
+      trimTrailingZeros: true,
+    });
   }, [platformFeeSatoshi]);
 
   if (!isRewarded) {

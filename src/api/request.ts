@@ -132,6 +132,24 @@ export interface GenerateUnlockPricePlaintextReq {
   unlock_price_satoshi: number;
 }
 
+export interface GenerateEditPlaintextReq {
+  title: string;
+  description: string;
+  event_type: EventType;
+  options?: string[];
+  hashtags?: string[];
+}
+
+export interface UpdateEventReq {
+  title: string;
+  description: string;
+  event_type: EventType;
+  options?: string[];
+  hashtags?: string[];
+  plaintext: string;
+  signature: string;
+}
+
 export interface UpdateUnlockPriceReq {
   email: string;
   unlock_price_satoshi: number;

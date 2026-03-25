@@ -364,41 +364,8 @@ export default function ConfirmPay() {
     return Math.round(fee);
   }, [state?.isRewarded, state?.durationHours, systemParams]);
 
-  // Calculate preheat fee
-  // Formula: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
-  const preheatFeeSatoshi = useMemo(() => {
-    // Only calculate if preheat is enabled
-    if (
-      !state?.enablePreheat ||
-      !state?.preheatHours ||
-      state.preheatHours <= 0
-    ) {
-      return null;
-    }
-
-    // Check if system parameters are loaded
-    if (!systemParams) return null;
-
-    const preheatHoursNum = state.preheatHours;
-    const satoshiPerDurationHour = systemParams.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = systemParams.platform_fee_percentage ?? 0;
-
-    // Validate preheat hours (must be between 1 and 720)
-    if (preheatHoursNum < 1 || preheatHoursNum > 720) {
-      return null;
-    }
-
-    // Calculate: preheatHours × satoshi_per_duration_hour × platform_fee_percentage × (0.2 + 0.8 × preheatHours / 720)
-    const multiplier = 0.2 + 0.8 * (preheatHoursNum / 720);
-    const fee =
-      preheatHoursNum *
-      satoshiPerDurationHour *
-      (platformFeePercentage / 100) *
-      multiplier;
-
-    // Round to nearest satoshi
-    return Math.round(fee);
-  }, [state?.enablePreheat, state?.preheatHours, systemParams]);
+  // Preheat is free — no fee calculation needed
+  const preheatFeeSatoshi = null;
 
   // Calculate reward amount in satoshi
   const rewardAmountSatoshi = useMemo(() => {
@@ -406,23 +373,18 @@ export default function ConfirmPay() {
     return Math.round(parseFloat(state.rewardBtc) * BTC_TO_SATS);
   }, [state?.isRewarded, state?.rewardBtc]);
 
-  // Calculate total amount
+  // Calculate total amount (preheat is free, not included)
   const totalAmountSatoshi = useMemo(() => {
     const platform = platformFeeSatoshi ?? 0;
-    const preheat = preheatFeeSatoshi ?? 0;
     const reward = rewardAmountSatoshi;
-    return reward + platform + preheat;
-  }, [platformFeeSatoshi, preheatFeeSatoshi, rewardAmountSatoshi]);
+    return reward + platform;
+  }, [platformFeeSatoshi, rewardAmountSatoshi]);
 
   // Format amounts for display
   const rewardAmountBtc = useMemo(() => {
     if (rewardAmountSatoshi === 0) return "0";
     return satsToBtc(rewardAmountSatoshi, { suffix: false });
   }, [rewardAmountSatoshi]);
-
-  const preheatFeeBtc = useMemo(() => {
-    return satsToBtc(preheatFeeSatoshi, { suffix: false });
-  }, [preheatFeeSatoshi]);
 
   const platformFeeBtc = useMemo(() => {
     return satsToBtc(platformFeeSatoshi, { suffix: false });
@@ -631,20 +593,6 @@ export default function ConfirmPay() {
                 </div>
               </div>
             )}
-
-            {/* Preheat Fee (only if enabled) */}
-            {state.enablePreheat &&
-              preheatFeeSatoshi !== null &&
-              preheatFeeSatoshi > 0 && (
-                <div className="mb-6 space-y-2">
-                  <div className="tx-12 lh-18 text-secondary">
-                    {t("confirmPay.preheatFee", "Preheat Fee")}
-                  </div>
-                  <div className="tx-14 lh-20 text-primary">
-                    {formatBtcDisplay(preheatFeeBtc)} BTC
-                  </div>
-                </div>
-              )}
 
             {/* Platform Fee (only for non-reward events with fees) */}
             {showPlatformFee && (

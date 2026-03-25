@@ -7,6 +7,21 @@
     "sendButton": "送出",
     "cancel": "取消"
   },
+  "common": {
+    "oneDay": "1 天",
+    "days": "{{days}} 天",
+    "hours": "{{hours}} 小時",
+    "byProceeding": "繼續即表示您同意",
+    "agreeToThe": "我同意",
+    "termsOfService": "服務條款",
+    "rewardDistribution": "獎勵分配條款",
+    "privacyPolicy": "隱私權政策",
+    "and": "和",
+    "chargesRefunds": "費用與退款",
+    "change": "變更",
+    "generatePlaintext": "產生明文",
+    "event": "活動"
+  },
   "layout": {
     "title": "Koinvote",
     "createEvent": "建立活動",
@@ -25,7 +40,9 @@
     "terms": "條款聲明",
     "help": "幫助 / 常見問題",
     "light": "淺色模式",
-    "dark": "深色模式"
+    "dark": "深色模式",
+    "socialMedias": "社群媒體",
+    "x": "X (Twitter)"
   },
   "createEvent": {
     "creatorAddressTooltip": "此地址也將用於退款。",
@@ -94,9 +111,9 @@
     "errorInvalidRewardAmount": "請輸入有效的獎勵金額",
     "errorMinimumReward": "最低 {{min}} BTC",
     "errorEnterPreheatHours": "請輸入預熱時數",
-    "enterPreheatHoursHint": "最少 1 小時，最多 720 小時",
+    "enterPreheatHoursHint": "最少 1 小時，最多 {{hours}} 小時",
     "errorInvalidNumber": "請輸入有效的數字",
-    "errorMaxPreheatHours": "預熱時數最多 720 小時",
+    "errorMaxPreheatHours": "預熱時數最多 {{hours}} 小時",
     "errorMinPreheatHours": "預熱時數最少 1 小時",
     "errorAtLeastOneOption": "至少需要一個選項",
     "errorDuplicateOption": "已存在相同的選項",
@@ -328,10 +345,6 @@
     "s5_4": "扣除<a1>平台服務費</a1>與<a2>交易手續費</a2>後，剩餘獎池將依中獎地址的持倉比例進行分配。",
     "s5_5": "每一獎項皆獨立抽選；同一地址在同一獎項中僅能中獎一次，但可於不同獎項中再次中獎。",
     "s5_6": "若中獎金額低於<a>最低發放門檻</a>，該獎勵將進行重新分配。",
-    "s6_title": "預熱",
-    "s6_p1": "部分事件可能在正式開放前啟用預熱期間。",
-    "s6_p2": "啟用預熱的創作者，可能需依預熱時長支付額外費用。",
-    "s6_p3": "所有與預熱相關的費用與規則，皆依<a>費用與退款</a>條款辦理。",
     "s7_title": "使用者義務",
     "s7_1": "你必須確保所提供的比特幣地址正確無誤。",
     "s7_2": "你同意不得將本平台用於任何非法或干擾性行為，包括但不限於洗錢、詐欺、濫用檢舉機制或系統攻擊。",
@@ -372,13 +385,10 @@
     "s1_1_2_text": "所有無獎事件皆包含 <bold>{{freeHours}} 小時免費時長</bold>。超過 {{freeHours}} 小時的部分，平台將按<bold>每小時 {{btcPerDurationHour}} BTC</bold> 收費。",
     "s1_2_title": "交易手續費",
     "s1_2_text": "所有獎勵發放與退款交易，皆需支付比特幣網路手續費，實際費率將依處理當下的建議礦工費率計算。",
-    "s1_3_title": "預熱費用",
-    "s1_3_text1": "啟用預熱的事件，其預熱費用計算方式如下",
-    "s1_3_text2": "<bold>預熱費用 =（無獎事件每小時費率）x（0.2 + 0.8 x 預熱時數 ÷ 720）</bold>",
-    "s1_4_title": "精準支付要求：",
-    "s1_4_text1": "本平台所有付款皆採用<bold>精準支付機制</bold>。",
-    "s1_4_text2": "使用者必須於指定時間內，支付<bold>平台所顯示的精確金額</bold>。",
-    "s1_4_text3": "任何金額錯誤的付款（無論多付或少付），<bold>均不保證事件啟用、結果解鎖或退款</bold>。",
+    "s1_3_title": "精準支付要求：",
+    "s1_3_text1": "本平台所有付款皆採用<bold>精準支付機制</bold>。",
+    "s1_3_text2": "使用者必須於指定時間內，支付<bold>平台所顯示的精確金額</bold>。",
+    "s1_3_text3": "任何金額錯誤的付款（無論多付或少付），<bold>均不保證事件啟用、結果解鎖或退款</bold>。",
     "section2Title": "退款",
     "s2_1_title": "不可退款情況：",
     "s2_1_text": "在以下情況下，<bold>不提供退款</bold>：",
@@ -658,19 +668,6 @@
     "successMessageTitle": "訂閱成功！",
     "successMessageDescription": "當有新的獎勵活動發佈時，我們會通知您。"
   },
-  "common": {
-    "oneDay": "1 天",
-    "days": "{{days}} 天",
-    "hours": "{{hours}} 小時",
-    "byProceeding": "繼續即表示您同意",
-    "agreeToThe": "我同意",
-    "termsOfService": "服務條款",
-    "rewardDistribution": "獎勵分配條款",
-    "privacyPolicy": "隱私權政策",
-    "and": "和",
-    "chargesRefunds": "費用與退款",
-    "change": "變更"
-  },
   "homeToolbar": {
     "sortTime": "時間",
     "sortReward": "獎勵",
@@ -877,6 +874,13 @@
     "creatorOnly": "僅創建者",
     "clearAll": "清除",
     "apply": "套用"
+  },
+  "editEvent": {
+    "formTitle": "編輯活動",
+    "creatorAddressWarning": "只有活動的創建者可以變更內容，您將會被要求簽名以異動內容，請確保您擁有此錢包地址的控制權：",
+    "confirmSignTitle": "變更活動內容",
+    "confirmSignSubtitle": "以創建者地址簽名以套用變更",
+    "updateSuccess": "活動更新成功"
   },
   "formatter": {
     "w": " 週",

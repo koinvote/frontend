@@ -25,7 +25,6 @@ export default function ChargesnRefunds() {
       setupAnchorFlash({ hash: "anchor1" }),
       setupAnchorFlash({ hash: "anchor2" }),
       setupAnchorFlash({ hash: "anchor3" }),
-      setupAnchorFlash({ hash: "anchor4" }),
     ];
     return () => cleanups.forEach((fn) => fn());
   }, []);
@@ -72,23 +71,16 @@ export default function ChargesnRefunds() {
               <h3 className="font-bold">{t("charges.s1_2_title")}</h3>
               <p className="text-secondary">{t("charges.s1_2_text")}</p>
             </li>
-            <li className="space-y-1" id="anchor4">
+            <li className="space-y-1">
               <h3 className="font-bold">{t("charges.s1_3_title")}</h3>
-              <p className="text-secondary">{t("charges.s1_3_text1")}</p>
+              <p className="text-secondary">
+                <Trans i18nKey="charges.s1_3_text1" components={{ bold }} />
+              </p>
               <p className="text-secondary">
                 <Trans i18nKey="charges.s1_3_text2" components={{ bold }} />
               </p>
-            </li>
-            <li className="space-y-1">
-              <h3 className="font-bold">{t("charges.s1_4_title")}</h3>
               <p className="text-secondary">
-                <Trans i18nKey="charges.s1_4_text1" components={{ bold }} />
-              </p>
-              <p className="text-secondary">
-                <Trans i18nKey="charges.s1_4_text2" components={{ bold }} />
-              </p>
-              <p className="text-secondary">
-                <Trans i18nKey="charges.s1_4_text3" components={{ bold }} />
+                <Trans i18nKey="charges.s1_3_text3" components={{ bold }} />
               </p>
             </li>
           </ol>
