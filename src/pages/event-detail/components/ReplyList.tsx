@@ -15,6 +15,8 @@ import InvalidateIcon from "@/assets/icons/invalidate.svg?react";
 import ReplyValidateIcon from "@/assets/icons/replyValidate.svg?react";
 import IconSha from "@/assets/icons/sha256.svg?react";
 import UnlockIcon from "@/assets/icons/unlock.svg?react";
+import VisibilityOffIcon from "@/assets/icons/visibility-off.svg?react";
+import VisibilityOnIcon from "@/assets/icons/visibility-on.svg?react";
 import { Button } from "@/components/base/Button";
 import { useToast } from "@/components/base/Toast/useToast";
 import { PageLoading } from "@/components/PageLoading";
@@ -544,17 +546,30 @@ function ReplyItem({
     reply.content ||
     (reply.option_id !== undefined ? getOptionText(reply.option_id) : "");
 
+  const displayBalance = getDisplayBalance();
+  const isCollapsible = !reply.is_reply_valid || !displayBalance;
+  const [showDetails, setShowDetails] = useState(!isCollapsible);
+
   return (
     <div className="border-border bg-bg group relative flex h-full flex-col rounded-xl border p-4 md:p-6">
-      <div className="flex flex-1 flex-col gap-4 md:flex-row md:items-stretch md:justify-between">
+      <div
+        className={cn(
+          "flex flex-1 flex-col md:flex-row md:items-stretch md:justify-between md:gap-4",
+          (!isCollapsible || showDetails) && "gap-4",
+        )}
+      >
         {/* Left Column: Balance and Content */}
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="mb-2 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span
-                className={`text-primary text-base font-semibold md:text-lg ${
-                  !reply.is_reply_valid ? "line-through" : ""
-                }`}
+                className={cn(
+                  "text-base font-semibold md:text-lg",
+                  isCollapsible && !showDetails
+                    ? "text-neutral-400 dark:text-neutral-600"
+                    : "text-primary",
+                  !reply.is_reply_valid && "line-through",
+                )}
               >
                 {balanceBtc} BTC
               </span>
@@ -594,16 +609,35 @@ function ReplyItem({
                 </Tooltip>
               )}
             </div>
-            <span className="text-secondary text-xs md:hidden md:text-sm">
-              {timeAgo}
-            </span>
+            <div className="flex items-center gap-1.5 md:hidden">
+              <span className="text-secondary text-xs md:text-sm">
+                {timeAgo}
+              </span>
+              {isCollapsible && (
+                <button
+                  type="button"
+                  onClick={() => setShowDetails((prev) => !prev)}
+                  className="text-secondary hover:text-primary shrink-0 cursor-pointer"
+                >
+                  {showDetails ? (
+                    <VisibilityOnIcon className="h-5 w-5" />
+                  ) : (
+                    <VisibilityOffIcon className="h-5 w-5" />
+                  )}
+                </button>
+              )}
+            </div>
           </div>
           {displayText && (
             <div>
               <span
-                className={`text-primary text-sm wrap-break-word md:text-base ${
-                  !reply.is_reply_valid ? "line-through" : ""
-                }`}
+                className={cn(
+                  "text-sm wrap-break-word md:text-base",
+                  isCollapsible && !showDetails
+                    ? "text-neutral-400 dark:text-neutral-600"
+                    : "text-primary",
+                  !reply.is_reply_valid && "line-through",
+                )}
               >
                 {displayText}
               </span>
@@ -636,7 +670,14 @@ function ReplyItem({
                     className="hover:text-primary relative top-0.5 ml-1 h-auto border-0 bg-transparent p-0 hover:bg-transparent"
                     onClick={handleCopyHash}
                   >
-                    <IconSha className="text-secondary h-4 w-4" />
+                    <IconSha
+                      className={cn(
+                        "h-4 w-4",
+                        isCollapsible && !showDetails
+                          ? "text-neutral-400 dark:text-neutral-600"
+                          : "text-primary",
+                      )}
+                    />
                   </Button>
                 </Tooltip>
               )}
@@ -656,87 +697,104 @@ function ReplyItem({
 
         {/* Right Column: Time and Details */}
         <div className="flex min-w-[280px] flex-col items-start gap-3 md:items-end">
-          <span className="text-secondary hidden w-full text-right text-xs md:inline-block md:text-sm md:whitespace-nowrap">
-            {timeAgo}
-          </span>
-
-          <div className="flex w-full flex-col gap-4">
-            {/* Bitcoin Address */}
-            <div className="flex flex-col gap-1">
-              <span className="text-secondary text-xs">
-                {t("replyList.bitcoinAddress", "Bitcoin Address")}
-              </span>
-              <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
-                <span className="text-primary truncate font-mono text-xs">
-                  {truncateAddress(reply.btc_address)}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    onCopy(
-                      reply.btc_address,
-                      t("replyList.bitcoinAddress", "Bitcoin Address"),
-                    )
-                  }
-                  className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
-                >
-                  <CopyIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            <Divider />
-
-            {/* Bitcoin Signature */}
-            <div className="flex flex-col gap-1">
-              <span className="text-secondary text-xs">
-                {t("replyList.bitcoinSignature", "Bitcoin Signature")}
-              </span>
-              <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
-                <span className="text-primary truncate font-mono text-xs">
-                  {truncateText(reply.signature, 20)}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    onCopy(
-                      reply.signature,
-                      t("replyList.bitcoinSignature", "Bitcoin Signature"),
-                    )
-                  }
-                  className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
-                >
-                  <CopyIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-
-            <Divider />
-
-            {/* Plaintext */}
-            <div className="flex flex-col gap-1">
-              <span className="text-secondary text-xs">
-                {t("replyList.plaintext", "Plaintext")}
-              </span>
-              <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
-                <span className="text-primary truncate font-mono text-xs">
-                  {truncateText(reply.plaintext, 20)}
-                </span>
-                <button
-                  type="button"
-                  onClick={() =>
-                    onCopy(
-                      reply.plaintext,
-                      t("replyList.plaintext", "Plaintext"),
-                    )
-                  }
-                  className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
-                >
-                  <CopyIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
+          <div className="hidden items-center justify-end gap-1.5 md:flex">
+            <span className="text-secondary text-xs md:text-sm md:whitespace-nowrap">
+              {timeAgo}
+            </span>
+            {isCollapsible && (
+              <button
+                type="button"
+                onClick={() => setShowDetails((prev) => !prev)}
+                className="text-primary shrink-0 cursor-pointer"
+              >
+                {showDetails ? (
+                  <VisibilityOffIcon className="h-5 w-5" />
+                ) : (
+                  <VisibilityOnIcon className="h-5 w-5" />
+                )}
+              </button>
+            )}
           </div>
+
+          {showDetails && (
+            <div className="flex w-full flex-col gap-4">
+              {/* Bitcoin Address */}
+              <div className="flex flex-col gap-1">
+                <span className="text-secondary text-xs">
+                  {t("replyList.bitcoinAddress", "Bitcoin Address")}
+                </span>
+                <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
+                  <span className="text-primary truncate font-mono text-xs">
+                    {truncateAddress(reply.btc_address)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onCopy(
+                        reply.btc_address,
+                        t("replyList.bitcoinAddress", "Bitcoin Address"),
+                      )
+                    }
+                    className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
+                  >
+                    <CopyIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <Divider />
+
+              {/* Bitcoin Signature */}
+              <div className="flex flex-col gap-1">
+                <span className="text-secondary text-xs">
+                  {t("replyList.bitcoinSignature", "Bitcoin Signature")}
+                </span>
+                <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
+                  <span className="text-primary truncate font-mono text-xs">
+                    {truncateText(reply.signature, 20)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onCopy(
+                        reply.signature,
+                        t("replyList.bitcoinSignature", "Bitcoin Signature"),
+                      )
+                    }
+                    className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
+                  >
+                    <CopyIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+
+              <Divider />
+
+              {/* Plaintext */}
+              <div className="flex flex-col gap-1">
+                <span className="text-secondary text-xs">
+                  {t("replyList.plaintext", "Plaintext")}
+                </span>
+                <div className="bg-surface border-border flex items-center justify-between gap-2 rounded border p-2">
+                  <span className="text-primary truncate font-mono text-xs">
+                    {truncateText(reply.plaintext, 20)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onCopy(
+                        reply.plaintext,
+                        t("replyList.plaintext", "Plaintext"),
+                      )
+                    }
+                    className="hover:bg-surface-hover text-secondary hover:text-primary shrink-0 cursor-pointer rounded p-1 transition-colors"
+                  >
+                    <CopyIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
