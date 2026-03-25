@@ -1,12 +1,11 @@
 import { Tooltip } from "antd";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import InfoIcon from "@/assets/icons/info.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useSystemParametersStore } from "@/stores/systemParametersStore";
-import { satsToBtc } from "@/utils/formatter";
 import { cn } from "@/utils/style";
 
 import type { CreateEventFormValues } from "../formTypes";
@@ -44,40 +43,11 @@ export function PreheatField() {
   const enablePreheatTooltip = useTooltipWithClick();
 
   const enablePreheat = watch("enablePreheat");
-  const preheatHours = watch("preheatHours");
 
   const enablePreheatRef = useRef(enablePreheat);
   enablePreheatRef.current = enablePreheat;
 
-  const preheatFeeSatoshi = useMemo(() => {
-    if (!enablePreheat) return null;
-    if (!params) return null;
-
-    const preheatHoursNum = Number(preheatHours);
-    const satoshiPerDurationHour = params.satoshi_per_duration_hour ?? 0;
-    const platformFeePercentage = params.platform_fee_percentage ?? 0;
-
-    if (
-      !Number.isFinite(preheatHoursNum) ||
-      preheatHoursNum < 1 ||
-      preheatHoursNum > 720
-    ) {
-      return null;
-    }
-
-    const multiplier = 0.2 + 0.8 * (preheatHoursNum / 720);
-    const fee =
-      preheatHoursNum *
-      satoshiPerDurationHour *
-      (platformFeePercentage / 100) *
-      multiplier;
-
-    return Math.round(fee);
-  }, [enablePreheat, params, preheatHours]);
-
-  const preheatFeeDisplay = useMemo(() => {
-    return satsToBtc(preheatFeeSatoshi);
-  }, [preheatFeeSatoshi]);
+  const maxPreheatHours = params?.free_hours ?? 720;
 
   return (
     <>
@@ -141,10 +111,11 @@ export function PreheatField() {
                   "createEvent.errorInvalidNumber",
                   "Please enter a valid number",
                 );
-              if (n > 720)
+              if (n > maxPreheatHours)
                 return t(
                   "createEvent.errorMaxPreheatHours",
-                  "Maximum preheat hours is 720",
+                  "Maximum preheat hours is {{hours}}",
+                  { hours: maxPreheatHours },
                 );
               if (n < 1)
                 return t(
@@ -191,19 +162,10 @@ export function PreheatField() {
         <div className="text-secondary mt-2 text-xs">
           {t(
             "createEvent.enterPreheatHoursHint",
-            "Min. 1 hour, Max. 720 hours",
+            "Min. 1 hour, Max. {{hours}} hours",
+            { hours: maxPreheatHours },
           )}
         </div>
-      </div>
-
-      {/* Preheat fee */}
-      <div>
-        <p className="text-primary mb-1 text-sm leading-5 font-medium">
-          {t("createEvent.preheatFee", "Preheat fee:")}
-        </p>
-        <p className="tx-12 lh-18 text-black dark:text-white">
-          {preheatFeeDisplay}
-        </p>
       </div>
     </>
   );

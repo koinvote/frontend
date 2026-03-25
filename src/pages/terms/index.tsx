@@ -12,13 +12,13 @@ export default function Terms() {
   }, []);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27 text-primary px-2 md:px-0">
-      <h1 className="text-2xl md:text-3xl fw-m text-center">
+    <div className="lg:tx-16 lg:lh-27 text-primary mx-auto max-w-3xl space-y-6 px-2 md:px-0">
+      <h1 className="fw-m text-center text-2xl md:text-3xl">
         {t("terms.title")}
       </h1>
 
       <section>
-        <ol className="list-decimal pl-6 marker:font-bold space-y-3">
+        <ol className="list-decimal space-y-3 pl-6 marker:font-bold">
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s1_title")}</h3>
             <p className="text-secondary leading-relaxed">
@@ -27,7 +27,7 @@ export default function Terms() {
           </li>
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s2_title")}</h3>
-            <div className="space-y-1 text-secondary">
+            <div className="text-secondary space-y-1">
               <p>
                 <Trans i18nKey="terms.s2_p1" components={{ bold }} />
               </p>
@@ -40,7 +40,7 @@ export default function Terms() {
               <p>
                 <Trans i18nKey="terms.s2_types_intro" components={{ bold }} />
               </p>
-              <ol className="list-decimal pl-6 marker:font-bold space-y-1">
+              <ol className="list-decimal space-y-1 pl-6 marker:font-bold">
                 <li>
                   <Trans i18nKey="terms.s2_type_1" components={{ bold }} />
                 </li>
@@ -60,7 +60,7 @@ export default function Terms() {
                   components={{ bold }}
                 />
               </p>
-              <ol className="list-decimal pl-6 marker:font-bold space-y-1">
+              <ol className="list-decimal space-y-1 pl-6 marker:font-bold">
                 <li>
                   <Trans
                     i18nKey="terms.s2_visibility_1"
@@ -75,7 +75,7 @@ export default function Terms() {
                 </li>
               </ol>
               <div className="space-y-1 pt-2">
-                <p className="font-bold text-primary">
+                <p className="text-primary font-bold">
                   {t("terms.s2_paid_title")}
                 </p>
                 <p>
@@ -98,7 +98,7 @@ export default function Terms() {
                 </p>
               </div>
               <div className="space-y-1 pt-2">
-                <p className="font-bold text-primary">
+                <p className="text-primary font-bold">
                   {t("terms.s2_creator_title")}
                 </p>
                 <p>
@@ -118,7 +118,7 @@ export default function Terms() {
           </li>
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s4_title")}</h3>
-            <div className="space-y-1 text-secondary">
+            <div className="text-secondary space-y-1">
               <p>
                 <Trans i18nKey="terms.s4_p1" components={{ bold }} />
               </p>
@@ -140,7 +140,7 @@ export default function Terms() {
           </li>
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s5_title")}</h3>
-            <ul className="list-disc pl-6 space-y-1 text-secondary">
+            <ul className="text-secondary list-disc space-y-1 pl-6">
               <li>
                 <Trans i18nKey="terms.s5_1" components={{ bold }} />
               </li>
@@ -195,34 +195,8 @@ export default function Terms() {
             </ul>
           </li>
           <li className="space-y-1">
-            <h3 className="font-bold">{t("terms.s6_title")}</h3>
-            <div className="space-y-1 text-secondary">
-              <p>
-                <Trans i18nKey="terms.s6_p1" components={{ bold }} />
-              </p>
-              <p>
-                <Trans i18nKey="terms.s6_p2" components={{ bold }} />
-              </p>
-              <p>
-                <Trans
-                  i18nKey="terms.s6_p3"
-                  components={{
-                    a: (
-                      <Link
-                        to="/charges-refunds#anchor4"
-                        className="underline"
-                        target="_blank"
-                      />
-                    ),
-                  }}
-                  default="ll Preheat-related fees and rules are governed by the platform’s <link><bold>Charges & Refunds</bold></link> policy."
-                />
-              </p>
-            </div>
-          </li>
-          <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s7_title")}</h3>
-            <ul className="list-disc pl-6 space-y-1 text-secondary">
+            <ul className="text-secondary list-disc space-y-1 pl-6">
               <li>
                 <Trans i18nKey="terms.s7_1" components={{ bold }} />
               </li>
@@ -239,7 +213,7 @@ export default function Terms() {
           </li>
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s8_title")}</h3>
-            <ul className="list-disc pl-6 space-y-1 text-secondary">
+            <ul className="text-secondary list-disc space-y-1 pl-6">
               <li>
                 <Trans i18nKey="terms.s8_1" components={{ bold }} />
               </li>
@@ -259,7 +233,7 @@ export default function Terms() {
                 <Trans i18nKey="terms.s8_6" components={{ bold }} />
               </li>
             </ul>
-            <div className="space-y-1 text-secondary pt-2">
+            <div className="text-secondary space-y-1 pt-2">
               <p>
                 <Trans i18nKey="terms.s8_content_p1" components={{ bold }} />
               </p>
@@ -272,7 +246,7 @@ export default function Terms() {
                   components={{ bold }}
                 />
               </p>
-              <ul className="list-disc pl-6 space-y-1">
+              <ul className="list-disc space-y-1 pl-6">
                 <li>
                   <Trans i18nKey="terms.s8_content_li1" components={{ bold }} />
                 </li>
@@ -308,7 +282,7 @@ export default function Terms() {
           </li>
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s9_title")}</h3>
-            <ul className="list-disc pl-6 space-y-1 text-secondary">
+            <ul className="text-secondary list-disc space-y-1 pl-6">
               <li>
                 <Trans i18nKey="terms.s9_1" components={{ bold }} />
               </li>
