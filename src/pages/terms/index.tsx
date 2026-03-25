@@ -195,32 +195,6 @@ export default function Terms() {
             </ul>
           </li>
           <li className="space-y-1">
-            <h3 className="font-bold">{t("terms.s6_title")}</h3>
-            <div className="text-secondary space-y-1">
-              <p>
-                <Trans i18nKey="terms.s6_p1" components={{ bold }} />
-              </p>
-              <p>
-                <Trans i18nKey="terms.s6_p2" components={{ bold }} />
-              </p>
-              <p>
-                <Trans
-                  i18nKey="terms.s6_p3"
-                  components={{
-                    a: (
-                      <Link
-                        to="/charges-refunds#anchor4"
-                        className="underline"
-                        target="_blank"
-                      />
-                    ),
-                  }}
-                  default="ll Preheat-related fees and rules are governed by the platform’s <link><bold>Charges & Refunds</bold></link> policy."
-                />
-              </p>
-            </div>
-          </li>
-          <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s7_title")}</h3>
             <ul className="text-secondary list-disc space-y-1 pl-6">
               <li>
