@@ -7,6 +7,21 @@
     "sendButton": "送出",
     "cancel": "取消"
   },
+  "common": {
+    "oneDay": "1 天",
+    "days": "{{days}} 天",
+    "hours": "{{hours}} 小時",
+    "byProceeding": "繼續即表示您同意",
+    "agreeToThe": "我同意",
+    "termsOfService": "服務條款",
+    "rewardDistribution": "獎勵分配條款",
+    "privacyPolicy": "隱私權政策",
+    "and": "和",
+    "chargesRefunds": "費用與退款",
+    "change": "變更",
+    "generatePlaintext": "產生明文",
+    "event": "活動"
+  },
   "layout": {
     "title": "Koinvote",
     "createEvent": "建立活動",
@@ -651,19 +666,6 @@
     "successMessageTitle": "訂閱成功！",
     "successMessageDescription": "當有新的獎勵活動發佈時，我們會通知您。"
   },
-  "common": {
-    "oneDay": "1 天",
-    "days": "{{days}} 天",
-    "hours": "{{hours}} 小時",
-    "byProceeding": "繼續即表示您同意",
-    "agreeToThe": "我同意",
-    "termsOfService": "服務條款",
-    "rewardDistribution": "獎勵分配條款",
-    "privacyPolicy": "隱私權政策",
-    "and": "和",
-    "chargesRefunds": "費用與退款",
-    "change": "變更"
-  },
   "homeToolbar": {
     "sortTime": "時間",
     "sortReward": "獎勵",
@@ -870,6 +872,13 @@
     "creatorOnly": "僅創建者",
     "clearAll": "清除",
     "apply": "套用"
+  },
+  "editEvent": {
+    "formTitle": "編輯活動",
+    "creatorAddressWarning": "只有活動的創建者可以變更內容，您將會被要求簽名以異動內容，請確保您擁有此錢包地址的控制權：",
+    "confirmSignTitle": "變更活動內容",
+    "confirmSignSubtitle": "以創建者地址簽名以套用變更",
+    "updateSuccess": "活動更新成功"
   },
   "formatter": {
     "w": " 週",

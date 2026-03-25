@@ -7,6 +7,21 @@
     "sendButton": "Send",
     "cancel": "Cancel"
   },
+  "common": {
+    "oneDay": "1 day",
+    "days": "{{days}} days",
+    "hours": "{{hours}} hours",
+    "byProceeding": "By proceeding, you agree to the",
+    "agreeToThe": "I agree to the",
+    "termsOfService": "Terms of Service",
+    "rewardDistribution": "Reward Distribution",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and",
+    "chargesRefunds": "Charges & Refunds",
+    "change": "Change",
+    "generatePlaintext": "Generate Plaintext",
+    "event": "Event"
+  },
   "layout": {
     "title": "Koinvote",
     "createEvent": "Create",
@@ -648,19 +663,6 @@
     "successMessageTitle": "Subscription successful.",
     "successMessageDescription": "You'll be notified when new reward events go live."
   },
-  "common": {
-    "oneDay": "1 day",
-    "days": "{{days}} days",
-    "hours": "{{hours}} hours",
-    "byProceeding": "By proceeding, you agree to the",
-    "agreeToThe": "I agree to the",
-    "termsOfService": "Terms of Service",
-    "rewardDistribution": "Reward Distribution",
-    "privacyPolicy": "Privacy Policy",
-    "and": "and",
-    "chargesRefunds": "Charges & Refunds",
-    "change": "Change"
-  },
   "homeToolbar": {
     "sortTime": "Time",
     "sortReward": "Reward",
@@ -867,6 +869,13 @@
     "creatorOnly": "Creator-only",
     "clearAll": "Clear all",
     "apply": "Apply"
+  },
+  "editEvent": {
+    "formTitle": "Edit Event",
+    "creatorAddressWarning": "Only the creator can edit this event. You will need to sign with this address to verify your changes. Please ensure you control it:",
+    "confirmSignTitle": "Change event details",
+    "confirmSignSubtitle": "Sign with your creator address to apply this change",
+    "updateSuccess": "Event updated successfully"
   },
   "formatter": {
     "w": "w",

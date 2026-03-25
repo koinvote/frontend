@@ -41,12 +41,9 @@ export function EventCTAButton({
     switch (status) {
       case EventStatus.PREHEAT:
         return {
-          text: replyText,
-          disabled: true,
-          tooltip: t(
-            "eventCTA.preheatTooltip",
-            "Preheat lets people see the event before replies open.\nDuring this time, the event is visible but replies are disabled."
-          ),
+          text: t("common.edit", "Edit"),
+          disabled: false,
+          tooltip: null,
         };
       case EventStatus.ACTIVE:
         return {
@@ -63,7 +60,7 @@ export function EventCTAButton({
           tooltip: !isRewarded
             ? t(
                 "eventCTA.noRewardTooltip",
-                "This is a no-reward event.\nNo payout report is generated."
+                "This is a no-reward event.\nNo payout report is generated.",
               )
             : null,
         };
@@ -74,7 +71,7 @@ export function EventCTAButton({
           tooltip: !isRewarded
             ? t(
                 "eventCTA.noRewardTooltip",
-                "This is a no-reward event.\nNo payout report is generated."
+                "This is a no-reward event.\nNo payout report is generated.",
               )
             : null,
         };
@@ -91,8 +88,13 @@ export function EventCTAButton({
     tooltip: null,
   };
 
+  const isPreheat = status === EventStatus.PREHEAT;
+
   const handleClick = () => {
     switch (status) {
+      case EventStatus.PREHEAT:
+        navigate(`/event/${eventId}/edit`);
+        break;
       case EventStatus.ACTIVE:
         navigate(`/event/${eventId}/reply`);
         break;
@@ -104,21 +106,32 @@ export function EventCTAButton({
     }
   };
 
-  const button = (
+  const button = isPreheat ? (
+    <Button
+      type="button"
+      appearance="outline"
+      tone="white"
+      text="sm"
+      className="border-border! w-full px-6 whitespace-nowrap text-black hover:bg-white/5 md:w-auto dark:border-white dark:text-white"
+      onClick={handleClick}
+    >
+      {buttonText}
+    </Button>
+  ) : (
     <Button
       type="button"
       appearance="solid"
       tone="primary"
       text="sm"
-      className={`w-full md:w-auto whitespace-nowrap px-8 gap-2 ${
+      className={`w-full gap-2 px-8 whitespace-nowrap md:w-auto ${
         isCompleted
-          ? "bg-gray-500 dark:bg-gray-450 text-white hover:bg-gray-500/90 dark:hover:bg-gray-450/80"
+          ? "dark:bg-gray-450 dark:hover:bg-gray-450/80 bg-gray-500 text-white hover:bg-gray-500/90"
           : ""
       }`}
       disabled={isDisabled}
       onClick={handleClick}
     >
-      {isCompleted && <RewardReportIcon className="w-4 h-4" />}
+      {isCompleted && <RewardReportIcon className="h-4 w-4" />}
       {buttonText}
     </Button>
   );
@@ -134,7 +147,7 @@ export function EventCTAButton({
           root: { maxWidth: "min(300px, 90vw)", whiteSpace: "pre-line" },
         }}
       >
-        <span className="w-full md:w-auto inline-block cursor-not-allowed">
+        <span className="inline-block w-full cursor-not-allowed md:w-auto">
           {button}
         </span>
       </Tooltip>

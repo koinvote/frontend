@@ -5,6 +5,8 @@ import type {
   AdminLoginReq,
   ContactUsReq,
   CreateEventReq,
+  GenerateEditPlaintextReq,
+  UpdateEventReq,
   CreateWithdrawalReq,
   GenerateChangeVisibilityPlaintextReq,
   GenerateReplyPlaintextReq,
@@ -29,6 +31,7 @@ import type {
   EventDataRes,
   EventDetailDataRes,
   GenerateChangeVisibilityPlaintextRes,
+  GetEditPlaintextRes,
   GenerateUnlockPricePlaintextRes,
   GetCompletedTopRepliesRes,
   GetEventListRes,
@@ -112,6 +115,19 @@ export const API = {
   ),
 
   createEvent: post<ApiResponse<EventDataRes>, CreateEventReq>("/events"),
+
+  generateEditPlaintext: (eventId: string) =>
+    post<ApiResponse<GetEditPlaintextRes>, GenerateEditPlaintextReq>(
+      `/events/${eventId}/edit-plaintext`,
+    ),
+
+  updateEvent: (eventId: string) =>
+    (data?: UpdateEventReq, config: RequestConf = {}) =>
+      http.put<ApiResponse<EventDataRes>>(
+        `/events/${eventId}`,
+        data,
+        config,
+      ) as Promise<ApiResponse<EventDataRes>>,
 
   getEventList: get<ApiResponse<GetEventListRes>, GetEventListReq>("/events"),
 
