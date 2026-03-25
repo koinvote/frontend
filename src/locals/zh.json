@@ -40,7 +40,9 @@
     "terms": "條款聲明",
     "help": "幫助 / 常見問題",
     "light": "淺色模式",
-    "dark": "深色模式"
+    "dark": "深色模式",
+    "socialMedias": "社群媒體",
+    "x": "X (Twitter)"
   },
   "createEvent": {
     "creatorAddressTooltip": "此地址也將用於退款。",

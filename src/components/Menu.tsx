@@ -12,6 +12,7 @@ import SubscribeIcon from "@/assets/icons/menu-subscribe.svg?react";
 import SupportIcon from "@/assets/icons/menu-support.svg?react";
 import TermsIcon from "@/assets/icons/menu-terms.svg?react";
 import VerificationIcon from "@/assets/icons/menu-verificationTool.svg?react";
+import XIcon from "@/assets/logo/x.svg?react";
 import { useLanguagesStore } from "@/stores/languagesStore";
 import { useThemeStore } from "@/stores/themeStore";
 
@@ -24,6 +25,7 @@ type Item = {
   to: string;
   key: string;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  external?: boolean;
 };
 
 const items: Item[] = [
@@ -35,6 +37,15 @@ const items: Item[] = [
     Icon: VerificationIcon,
   },
   { to: "/support", key: "menu.support", Icon: SupportIcon },
+];
+
+const socialItems: Item[] = [
+  {
+    to: "https://x.com/koinvote",
+    key: "menu.x",
+    Icon: XIcon,
+    external: true,
+  },
 ];
 
 const termItems: Item[] = [
@@ -70,7 +81,7 @@ function MenuItem({
   labelClassName,
 }: MenuItemProps) {
   const { t } = useTranslation();
-  const { to, key, Icon } = item;
+  const { to, key, Icon, external } = item;
 
   const iconWrapper = (isActive: boolean) => (
     <span
@@ -88,6 +99,34 @@ function MenuItem({
       />
     </span>
   );
+
+  if (external) {
+    return (
+      <a
+        href={to}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={t(key)}
+        className={cn(baseLink, collapsed ? "justify-center px-2" : "gap-3")}
+        onClick={onLinkClick}
+      >
+        {collapsed ? (
+          <Tooltip
+            placement="right"
+            title={t(key)}
+            color={theme === "dark" ? "#000" : "#fff"}
+          >
+            {iconWrapper(false)}
+          </Tooltip>
+        ) : (
+          iconWrapper(false)
+        )}
+        <span className={cn(collapsed && "sr-only", labelClassName)}>
+          {t(key)}
+        </span>
+      </a>
+    );
+  }
 
   if (to) {
     return (
@@ -179,6 +218,23 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
         </div>
       )}
       {termItems.map((item) => (
+        <MenuItem
+          key={item.to || item.key}
+          item={item}
+          collapsed={collapsed}
+          theme={theme}
+          onLinkClick={onItemClick}
+          labelClassName="text-sm"
+        />
+      ))}
+
+      <Divider styles={{ root: { margin: "8px 0" } }} />
+      {!collapsed && (
+        <div className="mb-2 p-3 pb-0 text-xs font-medium text-neutral-500">
+          {t("menu.socialMedias", "SOCIAL MEDIAS")}
+        </div>
+      )}
+      {socialItems.map((item) => (
         <MenuItem
           key={item.to || item.key}
           item={item}
