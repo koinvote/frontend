@@ -251,7 +251,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
             <div>
               <Tooltip
                 placement="right"
-                title={current === "en" ? "EN" : "中文"}
+                title={current === "en" ? "中文" : "EN"}
                 color={theme === "dark" ? "#000" : "#fff"}
               >
                 <Button
@@ -288,7 +288,7 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 icon={<GlobalOutlined />}
                 autoInsertSpace={false}
               >
-                {current === "en" ? "EN" : "中文"}
+                {current === "en" ? "中文" : "EN"}
               </Button>
               <Button
                 type="link"
