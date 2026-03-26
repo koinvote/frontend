@@ -1,6 +1,6 @@
 import { Tooltip } from "antd";
 
-import BTCIcon from "@/assets/icons/btc.svg?react";
+import RewardBtcIcon from "@/assets/icons/reward-btc.svg?react";
 
 export interface RewardCountdownProps {
   totalRewardBtc: string;
@@ -20,7 +20,7 @@ export function RewardCountdown({
     >
       {Number(totalRewardBtc) > 0 && (
         <span className="text-accent flex items-center gap-1 font-semibold">
-          <BTCIcon />
+          <RewardBtcIcon className="h-5 w-5" />
           {Number(totalRewardBtc)} BTC
         </span>
       )}

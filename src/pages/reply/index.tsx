@@ -11,6 +11,7 @@ import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import HashIcon from "@/assets/icons/hash.svg?react";
+import RewardBtcIcon from "@/assets/icons/reward-btc.svg?react";
 import TrophyIcon from "@/assets/icons/trophy.svg?react";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
@@ -415,7 +416,7 @@ export default function ReplyPage() {
           <EventInfoBox
             label={t("reply.rewardAmount", "Reward Amount")}
             value={Number(rewardText)}
-            icon={<TrophyIcon className="h-3 w-3 text-[#AD46FF]" />}
+            icon={<RewardBtcIcon className="text-accent h-3 w-3" />}
           />
           <EventInfoBox
             label={t("reply.maxRecipients", "Max Recipients")}
