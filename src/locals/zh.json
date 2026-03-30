@@ -542,6 +542,7 @@
     "rewardAmount": "獎勵金額：",
     "additionalReward": "額外獎勵：",
     "timeRemaining": "剩餘時間：",
+    "preheatTimeRemaining": "預熱剩餘時間：",
     "eventEndedOn": "活動結束於",
     "durationOfEvent": "活動時長：",
     "preheatDuration": "預熱時長：",

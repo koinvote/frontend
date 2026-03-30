@@ -539,6 +539,7 @@
     "rewardAmount": "Reward amount:",
     "additionalReward": "Additional reward:",
     "timeRemaining": "Time remaining:",
+    "preheatTimeRemaining": "Preheat remaining:",
     "eventEndedOn": "Ended on",
     "durationOfEvent": "Duration of this event:",
     "preheatDuration": "Preheat duration:",
