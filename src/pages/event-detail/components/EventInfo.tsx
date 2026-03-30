@@ -346,7 +346,9 @@ export function EventInfo({
 
     result.push({
       key: "time-remaining",
-      label: t("eventInfo.timeRemaining", "Time Remaining:"),
+      label: isPreheat
+        ? t("eventInfo.preheatTimeRemaining", "Preheat remaining:")
+        : t("eventInfo.timeRemaining", "Time Remaining:"),
       value: (
         <div className="text-primary text-xs font-semibold md:text-sm">
           {timeRemaining}
