@@ -372,3 +372,19 @@ export interface VerifyChangeVisibilityPlaintextRes {
 }
 
 export type GenerateUnlockPricePlaintextRes = GenerateChangeVisibilityPlaintextRes;
+
+export interface ReferralCode {
+  id: number;
+  code: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetReferralCodesRes {
+  referral_codes: ReferralCode[];
+  total: number;
+  page: number;
+  limit: number;
+}
+

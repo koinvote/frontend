@@ -156,3 +156,12 @@ export interface UpdateUnlockPriceReq {
   plaintext: string;
   signature: string;
 }
+
+export interface GetReferralCodesReq {
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateReferralCodeReq {
+  code: string;
+}

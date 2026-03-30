@@ -22,6 +22,8 @@ import type {
   VerifyChangeVisibilityPlaintextReq,
   UpdateUnlockPriceReq,
   VerifySignatureReq,
+  GetReferralCodesReq,
+  CreateReferralCodeReq,
 } from "./request.ts";
 
 import type {
@@ -49,6 +51,7 @@ import type {
   UnlockEventRes,
   VerifyChangeVisibilityPlaintextRes,
   VerifySignatureRes,
+  GetReferralCodesRes,
 } from "./response.ts";
 
 export function get<R = unknown, D = unknown>(path: string) {
@@ -85,6 +88,11 @@ export function adminPost<R = unknown, D = unknown>(path: string) {
 export function adminPut<R = unknown, D = unknown>(path: string) {
   return (data?: D, config: RequestConf = {}) =>
     adminHttp.put<R>(path, data, config) as Promise<R>;
+}
+
+export function adminDelete<R = unknown>(path: string) {
+  return (config: RequestConf = {}) =>
+    adminHttp.delete<R>(path, config) as Promise<R>;
 }
 
 export interface ApiResponse<T> {
@@ -291,4 +299,13 @@ export const AdminAPI = {
     ApiResponse<GetWithdrawalRecordRes>,
     GetWithdrawalRecordReq
   >("/admin/withdrawals"),
+  getReferralCodes: adminGet<
+    ApiResponse<GetReferralCodesRes>,
+    GetReferralCodesReq
+  >("/admin/referral-codes"),
+  createReferralCode: adminPost<ApiResponse<void>, CreateReferralCodeReq>(
+    "/admin/referral-codes",
+  ),
+  deleteReferralCode: (id: number) =>
+    adminDelete<ApiResponse<void>>(`/admin/referral-codes/${id}`)(),
 };
