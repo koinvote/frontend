@@ -70,6 +70,7 @@ export interface SubmitReplyReq {
   signature: string;
   nonce_timestamp: string;
   random_code: string;
+  referral_code?: string;
 }
 
 export interface GenerateReplyPlaintextReq {

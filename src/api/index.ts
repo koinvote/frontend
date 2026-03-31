@@ -273,6 +273,14 @@ export const API = {
     post<ApiResponse<void>, UpdateUnlockPriceReq>(
       `/events/${eventId}/unlock-price`,
     ),
+
+  getReferralCodeCount: get<ApiResponse<{ count: number }>, void>(
+    "/referral-codes/count",
+  ),
+
+  validateReferralCode: get<ApiResponse<{ valid: boolean }>, { code: string }>(
+    "/referral-codes/validate",
+  ),
 };
 
 // Admin API (requires Bearer token authentication)

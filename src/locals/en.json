@@ -838,7 +838,10 @@
     "receiptNotAvailable": "Receipt not available",
     "failedToDownloadReceipt": "Failed to download receipt",
     "downloading": "Downloading...",
-    "receiptDownloaded": "Receipt downloaded successfully"
+    "receiptDownloaded": "Receipt downloaded successfully",
+    "referralCodeLabel": "Referral code (Optional)",
+    "referralCodePlaceholder": "Please enter your referral code",
+    "referralCodeInvalid": "Invalid referral code"
   },
   "comingSoon": {
     "brandName": "Koinvote",
