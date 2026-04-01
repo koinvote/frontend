@@ -68,6 +68,7 @@ src/
 ### Key Architectural Patterns
 
 #### API Layer
+- Full API documentation: `.claude/docs/api_doc.md`
 - Two separate axios instances: `http` for public APIs and `adminHttp` for authenticated admin APIs
 - `adminHttp` automatically injects Bearer token from localStorage (`koinvote:admin_token`)
 - Response interceptor unwraps `response.data` automatically

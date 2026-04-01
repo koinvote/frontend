@@ -1195,4 +1195,61 @@ export const handlers = [
       });
     },
   ),
+
+  // Admin API - GET /admin/referral-codes
+  http.get(`${API_BASE_URL}/admin/referral-codes`, ({ request }) => {
+    const url = new URL(request.url);
+    const page = parseInt(url.searchParams.get("page") || "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "20", 10);
+
+    const allCodes = Array.from({ length: 35 }, (_, i) => ({
+      id: i + 1,
+      code: `REFERRAL${String(i + 1).padStart(3, "0")}`,
+      is_active: true,
+      created_at: `2026-03-${String(Math.min(i + 1, 31)).padStart(2, "0")}T10:00:00Z`,
+      updated_at: `2026-03-${String(Math.min(i + 1, 31)).padStart(2, "0")}T10:00:00Z`,
+    }));
+
+    const start = (page - 1) * limit;
+    const paged = allCodes.slice(start, start + limit);
+
+    return HttpResponse.json({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        referral_codes: paged,
+        total: allCodes.length,
+        page,
+        limit,
+      },
+    });
+  }),
+
+  // Admin API - POST /admin/referral-codes
+  http.post(`${API_BASE_URL}/admin/referral-codes`, async ({ request }) => {
+    const body = (await request.json()) as { code: string };
+    return HttpResponse.json({
+      code: "000000",
+      success: true,
+      message: null,
+      data: {
+        id: Date.now(),
+        code: body.code,
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    });
+  }),
+
+  // Admin API - DELETE /admin/referral-codes/:id
+  http.delete(`${API_BASE_URL}/admin/referral-codes/:id`, () => {
+    return HttpResponse.json({
+      code: "000000",
+      success: true,
+      message: null,
+      data: null,
+    });
+  }),
 ];

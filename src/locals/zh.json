@@ -841,7 +841,10 @@
     "receiptNotAvailable": "收據不可用",
     "failedToDownloadReceipt": "收據下載失敗",
     "downloading": "下載中...",
-    "receiptDownloaded": "收據下載成功"
+    "receiptDownloaded": "收據下載成功",
+    "referralCodeLabel": "推薦碼（選填）",
+    "referralCodePlaceholder": "請輸入您的推薦碼",
+    "referralCodeInvalid": "無效的推薦碼"
   },
   "comingSoon": {
     "brandName": "Koinvote",

@@ -70,6 +70,7 @@ export interface SubmitReplyReq {
   signature: string;
   nonce_timestamp: string;
   random_code: string;
+  referral_code?: string;
 }
 
 export interface GenerateReplyPlaintextReq {
@@ -155,4 +156,13 @@ export interface UpdateUnlockPriceReq {
   unlock_price_satoshi: number;
   plaintext: string;
   signature: string;
+}
+
+export interface GetReferralCodesReq {
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateReferralCodeReq {
+  code: string;
 }
