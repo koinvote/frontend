@@ -200,16 +200,19 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
 
   return (
-    <nav className="space-y-1">
-      {items.map((item) => (
-        <MenuItem
-          key={item.to || item.key}
-          item={item}
-          collapsed={collapsed}
-          theme={theme}
-          onLinkClick={onItemClick}
-        />
-      ))}
+    <nav aria-label="Site navigation">
+      <ul className="m-0 list-none space-y-1 p-0">
+        {items.map((item) => (
+          <li key={item.to || item.key}>
+            <MenuItem
+              item={item}
+              collapsed={collapsed}
+              theme={theme}
+              onLinkClick={onItemClick}
+            />
+          </li>
+        ))}
+      </ul>
 
       <Divider styles={{ root: { margin: "8px 0" } }} />
       {!collapsed && (
@@ -217,16 +220,19 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           {t("menu.terms", "TERMS")}
         </div>
       )}
-      {termItems.map((item) => (
-        <MenuItem
-          key={item.to || item.key}
-          item={item}
-          collapsed={collapsed}
-          theme={theme}
-          onLinkClick={onItemClick}
-          labelClassName="text-sm"
-        />
-      ))}
+      <ul className="m-0 list-none space-y-1 p-0">
+        {termItems.map((item) => (
+          <li key={item.to || item.key}>
+            <MenuItem
+              item={item}
+              collapsed={collapsed}
+              theme={theme}
+              onLinkClick={onItemClick}
+              labelClassName="text-sm"
+            />
+          </li>
+        ))}
+      </ul>
 
       <Divider styles={{ root: { margin: "8px 0" } }} />
       {!collapsed && (
@@ -234,16 +240,19 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
           {t("menu.socialMedias", "SOCIAL MEDIAS")}
         </div>
       )}
-      {socialItems.map((item) => (
-        <MenuItem
-          key={item.to || item.key}
-          item={item}
-          collapsed={collapsed}
-          theme={theme}
-          onLinkClick={onItemClick}
-          labelClassName="text-sm"
-        />
-      ))}
+      <ul className="m-0 list-none space-y-1 p-0">
+        {socialItems.map((item) => (
+          <li key={item.to || item.key}>
+            <MenuItem
+              item={item}
+              collapsed={collapsed}
+              theme={theme}
+              onLinkClick={onItemClick}
+              labelClassName="text-sm"
+            />
+          </li>
+        ))}
+      </ul>
 
       <div className="absolute bottom-0 left-0 w-full">
         <div className="border-border border-t p-4">

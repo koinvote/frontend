@@ -10,6 +10,7 @@ import type {
 } from "@/api/response";
 import { EventStatus, ReplySortBy } from "@/api/types";
 import BackButton from "@/components/base/BackButton";
+import { JsonLd } from "@/components/JsonLd";
 import { Button } from "antd";
 import { PageLoading } from "@/components/PageLoading";
 import { useBackOrFallback } from "@/hooks/useBack";
@@ -237,8 +238,30 @@ const EventDetail = () => {
     );
   }
 
+  const eventJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    headline: eventDetail.title,
+    text: eventDetail.description,
+    url: `https://koinvote.com/event/${eventDetail.event_id}`,
+    dateCreated: eventDetail.created_at,
+    datePublished: eventDetail.started_at,
+    keywords: eventDetail.hashtags.join(", "),
+    interactionStatistic: {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/ReplyAction",
+      userInteractionCount: eventDetail.participants_count,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Koinvote",
+      url: "https://koinvote.com",
+    },
+  };
+
   return (
     <div className="flex w-full flex-col items-center justify-center px-2 md:px-0">
+      <JsonLd id="event-detail-json-ld" data={eventJsonLd} />
       <div className="relative h-[50px] w-full max-w-3xl">
         <BackButton onClick={goBack} />
       </div>
