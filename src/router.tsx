@@ -38,6 +38,7 @@ import AdminRefundsPage from "@/admin/pages/refund";
 import AdminRewardRulesPage from "@/admin/pages/rewardRules";
 import AdminSubscribersPage from "@/admin/pages/subscribe";
 import AdminWithdrawal from "@/admin/pages/withdrawal";
+import AdminReferralCodesPage from "@/admin/pages/referralCodes";
 import AdminLayout from "@/layout/AdminLayout";
 
 const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
@@ -100,6 +101,7 @@ export const router = createBrowserRouter([
           { path: "withdrawal", element: <AdminWithdrawal />, handle: { title: "Withdrawal | Koinvote Admin" } },
           { path: "announcements", element: <AdminAnnouncementsPage />, handle: { title: "Announcements | Koinvote Admin" } },
           { path: "subscribers", element: <AdminSubscribersPage />, handle: { title: "Subscribers | Koinvote Admin" } },
+          { path: "referral-codes", element: <AdminReferralCodesPage />, handle: { title: "Referral Codes | Koinvote Admin" } },
         ],
       },
       {

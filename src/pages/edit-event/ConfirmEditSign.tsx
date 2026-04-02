@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
+import { getApiMessage } from "@/api/http";
 import type { GetEditPlaintextRes } from "@/api/response";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -86,11 +87,11 @@ export default function ConfirmEditSign() {
       setExpiredAt(res.data.timestamp + COUNTDOWN_MINUTES * 60);
       setCountdown(COUNTDOWN_MINUTES * 60);
     } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const msg =
-        (err as any)?.apiMessage ??
-        (err instanceof Error ? err.message : "Failed to generate plaintext");
-      showToast("error", msg);
+      showToast(
+        "error",
+        getApiMessage(err) ??
+          (err instanceof Error ? err.message : "Failed to generate plaintext"),
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -163,11 +164,10 @@ export default function ConfirmEditSign() {
       );
       navigate(`/event/${eventId}`, { replace: true });
     } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const msg =
-        (err as any)?.apiMessage ??
-        (err instanceof Error ? err.message : "Failed to update event");
-      setSignatureError(msg);
+      setSignatureError(
+        getApiMessage(err) ??
+          (err instanceof Error ? err.message : "Failed to update event"),
+      );
     } finally {
       setIsSubmitting(false);
     }

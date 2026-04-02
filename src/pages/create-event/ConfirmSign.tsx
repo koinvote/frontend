@@ -1,4 +1,5 @@
 import { API } from "@/api";
+import { getApiMessage } from "@/api/http";
 import type { EventType } from "@/api/types";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -133,15 +134,13 @@ export default function ConfirmSign() {
         setCountdown(COUNTDOWN_MINUTES * 60);
       } catch (error) {
         console.error("Error getting plaintext:", error);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorAny = error as any;
-        const errorMessage =
-          errorAny?.apiMessage ||
-          (error instanceof Error
-            ? error.message
-            : "Failed to get plaintext. Please try again.");
-
-        showToast("error", errorMessage);
+        showToast(
+          "error",
+          getApiMessage(error) ||
+            (error instanceof Error
+              ? error.message
+              : "Failed to get plaintext. Please try again."),
+        );
         // Redirect back to preview if we have state, otherwise to create-event
         if (state) {
           navigate("/preview-event", { state });
@@ -274,14 +273,10 @@ export default function ConfirmSign() {
       }
     } catch (error) {
       console.error("Error verifying signature:", error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const errorAny = error as any;
-      const errorMessage =
-        errorAny?.apiMessage ||
-        (error instanceof Error
-          ? error.message
-          : "Signature verification failed");
-      setSignatureError(errorMessage);
+      setSignatureError(
+        getApiMessage(error) ||
+          (error instanceof Error ? error.message : "Signature verification failed"),
+      );
     } finally {
       setIsLoading(false);
     }

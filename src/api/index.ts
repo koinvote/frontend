@@ -22,6 +22,8 @@ import type {
   VerifyChangeVisibilityPlaintextReq,
   UpdateUnlockPriceReq,
   VerifySignatureReq,
+  GetReferralCodesReq,
+  CreateReferralCodeReq,
 } from "./request.ts";
 
 import type {
@@ -49,6 +51,7 @@ import type {
   UnlockEventRes,
   VerifyChangeVisibilityPlaintextRes,
   VerifySignatureRes,
+  GetReferralCodesRes,
 } from "./response.ts";
 
 export function get<R = unknown, D = unknown>(path: string) {
@@ -87,10 +90,16 @@ export function adminPut<R = unknown, D = unknown>(path: string) {
     adminHttp.put<R>(path, data, config) as Promise<R>;
 }
 
+export function adminDelete<R = unknown>(path: string) {
+  return (config: RequestConf = {}) =>
+    adminHttp.delete<R>(path, config) as Promise<R>;
+}
+
 export interface ApiResponse<T> {
   code: string;
   success: boolean;
   message: string | null;
+  error_key?: string;
   data: T;
 }
 export interface ReplyReceiptData {
@@ -265,6 +274,14 @@ export const API = {
     post<ApiResponse<void>, UpdateUnlockPriceReq>(
       `/events/${eventId}/unlock-price`,
     ),
+
+  getReferralCodeCount: get<ApiResponse<{ count: number }>, void>(
+    "/referral-codes/count",
+  ),
+
+  validateReferralCode: get<ApiResponse<{ valid: boolean }>, { code: string }>(
+    "/referral-codes/validate",
+  ),
 };
 
 // Admin API (requires Bearer token authentication)
@@ -291,4 +308,13 @@ export const AdminAPI = {
     ApiResponse<GetWithdrawalRecordRes>,
     GetWithdrawalRecordReq
   >("/admin/withdrawals"),
+  getReferralCodes: adminGet<
+    ApiResponse<GetReferralCodesRes>,
+    GetReferralCodesReq
+  >("/admin/referral-codes"),
+  createReferralCode: adminPost<ApiResponse<void>, CreateReferralCodeReq>(
+    "/admin/referral-codes",
+  ),
+  deleteReferralCode: (id: number) =>
+    adminDelete<ApiResponse<void>>(`/admin/referral-codes/${id}`)(),
 };

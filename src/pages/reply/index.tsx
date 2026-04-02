@@ -5,8 +5,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
+import { getApiMessage } from "@/api/http";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
+import CheckCircleIcon from "@/assets/icons/check_circle.svg?react";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
@@ -83,6 +85,12 @@ export default function ReplyPage() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [submittedReplyId, setSubmittedReplyId] = useState<number | null>(null);
   const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+  const [referralCodeValid, setReferralCodeValid] = useState<boolean | null>(
+    null,
+  );
+  const [isValidatingReferralCode, setIsValidatingReferralCode] =
+    useState(false);
 
   // --- Validation States ---
   const isAddressValid = useMemo(() => {
@@ -136,6 +144,17 @@ export default function ReplyPage() {
     enabled: !!eventId,
   });
 
+  const { data: referralCodeCount } = useQuery({
+    queryKey: ["referralCodeCount"],
+    queryFn: async () => {
+      const res = await API.getReferralCodeCount();
+      return res.success ? res.data.count : 0;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const showReferralCode = (referralCodeCount ?? 0) > 0;
+
   // --- Derived States ---
   const isContentFilled = useMemo(() => {
     if (!event) return false;
@@ -150,14 +169,34 @@ export default function ReplyPage() {
   const isPlaintextGenerated = !!plaintext;
   const isSignatureEntered = signature.trim().length > 0;
 
+  const isReferralCodeOk = !referralCode.trim() || referralCodeValid === true;
+
   const canSubmit =
     isAddressValid &&
     isContentFilled &&
     isPlaintextGenerated &&
     isSignatureEntered &&
-    countdown > 0;
+    countdown > 0 &&
+    isReferralCodeOk;
 
   // --- Handlers ---
+
+  const handleReferralCodeBlur = async () => {
+    const code = referralCode.trim();
+    if (!code) {
+      setReferralCodeValid(null);
+      return;
+    }
+    setIsValidatingReferralCode(true);
+    try {
+      const res = await API.validateReferralCode({ code });
+      setReferralCodeValid(res.success && res.data.valid);
+    } catch {
+      setReferralCodeValid(false);
+    } finally {
+      setIsValidatingReferralCode(false);
+    }
+  };
 
   const handleGeneratePlaintext = async () => {
     if (!event || !eventId) return;
@@ -206,12 +245,9 @@ export default function ReplyPage() {
       }
     } catch (error) {
       console.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const err = error as any;
       showToast(
         "error",
-        err.response?.data?.message ||
-          err.message ||
+        getApiMessage(error) ||
           t("reply.failedToGeneratePlaintext", "Failed to generate plaintext"),
       );
     } finally {
@@ -265,6 +301,7 @@ export default function ReplyPage() {
         signature: signature,
         nonce_timestamp: nonceTimestamp,
         random_code: randomCode,
+        referral_code: referralCode.trim() || undefined,
       });
 
       if (res.success) {
@@ -282,13 +319,9 @@ export default function ReplyPage() {
       }
     } catch (error) {
       console.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const err = error as any;
       showToast(
         "error",
-        err.response?.data?.message ||
-          err.message ||
-          t("reply.submitFailed", "Failed to submit reply"),
+        getApiMessage(error) || t("reply.submitFailed", "Failed to submit reply"),
       );
     } finally {
       setIsSubmitting(false);
@@ -724,12 +757,57 @@ export default function ReplyPage() {
           </div>
         </div>
 
-        <div className="flex gap-4">
+        {/* 6. Referral Code (Optional) */}
+        {showReferralCode && (
+          <div className="my-6 w-full max-w-3xl">
+            <div className="space-y-2">
+              <label className="text-primary text-sm font-medium">
+                {t("reply.referralCodeLabel", "Referral code (Optional)")}
+              </label>
+              <div className="relative mt-2">
+                <input
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => {
+                    setReferralCode(e.target.value);
+                    setReferralCodeValid(null);
+                  }}
+                  onBlur={handleReferralCodeBlur}
+                  placeholder={t(
+                    "reply.referralCodePlaceholder",
+                    "Please enter your referral code",
+                  )}
+                  autoComplete="off"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  disabled={isValidatingReferralCode}
+                  className={cn(
+                    "bg-form-bg text-primary w-full rounded-xl border px-3 py-2 pr-10 text-sm leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none dark:placeholder:text-neutral-600",
+                    referralCodeValid === false
+                      ? "border-red-500 focus:ring-red-500"
+                      : "border-border focus:ring-(--color-orange-500)",
+                  )}
+                />
+                {referralCodeValid === true && (
+                  <CheckCircleIcon className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2" />
+                )}
+              </div>
+              {referralCodeValid === false && (
+                <p className="text-xs text-red-500">
+                  {t("reply.referralCodeInvalid", "Invalid referral code")}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end gap-4">
           <Button
             type="button"
             appearance="outline"
             tone="white"
-            className="border-border flex-1 text-black hover:bg-white/5 dark:border-white dark:text-white"
+            className="border-border! flex-1 text-black hover:bg-white/5 md:w-40 md:flex-none dark:border-white dark:text-white"
             onClick={goBack}
           >
             {t("reply.cancel", "Cancel")}
@@ -738,7 +816,7 @@ export default function ReplyPage() {
             type="button"
             appearance="solid"
             tone="primary"
-            className="flex-1"
+            className="flex-1 md:w-40 md:flex-none"
             disabled={!canSubmit || isSubmitting}
             onClick={handleSubmit}
           >

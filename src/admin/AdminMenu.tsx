@@ -11,6 +11,7 @@ const items: Item[] = [
   { to: "/admin/fees", label: "手續費相關" },
   { to: "/admin/refunds", label: "退款相關" },
   { to: "/admin/withdrawal", label: "提款相關" },
+  { to: "/admin/referral-codes", label: "推薦碼管理" },
   // { to: '/admin/announcements', label: '公告管理' },
   // { to: '/admin/subscribers',  label: '訂閱者 email 匯出' },
 ];

@@ -70,6 +70,11 @@ const darkComponents: ThemeConfig["components"] = {
 
 // Light theme specific styles
 const lightComponents: ThemeConfig["components"] = {
+  Pagination: {
+    itemActiveBg: cssVar.orange500,
+    colorPrimary: cssVar.white,
+    colorPrimaryHover: cssVar.white,
+  },
   Button: {
     colorPrimary: cssVar.orange500,
     colorPrimaryHover: cssVar.btnPrimaryBgHover,
