@@ -1,13 +1,32 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
 import { toast } from "@/components/base/Toast/toast";
+import i18n from "@/i18n";
 
 export type RequestConf = AxiosRequestConfig;
+
+const errorKeyToI18nKey = (key: string): string =>
+  "backend." +
+  key.toLowerCase().replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
+
+export function getApiMessage(error: unknown): string | undefined {
+  if (error && typeof error === "object" && "apiMessage" in error) {
+    return (error as { apiMessage: string }).apiMessage;
+  }
+  return undefined;
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getApiErrorMessage(error: any): string {
   // Axios response error
   if (error?.response) {
+    const errorKey = error.response.data?.error_key;
+    if (errorKey) {
+      const i18nKey = errorKeyToI18nKey(errorKey);
+      if (i18n.exists(i18nKey)) {
+        return i18n.t(i18nKey);
+      }
+    }
     return (
       error.response.data?.message ||
       error.response.data?.msg ||

@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
+import { getApiMessage } from "@/api/http";
 import type { EventDetailDataRes } from "@/api/response";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -158,14 +159,9 @@ export default function ChangeResultVisibilityPage() {
         );
       }
     } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
       showToast(
         "error",
-        e?.response?.data?.message ||
-          e?.message ||
+        getApiMessage(err) ||
           t("creatorSign.failedToGenerate", "Failed to generate plaintext"),
       );
     } finally {
@@ -209,13 +205,8 @@ export default function ChangeResultVisibilityPage() {
         );
       }
     } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
       setSignatureError(
-        e?.response?.data?.message ||
-          e?.message ||
+        getApiMessage(err) ||
           t(
             "creatorSign.failedToVerifyPlaintext",
             "Plaintext verification failed. Please check your signature.",
@@ -259,14 +250,9 @@ export default function ChangeResultVisibilityPage() {
         setShowConfirmModal(false);
       }
     } catch (err: unknown) {
-      const e = err as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
       showToast(
         "error",
-        e?.response?.data?.message ||
-          e?.message ||
+        getApiMessage(err) ||
           t("changeVisibility.failedToUpdate", "Failed to update visibility"),
       );
       setShowConfirmModal(false);

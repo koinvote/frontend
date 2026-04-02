@@ -99,6 +99,7 @@ export interface ApiResponse<T> {
   code: string;
   success: boolean;
   message: string | null;
+  error_key?: string;
   data: T;
 }
 export interface ReplyReceiptData {

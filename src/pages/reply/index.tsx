@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router";
 
 import { API, type ApiResponse } from "@/api";
+import { getApiMessage } from "@/api/http";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
 import CheckCircleIcon from "@/assets/icons/check_circle.svg?react";
@@ -244,12 +245,9 @@ export default function ReplyPage() {
       }
     } catch (error) {
       console.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const err = error as any;
       showToast(
         "error",
-        err.response?.data?.message ||
-          err.message ||
+        getApiMessage(error) ||
           t("reply.failedToGeneratePlaintext", "Failed to generate plaintext"),
       );
     } finally {
@@ -321,13 +319,9 @@ export default function ReplyPage() {
       }
     } catch (error) {
       console.error(error);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const err = error as any;
       showToast(
         "error",
-        err.response?.data?.message ||
-          err.message ||
-          t("reply.submitFailed", "Failed to submit reply"),
+        getApiMessage(error) || t("reply.submitFailed", "Failed to submit reply"),
       );
     } finally {
       setIsSubmitting(false);

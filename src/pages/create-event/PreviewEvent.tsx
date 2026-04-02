@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router";
 
 import { API } from "@/api";
+import { getApiMessage } from "@/api/http";
 import type { CreateEventReq } from "@/api/request";
 import type { EventType } from "@/api/types";
 import BackButton from "@/components/base/BackButton";
@@ -276,14 +277,13 @@ export default function PreviewEvent() {
         navigate(`/confirm-sign/${eventId}`, { state });
       } catch (error) {
         console.error("Error creating event:", error);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorAny = error as any;
-        const errorMessage =
-          errorAny?.apiMessage ||
-          (error instanceof Error
-            ? error.message
-            : "Failed to create event. Please try again.");
-        showToast("error", errorMessage);
+        showToast(
+          "error",
+          getApiMessage(error) ||
+            (error instanceof Error
+              ? error.message
+              : "Failed to create event. Please try again."),
+        );
       } finally {
         setIsCreatingEvent(false);
       }
@@ -340,14 +340,13 @@ export default function PreviewEvent() {
         navigate(`/confirm-pay/${eventId}/payment`, { state });
       } catch (error) {
         console.error("Error creating event:", error);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorAny = error as any;
-        const errorMessage =
-          errorAny?.apiMessage ||
-          (error instanceof Error
-            ? error.message
-            : "Failed to create event. Please try again.");
-        showToast("error", errorMessage);
+        showToast(
+          "error",
+          getApiMessage(error) ||
+            (error instanceof Error
+              ? error.message
+              : "Failed to create event. Please try again."),
+        );
       } finally {
         setIsCreatingEvent(false);
       }
