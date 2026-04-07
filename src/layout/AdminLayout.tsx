@@ -1,14 +1,30 @@
 import ComputerIcon from "@/assets/icons/computer.svg?react";
 import LogoutIcon from "@/assets/icons/logout.svg?react";
 import ProfileIcon from "@/assets/icons/profile.svg?react";
-import { Outlet, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Navigate, Outlet, useNavigate } from "react-router";
 
 import AdminMenu from "@/admin/AdminMenu";
-import { removeAdminToken } from "@/api/http";
+import { AdminAPI } from "@/api";
+import { getAdminToken, removeAdminToken } from "@/api/http";
 import Logo from "@/assets/logo/logo.svg?react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const hasToken = !!getAdminToken();
+  const [authChecked, setAuthChecked] = useState(false);
+
+  useEffect(() => {
+    if (!hasToken) return;
+    AdminAPI.getSystemParameters()
+      .then(() => setAuthChecked(true))
+      .catch(() => {
+        // 401 handled by adminHttp interceptor (toast + redirect)
+      });
+  }, [hasToken]);
+
+  if (!hasToken) return <Navigate to="/admin/login" replace />;
+  if (!authChecked) return null;
 
   const handleLogout = () => {
     removeAdminToken();
