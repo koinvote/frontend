@@ -666,6 +666,14 @@
     "successMessageTitle": "Subscription successful.",
     "successMessageDescription": "You'll be notified when new reward events go live."
   },
+  "unsubscribe": {
+    "title": "Unsubscribe Event Notification",
+    "loading": "Processing your request...",
+    "successTitle": "Unsubscribed successfully.",
+    "successDescription": "You will no longer receive these notifications.",
+    "errorTitle": "Unsubscribe Failed.",
+    "errorDescription": "Please contact customer support for assistance."
+  },
   "homeToolbar": {
     "sortTime": "Time",
     "sortReward": "Reward",

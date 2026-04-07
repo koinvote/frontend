@@ -22,6 +22,7 @@ import PayoutReport from "@/pages/payout-report";
 import Privacy from "@/pages/privacy";
 import ReplyPage from "@/pages/reply";
 import Subscribe from "@/pages/subscribe";
+import Unsubscribe from "@/pages/unsubscribe";
 import Support from "@/pages/support";
 import Terms from "@/pages/terms";
 import TestSafeArea from "@/pages/TestSafeArea";
@@ -62,6 +63,7 @@ const publicChildren = isComingSoonMode
         handle: { title: "Terms of Reward Distribution | Koinvote" },
       },
       { path: "subscribe", element: <Subscribe />, handle: { title: "Subscribe | Koinvote" } },
+      { path: "unsubscribe", element: <Unsubscribe />, handle: { title: "Unsubscribe | Koinvote" } },
       { path: "support", element: <Support />, handle: { title: "Support | Koinvote" } },
       { path: "verification-tool", element: <VerificaionTool />, handle: { title: "Verification Tool | Koinvote" } },
       { path: "create-event", element: <CreateEvent />, handle: { title: "Create Event | Koinvote" } },
