@@ -669,6 +669,14 @@
     "successMessageTitle": "訂閱成功！",
     "successMessageDescription": "當有新的獎勵活動發佈時，我們會通知您。"
   },
+  "unsubscribe": {
+    "title": "取消訂閱活動通知",
+    "loading": "正在處理您的請求...",
+    "successTitle": "取消訂閱成功",
+    "successDescription": "您將不再收到這些通知",
+    "errorTitle": "取消訂閱失敗",
+    "errorDescription": "請聯絡客服以獲得協助"
+  },
   "homeToolbar": {
     "sortTime": "時間",
     "sortReward": "獎勵",

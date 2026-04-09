@@ -207,6 +207,7 @@ export const API = {
 
   // Subscribe API
   subscribe: post<ApiResponse<void>, SubscribeReq>("/subscribe"),
+  unsubscribe: post<ApiResponse<{ message: string }>, { token: string }>("/unsubscribe"),
 
   // Contact Us API
   contactUs: post<ApiResponse<void>, ContactUsReq>("/contact-us"),

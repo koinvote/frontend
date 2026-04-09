@@ -775,6 +775,28 @@ export const handlers = [
     });
   }),
 
+  // POST /unsubscribe - Unsubscribe from email notifications
+  http.post(`${API_BASE_URL}/unsubscribe`, async ({ request }) => {
+    const body = (await request.json()) as { token: string };
+    console.log("[Mock] Unsubscribe request:", body);
+
+    if (!body.token) {
+      return HttpResponse.json<ApiResponse<{ message: string }>>({
+        code: "400000",
+        success: false,
+        message: "Invalid or expired unsubscribe token",
+        data: undefined as unknown as { message: string },
+      });
+    }
+
+    return HttpResponse.json<ApiResponse<{ message: string }>>({
+      code: "000000",
+      success: true,
+      message: null,
+      data: { message: "Unsubscribed successfully" },
+    });
+  }),
+
   // POST /contact-us - Contact us form submission
   http.post(`${API_BASE_URL}/contact-us`, async ({ request }) => {
     const body = (await request.json()) as {
