@@ -96,11 +96,15 @@
 
       .btn-cta a {
         background-color: #fffffe !important;
-        color: #111111 !important;
+        color: #0A0A0A !important;
+      }
+
+      .btn-text {
+        color: #0A0A0A !important;
       }
 
       .footer-text {
-        color: #6e6e6e !important;
+        color: #a1a1a1 !important;
       }
     }
 
@@ -136,7 +140,11 @@
 
     [data-ogsc] .btn-cta a {
       background-color: #fffffe !important;
-      color: #111111 !important;
+      color: #0A0A0A !important;
+    }
+
+    [data-ogsc] .btn-text {
+      color: #0A0A0A !important;
     }
 
     /* Hotmail / Outlook app dark mode */
@@ -148,13 +156,41 @@
       background-color: #141414 !important;
     }
 
+    [data-ogsb] .logo-text {
+      color: #ffffff !important;
+    }
+
+    [data-ogsb] .text-primary {
+      color: #fafafa !important;
+    }
+
+    [data-ogsb] .text-muted {
+      color: #a1a1a1 !important;
+    }
+
+    [data-ogsb] .text-label {
+      color: #a1a1a1 !important;
+    }
+
+    [data-ogsb] .badge-wrap {
+      border-color: #292929 !important;
+    }
+
+    [data-ogsb] .footer-text {
+      color: #6e6e6e !important;
+    }
+
     [data-ogsb] .btn-cta {
       background-color: #fffffe !important;
     }
 
     [data-ogsb] .btn-cta a {
       background-color: #fffffe !important;
-      color: #111111 !important;
+      color: #0A0A0A !important;
+    }
+
+    [data-ogsb] .btn-text {
+      color: #0A0A0A !important;
     }
 
     /* ── Responsive ── */
@@ -180,20 +216,19 @@
   </style>
 </head>
 
-<body bgcolor="#f2f2f2" class="bg-page"
-  style="margin:0;padding:0;background-color:#f2f2f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<body class="bg-page"
+  style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 
   <!-- Preheader -->
-  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#f2f2f2;">
+  <div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#ffffff;">
     A reward event is now ongoing on Koinvote. Submit your reply before it
     ends.&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌
   </div>
 
   <!-- Outer wrapper -->
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f2f2f2" class="bg-page"
-    style="background-color:#f2f2f2;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="bg-page">
     <tr>
-      <td align="center" class="bg-page" style="padding:32px 16px 40px;background-color:#f2f2f2;">
+      <td align="center" class="bg-page" style="padding:32px 16px 40px;">
 
         <!-- Logo (outside card) -->
         <table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"
@@ -218,12 +253,12 @@
 
         <!-- Email card -->
         <table role="presentation" class="email-wrapper bg-card" width="680" cellpadding="0" cellspacing="0" border="0"
-          bgcolor="#ffffff"
-          style="max-width:680px;width:100%;background-color:#ffffff;border-radius:4px;overflow:hidden;">
+          bgcolor="#FAFAFA"
+          style="max-width:680px;width:100%;background-color:#FAFAFA;border-radius:4px;overflow:hidden;">
 
           <!-- ── BODY ── -->
           <tr>
-            <td class="content-cell bg-card" style="padding:32px 40px 40px;background-color:#ffffff;">
+            <td class="content-cell bg-card" style="padding:32px 40px 40px;background-color:#FAFAFA;">
 
               <!-- Ongoing badge -->
               <div style="margin-bottom:20px;">
@@ -237,9 +272,8 @@
 
               <!-- Intro text -->
               <p class="text-primary" style="margin:0 0 16px;font-size:14px;line-height:22px;color:#111111;">
-                A reward event is now ongoing on Koinvote.<br>
-                The event is currently accepting replies.<br>
-                Submit your reply before it ends.
+                A new reward event has just started on Koinvote.<br>
+                You can now submit your reply before the countdown ends.
               </p>
 
               <!-- Event title label -->
@@ -287,7 +321,7 @@
                 <tr>
                   <td style="padding-bottom:4px;word-break:break-all;">
                     <a href="{{ params.event_link }}"
-                      style="font-size:12px;color:#F7931A;text-decoration:none;word-break:break-all;">
+                      style="font-size:12px;color:#FF8904;text-decoration:none;word-break:break-all;">
                       {{ params.event_link }}
                     </a>
                   </td>
@@ -317,7 +351,7 @@
                         <td class="btn-cta" style="background-color:#141414;border-radius:12px;padding:8px 20px;">
                           <a href="{{ params.event_link }}" class="btn-cta"
                             style="display:block;background-color:#141414;font-size:15px;color:#ffffff;text-decoration:none;white-space:nowrap;letter-spacing:0.1px;">
-                            View event
+                            <span class="btn-text" style="color:#ffffff;">View event</span>
                           </a>
                         </td>
                         <!--<![endif]-->
@@ -332,10 +366,11 @@
 
           <!-- ── FOOTER ── -->
           <tr>
-            <td class="footer-cell bg-card" style="padding:20px 40px 28px;background-color:#ffffff;">
+            <td class="footer-cell bg-card" style="padding:20px 40px 28px;background-color:#FAFAFA;">
               <p class="footer-text" style="margin:0;font-size:11px;line-height:18px;color:#a1a1a1;text-align:left;">
                 To unsubscribe from these notifications,&nbsp;<a href="{{ params.unsubscribe_url }}"
-                  style="color:#a1a1a1;text-decoration:underline;font-size:11px;">click here</a>.
+                  style="color:#a1a1a1;text-decoration:underline;font-size:11px;"><span
+                    style="color:#a1a1a1;text-decoration:underline;">click here</span></a>.
               </p>
             </td>
           </tr>
