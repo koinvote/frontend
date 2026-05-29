@@ -61,9 +61,12 @@
     /* ── Dark mode overrides ── */
     @media (prefers-color-scheme: dark) {
 
-      body,
-      .bg-page {
-        background-color: #000000 !important;
+      .bg-outer {
+        background-color: #0a0a0a !important;
+      }
+
+      .outer-border {
+        border-color: #292929 !important;
       }
 
       .bg-card {
@@ -109,9 +112,12 @@
     }
 
     /* Gmail dark mode */
-    [data-ogsc] body,
-    [data-ogsc] .bg-page {
-      background-color: #000000 !important;
+    [data-ogsc] .bg-outer {
+      background-color: #0a0a0a !important;
+    }
+
+    [data-ogsc] .outer-border {
+      border-color: #292929 !important;
     }
 
     [data-ogsc] .bg-card {
@@ -134,6 +140,10 @@
       color: #ffffff !important;
     }
 
+    [data-ogsc] .card-border {
+      border-color: #292929 !important;
+    }
+
     [data-ogsc] .btn-cta {
       background-color: #fffffe !important;
     }
@@ -148,8 +158,12 @@
     }
 
     /* Hotmail / Outlook app dark mode */
-    [data-ogsb] .bg-page {
-      background-color: #000000 !important;
+    [data-ogsb] .bg-outer {
+      background-color: #0a0a0a !important;
+    }
+
+    [data-ogsb] .outer-border {
+      border-color: #292929 !important;
     }
 
     [data-ogsb] .bg-card {
@@ -173,6 +187,10 @@
     }
 
     [data-ogsb] .badge-wrap {
+      border-color: #292929 !important;
+    }
+
+    [data-ogsb] .card-border {
       border-color: #292929 !important;
     }
 
@@ -216,7 +234,7 @@
   </style>
 </head>
 
-<body class="bg-page"
+<body
   style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 
   <!-- Preheader -->
@@ -225,109 +243,111 @@
     ends.&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌&nbsp;‌
   </div>
 
-  <!-- Outer wrapper -->
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="bg-page">
+  <!-- Outer wrapper (transparent — uses client default background) -->
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
     <tr>
-      <td align="center" class="bg-page" style="padding:32px 16px 40px;">
+      <td align="center" style="padding:32px 16px 40px;">
 
-        <!-- Logo (outside card) -->
-        <table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0"
-          style="max-width:680px;width:100%;">
+        <!-- ── OUTER CARD ── -->
+        <table role="presentation" class="email-wrapper bg-outer outer-border" width="680" cellpadding="0"
+          cellspacing="0" border="0" bgcolor="#FFFFFF"
+          style="max-width:680px;width:100%;background-color:#FFFFFF;border:1px solid #e8e8e8;border-radius:8px;overflow:hidden;">
           <tr>
-            <td style="padding:0 0 24px 32px;">
+            <td class="bg-outer" style="padding:16px;background-color:#FFFFFF;">
+
+              <!-- Logo (between outer and inner card) -->
               <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                 <tr>
-                  <td style="vertical-align:middle;padding-right:8px;">
+                  <td style="vertical-align:middle;padding:4px 8px 16px 40px;">
                     <img src="https://koinvote.com/logo-transparent.png" alt="Koinvote" width="32" height="32"
                       style="display:block;width:32px;height:32px;">
                   </td>
-                  <td style="vertical-align:middle;">
+                  <td style="vertical-align:middle;padding-bottom:16px;padding-top:4px;">
                     <span class="logo-text"
                       style="font-size:24px;font-weight:700;color:#111111;letter-spacing:-0.3px;">Koinvote</span>
                   </td>
                 </tr>
               </table>
-            </td>
-          </tr>
-        </table>
 
-        <!-- Email card -->
-        <table role="presentation" class="email-wrapper bg-card" width="680" cellpadding="0" cellspacing="0" border="0"
-          bgcolor="#FAFAFA"
-          style="max-width:680px;width:100%;background-color:#FAFAFA;border-radius:4px;overflow:hidden;">
+              <!-- ── INNER CARD ── -->
+              <table role="presentation" class="bg-card card-border" width="100%" cellpadding="0" cellspacing="0"
+                border="0" bgcolor="#FAFAFA"
+                style="width:100%;background-color:#FAFAFA;border:1px solid #e8e8e8;border-radius:4px;overflow:hidden;">
 
-          <!-- ── BODY ── -->
-          <tr>
-            <td class="content-cell bg-card" style="padding:32px 40px 40px;background-color:#FAFAFA;">
-
-              <!-- Ongoing badge -->
-              <div style="margin-bottom:20px;">
-                <span class="badge-wrap"
-                  style="display:inline-block;border:1px solid #e8e8e8;border-radius:8px;padding:2px 10px 5px 8px;line-height:1;color:#67C23A;">
-                  <img src="https://koinvote.com/clock-green.png" alt="" width="14" height="14"
-                    style="display:inline-block;vertical-align:middle;margin-right:4px;">
-                  <span style="font-size:12px;color:#67C23A;white-space:nowrap;vertical-align:middle;">Ongoing</span>
-                </span>
-              </div>
-
-              <!-- Intro text -->
-              <p class="text-primary" style="margin:0 0 16px;font-size:14px;line-height:22px;color:#111111;">
-                A new reward event has just started on Koinvote.<br>
-                You can now submit your reply before the countdown ends.
-              </p>
-
-              <!-- Event title label -->
-              <p class="text-label" style="margin:0 0 6px;font-size:12px;color:#888888;font-weight:400;">Event title</p>
-
-              <!-- Event title -->
-              <p class="event-title text-primary"
-                style="margin:0 0 20px;font-size:22px;font-weight:700;line-height:30px;color:#111111;">
-                {{ params.event_title }}
-              </p>
-
-              <!-- Stats -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                style="margin-bottom:32px;">
+                <!-- ── BODY ── -->
                 <tr>
-                  <td style="padding-bottom:6px;">
-                    <span class="text-muted" style="font-size:13px;color:#6e6e6e;">Reward&nbsp;</span>
-                    <span class="text-primary" style="font-size:13px;font-weight:700;color:#111111;">{{
-                      params.reward_amount }} BTC</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <span class="text-muted" style="font-size:13px;color:#6e6e6e;">Duration&nbsp;</span>
-                    <span class="text-primary" style="font-size:13px;font-weight:700;color:#111111;">{{
-                      params.duration_hours }} hours</span>
-                  </td>
-                </tr>
-              </table>
+                  <td class="content-cell bg-card" style="padding:32px 40px 40px;background-color:#FAFAFA;">
 
-              <!-- View event URL -->
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="padding-bottom:4px;">
-                    <span class="text-muted" style="font-size:12px;color:#6e6e6e;">View event:</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding-bottom:4px;word-break:break-all;">
-                    <a href="{{ params.event_link }}"
-                      style="font-size:12px;color:#FF8904;text-decoration:none;word-break:break-all;">
-                      {{ params.event_link }}
-                    </a>
-                  </td>
-                </tr>
-              </table>
+                    <!-- Ongoing badge -->
+                    <div class="bg-card" style="margin-bottom:20px;background-color:#FAFAFA;">
+                      <span class="badge-wrap"
+                        style="display:inline-block;border:1px solid #e8e8e8;border-radius:8px;padding:2px 10px 5px 8px;line-height:1;color:#67C23A;">
+                        <img src="https://koinvote.com/clock-green.png" alt="" width="14" height="14"
+                          style="display:inline-block;vertical-align:middle;margin-right:4px;">
+                        <span
+                          style="font-size:12px;color:#67C23A;white-space:nowrap;vertical-align:middle;">Ongoing</span>
+                      </span>
+                    </div>
 
-              <!-- CTA Button -->
-              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
-                <tr>
-                  <td style="padding-top:16px;">
+                    <!-- Intro text -->
+                    <p class="text-primary" style="margin:0 0 16px;font-size:14px;line-height:22px;color:#111111;">
+                      A new reward event has just started on Koinvote.<br>
+                      You can now submit your reply before the countdown ends.
+                    </p>
+
+                    <!-- Event title label -->
+                    <p class="text-label" style="margin:0 0 6px;font-size:12px;color:#888888;font-weight:400;">Event
+                      title</p>
+
+                    <!-- Event title -->
+                    <p class="event-title text-primary"
+                      style="margin:0 0 20px;font-size:22px;font-weight:700;line-height:30px;color:#111111;">
+                      {{ params.event_title }}
+                    </p>
+
+                    <!-- Stats -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                      style="margin-bottom:32px;">
+                      <tr>
+                        <td style="padding-bottom:6px;">
+                          <span class="text-muted" style="font-size:13px;color:#6e6e6e;">Reward&nbsp;</span>
+                          <span class="text-primary" style="font-size:13px;font-weight:700;color:#111111;">{{
+                            params.reward_amount }} BTC</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <span class="text-muted" style="font-size:13px;color:#6e6e6e;">Duration&nbsp;</span>
+                          <span class="text-primary" style="font-size:13px;font-weight:700;color:#111111;">{{
+                            params.duration_hours }} hours</span>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- View event URL -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                      <tr>
+                        <td style="padding-bottom:4px;">
+                          <span class="text-muted" style="font-size:12px;color:#6e6e6e;">View event:</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding-bottom:4px;word-break:break-all;">
+                          <a href="{{ params.event_link }}"
+                            style="font-size:12px;color:#FF8904;text-decoration:none;word-break:break-all;">
+                            {{ params.event_link }}
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <!-- CTA Button -->
                     <table role="presentation" cellpadding="0" cellspacing="0" border="0">
                       <tr>
-                        <!--[if mso]>
+                        <td style="padding-top:16px;">
+                          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                              <!--[if mso]>
                         <td>
                           <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
                             href="{{ params.event_link }}"
@@ -340,35 +360,42 @@
                           </v:roundrect>
                         </td>
                         <![endif]-->
-                        <!--[if !mso]><!-->
-                        <td class="btn-cta" style="background-color:#141414;border-radius:12px;padding:8px 20px;">
-                          <a href="{{ params.event_link }}" class="btn-cta"
-                            style="display:block;background-color:#141414;font-size:15px;color:#ffffff;text-decoration:none;white-space:nowrap;letter-spacing:0.1px;">
-                            <span class="btn-text" style="color:#ffffff;">View event</span>
-                          </a>
+                              <!--[if !mso]><!-->
+                              <td class="btn-cta" style="background-color:#141414;border-radius:12px;padding:8px 20px;">
+                                <a href="{{ params.event_link }}" class="btn-cta"
+                                  style="display:block;background-color:#141414;font-size:15px;color:#ffffff;text-decoration:none;white-space:nowrap;letter-spacing:0.1px;">
+                                  <span class="btn-text" style="color:#ffffff;">View event</span>
+                                </a>
+                              </td>
+                              <!--<![endif]-->
+                            </tr>
+                          </table>
                         </td>
-                        <!--<![endif]-->
                       </tr>
                     </table>
+
                   </td>
                 </tr>
+
+                <!-- ── FOOTER ── -->
+                <tr>
+                  <td class="footer-cell bg-card" style="padding:20px 40px 28px;background-color:#FAFAFA;">
+                    <p class="footer-text"
+                      style="margin:0;font-size:11px;line-height:18px;color:#a1a1a1;text-align:left;">
+                      To unsubscribe from these notifications,&nbsp;<a href="{{ params.unsubscribe_url }}"
+                        style="color:#a1a1a1;text-decoration:underline;font-size:11px;"><span
+                          style="color:#a1a1a1;text-decoration:underline;">click here</span></a>.
+                    </p>
+                  </td>
+                </tr>
+
               </table>
+              <!-- /inner card -->
 
             </td>
           </tr>
-
-          <!-- ── FOOTER ── -->
-          <tr>
-            <td class="footer-cell bg-card" style="padding:20px 40px 28px;background-color:#FAFAFA;">
-              <p class="footer-text" style="margin:0;font-size:11px;line-height:18px;color:#a1a1a1;text-align:left;">
-                To unsubscribe from these notifications,&nbsp;<a href="{{ params.unsubscribe_url }}"
-                  style="color:#a1a1a1;text-decoration:underline;font-size:11px;"><span
-                    style="color:#a1a1a1;text-decoration:underline;">click here</span></a>.
-              </p>
-            </td>
-          </tr>
-
         </table>
+        <!-- /outer card -->
 
       </td>
     </tr>
