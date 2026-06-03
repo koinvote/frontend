@@ -513,18 +513,18 @@ export default function PreviewEvent() {
 
           <Divider />
 
-          {/* Result visibility / unlock email / confirm unlock email / unlock price */}
+          {/* Result visibility — 永遠顯示（包含 public）；unlock email/confirm/unlock price 只在 paid_only/creator_only 顯示 */}
+          <Field label={t("preview.resultVisibility", "Result visibility")}>
+            {resultVisibility === "paid_only"
+              ? t("createEvent.resultVisibilityPaidOnly", "Paid-only")
+              : resultVisibility === "creator_only"
+                ? t("createEvent.resultVisibilityCreatorOnly", "Creator-only")
+                : t("createEvent.resultVisibilityPublic", "Public")}
+          </Field>
+
           {(resultVisibility === "paid_only" ||
             resultVisibility === "creator_only") && (
             <>
-              <Field label={t("preview.resultVisibility", "Result visibility")}>
-                {resultVisibility === "paid_only"
-                  ? t("createEvent.resultVisibilityPaidOnly", "Paid-only")
-                  : t(
-                      "createEvent.resultVisibilityCreatorOnly",
-                      "Creator-only",
-                    )}
-              </Field>
               <Field label={t("preview.unlockEmail", "Unlock email")}>
                 <div>
                   <div>{creatorEmail || "--"}</div>
@@ -570,9 +570,10 @@ export default function PreviewEvent() {
                   {unlockPriceBtc ? `${unlockPriceBtc} BTC` : "--"}
                 </Field>
               )}
-              <Divider />
             </>
           )}
+
+          <Divider />
 
           {/* Preheat（有開啟 Preheat 才顯示，免費不顯示費用） */}
           {enablePreheat && preheatHours > 0 && (
