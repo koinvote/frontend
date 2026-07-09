@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import { useHomeEventCounts } from "@/hooks/useHomeEventCounts";
 import { BackToTopButton } from "@/pages/home/component/BackToTopButton";
 import { EventList } from "@/pages/home/component/EventList";
 import { HomeToolbar } from "@/pages/home/component/HomeToolbar";
@@ -8,6 +9,9 @@ import { useHomeStore } from "@/stores/homeStore";
 export function HomePage() {
   const scrollY = useHomeStore((state) => state.scrollY);
   const setScrollY = useHomeStore((state) => state.setScrollY);
+
+  // 取得各頁籤事件數量，並在首次進入時依規格決定預設頁籤
+  useHomeEventCounts();
 
   useEffect(() => {
     if (scrollY > 0) {

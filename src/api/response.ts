@@ -90,6 +90,13 @@ export interface GetEventListRes {
   limit: number;
 }
 
+// GET /events/counts - Number of events in each home tab
+export interface GetEventCountsRes {
+  preheat: number;
+  ongoing: number;
+  completed: number;
+}
+
 export interface EventOption {
   id: number;
   option_text: string;
