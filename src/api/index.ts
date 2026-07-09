@@ -36,6 +36,7 @@ import type {
   GetEditPlaintextRes,
   GenerateUnlockPricePlaintextRes,
   GetCompletedTopRepliesRes,
+  GetEventCountsRes,
   GetEventListRes,
   GetHotHashtagsRes,
   GetListRepliesRes,
@@ -139,6 +140,9 @@ export const API = {
       ) as Promise<ApiResponse<EventDataRes>>,
 
   getEventList: get<ApiResponse<GetEventListRes>, GetEventListReq>("/events"),
+
+  // Number of events in each home tab (preheat / ongoing / completed)
+  getEventCounts: get<ApiResponse<GetEventCountsRes>, void>("/events/counts"),
 
   getEventDetail: (eventId: string) =>
     get<ApiResponse<EventDetailDataRes>, { unlock_email?: string }>(
