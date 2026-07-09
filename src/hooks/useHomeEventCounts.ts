@@ -21,14 +21,20 @@ export function useHomeEventCounts() {
   const eventCounts = useHomeStore((s) => s.eventCounts);
   const setEventCounts = useHomeStore((s) => s.setEventCounts);
   const setStatus = useHomeStore((s) => s.setStatus);
+  const setSort = useHomeStore((s) => s.setSort);
 
   useEffect(() => {
     let cancelled = false;
 
     // 套用預設頁籤；setStatus 會清空列表並觸發重新載入，僅在頁籤真的需要改變時呼叫。
     const applyDefaultTab = (tab: HomeStatusFilter) => {
-      if (useHomeStore.getState().status !== tab) {
-        setStatus(tab);
+      const state = useHomeStore.getState();
+      if (state.status === tab) return;
+      setStatus(tab);
+      // 與 HomeToolbar.handleTabChange 一致：使用者未手動改過排序時，套用該頁籤的預設排序
+      // completed → time desc；preheat / ongoing → time asc
+      if (!state.isSortActive) {
+        setSort("time", tab === "completed" ? "desc" : "asc");
       }
     };
 
