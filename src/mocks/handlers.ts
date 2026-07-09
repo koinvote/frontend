@@ -168,6 +168,24 @@ export const handlers = [
     });
   }),
 
+  // GET /events/counts - Number of events in each home tab
+  // NOTE: must be registered before `/events/:eventId` so it isn't captured as an eventId
+  http.get(`${API_BASE_URL}/events/counts`, () => {
+    const preheat = mockEventList.filter((e) => e.status === 2).length;
+    const ongoing = mockEventList.filter((e) => e.status === 3).length;
+    // completed tab covers all ended states (4=ended, 5=completed, 6=cancelled, 7=refunded, 8=expired)
+    const completed = mockEventList.filter((e) => e.status >= 4).length;
+
+    return HttpResponse.json<
+      ApiResponse<{ preheat: number; ongoing: number; completed: number }>
+    >({
+      code: "200",
+      success: true,
+      message: null,
+      data: { preheat, ongoing, completed },
+    });
+  }),
+
   // GET /events/:eventId - Get event detail
   http.get(`${API_BASE_URL}/events/:eventId`, ({ params, request }) => {
     const { eventId } = params;

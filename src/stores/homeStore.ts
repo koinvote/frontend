@@ -1,3 +1,4 @@
+import type { GetEventCountsRes } from "@/api/response";
 import {
   type EventSummary,
   type HomeSortField,
@@ -27,6 +28,9 @@ interface HomeStoreState {
   limit: number;
   total: number;
   popularHashtags: string[];
+
+  // tab event counts（每次進首頁重新取得，不 persist）
+  eventCounts: GetEventCountsRes | null;
 
   // ui
   isLoading: boolean;
@@ -65,6 +69,8 @@ interface HomeStoreState {
   resetFilters: () => void;
   resetList: () => void;
   setPopularHashtags: (hashtags: string[]) => void;
+
+  setEventCounts: (counts: GetEventCountsRes) => void;
 }
 
 export const useHomeStore = create<HomeStoreState>()(
@@ -88,6 +94,8 @@ export const useHomeStore = create<HomeStoreState>()(
         limit: 20,
         total: 0,
         popularHashtags: [],
+
+        eventCounts: null,
 
         isLoading: false,
         isError: false,
@@ -248,6 +256,9 @@ export const useHomeStore = create<HomeStoreState>()(
             false,
             "home/setPopularHashtags",
           ),
+
+        setEventCounts: (counts) =>
+          set(() => ({ eventCounts: counts }), false, "home/setEventCounts"),
       }),
       {
         name: "home-store",
