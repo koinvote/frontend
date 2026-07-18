@@ -4,6 +4,9 @@ import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from 'url'
 import svgr from 'vite-plugin-svgr'
 import legacy from '@vitejs/plugin-legacy'
+import postcssOKLabFunction from '@csstools/postcss-oklab-function'
+import postcssColorMixFunction from '@csstools/postcss-color-mix-function'
+import postcssCascadeLayers from '@csstools/postcss-cascade-layers'
 
 export default defineConfig({
   plugins: [
@@ -20,6 +23,18 @@ export default defineConfig({
   // Ensure the modern bundle's syntax is also parseable by Safari 14.
   build: {
     target: ['es2020', 'safari14'],
+  },
+  // Downlevel modern CSS (Tailwind 4) for older Safari. `preserve: true` keeps
+  // the modern oklch()/color-mix() for new browsers and adds rgb fallbacks;
+  // cascade-layers flattens @layer, which Safari < 15.4 drops entirely.
+  css: {
+    postcss: {
+      plugins: [
+        postcssOKLabFunction({ preserve: true }),
+        postcssColorMixFunction({ preserve: true }),
+        postcssCascadeLayers(),
+      ],
+    },
   },
   resolve: {
     alias: {
