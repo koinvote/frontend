@@ -160,7 +160,7 @@ export default function Layout() {
           <div
             ref={drawerRef}
             className={cn(
-              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
+              "absolute inset-y-0 left-0 flex w-[85%] max-w-[320px] flex-col bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
               isClosing || isOpening ? "-translate-x-full" : "translate-x-0",
             )}
             onTouchStart={handleTouchStart}
@@ -192,7 +192,10 @@ export default function Layout() {
                 </svg>
               </button>
             </div>
-            <div className="max-h-dvh-drawer overflow-y-auto pb-20">
+            {/* flex-1 tracks the drawer's real height; a vh-based max-height
+                overshoots on iOS while the Safari toolbars are expanded and
+                let content run under the pinned language/theme footer. */}
+            <div className="min-h-0 flex-1 overflow-y-auto pb-20">
               <Menu onItemClick={handleClose} />
             </div>
           </div>
