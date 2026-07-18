@@ -264,6 +264,28 @@
   line-height: 32px;
 }
 
+/* vh fallback for dvh (unsupported pre-Safari 15.4); @supports avoids the minifier deduping duplicate declarations away */
+.min-h-dvh-header {
+  min-height: calc(100vh - 4rem);
+}
+.h-dvh-header {
+  height: calc(100vh - 4rem);
+}
+.max-h-dvh-drawer {
+  max-height: calc(100vh - 72px);
+}
+@supports (height: 100dvh) {
+  .min-h-dvh-header {
+    min-height: calc(100dvh - 4rem);
+  }
+  .h-dvh-header {
+    height: calc(100dvh - 4rem);
+  }
+  .max-h-dvh-drawer {
+    max-height: calc(100dvh - 72px);
+  }
+}
+
 /* letter-spacing (tracking) */
 @utility track-0 {
   letter-spacing: var(--track-0);

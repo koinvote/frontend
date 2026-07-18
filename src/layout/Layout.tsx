@@ -85,7 +85,7 @@ export default function Layout() {
 
   return (
     // 1. Root Container
-    <div className="w-full min-h-[calc(100dvh-4rem)]">
+    <div className="w-full min-h-dvh-header">
       <Header
         open={open}
         setOpen={setOpen}
@@ -94,13 +94,13 @@ export default function Layout() {
       />
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-[calc(100dvh-4rem)] md:pt-16">
+      <div className="relative flex w-full min-h-dvh-header md:pt-16">
         {/* Sidebar (Desktop Only - Fixed) */}
         {isDesktop && (
           <aside
             className={cn(
               "fixed top-16 left-0 z-40",
-              "h-[calc(100dvh-4rem)]",
+              "h-dvh-header",
               "backdrop-blur",
               "transition-[width] duration-200 ease-out",
               "border-r border-border bg-(--color-bg)",
@@ -109,7 +109,7 @@ export default function Layout() {
           >
             <div
               className={cn(
-                "h-full overflow-y-auto py-2",
+                "h-full overflow-y-auto py-2 pb-20",
                 collapsed ? "px-0" : "px-2",
               )}
             >
@@ -192,7 +192,7 @@ export default function Layout() {
                 </svg>
               </button>
             </div>
-            <div className="max-h-[calc(100dvh-72px)] overflow-y-auto">
+            <div className="max-h-dvh-drawer overflow-y-auto pb-20">
               <Menu onItemClick={handleClose} />
             </div>
           </div>
