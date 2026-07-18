@@ -33,6 +33,24 @@ export default defineConfig({
         postcssOKLabFunction({ preserve: true }),
         postcssColorMixFunction({ preserve: true }),
         postcssCascadeLayers(),
+        // postcss-cascade-layers emulates layer priority by inflating
+        // specificity with `:not(#\#)` chains, which lets low-priority rules
+        // like Tailwind preflight's `button { color: inherit }` (boosted to
+        // 6 ids) beat unlayered component CSS — CSS modules, antd runtime
+        // styles — that native @layer would never override. This stylesheet's
+        // physical order already matches its layer order (theme → base →
+        // utilities → app styles), so source order + plain specificity gives
+        // the correct cascade; strip the boosts.
+        {
+          postcssPlugin: 'strip-cascade-layer-specificity-boosts',
+          OnceExit(root) {
+            root.walkRules((rule) => {
+              if (rule.selector.includes(':not(#\\#)')) {
+                rule.selector = rule.selector.replaceAll(':not(#\\#)', '')
+              }
+            })
+          },
+        },
       ],
     },
   },
