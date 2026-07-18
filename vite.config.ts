@@ -41,6 +41,29 @@ export default defineConfig({
         // physical order already matches its layer order (theme → base →
         // utilities → app styles), so source order + plain specificity gives
         // the correct cascade; strip the boosts.
+        // Safari < 15.4 drops an entire rule when any selector in its list is
+        // unknown. Tailwind groups `::backdrop` (and `::file-selector-button`)
+        // with `*`/`::before`/`::after` in preflight and in the @supports
+        // fallback that seeds `--tw-*` defaults (--tw-border-style etc.) for
+        // browsers without @property — so on iOS 14 those rules vanished and
+        // e.g. `.border` computed to border-style:none. Split the risky
+        // pseudo-elements into their own rule so the rest survives.
+        {
+          postcssPlugin: 'split-modern-pseudo-element-selectors',
+          OnceExit(root) {
+            root.walkRules((rule) => {
+              const risky = rule.selectors.filter((s) =>
+                /::(backdrop|file-selector-button)/.test(s),
+              )
+              if (risky.length > 0 && risky.length < rule.selectors.length) {
+                rule.cloneAfter({ selectors: risky })
+                rule.selectors = rule.selectors.filter(
+                  (s) => !risky.includes(s),
+                )
+              }
+            })
+          },
+        },
         {
           postcssPlugin: 'strip-cascade-layer-specificity-boosts',
           OnceExit(root) {
