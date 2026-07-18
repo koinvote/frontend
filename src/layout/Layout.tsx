@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router";
 
 import { cn } from "@/utils/style";
-import Menu from "../components/Menu";
+import Menu, { MenuFooter } from "../components/Menu";
 import Header from "./Header";
 
 import LeftArrow from "@/assets/icons/leftArrow.svg?react";
@@ -193,10 +193,14 @@ export default function Layout() {
               </button>
             </div>
             {/* flex-1 tracks the drawer's real height; a vh-based max-height
-                overshoots on iOS while the Safari toolbars are expanded and
-                let content run under the pinned language/theme footer. */}
-            <div className="min-h-0 flex-1 overflow-y-auto pb-20">
-              <Menu onItemClick={handleClose} />
+                overshoots on iOS while the Safari toolbars are expanded. The
+                footer sits after the scroll area as a normal flex child (not
+                pinned over it) so it can never cover the last menu items. */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <Menu onItemClick={handleClose} showFooter={false} />
+            </div>
+            <div className="-mx-3 -mb-3 shrink-0">
+              <MenuFooter />
             </div>
           </div>
         </div>
