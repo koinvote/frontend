@@ -285,6 +285,43 @@
     max-height: calc(100dvh - 72px);
   }
 }
+.min-h-dvh-page {
+  min-height: calc(100vh - 10rem);
+}
+@supports (height: 100dvh) {
+  .min-h-dvh-page {
+    min-height: calc(100dvh - 10rem);
+  }
+}
+
+/* Physical longhand fallbacks for the `inset`/`inset-block` shorthands Tailwind
+   v4 emits, which Safari < 14.1 (iOS < 14.5) drops entirely — the mobile drawer
+   overlay loses its coordinates and renders off-screen. Values mirror the
+   utilities exactly, so modern browsers resolve to the same layout. */
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.inset-y-0 {
+  top: 0;
+  bottom: 0;
+}
+
+/* Same story for the standalone `translate` property: fall back to transform.
+   Gated so browsers that support `translate` don't apply both and move twice.
+   Covers every translate-* utility currently used in src/. */
+@supports not (translate: none) {
+  .translate-x-0,
+  .translate-x-1,
+  .translate-x-6,
+  .-translate-x-full,
+  .-translate-x-1\/2,
+  .-translate-y-1\/2 {
+    transform: translate(var(--tw-translate-x, 0), var(--tw-translate-y, 0));
+  }
+}
 
 /* letter-spacing (tracking) */
 @utility track-0 {

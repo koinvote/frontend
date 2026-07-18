@@ -49,4 +49,14 @@ export default defineConfig({
       },
     },
   },
+  // `vite preview` does not inherit server.proxy; needed when testing the
+  // built app from a real device on the LAN.
+  preview: {
+    proxy: {
+      '/api/v1': {
+        target: 'http://35.229.204.234:8080',
+        changeOrigin: true,
+      },
+    },
+  },
 })
