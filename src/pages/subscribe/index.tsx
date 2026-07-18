@@ -63,7 +63,7 @@ export default function Subscribe() {
   };
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center gap-3 px-6 text-center text-xl md:px-0">
+    <div className="mx-auto flex min-h-dvh-page flex-col items-center justify-center gap-3 px-6 text-center text-xl md:px-0">
       <h1 className="fw-m text-center text-2xl md:text-3xl">
         {t("subscribe.title", "Don't Miss Any Chance to Earn Bitcoin")}
       </h1>

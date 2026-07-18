@@ -31,7 +31,7 @@ export default function Unsubscribe() {
   }, [searchParams]);
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-10rem)] flex-col items-center justify-center gap-3 px-6 text-center text-xl md:px-0">
+    <div className="mx-auto flex min-h-dvh-page flex-col items-center justify-center gap-3 px-6 text-center text-xl md:px-0">
       <h1 className="text-center text-2xl font-medium md:text-3xl">
         {t("unsubscribe.title", "Email Notification Settings")}
       </h1>

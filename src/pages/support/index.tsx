@@ -144,7 +144,7 @@ export default function Support() {
 
   if (isSuccess) {
     return (
-      <div className="mx-auto flex min-h-[calc(100dvh-10rem)] max-w-3xl flex-col items-center justify-center gap-3 px-2 text-center text-xl md:px-0">
+      <div className="mx-auto flex min-h-dvh-page max-w-3xl flex-col items-center justify-center gap-3 px-2 text-center text-xl md:px-0">
         <CheckCircle className="mb-1" />
         <p className="text-primary">
           {t("support.sendSuccessTitle", "Message sent")}
