@@ -271,18 +271,12 @@
 .h-dvh-header {
   height: calc(100vh - 4rem);
 }
-.max-h-dvh-drawer {
-  max-height: calc(100vh - 72px);
-}
 @supports (height: 100dvh) {
   .min-h-dvh-header {
     min-height: calc(100dvh - 4rem);
   }
   .h-dvh-header {
     height: calc(100dvh - 4rem);
-  }
-  .max-h-dvh-drawer {
-    max-height: calc(100dvh - 72px);
   }
 }
 .min-h-dvh-page {

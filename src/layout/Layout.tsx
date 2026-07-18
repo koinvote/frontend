@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router";
 
 import { cn } from "@/utils/style";
-import Menu from "../components/Menu";
+import Menu, { MenuFooter } from "../components/Menu";
 import Header from "./Header";
 
 import LeftArrow from "@/assets/icons/leftArrow.svg?react";
@@ -160,7 +160,7 @@ export default function Layout() {
           <div
             ref={drawerRef}
             className={cn(
-              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
+              "absolute inset-y-0 left-0 flex w-[85%] max-w-[320px] flex-col bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
               isClosing || isOpening ? "-translate-x-full" : "translate-x-0",
             )}
             onTouchStart={handleTouchStart}
@@ -192,8 +192,15 @@ export default function Layout() {
                 </svg>
               </button>
             </div>
-            <div className="max-h-dvh-drawer overflow-y-auto pb-20">
-              <Menu onItemClick={handleClose} />
+            {/* flex-1 tracks the drawer's real height; a vh-based max-height
+                overshoots on iOS while the Safari toolbars are expanded. The
+                footer sits after the scroll area as a normal flex child (not
+                pinned over it) so it can never cover the last menu items. */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <Menu onItemClick={handleClose} showFooter={false} />
+            </div>
+            <div className="-mx-3 -mb-3 shrink-0">
+              <MenuFooter />
             </div>
           </div>
         </div>
