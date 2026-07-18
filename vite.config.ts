@@ -7,6 +7,15 @@ import legacy from '@vitejs/plugin-legacy'
 import postcssOKLabFunction from '@csstools/postcss-oklab-function'
 import postcssColorMixFunction from '@csstools/postcss-color-mix-function'
 import postcssCascadeLayers from '@csstools/postcss-cascade-layers'
+import postcssLogical from 'postcss-logical'
+
+// Safari 14.0 (iOS 14.0–14.4) does not support flex `gap` (14.5+). Old iOS is
+// detected via `@supports (-webkit-touch-callout: none) and (not (translate:
+// none))` — individual transform properties shipped in the same Safari 14.1
+// release as flex gap, and -webkit-touch-callout limits it to iOS so old
+// desktop Chrome/Firefox never double-apply margins on top of working gap.
+const OLD_IOS_SUPPORTS_QUERY =
+  '(-webkit-touch-callout: none) and (not (translate: none))'
 
 export default defineConfig({
   plugins: [
@@ -32,6 +41,12 @@ export default defineConfig({
       plugins: [
         postcssOKLabFunction({ preserve: true }),
         postcssColorMixFunction({ preserve: true }),
+        // Tailwind 4 emits logical shorthands (padding-inline/margin-block/…)
+        // for px-*/py-*/mx-*/space-y-* etc., which Safari < 14.1 drops —
+        // on iOS 14.0–14.4 every horizontal/vertical padding and margin
+        // utility silently did nothing. The app is LTR-only (en/zh), so
+        // rewriting to physical properties is lossless.
+        postcssLogical(),
         postcssCascadeLayers(),
         // postcss-cascade-layers emulates layer priority by inflating
         // specificity with `:not(#\#)` chains, which lets low-priority rules
@@ -72,6 +87,73 @@ export default defineConfig({
                 rule.selector = rule.selector.replaceAll(':not(#\\#)', '')
               }
             })
+          },
+        },
+        // Emulate flex gap with margins on Safari 14.0 (see
+        // OLD_IOS_SUPPORTS_QUERY above). Selectors require .flex/.inline-flex
+        // so grid containers (where native gap works since Safari 12) are
+        // untouched; base utilities only — rules inside @media are skipped
+        // because md:+ breakpoints never apply on the old phones this targets.
+        {
+          postcssPlugin: 'flex-gap-fallback-for-old-ios',
+          OnceExit(root, { AtRule, Rule, Declaration }) {
+            const fallback = new AtRule({
+              name: 'supports',
+              params: OLD_IOS_SUPPORTS_QUERY,
+            })
+            const addRule = (
+              selectors: string[],
+              props: Record<string, string>,
+            ) => {
+              const rule = new Rule({ selector: selectors.join(',') })
+              for (const [prop, value] of Object.entries(props)) {
+                rule.append(new Declaration({ prop, value }))
+              }
+              fallback.append(rule)
+            }
+            root.walkRules((rule) => {
+              if (rule.parent?.type === 'atrule') return
+              const m = rule.selector.match(/^\.(gap(?:-x|-y)?)-[\w.\\]+$/)
+              if (!m) return
+              let axis: string | null = null
+              let value: string | null = null
+              rule.walkDecls((decl) => {
+                if (['gap', 'column-gap', 'row-gap'].includes(decl.prop)) {
+                  axis = decl.prop
+                  value = decl.value
+                }
+              })
+              if (!value) return
+              const s = rule.selector
+              if (axis === 'gap' || axis === 'column-gap') {
+                addRule(
+                  [
+                    `.flex${s}:not(.flex-col):not(.flex-wrap)>:not(:first-child)`,
+                    `.inline-flex${s}:not(.flex-col):not(.flex-wrap)>:not(:first-child)`,
+                  ],
+                  { 'margin-left': value },
+                )
+              }
+              if (axis === 'gap' || axis === 'row-gap') {
+                addRule([`.flex.flex-col${s}>:not(:first-child)`], {
+                  'margin-top': value,
+                })
+              }
+              if (axis === 'gap') {
+                addRule([`.flex.flex-wrap${s}>*`], {
+                  margin: `calc(${value} / 2)`,
+                })
+                addRule([`.flex.flex-wrap${s}`], {
+                  margin: `calc(${value} / -2)`,
+                })
+              }
+              if (axis === 'row-gap') {
+                addRule([`.flex.flex-wrap${s}>*`], {
+                  'margin-bottom': value,
+                })
+              }
+            })
+            if (fallback.nodes?.length) root.append(fallback)
           },
         },
       ],
