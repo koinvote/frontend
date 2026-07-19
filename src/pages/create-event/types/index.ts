@@ -30,6 +30,7 @@ export interface EventSummary {
   total_reward_btc: string;
   participants_count: number;
   total_stake_btc: string;
+  reward_paid: boolean;
 
   top_replies: TopReply[];
   event_type: "open" | "single_choice";

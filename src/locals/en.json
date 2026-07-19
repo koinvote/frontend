@@ -718,7 +718,8 @@
     "totalAddresses": "Total participation addresses",
     "totalAmount": "Total participation amount",
     "participants": "participants",
-    "btcTotal": "BTC total"
+    "btcTotal": "BTC total",
+    "paid": "PAID"
   },
   "searchFilter": {
     "sortDesc": "Sort descending",

@@ -8,6 +8,7 @@ import postcssOKLabFunction from '@csstools/postcss-oklab-function'
 import postcssColorMixFunction from '@csstools/postcss-color-mix-function'
 import postcssCascadeLayers from '@csstools/postcss-cascade-layers'
 import postcssLogical from 'postcss-logical'
+import postcssNesting from 'postcss-nesting'
 
 // Safari 14.0 (iOS 14.0–14.4) does not support flex `gap` (14.5+). Old iOS is
 // detected via `@supports (-webkit-touch-callout: none) and (not (translate:
@@ -16,6 +17,12 @@ import postcssLogical from 'postcss-logical'
 // desktop Chrome/Firefox never double-apply margins on top of working gap.
 const OLD_IOS_SUPPORTS_QUERY =
   '(-webkit-touch-callout: none) and (not (translate: none))'
+
+// Override with e.g. VITE_API_PROXY_TARGET=http://localhost:8080 to point the
+// dev/preview proxy at a locally running backend.
+const API_PROXY_TARGET =
+  process.env.VITE_API_PROXY_TARGET ?? 'http://35.229.204.234:8080'
+
 
 export default defineConfig({
   plugins: [
@@ -39,6 +46,13 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
+        // In dev, Tailwind 4 serves *nested* CSS (variants as `@media`/`&`
+        // blocks inside each utility rule); the build pipeline flattens it
+        // before PostCSS runs, but dev does not. postcss-cascade-layers only
+        // understands flat CSS — fed the nested form it emptied every
+        // responsive rule, so `md:` styles vanished from `vite dev` (desktop
+        // rendered the mobile layout). Flatten first so dev matches build.
+        postcssNesting(),
         postcssOKLabFunction({ preserve: true }),
         postcssColorMixFunction({ preserve: true }),
         // Tailwind 4 emits logical shorthands (padding-inline/margin-block/…)
@@ -170,7 +184,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/v1': {
-        target: 'http://35.229.204.234:8080',
+        target: API_PROXY_TARGET,
         changeOrigin: true,
       },
     },
@@ -180,7 +194,7 @@ export default defineConfig({
   preview: {
     proxy: {
       '/api/v1': {
-        target: 'http://35.229.204.234:8080',
+        target: API_PROXY_TARGET,
         changeOrigin: true,
       },
     },
