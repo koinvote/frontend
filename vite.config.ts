@@ -139,12 +139,15 @@ export default defineConfig({
                   'margin-top': value,
                 })
               }
+              // Wrap containers get half-gap margins on the children only.
+              // No compensating negative margin on the container: it would
+              // widen w-full boxes past their parent and pull bordered boxes
+              // into their neighbors. The cost is a half-gap inset inside the
+              // container; bordered wrap containers (hashtag input box) shave
+              // it off their padding instead — see global.css.
               if (axis === 'gap') {
                 addRule([`.flex.flex-wrap${s}>*`], {
                   margin: `calc(${value} / 2)`,
-                })
-                addRule([`.flex.flex-wrap${s}`], {
-                  margin: `calc(${value} / -2)`,
                 })
               }
               if (axis === 'row-gap') {
