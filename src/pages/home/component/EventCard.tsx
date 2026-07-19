@@ -170,10 +170,18 @@ export function EventCard({ event, onClick }: EventCardProps) {
         <div className="shrink-0">
           {event.status === EventStatus.PREHEAT && (
             <RewardCountdownWithTooltip
-              tooltipText={t(
-                "eventCard.repliesOpenTooltip",
-                "Replies open after the countdown ends.",
-              )}
+              tooltipText={
+                event.event_reward_type === "rewarded" &&
+                Number(event.total_reward_btc) > 0
+                  ? t(
+                      "eventCard.preheatRewardTooltip",
+                      "This reward will be paid out when the event ends.",
+                    )
+                  : t(
+                      "eventCard.repliesOpenTooltip",
+                      "Replies open after the countdown ends.",
+                    )
+              }
               totalRewardBtc={event.total_reward_btc}
               countdown={countdown}
               isDesktop={isDesktop}
@@ -184,10 +192,17 @@ export function EventCard({ event, onClick }: EventCardProps) {
           {event.status !== EventStatus.PREHEAT &&
             event.event_reward_type === "rewarded" && (
               <RewardCountdownWithTooltip
-                tooltipText={t(
-                  "eventCard.rewardDistributionTooltip",
-                  "After the countdown, this reward will be distributed.",
-                )}
+                tooltipText={
+                  event.reward_paid
+                    ? t(
+                        "eventCard.rewardPaidTooltip",
+                        "This reward has already been paid out.",
+                      )
+                    : t(
+                        "eventCard.rewardDistributionTooltip",
+                        "After the countdown, this reward will be distributed.",
+                      )
+                }
                 totalRewardBtc={event.total_reward_btc}
                 countdown={countdown}
                 showPaidBadge={event.reward_paid}

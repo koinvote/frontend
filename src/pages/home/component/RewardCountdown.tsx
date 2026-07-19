@@ -16,15 +16,7 @@ export function RewardCountdown({
   showPaidBadge,
   triggerProps,
 }: RewardCountdownProps) {
-  const { t, i18n } = useTranslation();
-
-  // Optical centering, tuned per script on 2x devices: Latin uppercase
-  // ("PAID") leaves the font's descender space empty below the baseline and
-  // needs a 1px downward nudge; CJK glyphs ("已發放") sit slightly high too
-  // but only need half that. Both keep the same 4px total vertical padding.
-  const badgePaddingY = i18n.language?.startsWith("zh")
-    ? "pt-[2.5px] pb-[1.5px]"
-    : "pt-[3px] pb-px";
+  const { t } = useTranslation();
 
   return (
     <div
@@ -35,10 +27,11 @@ export function RewardCountdown({
         <span className="text-accent flex items-center gap-1 font-semibold">
           <RewardBtcIcon className="h-5 w-5" />
           {Number(totalRewardBtc)} BTC
+          {/* Flex-centered on the amount's line box, then nudged up 1px:
+              dead-center still reads slightly low next to the digits/caps
+              optical midline (tuned on device). */}
           {showPaidBadge && (
-            <span
-              className={`bg-gray-450 text-secondary ml-1 shrink-0 rounded px-1.5 text-[10px] leading-none font-medium ${badgePaddingY}`}
-            >
+            <span className="bg-gray-450 text-secondary relative top-[-1px] ml-1 shrink-0 rounded px-1.5 py-0.5 text-[10px] leading-none font-medium">
               {t("eventCard.paid", "PAID")}
             </span>
           )}
