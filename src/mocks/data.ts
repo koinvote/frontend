@@ -317,6 +317,35 @@ export const mockEventList: EventListDataRes[] = [
     ],
     options: [],
   },
+  {
+    id: 4,
+    event_type: "open",
+    event_reward_type: "rewarded",
+    event_id: "evt_004_mock",
+    title: "Ended event awaiting payout (should NOT show PAID)",
+    description:
+      "This rewarded event has ended but the payout tx is not confirmed yet (status 4).",
+    status: 4, // ended, payout pending
+    hashtags: ["bitcoin"],
+    created_at: "2026-02-25T10:00:00Z",
+    preheat_start_at: "2026-02-25T11:00:00Z",
+    started_at: "2026-02-25T12:00:00Z",
+    deadline_at: "2026-02-26T12:00:00Z",
+    ended_at: "2026-02-26T12:00:00Z",
+    updated_at: "2026-02-26T12:00:00Z",
+    total_reward_satoshi: 120000,
+    participants_count: 12,
+    total_stake_satoshi: 3400000,
+    top_replies: [
+      {
+        id: 1,
+        body: "Waiting for payout confirmation",
+        weight_percent: 60,
+        amount_satoshi: 72000,
+      },
+    ],
+    options: [],
+  },
 ];
 
 export const mockGetEventListResponse: GetEventListRes = {

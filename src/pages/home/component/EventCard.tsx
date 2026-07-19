@@ -190,6 +190,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
                 )}
                 totalRewardBtc={event.total_reward_btc}
                 countdown={countdown}
+                showPaidBadge={event.reward_paid}
                 isDesktop={isDesktop}
                 tooltipProps={tooltipProps}
                 triggerProps={triggerProps}
