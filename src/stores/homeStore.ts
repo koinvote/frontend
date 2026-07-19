@@ -262,6 +262,12 @@ export const useHomeStore = create<HomeStoreState>()(
       }),
       {
         name: "home-store",
+        // Bump whenever the shape of persisted state changes (e.g. a new
+        // field on EventSummary): rehydrating events serialized by an older
+        // bundle silently misses new fields — iOS Safari keeps a tab's
+        // sessionStorage alive for weeks, so stale objects survive deploys.
+        // A version mismatch makes zustand discard the stored state instead.
+        version: 1,
         storage: createJSONStorage(() => sessionStorage),
         partialize: (state) => ({
           status: state.status,

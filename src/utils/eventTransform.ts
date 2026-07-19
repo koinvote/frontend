@@ -38,6 +38,16 @@ export const mapApiTopReply = (r: TopReplyRes): TopReply => ({
   amount_satoshi: String(r.amount_satoshi),
 });
 
+// Reward is considered paid only when the payout tx is confirmed on-chain
+// (raw status 5). Status 4 (ended) means payout is still pending or failed.
+// Status 5 is also written for no-valid-reply rewarded events (refunded to
+// creator) and non-reward events, hence the extra conditions.
+const isRewardPaid = (ev: EventListDataRes): boolean =>
+  ev.status === EventStatus.COMPLETED &&
+  ev.event_reward_type === "rewarded" &&
+  ev.total_reward_satoshi > 0 &&
+  ev.participants_count > 0;
+
 // New function to map API response to EventSummary
 export const mapApiEventToEventSummary = (
   ev: EventListDataRes,
@@ -56,6 +66,7 @@ export const mapApiEventToEventSummary = (
   ended_at: undefined, // API doesn't return ended_at for list endpoint
   total_reward_btc: satsToBtcString(ev.total_reward_satoshi),
   participants_count: ev.participants_count,
+  reward_paid: isRewardPaid(ev),
   total_stake_btc: satsToBtc(ev.total_stake_satoshi, { suffix: false, trimTrailingZeros: true }),
   top_replies: ev.top_replies.map(mapApiTopReply),
   options: ev.options ?? [],

@@ -92,7 +92,10 @@ export const handlers = [
     } else if (tab === "ongoing") {
       filteredEvents = filteredEvents.filter((e) => e.status === 3);
     } else if (tab === "completed") {
-      filteredEvents = filteredEvents.filter((e) => e.status === 5);
+      // Match backend: completed tab covers 4 (ended, payout pending) and 5 (completed)
+      filteredEvents = filteredEvents.filter(
+        (e) => e.status === 4 || e.status === 5,
+      );
     }
 
     // Filter by search query

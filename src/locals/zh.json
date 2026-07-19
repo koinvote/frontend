@@ -721,7 +721,8 @@
     "totalAddresses": "總參與地址數",
     "totalAmount": "總參與金額",
     "participants": "位參與者",
-    "btcTotal": "BTC 總計"
+    "btcTotal": "BTC 總計",
+    "paid": "已發放"
   },
   "searchFilter": {
     "sortDesc": "降序排列",

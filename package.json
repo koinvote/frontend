@@ -49,6 +49,7 @@
     "globals": "^16.4.0",
     "msw": "^2.12.7",
     "postcss-logical": "^9.0.0",
+    "postcss-nesting": "^14.0.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "terser": "^5.49.0",
