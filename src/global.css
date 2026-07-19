@@ -437,3 +437,15 @@
     white-space: nowrap !important;
   }
 }
+
+/* On old iOS Safari (no flex gap) the vite.config.ts fallback emulates gap
+   with half-gap margins on the children of wrap containers. Inside this
+   bordered box that would add 4px on every side, making it taller and more
+   inset than the other form fields — shave the same amount off its padding
+   (px-3 py-2 = 12px/8px → 8px/4px) so the rendered height and text inset
+   match. Doubled class beats the equal-specificity padding utilities. */
+@supports (-webkit-touch-callout: none) and (not (translate: none)) {
+  .hashtag-input-box.hashtag-input-box {
+    padding: 4px 8px;
+  }
+}
