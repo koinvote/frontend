@@ -722,7 +722,7 @@
     "totalAmount": "總參與金額",
     "participants": "位參與者",
     "btcTotal": "BTC 總計",
-    "paid": "PAID"
+    "paid": "已發放"
   },
   "searchFilter": {
     "sortDesc": "降序排列",
