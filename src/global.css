@@ -159,10 +159,13 @@
     textarea,
     select {
       font-size: 16px !important;
+      /* appearance: none already strips the native iOS corner rounding;
+         -webkit-border-radius: 0 must NOT be added back — old Safari still
+         honors that alias and this selector's specificity (0,1,1) beats
+         .rounded-* utilities (0,1,0), forcing square corners. */
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
-      -webkit-border-radius: 0;
     }
 
     /* 确保 select option 在 macOS 上也居中 */
@@ -262,6 +265,59 @@
 }
 @utility lh-32 {
   line-height: 32px;
+}
+
+/* vh fallback for dvh (unsupported pre-Safari 15.4); @supports avoids the minifier deduping duplicate declarations away */
+.min-h-dvh-header {
+  min-height: calc(100vh - 4rem);
+}
+.h-dvh-header {
+  height: calc(100vh - 4rem);
+}
+@supports (height: 100dvh) {
+  .min-h-dvh-header {
+    min-height: calc(100dvh - 4rem);
+  }
+  .h-dvh-header {
+    height: calc(100dvh - 4rem);
+  }
+}
+.min-h-dvh-page {
+  min-height: calc(100vh - 10rem);
+}
+@supports (height: 100dvh) {
+  .min-h-dvh-page {
+    min-height: calc(100dvh - 10rem);
+  }
+}
+
+/* Physical longhand fallbacks for the `inset`/`inset-block` shorthands Tailwind
+   v4 emits, which Safari < 14.1 (iOS < 14.5) drops entirely — the mobile drawer
+   overlay loses its coordinates and renders off-screen. Values mirror the
+   utilities exactly, so modern browsers resolve to the same layout. */
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.inset-y-0 {
+  top: 0;
+  bottom: 0;
+}
+
+/* Same story for the standalone `translate` property: fall back to transform.
+   Gated so browsers that support `translate` don't apply both and move twice.
+   Covers every translate-* utility currently used in src/. */
+@supports not (translate: none) {
+  .translate-x-0,
+  .translate-x-1,
+  .translate-x-6,
+  .-translate-x-full,
+  .-translate-x-1\/2,
+  .-translate-y-1\/2 {
+    transform: translate(var(--tw-translate-x, 0), var(--tw-translate-y, 0));
+  }
 }
 
 /* letter-spacing (tracking) */
@@ -379,5 +435,17 @@
   .event-card-tooltip .ant-tooltip-inner,
   .event-card-tooltip .ant-tooltip-inner * {
     white-space: nowrap !important;
+  }
+}
+
+/* On old iOS Safari (no flex gap) the vite.config.ts fallback emulates gap
+   with half-gap margins on the children of wrap containers. Inside this
+   bordered box that would add 4px on every side, making it taller and more
+   inset than the other form fields — shave the same amount off its padding
+   (px-3 py-2 = 12px/8px → 8px/4px) so the rendered height and text inset
+   match. Doubled class beats the equal-specificity padding utilities. */
+@supports (-webkit-touch-callout: none) and (not (translate: none)) {
+  .hashtag-input-box.hashtag-input-box {
+    padding: 4px 8px;
   }
 }

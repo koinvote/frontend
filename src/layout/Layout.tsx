@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router";
 
 import { cn } from "@/utils/style";
-import Menu from "../components/Menu";
+import Menu, { MenuFooter } from "../components/Menu";
 import Header from "./Header";
 
 import LeftArrow from "@/assets/icons/leftArrow.svg?react";
@@ -85,7 +85,7 @@ export default function Layout() {
 
   return (
     // 1. Root Container
-    <div className="w-full min-h-[calc(100dvh-4rem)]">
+    <div className="w-full min-h-dvh-header">
       <Header
         open={open}
         setOpen={setOpen}
@@ -94,13 +94,13 @@ export default function Layout() {
       />
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-[calc(100dvh-4rem)] md:pt-16">
+      <div className="relative flex w-full min-h-dvh-header md:pt-16">
         {/* Sidebar (Desktop Only - Fixed) */}
         {isDesktop && (
           <aside
             className={cn(
               "fixed top-16 left-0 z-40",
-              "h-[calc(100dvh-4rem)]",
+              "h-dvh-header",
               "backdrop-blur",
               "transition-[width] duration-200 ease-out",
               "border-r border-border bg-(--color-bg)",
@@ -109,7 +109,7 @@ export default function Layout() {
           >
             <div
               className={cn(
-                "h-full overflow-y-auto py-2",
+                "h-full overflow-y-auto py-2 pb-20",
                 collapsed ? "px-0" : "px-2",
               )}
             >
@@ -160,7 +160,7 @@ export default function Layout() {
           <div
             ref={drawerRef}
             className={cn(
-              "absolute inset-y-0 left-0 w-[85%] max-w-[320px] bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
+              "absolute inset-y-0 left-0 flex w-[85%] max-w-[320px] flex-col bg-white dark:bg-neutral-900 p-3 shadow-2xl transition-transform duration-200 ease-out",
               isClosing || isOpening ? "-translate-x-full" : "translate-x-0",
             )}
             onTouchStart={handleTouchStart}
@@ -192,8 +192,15 @@ export default function Layout() {
                 </svg>
               </button>
             </div>
-            <div className="max-h-[calc(100dvh-72px)] overflow-y-auto">
-              <Menu onItemClick={handleClose} />
+            {/* flex-1 tracks the drawer's real height; a vh-based max-height
+                overshoots on iOS while the Safari toolbars are expanded. The
+                footer sits after the scroll area as a normal flex child (not
+                pinned over it) so it can never cover the last menu items. */}
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <Menu onItemClick={handleClose} showFooter={false} />
+            </div>
+            <div className="-mx-3 -mb-3 shrink-0">
+              <MenuFooter />
             </div>
           </div>
         </div>

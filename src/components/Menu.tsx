@@ -19,6 +19,11 @@ import { useThemeStore } from "@/stores/themeStore";
 interface MenuProps {
   onItemClick?: () => void;
   collapsed?: boolean;
+  /** Render the language/theme footer pinned to the bottom of the nearest
+   *  positioned ancestor (desktop sidebar). The mobile drawer passes false
+   *  and lays out MenuFooter as a normal flex child instead, so it can
+   *  never overlap the menu items. */
+  showFooter?: boolean;
 }
 
 type Item = {
@@ -190,14 +195,14 @@ function MenuItem({
   );
 }
 
-const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
+const Menu = ({
+  onItemClick,
+  collapsed = false,
+  showFooter = true,
+}: MenuProps) => {
   const { t } = useTranslation();
 
   const theme = useThemeStore((state) => state.theme);
-  const toggle = useThemeStore((state) => state.toggle);
-
-  const { current, setLanguage } = useLanguagesStore();
-  const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
 
   return (
     <nav aria-label="Site navigation">
@@ -254,9 +259,27 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
         ))}
       </ul>
 
-      <div className="absolute bottom-0 left-0 w-full">
-        <div className="border-border border-t p-4">
-          {collapsed ? (
+      {showFooter && (
+        <div className="absolute bottom-0 left-0 w-full">
+          <MenuFooter collapsed={collapsed} />
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export function MenuFooter({ collapsed = false }: { collapsed?: boolean }) {
+  const { t } = useTranslation();
+
+  const theme = useThemeStore((state) => state.theme);
+  const toggle = useThemeStore((state) => state.toggle);
+
+  const { current, setLanguage } = useLanguagesStore();
+  const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
+
+  return (
+    <div className="border-border border-t p-4">
+      {collapsed ? (
             <div>
               <Tooltip
                 placement="right"
@@ -310,11 +333,9 @@ const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
                 {theme === "dark" ? t("menu.light") : t("menu.dark")}
               </Button>
             </div>
-          )}
-        </div>
-      </div>
-    </nav>
+      )}
+    </div>
   );
-};
+}
 
 export default Menu;

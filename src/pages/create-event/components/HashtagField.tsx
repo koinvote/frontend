@@ -113,7 +113,7 @@ export function HashtagField({
 
       <div
         className={cn(
-          "border-border bg-form-bg w-full rounded-xl border px-3 py-2",
+          "border-border bg-form-bg hashtag-input-box w-full rounded-xl border px-3 py-2",
           "flex flex-wrap items-center gap-2",
           "focus-within:ring-2 focus-within:ring-(--color-orange-500)",
         )}
