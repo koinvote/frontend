@@ -159,10 +159,13 @@
     textarea,
     select {
       font-size: 16px !important;
+      /* appearance: none already strips the native iOS corner rounding;
+         -webkit-border-radius: 0 must NOT be added back — old Safari still
+         honors that alias and this selector's specificity (0,1,1) beats
+         .rounded-* utilities (0,1,0), forcing square corners. */
       -webkit-appearance: none;
       -moz-appearance: none;
       appearance: none;
-      -webkit-border-radius: 0;
     }
 
     /* 确保 select option 在 macOS 上也居中 */
