@@ -153,7 +153,11 @@ export default function ReplyPage() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const showReferralCode = (referralCodeCount ?? 0) > 0;
+  // Referral code input hidden from users for now; state/API/submit logic
+  // untouched below, so re-enabling is just flipping this flag back on.
+  const REFERRAL_CODE_INPUT_ENABLED = false;
+  const showReferralCode =
+    REFERRAL_CODE_INPUT_ENABLED && (referralCodeCount ?? 0) > 0;
 
   // --- Derived States ---
   const isContentFilled = useMemo(() => {
