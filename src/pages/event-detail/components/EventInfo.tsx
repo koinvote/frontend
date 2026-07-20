@@ -356,7 +356,7 @@ export function EventInfo({
       ),
     });
 
-    if ((isOngoing || isCompleted) && isRewarded && rewardAmountBtc) {
+    if ((isOngoing || isCompleted || isPreheat) && isRewarded && rewardAmountBtc) {
       result.push({
         key: "reward-amount",
         label: t("eventInfo.rewardAmount", "Reward Amount:"),
