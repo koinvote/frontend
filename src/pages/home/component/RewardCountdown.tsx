@@ -27,11 +27,12 @@ export function RewardCountdown({
         <span className="text-accent flex items-center gap-1 font-semibold">
           <RewardBtcIcon className="h-5 w-5" />
           {Number(totalRewardBtc)} BTC
-          {/* Flex-centered on the amount's line box, then nudged up 1px:
-              dead-center still reads slightly low next to the digits/caps
-              optical midline (tuned on device). */}
+          {/* Flex-centered on the amount's line box, with a per-breakpoint
+              optical nudge tuned on device: desktop (14px text) reads
+              slightly low at dead-center so it gets -1px; mobile (12px text
+              in an icon-tall row) is correct at dead-center. */}
           {showPaidBadge && (
-            <span className="bg-gray-450 text-secondary relative top-[-1px] ml-1 shrink-0 rounded px-1.5 py-0.5 text-[10px] leading-none font-medium">
+            <span className="bg-gray-450 text-secondary relative top-0 ml-1 shrink-0 rounded px-1.5 py-0.5 text-[10px] leading-none font-medium md:top-[-1px]">
               {t("eventCard.paid", "PAID")}
             </span>
           )}
