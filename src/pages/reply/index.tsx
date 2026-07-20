@@ -565,7 +565,7 @@ export default function ReplyPage() {
               placeholder={t("reply.replyPlaceholder", "Enter your reply...")}
               rows={4}
               className={cn(
-                "bg-form-bg text-primary tx-14 w-full resize-none rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600",
+                "bg-form-bg text-primary tx-14 mt-2 w-full resize-none rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600",
                 "border-border",
               )}
             />
