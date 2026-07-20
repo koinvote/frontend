@@ -272,7 +272,7 @@ export function HomeToolbar() {
             </span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {popularHashtags.map((tag) => {
+            {popularHashtags.map((tag, index) => {
               const isActive =
                 activeHashtag &&
                 activeHashtag.toLowerCase() === tag.toLowerCase();
@@ -281,7 +281,9 @@ export function HomeToolbar() {
                   key={tag}
                   type="button"
                   onClick={() => handleHashtagClick(tag)}
-                  className={`cursor-pointer rounded-xl px-3 py-1 text-xs md:text-sm border ${
+                  // On mobile only the first 8 tags fit without spilling into
+                  // an extra row; the rest stay desktop-only.
+                  className={`${index >= 8 ? "hidden md:inline-block" : ""} cursor-pointer rounded-xl px-3 py-1 text-xs md:text-sm border ${
                     isActive
                       ? "bg-accent text-accent-foreground border-accent"
                       : "bg-surface border-border text-secondary"
