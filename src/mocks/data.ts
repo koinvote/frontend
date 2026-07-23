@@ -580,7 +580,7 @@ export const mockAdminSystemParameters: AdminSystemParametersRes = {
 export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-    balance_at_snapshot_satoshi: 1280086,
+    holding_score: "0.01280086",
     win_probability_percent: 20.0,
     is_dust: false,
     original_reward_satoshi: 1668,
@@ -590,7 +590,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
-    balance_at_snapshot_satoshi: 450000,
+    holding_score: "0.0045",
     win_probability_percent: 18.0,
     is_dust: false,
     original_reward_satoshi: 51750,
@@ -600,7 +600,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
-    balance_at_snapshot_satoshi: 400000,
+    holding_score: "0.004",
     win_probability_percent: 16.0,
     is_dust: false,
     original_reward_satoshi: 46000,
@@ -610,7 +610,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qabc123xyz456def789ghi012jkl345mno678pqr",
-    balance_at_snapshot_satoshi: 350000,
+    holding_score: "0.0035",
     win_probability_percent: 14.0,
     is_dust: false,
     original_reward_satoshi: 40250,
@@ -621,7 +621,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address:
       "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
-    balance_at_snapshot_satoshi: 300000,
+    holding_score: "0.003",
     win_probability_percent: 12.0,
     is_dust: false,
     original_reward_satoshi: 34500,
@@ -631,7 +631,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qdef456uvw789xyz012abc345ghi678jkl901mno",
-    balance_at_snapshot_satoshi: 250000,
+    holding_score: "0.0025",
     win_probability_percent: 10.0,
     is_dust: false,
     original_reward_satoshi: 28750,
@@ -641,7 +641,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qprocessing123xyz456def789ghi012jkl345mno",
-    balance_at_snapshot_satoshi: 200000,
+    holding_score: "0.002",
     win_probability_percent: 8.0,
     is_dust: false,
     original_reward_satoshi: 23000,
@@ -651,7 +651,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qwinner09abc123def456ghi789jkl012mno345pqr",
-    balance_at_snapshot_satoshi: 180000,
+    holding_score: "0.0018",
     win_probability_percent: 7.2,
     is_dust: false,
     original_reward_satoshi: 20700,
@@ -661,7 +661,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qwinner10xyz789abc012def345ghi678jkl901mno",
-    balance_at_snapshot_satoshi: 160000,
+    holding_score: "0.0016",
     win_probability_percent: 6.4,
     is_dust: false,
     original_reward_satoshi: 18400,
@@ -671,7 +671,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qdust123abc456def789ghi012jkl345mno678pqr",
-    balance_at_snapshot_satoshi: 5000,
+    holding_score: "0.00005",
     win_probability_percent: 0.2,
     is_dust: true,
     original_reward_satoshi: 500,
@@ -684,7 +684,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
 export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qghi789rst012uvw345xyz678abc901def234ghi",
-    balance_at_snapshot_satoshi: 800000,
+    holding_score: "0.008",
     win_probability_percent: 32.0,
     is_dust: false,
     original_reward_satoshi: 61280,
@@ -694,7 +694,7 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc",
-    balance_at_snapshot_satoshi: 650000,
+    holding_score: "0.0065",
     win_probability_percent: 26.0,
     is_dust: false,
     original_reward_satoshi: 49790,
@@ -704,7 +704,7 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qmno345pqr678stu901vwx234yz567abc890def",
-    balance_at_snapshot_satoshi: 550000,
+    holding_score: "0.0055",
     win_probability_percent: 22.0,
     is_dust: false,
     original_reward_satoshi: 42130,
@@ -714,7 +714,7 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi",
-    balance_at_snapshot_satoshi: 500000,
+    holding_score: "0.005",
     win_probability_percent: 20.0,
     is_dust: false,
     original_reward_satoshi: 38300,

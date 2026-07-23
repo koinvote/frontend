@@ -430,6 +430,8 @@
     "address": "地址",
     "snapshotBalance": "快照餘額",
     "distributableRatio": "可分配獎勵比例",
+    "holdingScore": "持倉積分",
+    "scoreShare": "積分占比",
     "estimatedReward": "預估獎勵",
     "paidStatus": "已付款（狀態）",
     "state": "狀態",

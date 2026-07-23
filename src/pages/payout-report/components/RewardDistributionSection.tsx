@@ -9,12 +9,16 @@ interface RewardDistributionSectionProps {
   detail: RewardDetail;
   eventId: string;
   index: number;
+  // Absent for events settled before the BTC-Time switchover; WinnerTable
+  // uses it to decide which weight column set to render.
+  scoringAlgorithm?: string;
 }
 
 export function RewardDistributionSection({
   detail,
   eventId,
   index,
+  scoringAlgorithm,
 }: RewardDistributionSectionProps) {
   const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -122,6 +126,7 @@ export function RewardDistributionSection({
           redistributedAddressCount={detail.dust_winner_count}
           redistributedSatoshi={detail.dust_redistribute_amount_satoshi}
           eventId={eventId}
+          scoringAlgorithm={scoringAlgorithm}
         />
 
         {/* Verification Info */}

@@ -426,6 +426,8 @@
     "address": "Address",
     "snapshotBalance": "Snapshot Balance",
     "distributableRatio": "Distributable",
+    "holdingScore": "Holding Score",
+    "scoreShare": "Score Share",
     "estimatedReward": "Estimated reward",
     "paidSats": "Paid (Sats)",
     "state": "State",

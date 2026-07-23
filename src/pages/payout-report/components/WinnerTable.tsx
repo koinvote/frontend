@@ -15,6 +15,10 @@ interface WinnerTableProps {
   redistributedAddressCount: number;
   redistributedSatoshi: number;
   eventId: string;
+  // Absent for events settled before BTC-Time. Those payouts were weighted by
+  // a plain snapshot balance, so they keep the original Snapshot Balance /
+  // Distributable columns rather than being relabelled as holding scores.
+  scoringAlgorithm?: string;
 }
 
 const DISPLAY_LIMIT = 10;
@@ -24,6 +28,7 @@ export function WinnerTable({
   winnerCount,
   redistributedAddressCount,
   redistributedSatoshi,
+  scoringAlgorithm,
 }: WinnerTableProps) {
   const { t } = useTranslation();
   const { showToast } = useToast();
@@ -35,6 +40,7 @@ export function WinnerTable({
     setIsScrolled(e.currentTarget.scrollLeft > 0);
   }, []);
 
+  const isBtcTimeScored = !!scoringAlgorithm;
   const displayedWinners = winners.slice(0, DISPLAY_LIMIT);
   const shouldShowRemaining = winnerCount > DISPLAY_LIMIT;
   const remainingCount = winnerCount - DISPLAY_LIMIT;
@@ -98,10 +104,14 @@ export function WinnerTable({
                 {t("payoutReport.address", "Address")}
               </th>
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
-                {t("payoutReport.snapshotBalance", "Snapshot Balance")}
+                {isBtcTimeScored
+                  ? t("payoutReport.holdingScore", "Holding Score")
+                  : t("payoutReport.snapshotBalance", "Snapshot Balance")}
               </th>
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
-                {t("payoutReport.distributableRatio", "Distributable")}
+                {isBtcTimeScored
+                  ? t("payoutReport.scoreShare", "Score Share")
+                  : t("payoutReport.distributableRatio", "Distributable")}
               </th>
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.estimatedReward", "Estimated reward")}
@@ -139,11 +149,15 @@ export function WinnerTable({
                     </button>
                   </div>
                 </td>
-                <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
-                  {satsToBtc(winner.balance_at_snapshot_satoshi)}
+                <td className="dark:text-primary tabular-nums px-2 py-3 text-right font-mono text-xs whitespace-nowrap text-gray-500">
+                  {isBtcTimeScored
+                    ? winner.holding_score
+                    : satsToBtc(winner.balance_at_snapshot_satoshi ?? null)}
                 </td>
                 <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
-                  {winner.distributable_rate.toFixed(4)}%
+                  {isBtcTimeScored
+                    ? `${winner.win_probability_percent.toFixed(4)}%`
+                    : `${winner.distributable_rate.toFixed(4)}%`}
                 </td>
                 <td className="dark:text-primary px-2 py-3 text-right text-xs font-bold whitespace-nowrap text-gray-500">
                   {winner.original_reward_satoshi.toLocaleString()} sats
