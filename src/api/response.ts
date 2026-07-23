@@ -207,6 +207,8 @@ export interface Reply {
   created_at: string;
   created_by_ip: string;
   updated_at: string;
+  holding_score?: string; // BTC-Time holding score, pre-formatted by backend. Absent when not applicable.
+  score_share?: string; // Only present once the event has settled.
 }
 
 export interface GetReplyPlainTextRes {
