@@ -23,7 +23,10 @@ export function VerificationInfo({
 }: VerificationInfoProps) {
   const { t } = useTranslation();
 
-  const blockExplorerUrl = `https://mempool.space/tx/${payout_txid}`;
+  // ?mode=details opens the inputs and outputs directly. Without it the
+  // page lands on the summary and the breakdown - which is the reason
+  // this link exists - takes another tap to reach.
+  const blockExplorerUrl = `https://mempool.space/tx/${payout_txid}?mode=details`;
 
   return (
     <div>
