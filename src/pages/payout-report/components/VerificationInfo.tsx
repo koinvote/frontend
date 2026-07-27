@@ -23,10 +23,15 @@ export function VerificationInfo({
 }: VerificationInfoProps) {
   const { t } = useTranslation();
 
-  // ?mode=details opens the inputs and outputs directly. Without it the
-  // page lands on the summary and the breakdown - which is the reason
-  // this link exists - takes another tap to reach.
-  const blockExplorerUrl = `https://mempool.space/tx/${payout_txid}?mode=details`;
+  // Land on the inputs and outputs rather than the summary: that breakdown
+  // is the reason this link exists, since it is what shows the on-chain
+  // outputs matching the winners listed above.
+  //
+  // Both parameters are needed because mempool.space reads them in
+  // different places. It sets mode=details itself on viewports under
+  // 768px, while showDetails=true is what its own details toggle writes
+  // back to the URL, so neither one alone covers both mobile and desktop.
+  const blockExplorerUrl = `https://mempool.space/tx/${payout_txid}?mode=details&showDetails=true`;
 
   return (
     <div>
