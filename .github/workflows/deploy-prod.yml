@@ -13,6 +13,22 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # The account this logs into is named after an engineer who left on
+      # 2026-07-28, and it carries two production responsibilities:
+      #
+      #   1. It runs og-meta-server, via pm2-yichinweng.service. nginx sends
+      #      /sitemap.xml, /render-meta/* and crawler hits on /event/{id} to
+      #      it, so it is what produces the preview card when somebody shares
+      #      an event link. Remove the account and shared links lose their
+      #      preview and sitemap.xml starts 404ing.
+      #   2. /var/www/koinvote and its ~37,000 files are owned by that UID,
+      #      so this deploy writes as that user.
+      #
+      # Nothing about the account name says any of that, which is why the
+      # same warning sits at the top of its authorized_keys on the host.
+      #
+      # PROD_GCE_SSH_PRIVATE_KEY was rotated on 2026-07-28 so that the copy
+      # the departing engineer held no longer opens anything.
       - name: Deploy to GCE prod via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
