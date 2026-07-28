@@ -18,10 +18,14 @@ import postcssNesting from 'postcss-nesting'
 const OLD_IOS_SUPPORTS_QUERY =
   '(-webkit-touch-callout: none) and (not (translate: none))'
 
+// Goes through dev's nginx rather than the backend's own port, so local
+// development is encrypted and does not depend on the container port being
+// reachable from the internet — it no longer is.
+//
 // Override with e.g. VITE_API_PROXY_TARGET=http://localhost:8080 to point the
 // dev/preview proxy at a locally running backend.
 const API_PROXY_TARGET =
-  process.env.VITE_API_PROXY_TARGET ?? 'http://35.229.204.234:8080'
+  process.env.VITE_API_PROXY_TARGET ?? 'https://dev.koinvote.com'
 
 
 export default defineConfig({
