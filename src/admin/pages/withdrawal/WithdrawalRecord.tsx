@@ -149,11 +149,19 @@ export default function WithdrawalRecordSection() {
                     key: record.id,
                     label: (
                       <div className="flex flex-wrap items-center gap-3">
-                        <span className="w-32 font-mono text-sm">
+                        <span className="w-32 shrink-0 font-mono text-sm">
                           {record.amount}
                           <span className="text-secondary ml-1">Sats</span>
                         </span>
-                        <span className="flex min-w-0 flex-1 items-center gap-1">
+                        {/* order-last + basis-full gives the TXID its own line on phones,
+                            below the amount and time rather than between them. It is flex-1
+                            min-w-0, so its min-content contribution is zero and the
+                            wrap container never breaks for it — it just gets squeezed
+                            to ~0 and its non-shrinkable children (the label and the
+                            copy button) spill over the neighbouring cells. The TXID is
+                            not repeated in the expanded panel, so it cannot simply be
+                            hidden here. */}
+                        <span className="order-last flex min-w-0 flex-1 basis-full items-center gap-1 md:order-none md:basis-0">
                           <span className="text-secondary text-sm">TXID:</span>
                           <span className="text-primary min-w-0 truncate font-mono text-sm lg:hidden">
                             {truncateAddress(record.txid, 10, 8)}
