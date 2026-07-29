@@ -168,8 +168,8 @@ export default function AdminPasskeysPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
+    <div className="space-y-4 px-4 py-4 md:px-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-admin-text-main text-xl font-medium">通行金鑰</h1>
           <p className="text-admin-text-sub mt-1 text-sm">
@@ -197,7 +197,7 @@ export default function AdminPasskeysPage() {
           it would cost every visitor ~300 KB for a screen only the admin sees.
           This matches the layout referralCodes already uses. */}
       <div className="rounded-lg bg-white px-4 py-2">
-        <div className="text-admin-text-sub grid grid-cols-[1.5fr_1.4fr_1fr_auto] border-b border-neutral-200 px-2 py-3 text-sm font-medium">
+        <div className="text-admin-text-sub hidden grid-cols-[1.5fr_1.4fr_1fr_auto] gap-2 border-b border-neutral-200 px-2 py-3 text-sm font-medium md:grid">
           <span>名稱</span>
           <span>同步狀態</span>
           <span>最後使用</span>
@@ -218,18 +218,18 @@ export default function AdminPasskeysPage() {
           passkeys.map((row) => (
             <div
               key={row.id}
-              className="grid grid-cols-[1.5fr_1.4fr_1fr_auto] items-center border-b border-neutral-100 px-2 py-4 text-sm last:border-b-0"
+              className="space-y-2 border-b border-neutral-100 px-2 py-4 text-sm last:border-b-0 md:grid md:grid-cols-[1.5fr_1.4fr_1fr_auto] md:items-center md:gap-2 md:space-y-0"
             >
-              <span className="text-neutral-800">
+              <div className="min-w-0 break-all text-neutral-800">
                 {row.label}
                 {row.clone_warning && (
                   <span className="ml-2 rounded bg-red-50 px-2 py-0.5 text-xs text-red-700">
                     計數器異常
                   </span>
                 )}
-              </span>
+              </div>
 
-              <span>
+              <div>
                 {row.synced ? (
                   <span className="rounded bg-green-50 px-2 py-0.5 text-xs text-green-700">
                     已同步
@@ -241,15 +241,18 @@ export default function AdminPasskeysPage() {
                     未同步（換機後會遺失）
                   </span>
                 )}
-              </span>
+              </div>
 
-              <span className="text-neutral-600">
+              <div className="text-neutral-600">
+                <span className="text-admin-text-sub md:hidden">
+                  最後使用：
+                </span>
                 {row.last_used_at
                   ? new Date(row.last_used_at).toLocaleString()
                   : "尚未使用"}
-              </span>
+              </div>
 
-              <span className="flex gap-3">
+              <div className="flex gap-3 md:justify-end">
                 <Button
                   type="link"
                   size="small"
@@ -269,7 +272,7 @@ export default function AdminPasskeysPage() {
                 >
                   刪除
                 </Button>
-              </span>
+              </div>
             </div>
           ))}
       </div>

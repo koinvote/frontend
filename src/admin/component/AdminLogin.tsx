@@ -46,8 +46,14 @@ export default function AdminLogin({
   const canSubmit = Boolean(plaintext) && !isExpired && !busy;
 
   return (
-    <div className="bg-admin-bg flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-xl rounded-2xl bg-white px-10 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+    <div
+      className="bg-admin-bg flex min-h-screen items-center justify-center px-4 py-6"
+      style={{
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
+    >
+      <div className="w-full max-w-xl rounded-2xl bg-white px-5 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.08)] md:px-10 md:py-8">
         <div className="mb-8 flex items-center justify-center gap-2 text-center">
           <div>
             <Logo className="h-8 w-8" />
@@ -101,7 +107,7 @@ export default function AdminLogin({
 
           {/* Message to sign. Issued by the server, single-use, 15 minutes. */}
           <div className="space-y-1">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <label className="text-admin-text-sub text-sm">
                 Message to Sign
               </label>

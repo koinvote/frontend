@@ -180,11 +180,11 @@ export default function AdminRewardRulesPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex h-20 items-center justify-between border-neutral-200 bg-white px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-neutral-200 bg-white px-4 py-4 md:h-20 md:flex-nowrap md:px-6">
         <h1 className="tx-18 fw-l">獎金與派獎規則</h1>
       </div>
 
-      <main className="px-6 py-4">
+      <main className="px-4 py-4 md:px-6">
         <AdminActionButtons
           onRestore={handleRestore}
           onSave={handleSubmit(onSubmit)}
