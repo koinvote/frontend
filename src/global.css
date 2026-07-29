@@ -449,3 +449,15 @@
     padding: 4px 8px;
   }
 }
+
+/* Horizontal scrollers need momentum explicitly: -webkit-overflow-scrolling is
+   only set on `html` above, and it does not usefully inherit. Named class
+   rather than the arbitrary-property utility because Tailwind v4's parser
+   handling of a leading `-` in the property name is unverified. */
+.admin-tabstrip {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.admin-tabstrip::-webkit-scrollbar {
+  display: none;
+}

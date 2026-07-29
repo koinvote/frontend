@@ -207,6 +207,8 @@ export interface Reply {
   created_at: string;
   created_by_ip: string;
   updated_at: string;
+  holding_score?: string; // BTC-Time holding score, pre-formatted by backend. Absent when not applicable.
+  score_share?: string; // Only present once the event has settled.
 }
 
 export interface GetReplyPlainTextRes {
@@ -229,6 +231,39 @@ export interface AdminLoginChallengeRes {
 
 export interface AdminLoginRes {
   token: string;
+}
+
+export interface PasskeyStepUpRes {
+  plaintext: string;
+  nonce_timestamp: string;
+  expires_at: string;
+}
+
+export interface PasskeyRegisterBeginRes {
+  challenge_id: string;
+  // PublicKeyCredentialCreationOptionsJSON, handed straight to
+  // @simplewebauthn/browser's startRegistration.
+  publicKey: unknown;
+}
+
+export interface PasskeyLoginBeginRes {
+  challenge_id: string;
+  publicKey: unknown;
+}
+
+export interface PasskeyRes {
+  id: number;
+  label: string;
+  /** False means the credential is device-bound and dies with this device. */
+  synced: boolean;
+  clone_warning: boolean;
+  aaguid?: string;
+  last_used_at?: string;
+  created_at: string;
+}
+
+export interface PasskeyListRes {
+  passkeys: PasskeyRes[];
 }
 
 export interface AdminSystemParametersRes {
@@ -297,7 +332,12 @@ export type PayoutStatus =
 export type RewardType = "initial" | "additional";
 
 export interface PayoutWinner {
-  balance_at_snapshot_satoshi: number;
+  // Exactly one of these is present, decided by the plan's scoring algorithm:
+  // BTC-Time payouts carry holding_score (pre-formatted by the backend),
+  // payouts settled before the switchover carry the raw snapshot balance they
+  // were actually weighted by.
+  holding_score?: string;
+  balance_at_snapshot_satoshi?: number;
   distributable_rate: number;
   final_reward_satoshi: number;
   is_dust: boolean;
@@ -326,6 +366,7 @@ export interface PayoutReportRes {
   event_id: string;
   event_title: string;
   snapshot_block_height: number;
+  scoring_algorithm?: string; // e.g. "btc_time_v1"; absent for reports settled before the BTC-Time switchover
   initial_reward_satoshi: number;
   additional_reward_1_satoshi: number;
   additional_reward_2_satoshi: number;

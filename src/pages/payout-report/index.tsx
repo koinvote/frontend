@@ -104,6 +104,7 @@ const PayoutReport = () => {
               detail={detail}
               eventId={payoutReport.event_id}
               index={index}
+              scoringAlgorithm={payoutReport.scoring_algorithm}
             />
           ))}
         </div>

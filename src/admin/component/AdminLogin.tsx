@@ -11,10 +11,13 @@ interface AdminLoginProps {
   isExpired: boolean;
   isLoading: boolean;
   isFetchingChallenge: boolean;
+  passkeySupported: boolean;
+  isPasskeyLoading: boolean;
   onSignatureChange: (value: string) => void;
   onCopy: (text: string, label: string) => void;
   onRegenerate: () => void;
   onLogin: () => void;
+  onPasskeyLogin: () => void;
 }
 
 function formatCountdown(totalSeconds: number): string {
@@ -31,17 +34,26 @@ export default function AdminLogin({
   isExpired,
   isLoading,
   isFetchingChallenge,
+  passkeySupported,
+  isPasskeyLoading,
   onSignatureChange,
   onCopy,
   onRegenerate,
   onLogin,
+  onPasskeyLogin,
 }: AdminLoginProps) {
-  const busy = isLoading || isFetchingChallenge;
+  const busy = isLoading || isFetchingChallenge || isPasskeyLoading;
   const canSubmit = Boolean(plaintext) && !isExpired && !busy;
 
   return (
-    <div className="bg-admin-bg flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-xl rounded-2xl bg-white px-10 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+    <div
+      className="bg-admin-bg flex min-h-screen items-center justify-center px-4 py-6"
+      style={{
+        paddingTop: "env(safe-area-inset-top)",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
+    >
+      <div className="w-full max-w-xl rounded-2xl bg-white px-5 py-6 shadow-[0_16px_40px_rgba(0,0,0,0.08)] md:px-10 md:py-8">
         <div className="mb-8 flex items-center justify-center gap-2 text-center">
           <div>
             <Logo className="h-8 w-8" />
@@ -57,6 +69,30 @@ export default function AdminLogin({
         </div>
 
         <div className="space-y-4">
+          {passkeySupported && (
+            <>
+              <Button
+                block
+                size="large"
+                type="primary"
+                onClick={onPasskeyLogin}
+                disabled={busy}
+              >
+                {isPasskeyLoading
+                  ? "Waiting for passkey..."
+                  : "Sign in with Passkey"}
+              </Button>
+
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-neutral-200" />
+                <span className="text-admin-text-sub text-xs">
+                  or use your wallet
+                </span>
+                <span className="h-px flex-1 bg-neutral-200" />
+              </div>
+            </>
+          )}
+
           {/* Admin Address */}
           <div className="space-y-1">
             <label className="text-admin-text-sub text-sm">Admin Address</label>
@@ -71,7 +107,7 @@ export default function AdminLogin({
 
           {/* Message to sign. Issued by the server, single-use, 15 minutes. */}
           <div className="space-y-1">
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <label className="text-admin-text-sub text-sm">
                 Message to Sign
               </label>

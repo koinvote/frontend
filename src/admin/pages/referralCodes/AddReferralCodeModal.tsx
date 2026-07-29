@@ -49,8 +49,8 @@ export default function AddReferralCodeModal({ onClose, onSuccess }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-[360px] rounded-lg bg-white shadow-lg md:w-[540px]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/40 p-4">
+      <div className="w-full max-w-[360px] rounded-lg bg-white shadow-lg md:max-w-[540px]">
         <div className="flex items-center justify-between p-5">
           <h2 className="text-base font-semibold">新增推薦碼</h2>
           <Button type="text" size="small" onClick={onClose}>

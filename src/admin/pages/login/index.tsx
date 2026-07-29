@@ -2,6 +2,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import AdminLogin from "@/admin/component/AdminLogin";
+import { usePasskeySupport } from "@/admin/hooks/usePasskeySupport";
+import {
+  ceremonyErrorMessage,
+  getPasskeyAssertion,
+  unwrap,
+} from "@/admin/passkey";
 import { AdminAPI } from "@/api";
 import { setAdminToken } from "@/api/http";
 import { useToast } from "@/components/base/Toast/useToast";
@@ -32,6 +38,9 @@ export default function AdminLoginPage() {
   const [signature, setSignature] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingChallenge, setIsFetchingChallenge] = useState(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+
+  const passkeySupported = usePasskeySupport();
 
   const fetchChallenge = useCallback(
     async (opts?: { silent?: boolean }) => {
@@ -171,6 +180,45 @@ export default function AdminLoginPage() {
     }
   };
 
+  const handlePasskeyLogin = async () => {
+    try {
+      setIsPasskeyLoading(true);
+
+      // begin takes no input: the authenticator picks the credential, so the
+      // request reveals nothing about who the administrators are.
+      const beginRes = unwrap(await AdminAPI.passkeyLoginBegin());
+      if (!beginRes?.success || !beginRes?.data?.publicKey) {
+        showToast(
+          "error",
+          beginRes?.message || "Could not start passkey sign-in",
+        );
+        return;
+      }
+
+      const credential = await getPasskeyAssertion(beginRes.data.publicKey);
+
+      const finishRes = unwrap(
+        await AdminAPI.passkeyLoginFinish({
+          challenge_id: beginRes.data.challenge_id,
+          credential,
+        }),
+      );
+
+      if (finishRes?.success && finishRes?.data?.token) {
+        setAdminToken(finishRes.data.token);
+        showToast("success", "Signed in");
+        navigate("/admin/reward-rules");
+        return;
+      }
+
+      showToast("error", finishRes?.message || "Passkey sign-in failed");
+    } catch (error: unknown) {
+      showToast("error", ceremonyErrorMessage(error, "Passkey sign-in failed"));
+    } finally {
+      setIsPasskeyLoading(false);
+    }
+  };
+
   return (
     <AdminLogin
       adminAddress={adminAddress}
@@ -180,6 +228,9 @@ export default function AdminLoginPage() {
       isExpired={isExpired}
       isLoading={isLoading}
       isFetchingChallenge={isFetchingChallenge}
+      passkeySupported={passkeySupported === true}
+      isPasskeyLoading={isPasskeyLoading}
+      onPasskeyLogin={handlePasskeyLogin}
       onSignatureChange={setSignature}
       onCopy={handleCopy}
       onRegenerate={() => void fetchChallenge()}
