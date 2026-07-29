@@ -5,25 +5,42 @@ on:
     branches:
       - main
 
+# One prod deploy at a time. This job SSHes in and rebuilds /var/www/koinvote
+# in place, so two overlapping runs would interleave `git pull`, `npm ci` and
+# `npm run build` in the same directory and could leave a half-written dist.
+#
+# cancel-in-progress is deliberately false: killing a deploy mid-build is worse
+# than making the next one wait, because what it leaves behind is a partial
+# tree that is already being served.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    # Gates this job behind the `production` environment, which requires a
-    # manual approval before it runs. Without this line the environment's
-    # protection rule exists but nothing is subject to it.
+    # NOTE: this job intentionally has NO `environment:` gate.
     #
-    # The reason is that a push to main is, by itself, code execution on the
-    # production host: this job SSHes in and rebuilds /var/www/koinvote. That
-    # made a compromised GitHub account enough to serve modified JavaScript to
-    # every visitor — including the Bitcoin deposit addresses the site
-    # displays. The approval turns a silent deploy into one that has to be
-    # acknowledged, and sends a notification when somebody triggers it.
+    # A manual-approval gate was added on 2026-07-29 (PR #50) and removed the
+    # same day, deliberately — not by accident. The project has a single
+    # operator who was also the only required reviewer, and self-review had to
+    # be permitted or the gate would have deadlocked. That makes it "press the
+    # button twice": it stops a silent deploy, but not an unauthorised one,
+    # since whoever holds that GitHub account can also approve.
     #
-    # Admin bypass is disabled on the environment, so this cannot be waved
-    # through from the API without first changing the environment itself.
-    environment: production
-
+    # The observation behind it still stands and is worth keeping in mind: a
+    # push to main is by itself code execution on the production host, and this
+    # site displays Bitcoin deposit addresses, so a compromised GitHub account
+    # is enough to serve modified JavaScript to every visitor.
+    #
+    # The gate also had a footgun of its own: waiting runs queued up, and each
+    # run deploys its own commit, so approving an older one would overwrite a
+    # newer deploy with stale code.
+    #
+    # If detection is wanted back without the friction, add a notification
+    # rather than a gate — the Telegram step at the bottom of this file already
+    # runs on every deploy and carries the actor and commit message.
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
