@@ -231,6 +231,39 @@ export interface AdminLoginRes {
   token: string;
 }
 
+export interface PasskeyStepUpRes {
+  plaintext: string;
+  nonce_timestamp: string;
+  expires_at: string;
+}
+
+export interface PasskeyRegisterBeginRes {
+  challenge_id: string;
+  // PublicKeyCredentialCreationOptionsJSON, handed straight to
+  // @simplewebauthn/browser's startRegistration.
+  publicKey: unknown;
+}
+
+export interface PasskeyLoginBeginRes {
+  challenge_id: string;
+  publicKey: unknown;
+}
+
+export interface PasskeyRes {
+  id: number;
+  label: string;
+  /** False means the credential is device-bound and dies with this device. */
+  synced: boolean;
+  clone_warning: boolean;
+  aaguid?: string;
+  last_used_at?: string;
+  created_at: string;
+}
+
+export interface PasskeyListRes {
+  passkeys: PasskeyRes[];
+}
+
 export interface AdminSystemParametersRes {
   min_reward_amount_satoshi: number; // 最低發起獎金金額
   satoshi_per_extra_winner: number; //中獎地址數 / 金額比例

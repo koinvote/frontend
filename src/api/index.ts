@@ -4,6 +4,10 @@ import http, { adminHttp, type RequestConf } from "./http.ts";
 import type {
   AdminLoginChallengeReq,
   AdminLoginReq,
+  PasskeyRegisterBeginReq,
+  PasskeyRegisterFinishReq,
+  PasskeyLoginFinishReq,
+  PasskeyRenameReq,
   ContactUsReq,
   CreateEventReq,
   GenerateEditPlaintextReq,
@@ -30,6 +34,11 @@ import type {
 import type {
   AdminLoginChallengeRes,
   AdminLoginRes,
+  PasskeyStepUpRes,
+  PasskeyRegisterBeginRes,
+  PasskeyLoginBeginRes,
+  PasskeyListRes,
+  PasskeyRes,
   AdminSystemParametersRes,
   DepositStatusRes,
   EventDataRes,
@@ -305,6 +314,36 @@ export const AdminAPI = {
   login: post<ApiResponse<AdminLoginRes>, AdminLoginReq>("/admin/login"),
   // Revokes the current token. Requires it, so it uses adminHttp.
   logout: adminPost<ApiResponse<void>, void>("/admin/logout"),
+
+  // --- Passkey login (no token required) ---
+  // begin takes no input at all: the authenticator decides which credential to
+  // offer, so nothing here reveals who the administrators are.
+  passkeyLoginBegin: post<ApiResponse<PasskeyLoginBeginRes>, void>(
+    "/admin/passkey/login/begin",
+  ),
+  passkeyLoginFinish: post<ApiResponse<AdminLoginRes>, PasskeyLoginFinishReq>(
+    "/admin/passkey/login/finish",
+  ),
+
+  // --- Passkey management (token required) ---
+  // Registration also needs a fresh wallet signature; a session token alone
+  // must not be able to grant persistent access.
+  passkeyStepUp: adminPost<ApiResponse<PasskeyStepUpRes>, void>(
+    "/admin/passkeys/step-up",
+  ),
+  passkeyRegisterBegin: adminPost<
+    ApiResponse<PasskeyRegisterBeginRes>,
+    PasskeyRegisterBeginReq
+  >("/admin/passkeys/register/begin"),
+  passkeyRegisterFinish: adminPost<
+    ApiResponse<PasskeyRes>,
+    PasskeyRegisterFinishReq
+  >("/admin/passkeys/register/finish"),
+  getPasskeys: adminGet<ApiResponse<PasskeyListRes>, void>("/admin/passkeys"),
+  renamePasskey: (id: number, body: PasskeyRenameReq) =>
+    adminPut<ApiResponse<void>, PasskeyRenameReq>(`/admin/passkeys/${id}`)(body),
+  deletePasskey: (id: number) =>
+    adminDelete<ApiResponse<void>>(`/admin/passkeys/${id}`)(),
   // Admin system parameters (requires token - uses adminHttp)
   getSystemParameters: adminGet<ApiResponse<AdminSystemParametersRes>, void>(
     "/admin/system-parameters",

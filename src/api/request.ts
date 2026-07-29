@@ -59,6 +59,29 @@ export interface AdminLoginReq {
   nonce_timestamp: string;
 }
 
+export interface PasskeyRegisterBeginReq {
+  plaintext: string;
+  nonce_timestamp: string;
+  signature: string;
+}
+
+export interface PasskeyRegisterFinishReq {
+  challenge_id: string;
+  label: string;
+  // The raw PublicKeyCredential the browser produced, passed through unchanged
+  // so the server's parser sees exactly what the authenticator sent.
+  credential: unknown;
+}
+
+export interface PasskeyLoginFinishReq {
+  challenge_id: string;
+  credential: unknown;
+}
+
+export interface PasskeyRenameReq {
+  label: string;
+}
+
 export interface UpdateSystemParametersReq {
   min_reward_sats: number;
   sats_per_extra_winner: number;
