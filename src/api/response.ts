@@ -218,6 +218,15 @@ export interface GetReplyPlainTextRes {
 export type GetHotHashtagsRes = string[];
 
 // Admin API Response Types
+export interface AdminLoginChallengeRes {
+  /** The exact string to sign in the wallet. Single-use, 15-minute lifetime. */
+  plaintext: string;
+  /** Echo back to /admin/login so the server can find and consume this challenge. */
+  nonce_timestamp: string;
+  /** RFC3339 UTC, so the page can show a countdown instead of failing silently. */
+  expires_at: string;
+}
+
 export interface AdminLoginRes {
   token: string;
 }

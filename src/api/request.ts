@@ -42,10 +42,21 @@ export interface GetListRepliesReq {
 }
 
 // Admin API Request Types
+export interface AdminLoginChallengeReq {
+  address: string;
+}
+
 export interface AdminLoginReq {
   address: string;
   plaintext: string;
   signature: string;
+  /**
+   * Identifies the challenge issued by POST /admin/login/challenge.
+   *
+   * The server still accepts a login without it, but such a login is
+   * replayable forever and raises an operational alert, so we always send it.
+   */
+  nonce_timestamp: string;
 }
 
 export interface UpdateSystemParametersReq {

@@ -1785,7 +1785,12 @@ plan_id,deposit_id,event_id,winner_address,balance_satoshi,win_probability,origi
 
 ## Admin Authentication
 
-All admin API endpoints (except `/api/v1/admin/login`) require authentication using Bearer token in the Authorization header.
+All admin API endpoints (except `/api/v1/admin/login` and
+`/api/v1/admin/login/challenge`) require authentication using Bearer token in
+the Authorization header.
+
+Tokens live for 60 minutes and are never refreshed on use.
+`POST /api/v1/admin/logout` revokes one early.
 
 ### Header Format
 
@@ -1803,14 +1808,61 @@ Authorization: Bearer abcd1234567890efgh...
 
 ## Admin Login
 
+**POST** `/api/v1/admin/login/challenge`
+
+Step 1. Issues the message to sign. Single-use, expires after 15 minutes.
+
+The client must not invent its own plaintext. It used to, and because the server
+never validated the content, any captured `(address, plaintext, signature)`
+triple stayed a working credential forever.
+
+This endpoint does not reveal whether the address is an admin — any
+syntactically valid address gets a challenge. The admin check happens at
+`/login`.
+
+### Request Body
+
+```json
+{
+  "address": "bc1qadminaddressplaceholder000000000000000"
+}
+```
+
+### Response
+
+```json
+{
+  "code": "000000",
+  "success": true,
+  "message": null,
+  "data": {
+    "plaintext": "koinvote.com | type:admin_login | bc1qadminaddressplaceholder000000000000000 | 1753000000000-a1b2c3d4 | 8f14e45fceea167a5a36dedd4bea2543",
+    "nonce_timestamp": "1753000000000-a1b2c3d4",
+    "expires_at": "2026-07-29T06:45:00Z"
+  }
+}
+```
+
+---
+
+## Admin Login
+
 **POST** `/api/v1/admin/login`
+
+Step 2. Verifies the signature and returns a session token.
+
+**A failed attempt burns the challenge.** The server consumes the nonce before
+it verifies the signature, so a wrong signature invalidates the message exactly
+as thoroughly as a successful login does. Retrying with the same one returns
+`LOGIN_CHALLENGE_ALREADY_USED`. After any failure, fetch a new challenge.
 
 ### Request Body
 
 ```json
 {
   "address": "bc1qadminaddressplaceholder000000000000000",
-  "plaintext": "koinvote.com|admin_login|1734345600|RAND123",
+  "plaintext": "koinvote.com | type:admin_login | bc1qadminaddressplaceholder000000000000000 | 1753000000000-a1b2c3d4 | 8f14e45fceea167a5a36dedd4bea2543",
+  "nonce_timestamp": "1753000000000-a1b2c3d4",
   "signature": "<BASE64_SIGNATURE_FROM_YOUR_WALLET>"
 }
 ```
@@ -1818,8 +1870,15 @@ Authorization: Bearer abcd1234567890efgh...
 **Parameters Description:**
 
 - `address`: Admin's Bitcoin wallet address (must be in admin whitelist)
-- `plaintext`: Message to be signed with format "koinvote.com|admin_login|timestamp|random_code"
+- `plaintext`: The exact `plaintext` returned by `/admin/login/challenge`
+- `nonce_timestamp`: The `nonce_timestamp` returned alongside it. Optional during
+  rollout only — omitting it accepts a client-invented plaintext, which is
+  replayable forever and raises an operational alert.
 - `signature`: Bitcoin wallet signature of the plaintext message
+
+**Error keys:** `INVALID_ADDRESS`, `SIGNATURE_VERIFICATION_FAILED`,
+`ADMIN_ACCOUNT_INACTIVE`, `LOGIN_CHALLENGE_EXPIRED`,
+`LOGIN_CHALLENGE_ALREADY_USED`
 
 ### Response
 

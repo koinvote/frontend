@@ -2,6 +2,7 @@
 import http, { adminHttp, type RequestConf } from "./http.ts";
 
 import type {
+  AdminLoginChallengeReq,
   AdminLoginReq,
   ContactUsReq,
   CreateEventReq,
@@ -27,6 +28,7 @@ import type {
 } from "./request.ts";
 
 import type {
+  AdminLoginChallengeRes,
   AdminLoginRes,
   AdminSystemParametersRes,
   DepositStatusRes,
@@ -292,8 +294,17 @@ export const API = {
 // Admin API (requires Bearer token authentication)
 // Note: Admin login endpoint does NOT require token, so it uses regular http
 export const AdminAPI = {
-  // Admin login (no token required - uses regular http)
+  // Step 1 of login: ask the server for the plaintext to sign. No token
+  // required, and it deliberately reveals nothing about whether the address is
+  // an admin, so it uses regular http.
+  loginChallenge: post<
+    ApiResponse<AdminLoginChallengeRes>,
+    AdminLoginChallengeReq
+  >("/admin/login/challenge"),
+  // Step 2 of login (no token required - uses regular http)
   login: post<ApiResponse<AdminLoginRes>, AdminLoginReq>("/admin/login"),
+  // Revokes the current token. Requires it, so it uses adminHttp.
+  logout: adminPost<ApiResponse<void>, void>("/admin/logout"),
   // Admin system parameters (requires token - uses adminHttp)
   getSystemParameters: adminGet<ApiResponse<AdminSystemParametersRes>, void>(
     "/admin/system-parameters",
