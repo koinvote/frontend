@@ -17,6 +17,7 @@ import CONSTS from "@/consts";
 import { http, HttpResponse } from "msw";
 import {
   mockAdminSystemParameters,
+  mockCompletedEventReplies,
   mockDepositStatus,
   mockEventDetail,
   mockEventList,
@@ -520,12 +521,28 @@ export const handlers = [
       );
     }
 
+    // Preheat events can't have replies yet - CreateReply only accepts
+    // Active events - so don't fall back to an unrelated mock event's
+    // replies just because this eventId isn't otherwise recognized.
+    if (eventFromList?.status === 2 /* preheat */) {
+      return HttpResponse.json<ApiResponse<typeof mockGetListRepliesResponse>>(
+        {
+          code: "200",
+          success: true,
+          message: null,
+          data: { replies: [], is_creator: 0, page, limit },
+        },
+      );
+    }
+
     let replies =
       eventId === "01KK0NP9AV6CQWG3TM4DJ5RFEZ"
         ? [...mockExchangeEventReplies]
         : eventId === "evt_scroll_mock"
           ? [...mockScrollEventReplies]
-          : [...mockGetListRepliesResponse.replies];
+          : eventId === "evt_003_mock"
+            ? [...mockCompletedEventReplies]
+            : [...mockGetListRepliesResponse.replies];
 
     // Filter by search
     if (search) {

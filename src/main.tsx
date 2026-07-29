@@ -14,6 +14,14 @@ async function enableMocking() {
     return
   }
 
+  // MSW's fetch interception uses TransformStream, which Safari 14 (e.g.
+  // iPhone SE on iOS 14.2) doesn't have — only load the polyfill when it's
+  // actually missing and only in mock mode, since this never ships to real
+  // users (production never sets VITE_USE_MOCK).
+  if (typeof window.TransformStream === 'undefined') {
+    await import('web-streams-polyfill/polyfill/es5')
+  }
+
   const { worker } = await import('./mocks/browser')
 
   // Start the worker and log when ready

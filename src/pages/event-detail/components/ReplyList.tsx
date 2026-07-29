@@ -28,6 +28,7 @@ import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
 import { formatRelativeTime } from "@/utils/formatter";
 import { Divider } from "./Divider";
+import { HoldingScoreBlock } from "./HoldingScoreBlock";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -546,8 +547,7 @@ function ReplyItem({
     reply.content ||
     (reply.option_id !== undefined ? getOptionText(reply.option_id) : "");
 
-  const displayBalance = getDisplayBalance();
-  const isCollapsible = !reply.is_reply_valid || !displayBalance;
+  const isCollapsible = !reply.is_reply_valid || !getDisplayBalance();
   const [showDetails, setShowDetails] = useState(!isCollapsible);
 
   return (
@@ -684,7 +684,16 @@ function ReplyItem({
             </div>
           )}
 
-          <div className="flex-1"></div>
+          <div className="flex flex-1 flex-col">
+            {(!isCollapsible || showDetails) && (
+              <HoldingScoreBlock
+                holdingScore={reply.holding_score}
+                scoreShare={reply.score_share}
+                currentBalanceSatoshi={reply.balance_at_current_satoshi}
+                className="mt-9 md:mt-auto"
+              />
+            )}
+          </div>
           {/* Todo Next version: Add report button */}
           {/* <button
             type="button"
@@ -708,9 +717,9 @@ function ReplyItem({
                 className="text-primary shrink-0 cursor-pointer"
               >
                 {showDetails ? (
-                  <VisibilityOffIcon className="h-5 w-5" />
-                ) : (
                   <VisibilityOnIcon className="h-5 w-5" />
+                ) : (
+                  <VisibilityOffIcon className="h-5 w-5" />
                 )}
               </button>
             )}

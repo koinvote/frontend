@@ -53,7 +53,7 @@ export const mockEventList: EventListDataRes[] = [
     participants_count: 23,
     total_stake_satoshi: 3200000,
     top_replies: [],
-    result_visibility: "paid_only",
+    result_visibility: "public",
     options: [
       {
         id: 1,
@@ -280,7 +280,7 @@ export const mockEventList: EventListDataRes[] = [
       },
     ],
     options: [],
-    result_visibility: "paid_only",
+    result_visibility: "public",
   },
   {
     id: 3,
@@ -403,7 +403,7 @@ export const mockEventDetail: EventDetailDataRes = {
   ],
   hashtags: ["bitcoin", "lightning", "scaling"],
   preheat_hours: 12,
-  result_visibility: "paid_only",
+  result_visibility: "public",
   unlock_price_satoshi: 5000,
   unlock_count: 128,
   // Within UNLOCK_LOCK_DURATION_MS (24h) → locked; set to >24h ago or null to test unlocked
@@ -443,7 +443,9 @@ export const mockDepositStatus: DepositStatusRes = {
   deposit_type: "event_creation",
 };
 
-// Replies Mock Data
+// Replies Mock Data — evt_001_mock (status: active). Holding Score here is
+// always in-progress (Accumulating/Paused), never final, since this event
+// hasn't ended.
 export const mockReplies: Reply[] = [
   {
     id: 1,
@@ -459,6 +461,7 @@ export const mockReplies: Reply[] = [
     balance_at_current_satoshi: 1600000,
     created_at: "2026-01-11T05:30:00Z",
     is_reply_valid: true,
+    holding_score: "337.27822686", // balance_at_current_satoshi > 0 -> Accumulating
   },
   {
     id: 2,
@@ -474,6 +477,7 @@ export const mockReplies: Reply[] = [
     balance_at_current_satoshi: 1250000,
     created_at: "2026-01-11T08:15:00Z",
     is_reply_valid: true,
+    holding_score: "2,423.40651987", // balance_at_current_satoshi > 0 -> Accumulating
   },
   {
     id: 3,
@@ -486,9 +490,67 @@ export const mockReplies: Reply[] = [
       "J0k4l5m6n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4",
     balance_at_reply_satoshi: 950000,
     balance_at_snapshot_satoshi: 950000,
-    balance_at_current_satoshi: 980000,
+    balance_at_current_satoshi: 0,
     created_at: "2026-01-11T10:45:00Z",
     is_reply_valid: true,
+    holding_score: "6.24589309", // balance_at_current_satoshi is 0 -> Paused
+  },
+];
+
+// Replies Mock Data — evt_003_mock (status: completed). Every reply here
+// carries the settled/final state: score_share present (or absent
+// entirely, for the "not applicable" case), never Accumulating/Paused.
+export const mockCompletedEventReplies: Reply[] = [
+  {
+    id: 101,
+    btc_address: "bc1q0xdmvyp8u7e6r5m6dygq0y2n2m4wm3vqe6t8v0",
+    content: "BlueWallet - simple UI and Lightning support built in.",
+    plaintext:
+      "Koinvote Event Reply\nEvent ID: evt_003_mock\nAddress: bc1q0xdmvyp8u7e6r5m6dygq0y2n2m4wm3vqe6t8v0\nNonce: 1706123456\nRandom: wal001",
+    signature:
+      "M3n7o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4p5q6r7",
+    balance_at_reply_satoshi: 1500000,
+    balance_at_snapshot_satoshi: 1500000,
+    balance_at_current_satoshi: 1600000,
+    created_at: "2026-02-10T10:45:00Z",
+    is_reply_valid: true,
+    holding_score: "2,423.40651987",
+    score_share: "12.84%",
+  },
+  {
+    id: 102,
+    btc_address: "bc1qpausedaddressxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    content: "Muun Wallet - great for first-time users, self-custodial.",
+    plaintext:
+      "Koinvote Event Reply\nEvent ID: evt_003_mock\nAddress: bc1qpausedaddressxxxxxxxxxxxxxxxxxxxxxxxxxx\nNonce: 1706123789\nRandom: wal002",
+    signature:
+      "N4o8p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4p5q6r7s8",
+    balance_at_reply_satoshi: 400000,
+    balance_at_snapshot_satoshi: 400000,
+    balance_at_current_satoshi: 0,
+    created_at: "2026-02-10T08:15:00Z",
+    is_reply_valid: true,
+    holding_score: "12,540",
+    score_share: "<0.01%",
+  },
+  {
+    id: 103,
+    btc_address:
+      "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
+    content:
+      "[Mock test case: intentionally no holding_score — verifies the block renders nothing instead of a fake 0] Sparrow Wallet - best for advanced coin control.",
+    plaintext:
+      "Koinvote Event Reply\nEvent ID: evt_003_mock\nAddress: bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej\nNonce: 1706124012\nRandom: wal003",
+    signature:
+      "O5p9q0r1s2t3u4v5w6x7y8z9a0b1c2d3e4f5g6h7i8j9k0l1m2n3o4p5q6r7s8t9",
+    balance_at_reply_satoshi: 950000,
+    balance_at_snapshot_satoshi: 950000,
+    balance_at_current_satoshi: 980000,
+    created_at: "2026-02-10T05:30:00Z",
+    is_reply_valid: true,
+    // Intentionally no holding_score: e.g. a non-rewarded reply or an
+    // address the settlement job couldn't score. Covers "not applicable"
+    // inside an otherwise-scored, already-completed event.
   },
 ];
 
@@ -518,7 +580,7 @@ export const mockAdminSystemParameters: AdminSystemParametersRes = {
 export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-    balance_at_snapshot_satoshi: 1280086,
+    holding_score: "0.01280086",
     win_probability_percent: 20.0,
     is_dust: false,
     original_reward_satoshi: 1668,
@@ -528,7 +590,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
-    balance_at_snapshot_satoshi: 450000,
+    holding_score: "0.0045",
     win_probability_percent: 18.0,
     is_dust: false,
     original_reward_satoshi: 51750,
@@ -538,7 +600,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
-    balance_at_snapshot_satoshi: 400000,
+    holding_score: "0.004",
     win_probability_percent: 16.0,
     is_dust: false,
     original_reward_satoshi: 46000,
@@ -548,7 +610,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qabc123xyz456def789ghi012jkl345mno678pqr",
-    balance_at_snapshot_satoshi: 350000,
+    holding_score: "0.0035",
     win_probability_percent: 14.0,
     is_dust: false,
     original_reward_satoshi: 40250,
@@ -559,7 +621,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address:
       "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
-    balance_at_snapshot_satoshi: 300000,
+    holding_score: "0.003",
     win_probability_percent: 12.0,
     is_dust: false,
     original_reward_satoshi: 34500,
@@ -569,7 +631,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qdef456uvw789xyz012abc345ghi678jkl901mno",
-    balance_at_snapshot_satoshi: 250000,
+    holding_score: "0.0025",
     win_probability_percent: 10.0,
     is_dust: false,
     original_reward_satoshi: 28750,
@@ -579,7 +641,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qprocessing123xyz456def789ghi012jkl345mno",
-    balance_at_snapshot_satoshi: 200000,
+    holding_score: "0.002",
     win_probability_percent: 8.0,
     is_dust: false,
     original_reward_satoshi: 23000,
@@ -589,7 +651,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qwinner09abc123def456ghi789jkl012mno345pqr",
-    balance_at_snapshot_satoshi: 180000,
+    holding_score: "0.0018",
     win_probability_percent: 7.2,
     is_dust: false,
     original_reward_satoshi: 20700,
@@ -599,7 +661,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qwinner10xyz789abc012def345ghi678jkl901mno",
-    balance_at_snapshot_satoshi: 160000,
+    holding_score: "0.0016",
     win_probability_percent: 6.4,
     is_dust: false,
     original_reward_satoshi: 18400,
@@ -609,7 +671,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qdust123abc456def789ghi012jkl345mno678pqr",
-    balance_at_snapshot_satoshi: 5000,
+    holding_score: "0.00005",
     win_probability_percent: 0.2,
     is_dust: true,
     original_reward_satoshi: 500,
@@ -622,7 +684,7 @@ export const mockPayoutWinners: PayoutWinner[] = [
 export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qghi789rst012uvw345xyz678abc901def234ghi",
-    balance_at_snapshot_satoshi: 800000,
+    holding_score: "0.008",
     win_probability_percent: 32.0,
     is_dust: false,
     original_reward_satoshi: 61280,
@@ -632,7 +694,7 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc",
-    balance_at_snapshot_satoshi: 650000,
+    holding_score: "0.0065",
     win_probability_percent: 26.0,
     is_dust: false,
     original_reward_satoshi: 49790,
@@ -642,7 +704,7 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qmno345pqr678stu901vwx234yz567abc890def",
-    balance_at_snapshot_satoshi: 550000,
+    holding_score: "0.0055",
     win_probability_percent: 22.0,
     is_dust: false,
     original_reward_satoshi: 42130,
@@ -652,7 +714,7 @@ export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   },
   {
     winner_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi",
-    balance_at_snapshot_satoshi: 500000,
+    holding_score: "0.005",
     win_probability_percent: 20.0,
     is_dust: false,
     original_reward_satoshi: 38300,
@@ -738,6 +800,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 3396718,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 3396718,
+    holding_score: "0.03396718", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:06.637073Z",
     is_hidden: false,
     created_at: "2026-03-07T18:39:09.688Z",
@@ -762,6 +825,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 3251200,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 3251200,
+    holding_score: "0.032512", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:46:47.031934Z",
     is_hidden: false,
     created_at: "2026-03-07T17:04:01.124Z",
@@ -786,6 +850,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 15076100,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 15076100,
+    holding_score: "0.150761", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:46:49.869154Z",
     is_hidden: false,
     created_at: "2026-03-07T03:07:54.652Z",
@@ -810,6 +875,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 15349744,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 15349744,
+    holding_score: "0.15349744", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:02.189134Z",
     is_hidden: false,
     created_at: "2026-03-06T20:22:45.073Z",
@@ -834,6 +900,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 11505,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:12.604199Z",
     is_hidden: false,
     created_at: "2026-03-06T18:33:05.173Z",
@@ -858,6 +925,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 3000,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:46:57.542191Z",
     is_hidden: false,
     created_at: "2026-03-06T18:23:26.425Z",
@@ -882,6 +950,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 3165,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:10.657805Z",
     is_hidden: false,
     created_at: "2026-03-06T18:23:09.749Z",
@@ -906,6 +975,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 2890,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:09.020598Z",
     is_hidden: false,
     created_at: "2026-03-06T18:22:42.743Z",
@@ -930,6 +1000,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 2890,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:16.461805Z",
     is_hidden: false,
     created_at: "2026-03-06T18:22:12.107Z",
@@ -954,6 +1025,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 3000,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:11.671275Z",
     is_hidden: false,
     created_at: "2026-03-06T18:05:58.03Z",
@@ -978,6 +1050,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 3000,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:13.482289Z",
     is_hidden: false,
     created_at: "2026-03-06T18:05:40.862Z",
@@ -1003,6 +1076,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 6834,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 6834,
+    holding_score: "0.00006834", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:46:54.342046Z",
     is_hidden: false,
     created_at: "2026-03-06T17:03:21.012Z",
@@ -1027,6 +1101,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 12698,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:00.676418Z",
     is_hidden: false,
     created_at: "2026-03-06T16:42:42.854Z",
@@ -1051,6 +1126,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 12808,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 0,
+    holding_score: "0", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:46:59.289674Z",
     is_hidden: false,
     created_at: "2026-03-06T16:22:36.302Z",
@@ -1075,6 +1151,7 @@ export const mockExchangeEventReplies: Reply[] = [
     balance_at_reply_satoshi: 81232,
     balance_at_snapshot_satoshi: null,
     balance_at_current_satoshi: 81232,
+    holding_score: "0.00081232", // synthetic, derived from balance_at_current_satoshi for mock display
     balance_last_updated_at: "2026-03-08T05:47:07.587821Z",
     is_hidden: false,
     created_at: "2026-03-06T14:24:01.519Z",
