@@ -40,6 +40,7 @@ import AdminRewardRulesPage from "@/admin/pages/rewardRules";
 import AdminSubscribersPage from "@/admin/pages/subscribe";
 import AdminWithdrawal from "@/admin/pages/withdrawal";
 import AdminReferralCodesPage from "@/admin/pages/referralCodes";
+import AdminPasskeysPage from "@/admin/pages/passkeys";
 import AdminLayout from "@/layout/AdminLayout";
 
 const isComingSoonMode = import.meta.env.VITE_COMING_SOON === "true";
@@ -52,37 +53,129 @@ const publicChildren = isComingSoonMode
   : [
       { index: true, element: <Home />, handle: { title: "Koinvote" } },
       { path: "home", element: <Home />, handle: { title: "Koinvote" } },
-      { path: "about", element: <About />, handle: { title: "About | Koinvote" } },
-      { path: "charges-refunds", element: <Chargesnrefunds />, handle: { title: "Charges & Refunds | Koinvote" } },
-      { path: "help-faq", element: <HelpnFaq />, handle: { title: "Help & FAQ | Koinvote" } },
-      { path: "privacy", element: <Privacy />, handle: { title: "Privacy Policy | Koinvote" } },
-      { path: "terms", element: <Terms />, handle: { title: "Terms of Use | Koinvote" } },
+      {
+        path: "about",
+        element: <About />,
+        handle: { title: "About | Koinvote" },
+      },
+      {
+        path: "charges-refunds",
+        element: <Chargesnrefunds />,
+        handle: { title: "Charges & Refunds | Koinvote" },
+      },
+      {
+        path: "help-faq",
+        element: <HelpnFaq />,
+        handle: { title: "Help & FAQ | Koinvote" },
+      },
+      {
+        path: "privacy",
+        element: <Privacy />,
+        handle: { title: "Privacy Policy | Koinvote" },
+      },
+      {
+        path: "terms",
+        element: <Terms />,
+        handle: { title: "Terms of Use | Koinvote" },
+      },
       {
         path: "terms-reward-distribution",
         element: <TermsOfRewardDistribution />,
         handle: { title: "Terms of Reward Distribution | Koinvote" },
       },
-      { path: "subscribe", element: <Subscribe />, handle: { title: "Subscribe | Koinvote" } },
-      { path: "unsubscribe", element: <Unsubscribe />, handle: { title: "Unsubscribe | Koinvote" } },
-      { path: "support", element: <Support />, handle: { title: "Support | Koinvote" } },
-      { path: "verification-tool", element: <VerificaionTool />, handle: { title: "Verification Tool | Koinvote" } },
-      { path: "create-event", element: <CreateEvent />, handle: { title: "Create Event | Koinvote" } },
-      { path: "preview-event", element: <PreviewEvent />, handle: { title: "Preview Event | Koinvote" } },
-      { path: "confirm-sign/:eventId", element: <ConfirmSign />, handle: { title: "Confirm Sign | Koinvote" } },
-      { path: "confirm-pay/:eventId/payment", element: <ConfirmPay />, handle: { title: "Confirm Payment | Koinvote" } },
+      {
+        path: "subscribe",
+        element: <Subscribe />,
+        handle: { title: "Subscribe | Koinvote" },
+      },
+      {
+        path: "unsubscribe",
+        element: <Unsubscribe />,
+        handle: { title: "Unsubscribe | Koinvote" },
+      },
+      {
+        path: "support",
+        element: <Support />,
+        handle: { title: "Support | Koinvote" },
+      },
+      {
+        path: "verification-tool",
+        element: <VerificaionTool />,
+        handle: { title: "Verification Tool | Koinvote" },
+      },
+      {
+        path: "create-event",
+        element: <CreateEvent />,
+        handle: { title: "Create Event | Koinvote" },
+      },
+      {
+        path: "preview-event",
+        element: <PreviewEvent />,
+        handle: { title: "Preview Event | Koinvote" },
+      },
+      {
+        path: "confirm-sign/:eventId",
+        element: <ConfirmSign />,
+        handle: { title: "Confirm Sign | Koinvote" },
+      },
+      {
+        path: "confirm-pay/:eventId/payment",
+        element: <ConfirmPay />,
+        handle: { title: "Confirm Payment | Koinvote" },
+      },
       // title: null → event detail page sets its own title from event data
-      { path: "event/:eventId", element: <EventDetail />, handle: { title: null } },
-      { path: "event/:eventId/unlock-payment", element: <UnlockPayment />, handle: { title: "Unlock Payment | Koinvote" } },
-      { path: "event/:eventId/reply", element: <ReplyPage />, handle: { title: "Reply | Koinvote" } },
-      { path: "event/:eventId/edit", element: <EditEvent />, handle: { title: "Edit Event | Koinvote" } },
-      { path: "event/:eventId/edit-preview", element: <PreviewEditEvent />, handle: { title: "Preview Edit | Koinvote" } },
-      { path: "event/:eventId/edit-confirm-sign", element: <ConfirmEditSign />, handle: { title: "Confirm Edit | Koinvote" } },
-      { path: "event/:eventId/change-result-visibility", element: <ChangeResultVisibility />, handle: { title: "Change Result Visibility | Koinvote" } },
-      { path: "event/:eventId/change-unlock-price", element: <ChangeUnlockPrice />, handle: { title: "Change Unlock Price | Koinvote" } },
-      { path: "event/:eventId/report", element: <PayoutReport />, handle: { title: "Payout Report | Koinvote" } },
+      {
+        path: "event/:eventId",
+        element: <EventDetail />,
+        handle: { title: null },
+      },
+      {
+        path: "event/:eventId/unlock-payment",
+        element: <UnlockPayment />,
+        handle: { title: "Unlock Payment | Koinvote" },
+      },
+      {
+        path: "event/:eventId/reply",
+        element: <ReplyPage />,
+        handle: { title: "Reply | Koinvote" },
+      },
+      {
+        path: "event/:eventId/edit",
+        element: <EditEvent />,
+        handle: { title: "Edit Event | Koinvote" },
+      },
+      {
+        path: "event/:eventId/edit-preview",
+        element: <PreviewEditEvent />,
+        handle: { title: "Preview Edit | Koinvote" },
+      },
+      {
+        path: "event/:eventId/edit-confirm-sign",
+        element: <ConfirmEditSign />,
+        handle: { title: "Confirm Edit | Koinvote" },
+      },
+      {
+        path: "event/:eventId/change-result-visibility",
+        element: <ChangeResultVisibility />,
+        handle: { title: "Change Result Visibility | Koinvote" },
+      },
+      {
+        path: "event/:eventId/change-unlock-price",
+        element: <ChangeUnlockPrice />,
+        handle: { title: "Change Unlock Price | Koinvote" },
+      },
+      {
+        path: "event/:eventId/report",
+        element: <PayoutReport />,
+        handle: { title: "Payout Report | Koinvote" },
+      },
 
       // TODO: test route, remove later
-      { path: "event-share/:eventId", element: <EventDetail />, handle: { title: null } },
+      {
+        path: "event-share/:eventId",
+        element: <EventDetail />,
+        handle: { title: null },
+      },
     ];
 
 export const router = createBrowserRouter([
@@ -96,14 +189,51 @@ export const router = createBrowserRouter([
         path: "admin",
         element: <AdminLayout />,
         children: [
-          { index: true, element: <AdminRewardRulesPage />, handle: { title: "Reward Rules | Koinvote Admin" } },
-          { path: "reward-rules", element: <AdminRewardRulesPage />, handle: { title: "Reward Rules | Koinvote Admin" } },
-          { path: "fees", element: <AdminFeesPage />, handle: { title: "Fees | Koinvote Admin" } },
-          { path: "refunds", element: <AdminRefundsPage />, handle: { title: "Refunds | Koinvote Admin" } },
-          { path: "withdrawal", element: <AdminWithdrawal />, handle: { title: "Withdrawal | Koinvote Admin" } },
-          { path: "announcements", element: <AdminAnnouncementsPage />, handle: { title: "Announcements | Koinvote Admin" } },
-          { path: "subscribers", element: <AdminSubscribersPage />, handle: { title: "Subscribers | Koinvote Admin" } },
-          { path: "referral-codes", element: <AdminReferralCodesPage />, handle: { title: "Referral Codes | Koinvote Admin" } },
+          {
+            index: true,
+            element: <AdminRewardRulesPage />,
+            handle: { title: "Reward Rules | Koinvote Admin" },
+          },
+          {
+            path: "reward-rules",
+            element: <AdminRewardRulesPage />,
+            handle: { title: "Reward Rules | Koinvote Admin" },
+          },
+          {
+            path: "fees",
+            element: <AdminFeesPage />,
+            handle: { title: "Fees | Koinvote Admin" },
+          },
+          {
+            path: "refunds",
+            element: <AdminRefundsPage />,
+            handle: { title: "Refunds | Koinvote Admin" },
+          },
+          {
+            path: "withdrawal",
+            element: <AdminWithdrawal />,
+            handle: { title: "Withdrawal | Koinvote Admin" },
+          },
+          {
+            path: "announcements",
+            element: <AdminAnnouncementsPage />,
+            handle: { title: "Announcements | Koinvote Admin" },
+          },
+          {
+            path: "subscribers",
+            element: <AdminSubscribersPage />,
+            handle: { title: "Subscribers | Koinvote Admin" },
+          },
+          {
+            path: "referral-codes",
+            element: <AdminReferralCodesPage />,
+            handle: { title: "Referral Codes | Koinvote Admin" },
+          },
+          {
+            path: "passkeys",
+            element: <AdminPasskeysPage />,
+            handle: { title: "Passkeys | Koinvote Admin" },
+          },
         ],
       },
       {

@@ -18,7 +18,7 @@ export function AdminActionButtons({
   const isDisabled = isLoading || isLoadingRestore;
 
   return (
-    <div className="h-20 flex items-center justify-end gap-2">
+    <div className="flex h-20 items-center justify-end gap-2">
       <Button
         size="md"
         text="sm"

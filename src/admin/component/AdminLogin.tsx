@@ -11,10 +11,13 @@ interface AdminLoginProps {
   isExpired: boolean;
   isLoading: boolean;
   isFetchingChallenge: boolean;
+  passkeySupported: boolean;
+  isPasskeyLoading: boolean;
   onSignatureChange: (value: string) => void;
   onCopy: (text: string, label: string) => void;
   onRegenerate: () => void;
   onLogin: () => void;
+  onPasskeyLogin: () => void;
 }
 
 function formatCountdown(totalSeconds: number): string {
@@ -31,12 +34,15 @@ export default function AdminLogin({
   isExpired,
   isLoading,
   isFetchingChallenge,
+  passkeySupported,
+  isPasskeyLoading,
   onSignatureChange,
   onCopy,
   onRegenerate,
   onLogin,
+  onPasskeyLogin,
 }: AdminLoginProps) {
-  const busy = isLoading || isFetchingChallenge;
+  const busy = isLoading || isFetchingChallenge || isPasskeyLoading;
   const canSubmit = Boolean(plaintext) && !isExpired && !busy;
 
   return (
@@ -57,6 +63,30 @@ export default function AdminLogin({
         </div>
 
         <div className="space-y-4">
+          {passkeySupported && (
+            <>
+              <Button
+                block
+                size="large"
+                type="primary"
+                onClick={onPasskeyLogin}
+                disabled={busy}
+              >
+                {isPasskeyLoading
+                  ? "Waiting for passkey..."
+                  : "Sign in with Passkey"}
+              </Button>
+
+              <div className="flex items-center gap-3">
+                <span className="h-px flex-1 bg-neutral-200" />
+                <span className="text-admin-text-sub text-xs">
+                  or use your wallet
+                </span>
+                <span className="h-px flex-1 bg-neutral-200" />
+              </div>
+            </>
+          )}
+
           {/* Admin Address */}
           <div className="space-y-1">
             <label className="text-admin-text-sub text-sm">Admin Address</label>

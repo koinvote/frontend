@@ -12,6 +12,7 @@ const items: Item[] = [
   { to: "/admin/refunds", label: "退款相關" },
   { to: "/admin/withdrawal", label: "提款相關" },
   { to: "/admin/referral-codes", label: "推薦碼管理" },
+  { to: "/admin/passkeys", label: "通行金鑰" },
   // { to: '/admin/announcements', label: '公告管理' },
   // { to: '/admin/subscribers',  label: '訂閱者 email 匯出' },
 ];
