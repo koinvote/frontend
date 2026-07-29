@@ -72,7 +72,9 @@ export default function AdminLogin({
           {/* Message to sign. Issued by the server, single-use, 15 minutes. */}
           <div className="space-y-1">
             <div className="flex items-center justify-between gap-2">
-              <label className="text-admin-text-sub text-sm">簽章訊息</label>
+              <label className="text-admin-text-sub text-sm">
+                Message to Sign
+              </label>
               <div className="flex items-center gap-3">
                 {plaintext && (
                   <span
@@ -83,8 +85,8 @@ export default function AdminLogin({
                     }
                   >
                     {isExpired
-                      ? "已過期"
-                      : `${formatCountdown(secondsLeft)} 後過期`}
+                      ? "Expired"
+                      : `Expires in ${formatCountdown(secondsLeft)}`}
                   </span>
                 )}
                 <button
@@ -93,7 +95,7 @@ export default function AdminLogin({
                   disabled={busy}
                   className="text-accent text-sm underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {isFetchingChallenge ? "產生中..." : "重新產生"}
+                  {isFetchingChallenge ? "Generating..." : "Regenerate"}
                 </button>
               </div>
             </div>
@@ -111,18 +113,14 @@ export default function AdminLogin({
               />
               <button
                 type="button"
-                onClick={() => onCopy(plaintext, "簽章訊息")}
+                onClick={() => onCopy(plaintext, "Message")}
                 disabled={!plaintext}
                 className="text-admin-text-sub hover:text-admin-text-main mt-1 transition-colors disabled:opacity-40"
-                aria-label="複製簽章訊息"
+                aria-label="Copy message to sign"
               >
                 <CopyIcon className="h-5 w-5 cursor-pointer" />
               </button>
             </div>
-
-            <p className="text-admin-text-sub mt-1 text-xs">
-              由伺服器產生，僅能使用一次。簽名失敗後會自動換一組新的。
-            </p>
           </div>
 
           {/* Signature */}
@@ -148,7 +146,7 @@ export default function AdminLogin({
               {isLoading
                 ? "Logging in..."
                 : isExpired
-                  ? "簽章訊息已過期，請重新產生"
+                  ? "Message expired — regenerate"
                   : "Log in"}
             </Button>
           </div>

@@ -53,12 +53,15 @@ export default function AdminLoginPage() {
           setSecondsLeft(secondsUntil(envelope.data.expires_at));
           setSignature("");
           if (!opts?.silent) {
-            showToast("success", "已產生新的簽章訊息");
+            showToast("success", "New message generated");
           }
           return true;
         }
 
-        showToast("error", envelope?.message || "取得簽章訊息失敗");
+        showToast(
+          "error",
+          envelope?.message || "Failed to get a message to sign",
+        );
         return false;
       } catch (error: unknown) {
         const message =
@@ -66,7 +69,7 @@ export default function AdminLoginPage() {
           (error as any)?.apiMessage ||
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (error as any)?.message ||
-          "取得簽章訊息失敗";
+          "Failed to get a message to sign";
         showToast("error", message);
         return false;
       } finally {
@@ -96,9 +99,9 @@ export default function AdminLoginPage() {
   const handleCopy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showToast("success", `${label} 已複製到剪貼簿`);
+      showToast("success", `${label} copied to clipboard`);
     } catch {
-      showToast("error", `${label} 複製失敗`);
+      showToast("error", `Failed to copy ${label.toLowerCase()}`);
     }
   };
 
@@ -113,21 +116,24 @@ export default function AdminLoginPage() {
   const replaceBurntChallenge = useCallback(async () => {
     const ok = await fetchChallenge({ silent: true });
     if (ok) {
-      showToast("warn", "簽章訊息已失效，已重新產生，請重新簽名");
+      showToast(
+        "warn",
+        "That message is no longer valid. A new one was generated — please sign again.",
+      );
     }
   }, [fetchChallenge, showToast]);
 
   const handleLogin = async () => {
     if (!signature.trim()) {
-      showToast("error", "請輸入簽名");
+      showToast("error", "Please enter a signature");
       return;
     }
     if (!plaintext || !nonceTimestamp) {
-      showToast("error", "尚未取得簽章訊息，請重新產生");
+      showToast("error", "No message to sign yet — regenerate");
       return;
     }
     if (isExpired) {
-      showToast("error", "簽章訊息已過期，請重新產生");
+      showToast("error", "The message expired — regenerate");
       return;
     }
 
@@ -147,17 +153,17 @@ export default function AdminLoginPage() {
 
       if (envelope?.success && envelope?.data?.token) {
         setAdminToken(envelope.data.token);
-        showToast("success", "登入成功");
+        showToast("success", "Signed in");
         navigate("/admin/reward-rules");
         return;
       }
 
-      showToast("error", envelope?.message || "登入失敗");
+      showToast("error", envelope?.message || "Login failed");
       await replaceBurntChallenge();
     } catch (error: unknown) {
       const errorMessage =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.apiMessage || (error as any)?.message || "登入失敗";
+        (error as any)?.apiMessage || (error as any)?.message || "Login failed";
       showToast("error", errorMessage);
       await replaceBurntChallenge();
     } finally {
