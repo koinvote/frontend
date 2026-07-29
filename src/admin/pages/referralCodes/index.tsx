@@ -61,7 +61,7 @@ export default function AdminReferralCodesPage() {
 
   return (
     <div>
-      <div className="flex h-20 items-center justify-between border-neutral-200 bg-white px-6 py-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-neutral-200 bg-white px-4 py-4 md:h-20 md:flex-nowrap md:px-6">
         <h1 className="text-lg font-medium">推薦碼管理</h1>
         <Button
           type="primary"
@@ -72,10 +72,10 @@ export default function AdminReferralCodesPage() {
         </Button>
       </div>
 
-      <main className="px-6 py-4">
+      <main className="px-4 py-4 md:px-6">
         <div className="overflow-hidden rounded bg-white">
           {/* Table header */}
-          <div className="grid grid-cols-[1fr_1fr_auto] border-b border-neutral-200 px-2 py-3 text-sm font-medium text-neutral-700">
+          <div className="grid grid-cols-[1fr_1fr_auto] items-center gap-2 border-b border-neutral-200 px-2 py-3 text-sm font-medium text-neutral-700">
             <span>推薦碼</span>
             <span>建立時間</span>
             <span>動作</span>
@@ -94,10 +94,12 @@ export default function AdminReferralCodesPage() {
             codes.map((item) => (
               <div
                 key={item.id}
-                className="grid grid-cols-[1fr_1fr_auto] border-b border-neutral-100 px-2 py-4 text-sm last:border-b-0"
+                className="grid grid-cols-[1fr_1fr_auto] items-center gap-2 border-b border-neutral-100 px-2 py-4 text-sm last:border-b-0"
               >
-                <span className="text-neutral-800">{item.code}</span>
-                <span className="text-neutral-600">
+                <span className="min-w-0 break-all text-neutral-800">
+                  {item.code}
+                </span>
+                <span className="min-w-0 text-neutral-600">
                   {formatDate(item.created_at)}
                 </span>
                 <Button

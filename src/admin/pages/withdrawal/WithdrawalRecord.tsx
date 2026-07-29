@@ -148,7 +148,7 @@ export default function WithdrawalRecordSection() {
                   items={group.records.map((record) => ({
                     key: record.id,
                     label: (
-                      <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+                      <div className="flex flex-wrap items-center gap-3">
                         <span className="w-32 font-mono text-sm">
                           {record.amount}
                           <span className="text-secondary ml-1">Sats</span>
