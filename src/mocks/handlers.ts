@@ -28,6 +28,7 @@ import {
   mockGetListRepliesResponse,
   mockGetReceiptVerifyPubKeysRes,
   mockHotHashtags,
+  mockLegacyPayoutReport,
   mockPayoutReport,
   mockSystemConfig,
   mockVerificationCsvContent,
@@ -749,13 +750,18 @@ export const handlers = [
       });
     }
 
+    // evt_legacy_mock serves a report settled before BTC-Time, so both column
+    // sets of WinnerTable can be seen side by side.
+    const report =
+      eventId === "evt_legacy_mock" ? mockLegacyPayoutReport : mockPayoutReport;
+
     // Return payout report for the event
     return HttpResponse.json<ApiResponse<typeof mockPayoutReport>>({
       code: "000000",
       success: true,
       message: null,
       data: {
-        ...mockPayoutReport,
+        ...report,
         event_id: eventId as string,
       },
     });

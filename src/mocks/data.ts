@@ -759,9 +759,64 @@ export const mockRewardDetails: RewardDetail[] = [
   },
 ];
 
+// A report from before the BTC-Time switchover, reachable at
+// /event/evt_legacy_mock/report. Its winners carry balance_at_snapshot_satoshi
+// and the report has no scoring_algorithm, so WinnerTable must keep rendering
+// the original Snapshot Balance / Distributable columns. Those payouts really
+// were weighted by a point-in-time balance; relabelling them as holding scores
+// would misstate what happened.
+export const mockLegacyPayoutWinners: PayoutWinner[] = [
+  {
+    winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    balance_at_snapshot_satoshi: 1280086,
+    win_probability_percent: 20.0,
+    is_dust: false,
+    original_reward_satoshi: 1668,
+    final_reward_satoshi: 1668,
+    distributable_rate: 19.0,
+    status: "completed",
+  },
+  {
+    winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    balance_at_snapshot_satoshi: 450000,
+    win_probability_percent: 18.0,
+    is_dust: false,
+    original_reward_satoshi: 51750,
+    final_reward_satoshi: 51750,
+    distributable_rate: 17.0,
+    status: "completed",
+  },
+];
+
+export const mockLegacyPayoutReport: PayoutReportRes = {
+  event_id: "evt_legacy_mock",
+  event_title: "Legacy event settled before BTC-Time scoring",
+  // No scoring_algorithm on purpose.
+  initial_reward_satoshi: 300000,
+  snapshot_block_height: 840000,
+  total_reward_pool_satoshi: 300000,
+  additional_reward_1_satoshi: 0,
+  additional_reward_2_satoshi: 0,
+  reward_details: [
+    {
+      ...mockRewardDetails[0],
+      winner_count: mockLegacyPayoutWinners.length,
+      winners: mockLegacyPayoutWinners,
+      dust_winner_count: 0,
+      dust_redistribute_amount_satoshi: 0,
+    },
+  ],
+};
+
 export const mockPayoutReport: PayoutReportRes = {
   event_id: "evt_001_mock",
   event_title: "What's the best Bitcoin scaling solution?",
+  // The winners below carry holding_score, which only a BTC-Time plan produces,
+  // so the report has to say so too. Without this the table falls back to the
+  // pre-BTC-Time columns and reads balance_at_snapshot_satoshi, which these
+  // winners do not have — every weight cell renders as "--". That combination
+  // cannot occur against the real backend: it sets both together.
+  scoring_algorithm: "btc_time_v1",
   initial_reward_satoshi: 300000,
   snapshot_block_height: 850000,
   total_reward_pool_satoshi: 500000,
