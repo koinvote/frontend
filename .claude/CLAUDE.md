@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⛔ 部署帳號與金鑰：不要自行清理
+
+本專案 dev/prod 都部署在 GCE VM 上，部署身分是 Linux 帳號 **`koinvote-web-deploy`**
+（secrets `GCE_USER` / `PROD_GCE_USER`），它同時擁有 `/var/www/koinvote`，
+prod 上還負責執行 og-meta-server。**這不是殘留帳號，刪掉或移除它的 SSH 金鑰，
+自動部署會立刻失效，prod 的分享預覽圖也會壞。**
+
+權威清冊在 backend repo 的 `doc/identities.md`（本機 `~/Desktop/backend/doc/identities.md`）。
+動任何帳號、SSH 金鑰或 GCE metadata 前先讀那份文件。
+
+git 作者欄裡的**已離職成員姓名是歷史紀錄，不是安全問題**；已決定不改寫 git 歷史。
+
 ## Project Overview
 
 KoinVote is a React + TypeScript voting/event platform built with Vite. The application supports creating and managing events with cryptocurrency-based voting, featuring both public-facing pages and an admin dashboard.

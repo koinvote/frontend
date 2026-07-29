@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 
 import AdminLogin from "@/admin/component/AdminLogin";
@@ -8,56 +8,142 @@ import { useToast } from "@/components/base/Toast/useToast";
 import systemConsts from "@/consts";
 import { truncateAddress } from "@/utils/address";
 
-/**
- * Generate a random 32-character string
- */
-function generateRandomHashKey(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < 32; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
 const adminAddress = truncateAddress(systemConsts.ADMIN_ADDRESS);
+
+/** Seconds remaining until an RFC3339 instant, floored at zero. */
+function secondsUntil(iso: string): number {
+  const ms = new Date(iso).getTime() - Date.now();
+  return ms > 0 ? Math.floor(ms / 1000) : 0;
+}
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
-  const [hashKey, setHashKey] = useState<string>("");
+  // The message to sign is now issued by the server instead of invented here.
+  // The old client-side random string was never validated by the backend, so
+  // any captured (address, plaintext, signature) triple stayed a working
+  // credential forever.
+  const [plaintext, setPlaintext] = useState<string>("");
+  const [nonceTimestamp, setNonceTimestamp] = useState<string>("");
+  const [expiresAt, setExpiresAt] = useState<string>("");
+  const [secondsLeft, setSecondsLeft] = useState<number>(0);
+
   const [signature, setSignature] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingChallenge, setIsFetchingChallenge] = useState(false);
 
-  // Generate hash key and plaintext on mount
+  const fetchChallenge = useCallback(
+    async (opts?: { silent?: boolean }) => {
+      try {
+        setIsFetchingChallenge(true);
+
+        // The axios interceptor unwraps to response.data at runtime while the
+        // types still describe an AxiosResponse, so both shapes are handled.
+        const res = (await AdminAPI.loginChallenge({
+          address: systemConsts.ADMIN_ADDRESS,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        })) as any;
+        const envelope = res?.success !== undefined ? res : res?.data;
+
+        if (envelope?.success && envelope?.data?.plaintext) {
+          setPlaintext(envelope.data.plaintext);
+          setNonceTimestamp(envelope.data.nonce_timestamp);
+          setExpiresAt(envelope.data.expires_at);
+          setSecondsLeft(secondsUntil(envelope.data.expires_at));
+          setSignature("");
+          if (!opts?.silent) {
+            showToast("success", "New message generated");
+          }
+          return true;
+        }
+
+        showToast(
+          "error",
+          envelope?.message || "Failed to get a message to sign",
+        );
+        return false;
+      } catch (error: unknown) {
+        const message =
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (error as any)?.apiMessage ||
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (error as any)?.message ||
+          "Failed to get a message to sign";
+        showToast("error", message);
+        return false;
+      } finally {
+        setIsFetchingChallenge(false);
+      }
+    },
+    [showToast],
+  );
+
   useEffect(() => {
-    const randomHashKey = generateRandomHashKey();
-    setHashKey(randomHashKey);
-  }, []);
+    void fetchChallenge({ silent: true });
+  }, [fetchChallenge]);
+
+  // Countdown, so expiry is visible before the message is used rather than
+  // discovered by a failed login.
+  useEffect(() => {
+    if (!expiresAt) return;
+
+    const tick = () => setSecondsLeft(secondsUntil(expiresAt));
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [expiresAt]);
+
+  const isExpired = Boolean(expiresAt) && secondsLeft <= 0;
 
   const handleCopy = async (text: string, label: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      showToast("success", `${label} 已複製到剪貼簿`);
+      showToast("success", `${label} copied to clipboard`);
     } catch {
-      showToast("error", `${label} 複製失敗`);
+      showToast("error", `Failed to copy ${label.toLowerCase()}`);
     }
   };
 
+  /**
+   * Replace the challenge after a failed attempt.
+   *
+   * The server consumes the nonce before it verifies the signature, so a typo
+   * in the signature burns the message exactly as thoroughly as a successful
+   * login does. Retrying with the same one returns LOGIN_CHALLENGE_ALREADY_USED,
+   * which reads like a bug. Fetching a fresh one is the only correct retry.
+   */
+  const replaceBurntChallenge = useCallback(async () => {
+    const ok = await fetchChallenge({ silent: true });
+    if (ok) {
+      showToast(
+        "warn",
+        "That message is no longer valid. A new one was generated — please sign again.",
+      );
+    }
+  }, [fetchChallenge, showToast]);
+
   const handleLogin = async () => {
     if (!signature.trim()) {
-      showToast("error", "請輸入簽名");
+      showToast("error", "Please enter a signature");
+      return;
+    }
+    if (!plaintext || !nonceTimestamp) {
+      showToast("error", "No message to sign yet — regenerate");
+      return;
+    }
+    if (isExpired) {
+      showToast("error", "The message expired — regenerate");
       return;
     }
 
     try {
       setIsLoading(true);
 
-      // Note: axios interceptor returns response.data at runtime, but types may still reflect AxiosResponse
       const loginRes = (await AdminAPI.login({
         address: systemConsts.ADMIN_ADDRESS,
-        plaintext: hashKey,
+        plaintext,
+        nonce_timestamp: nonceTimestamp,
         signature,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       })) as any;
@@ -66,21 +152,20 @@ export default function AdminLoginPage() {
         loginRes?.success !== undefined ? loginRes : loginRes?.data;
 
       if (envelope?.success && envelope?.data?.token) {
-        // Save token to localStorage
         setAdminToken(envelope.data.token);
-        showToast("success", "登入成功");
-
-        // Navigate to reward-rules page
+        showToast("success", "Signed in");
         navigate("/admin/reward-rules");
-      } else {
-        const errorMessage = envelope?.message || "登入失敗";
-        showToast("error", errorMessage);
+        return;
       }
+
+      showToast("error", envelope?.message || "Login failed");
+      await replaceBurntChallenge();
     } catch (error: unknown) {
       const errorMessage =
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.apiMessage || (error as any)?.message || "登入失敗";
+        (error as any)?.apiMessage || (error as any)?.message || "Login failed";
       showToast("error", errorMessage);
+      await replaceBurntChallenge();
     } finally {
       setIsLoading(false);
     }
@@ -89,11 +174,15 @@ export default function AdminLoginPage() {
   return (
     <AdminLogin
       adminAddress={adminAddress}
-      hashKey={hashKey}
+      plaintext={plaintext}
       signature={signature}
+      secondsLeft={secondsLeft}
+      isExpired={isExpired}
       isLoading={isLoading}
+      isFetchingChallenge={isFetchingChallenge}
       onSignatureChange={setSignature}
       onCopy={handleCopy}
+      onRegenerate={() => void fetchChallenge()}
       onLogin={handleLogin}
     />
   );
