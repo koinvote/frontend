@@ -5,23 +5,40 @@ import Logo from "@/assets/logo/logo.svg?react";
 
 interface AdminLoginProps {
   adminAddress: string;
-  hashKey: string;
+  plaintext: string;
   signature: string;
+  secondsLeft: number;
+  isExpired: boolean;
   isLoading: boolean;
+  isFetchingChallenge: boolean;
   onSignatureChange: (value: string) => void;
   onCopy: (text: string, label: string) => void;
+  onRegenerate: () => void;
   onLogin: () => void;
+}
+
+function formatCountdown(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 export default function AdminLogin({
   adminAddress,
-  hashKey,
+  plaintext,
   signature,
+  secondsLeft,
+  isExpired,
   isLoading,
+  isFetchingChallenge,
   onSignatureChange,
   onCopy,
+  onRegenerate,
   onLogin,
 }: AdminLoginProps) {
+  const busy = isLoading || isFetchingChallenge;
+  const canSubmit = Boolean(plaintext) && !isExpired && !busy;
+
   return (
     <div className="bg-admin-bg flex min-h-screen items-center justify-center">
       <div className="w-full max-w-xl rounded-2xl bg-white px-10 py-8 shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
@@ -30,7 +47,7 @@ export default function AdminLogin({
             <Logo className="h-8 w-8" />
           </div>
           <div>
-            <div className="tx-20 text-admin-text-main fw-m">
+            <div className="text-admin-text-main text-xl font-medium">
               Koinvote Admin
             </div>
             <div className="text-admin-text-sub text-sm">
@@ -52,24 +69,60 @@ export default function AdminLogin({
             </div>
           </div>
 
-          {/* Hash Key */}
+          {/* Message to sign. Issued by the server, single-use, 15 minutes. */}
           <div className="space-y-1">
-            <label className="text-admin-text-sub text-sm">Hash Key</label>
-            <div className="bg-admin-surface mt-2 flex items-center gap-2 rounded-md px-3 py-2">
-              <input
-                className="text-admin-text-main flex-1 border-0 bg-transparent font-mono text-sm outline-none"
-                value={hashKey}
+            <div className="flex items-center justify-between gap-2">
+              <label className="text-admin-text-sub text-sm">簽章訊息</label>
+              <div className="flex items-center gap-3">
+                {plaintext && (
+                  <span
+                    className={
+                      isExpired
+                        ? "text-sm text-red-600"
+                        : "text-admin-text-sub text-sm"
+                    }
+                  >
+                    {isExpired
+                      ? "已過期"
+                      : `${formatCountdown(secondsLeft)} 後過期`}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={onRegenerate}
+                  disabled={busy}
+                  className="text-accent text-sm underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isFetchingChallenge ? "產生中..." : "重新產生"}
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-admin-surface mt-2 flex items-start gap-2 rounded-md px-3 py-2">
+              {/* A textarea rather than an input: the server-issued message runs
+                  to about 120 characters, and a single-line field would hide all
+                  but the first few, making it impossible to check against what
+                  the wallet is about to sign. */}
+              <textarea
+                className="text-admin-text-main min-h-[4.5rem] flex-1 resize-none border-0 bg-transparent font-mono text-sm break-all outline-none"
+                value={plaintext}
                 readOnly
+                rows={3}
               />
               <button
                 type="button"
-                onClick={() => onCopy(hashKey, "Hash Key")}
-                className="text-admin-text-sub hover:text-admin-text-main transition-colors"
-                aria-label="Copy Hash Key"
+                onClick={() => onCopy(plaintext, "簽章訊息")}
+                disabled={!plaintext}
+                className="text-admin-text-sub hover:text-admin-text-main mt-1 transition-colors disabled:opacity-40"
+                aria-label="複製簽章訊息"
               >
                 <CopyIcon className="h-5 w-5 cursor-pointer" />
               </button>
             </div>
+
+            <p className="text-admin-text-sub mt-1 text-xs">
+              由伺服器產生，僅能使用一次。簽名失敗後會自動換一組新的。
+            </p>
           </div>
 
           {/* Signature */}
@@ -80,7 +133,7 @@ export default function AdminLogin({
               placeholder="Paste your signature here"
               value={signature}
               onChange={(e) => onSignatureChange(e.target.value)}
-              disabled={isLoading}
+              disabled={busy}
             />
           </div>
 
@@ -90,9 +143,13 @@ export default function AdminLogin({
               size="large"
               type="primary"
               onClick={onLogin}
-              disabled={isLoading}
+              disabled={!canSubmit}
             >
-              {isLoading ? "Logging in..." : "Log in"}
+              {isLoading
+                ? "Logging in..."
+                : isExpired
+                  ? "簽章訊息已過期，請重新產生"
+                  : "Log in"}
             </Button>
           </div>
         </div>
