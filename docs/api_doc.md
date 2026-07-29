@@ -1809,9 +1809,9 @@ Authorization: Bearer abcd1234567890efgh...
 
 ```json
 {
-  "address": "bc1ql4ugj3t09cw84dulj5y2ulvzftzt3ha9qsy539",
+  "address": "bc1qadminaddressplaceholder000000000000000",
   "plaintext": "koinvote.com|admin_login|1734345600|RAND123",
-  "signature": "HzqwHNG+0OANfHVQ768La5WMqv171OWOrYXJRCRcidM7ZijTdqZgm8zCEPrHi7NA27p/G4mbq+EVy7uPbkir8pw="
+  "signature": "<BASE64_SIGNATURE_FROM_YOUR_WALLET>"
 }
 ```
 
@@ -1929,7 +1929,7 @@ Authorization: Bearer abcd1234567890efgh...
 {
   "page": "1",
   "limit": "15",
-  "to_address": "bc1ql4ugj3t09cw84dulj5y2ulvzftzt3ha",
+  "to_address": "bc1qadminaddressplaceholder000000000000000",
   "start_time": "2025-01-01T00:00:00Z",
   "end_time": "2025-01-31T23:59:59Z"
 }
@@ -1956,8 +1956,8 @@ Authorization: Bearer abcd1234567890efgh...
     "withdrawals": [
       {
         "id": 1,
-        "from_address": "bc1ql4ugj3t09cw84dvzftzt3ha9qsy539",
-        "to_address": "bc1ql4ugj3t09cw84dulj5y2ulvzftzt3ha",
+        "from_address": "bc1qadminaddressplaceholder000000000000000",
+        "to_address": "bc1qadminaddressplaceholder000000000000000",
         "txid": "abc123...",
         "amount": 10000,
         "fee": 100,
