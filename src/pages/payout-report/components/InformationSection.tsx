@@ -1,6 +1,4 @@
 import type { PayoutReportRes } from "@/api/response";
-import { useSystemParametersStore } from "@/stores/systemParametersStore";
-import { Divider } from "antd";
 import { useTranslation } from "react-i18next";
 
 interface InformationSectionProps {
@@ -9,27 +7,27 @@ interface InformationSectionProps {
 
 export function InformationSection({ report }: InformationSectionProps) {
   const { t } = useTranslation();
-  const { params } = useSystemParametersStore();
+
+  // The threshold comes from the payout itself, not from the live system
+  // parameters. The current setting is 600 satoshi while payouts made in
+  // 2026-03 were planned at 2000: showing today's number against an older
+  // payout would misstate why those winners were redistributed.
+  const payoutThreshold = report.reward_details[0]?.dust_threshold_satoshi;
 
   const infoItems = [
-    { label: t("payoutReport.eventTitle"), value: report.event_title },
-    { label: t("payoutReport.eventId"), value: report.event_id },
+    { label: t("payoutReport.eventTitle", "Event title"), value: report.event_title },
+    { label: t("payoutReport.eventId", "Event ID"), value: report.event_id },
     {
-      label: t("payoutReport.blockHigh"),
-      value: report.snapshot_block_height.toLocaleString(),
-    },
-  ];
-
-  // TODO: 追加獎金 addition_reward_satoshi
-  const rewardItems = [
-    {
-      label: t("payoutReport.originalReward"),
-      value: `${report.initial_reward_satoshi.toLocaleString()} sats`,
+      label: t("payoutReport.settlementBlock", "Settlement Block Height"),
+      // Settled before the height was recorded, so there is nothing to show.
+      value: report.snapshot_block_height?.toLocaleString() ?? "--",
     },
     {
-      label: t("payoutReport.totalReward"),
-      value: `${report.total_reward_pool_satoshi.toLocaleString()} sats`,
-      highlight: true,
+      label: t("payoutReport.payoutThreshold", "Payout threshold"),
+      value:
+        payoutThreshold === undefined
+          ? "--"
+          : `${payoutThreshold.toLocaleString()} sats`,
     },
   ];
 
@@ -39,8 +37,7 @@ export function InformationSection({ report }: InformationSectionProps) {
         {t("payoutReport.information", "Information")}
       </h2>
 
-      {/* Basic info grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {infoItems.map((item, index) => (
           <div key={index}>
             <p className="text-base text-gray-400 mb-1">{item.label}</p>
@@ -50,36 +47,6 @@ export function InformationSection({ report }: InformationSectionProps) {
           </div>
         ))}
       </div>
-
-      <Divider styles={{ root: { margin: "1rem 0" } }} />
-
-      {/* Reward info grid */}
-      <div className="flex flex-wrap gap-4">
-        {rewardItems.map((item, index) => (
-          <div key={index} className="flex-1">
-            <p className="text-base text-gray-400 mb-1">{item.label}</p>
-            <p
-              className={`text-base text-primary ${
-                item.highlight ? "font-bold" : ""
-              }`}
-            >
-              {item.value}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Reward threshold badge */}
-      {params?.dust_threshold_satoshi && (
-        <div className="mt-4 flex items-center gap-2">
-          <span className="text-base text-gray-400">
-            {t("payoutReport.rewardThreshold")}:
-          </span>
-          <span className="px-2 py-0.5 text-white text-xs bg-neutral-800 rounded-2xl">
-            {params.dust_threshold_satoshi.toLocaleString()} sats
-          </span>
-        </div>
-      )}
     </div>
   );
 }

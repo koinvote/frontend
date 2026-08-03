@@ -98,12 +98,11 @@ const PayoutReport = () => {
           <h2 className="text-lg text-primary mt-8 mb-0 md:mb-6 font-bold md:font-normal">
             {t("payoutReport.distributionDetail", "Reward Distribution Detail")}
           </h2>
-          {payoutReport.reward_details.map((detail, index) => (
+          {payoutReport.reward_details.map((detail) => (
             <RewardDistributionSection
               key={`${detail.reward_type}-${detail.plan_id}`}
               detail={detail}
               eventId={payoutReport.event_id}
-              index={index}
               scoringAlgorithm={payoutReport.scoring_algorithm}
             />
           ))}

@@ -125,11 +125,6 @@ export function EventInfo({
     [event.initial_reward_satoshi],
   );
 
-  const additionalRewardBtc = useMemo(() => {
-    if (event.additional_reward_satoshi <= 0) return null;
-    return satsToBtc(event.additional_reward_satoshi, { suffix: false });
-  }, [event.additional_reward_satoshi]);
-
   // Duration calculations
   const eventDurationDisplay = useMemo(() => {
     if (isOngoing || isCompleted || isPreheat) {
@@ -375,22 +370,6 @@ export function EventInfo({
       });
     }
 
-    if ((isOngoing || isCompleted) && isRewarded && additionalRewardBtc) {
-      result.push({
-        key: "additional-reward",
-        label: t("eventInfo.additionalReward", "Additional Reward:"),
-        value: (
-          <span className="text-primary text-xs md:text-sm">
-            {additionalRewardBtc} BTC ({event.additional_winner_count}{" "}
-            {event.additional_winner_count === 1
-              ? t("eventInfo.address", "Address")
-              : t("eventInfo.addresses", "Addresses")}
-            )
-          </span>
-        ),
-      });
-    }
-
     if ((isOngoing || isCompleted || isPreheat) && event.creator_address) {
       result.push({
         key: "creator-address",
@@ -567,9 +546,7 @@ export function EventInfo({
     isPreheat,
     isRewarded,
     rewardAmountBtc,
-    additionalRewardBtc,
     event.winner_count,
-    event.additional_winner_count,
     timeRemaining,
     eventDurationDisplay,
     preheatDurationDisplay,

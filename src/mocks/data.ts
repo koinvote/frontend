@@ -25,9 +25,10 @@ export const mockSystemConfig: SystemConfigRes = {
   free_hours: 24,
   platform_fee_percentage: 2,
   refund_service_fee_percentage: 0,
-  payout_fee_multiplier: 1.0,
-  refund_fee_multiplier: 1.0,
-  withdrawal_fee_multiplier: 1.0,
+  payout_fee_target_blocks: 6,
+  refund_fee_target_blocks: 12,
+  withdrawal_fee_target_blocks: 3,
+  max_payout_fee_percentage: 5,
   maintenance_mode: false,
   required_confirmations: 3,
 };
@@ -365,10 +366,8 @@ export const mockEventDetail: EventDetailDataRes = {
   event_reward_type: "rewarded",
   status: EventStatus.ACTIVE,
   initial_reward_satoshi: 80000,
-  additional_reward_satoshi: 20000,
   total_reward_satoshi: 100000,
   winner_count: 5,
-  additional_winner_count: 2,
   duration_hours: 96,
   creator_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
   created_at: "2026-01-10T10:00:00Z",
@@ -569,9 +568,10 @@ export const mockAdminSystemParameters: AdminSystemParametersRes = {
   free_hours: 24,
   platform_fee_percentage: 2.5,
   refund_service_fee_percentage: 0.5,
-  payout_fee_multiplier: 1.0,
-  refund_fee_multiplier: 1.0,
-  withdrawal_fee_multiplier: 1.0,
+  payout_fee_target_blocks: 6,
+  refund_fee_target_blocks: 12,
+  withdrawal_fee_target_blocks: 3,
+  max_payout_fee_percentage: 5,
   maintenance_mode: false,
   required_confirmations: 3,
 };
@@ -581,6 +581,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
     holding_score: "0.01280086",
+    score_share: "35.71%",
+    average_holding_satoshi: 1280086,
+    join_block_height: 849501,
     win_probability_percent: 20.0,
     is_dust: false,
     original_reward_satoshi: 1668,
@@ -591,6 +594,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
     holding_score: "0.0045",
+    score_share: "12.55%",
+    average_holding_satoshi: 450000,
+    join_block_height: 849620,
     win_probability_percent: 18.0,
     is_dust: false,
     original_reward_satoshi: 51750,
@@ -601,6 +607,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
     holding_score: "0.004",
+    score_share: "11.16%",
+    average_holding_satoshi: 400000,
+    join_block_height: 849745,
     win_probability_percent: 16.0,
     is_dust: false,
     original_reward_satoshi: 46000,
@@ -611,6 +620,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qabc123xyz456def789ghi012jkl345mno678pqr",
     holding_score: "0.0035",
+    score_share: "9.76%",
+    average_holding_satoshi: 350000,
+    join_block_height: 849880,
     win_probability_percent: 14.0,
     is_dust: false,
     original_reward_satoshi: 40250,
@@ -622,6 +634,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
     winner_address:
       "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
     holding_score: "0.003",
+    score_share: "8.37%",
+    average_holding_satoshi: 300000,
+    join_block_height: 850010,
     win_probability_percent: 12.0,
     is_dust: false,
     original_reward_satoshi: 34500,
@@ -632,6 +647,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qdef456uvw789xyz012abc345ghi678jkl901mno",
     holding_score: "0.0025",
+    score_share: "6.97%",
+    average_holding_satoshi: 250000,
+    join_block_height: 850150,
     win_probability_percent: 10.0,
     is_dust: false,
     original_reward_satoshi: 28750,
@@ -642,6 +660,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qprocessing123xyz456def789ghi012jkl345mno",
     holding_score: "0.002",
+    score_share: "5.58%",
+    average_holding_satoshi: 200000,
+    join_block_height: 850290,
     win_probability_percent: 8.0,
     is_dust: false,
     original_reward_satoshi: 23000,
@@ -652,6 +673,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qwinner09abc123def456ghi789jkl012mno345pqr",
     holding_score: "0.0018",
+    score_share: "5.02%",
+    average_holding_satoshi: 180000,
+    join_block_height: 850430,
     win_probability_percent: 7.2,
     is_dust: false,
     original_reward_satoshi: 20700,
@@ -662,6 +686,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qwinner10xyz789abc012def345ghi678jkl901mno",
     holding_score: "0.0016",
+    score_share: "4.46%",
+    average_holding_satoshi: 160000,
+    join_block_height: 850560,
     win_probability_percent: 6.4,
     is_dust: false,
     original_reward_satoshi: 18400,
@@ -672,6 +699,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qdust123abc456def789ghi012jkl345mno678pqr",
     holding_score: "0.00005",
+    score_share: "0.14%",
+    average_holding_satoshi: 5000,
+    join_block_height: 850690,
     win_probability_percent: 0.2,
     is_dust: true,
     original_reward_satoshi: 500,
@@ -679,48 +709,57 @@ export const mockPayoutWinners: PayoutWinner[] = [
     distributable_rate: 0.0,
     status: "redistribute",
   },
-];
-
-export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   {
-    winner_address: "bc1qghi789rst012uvw345xyz678abc901def234ghi",
-    holding_score: "0.008",
-    win_probability_percent: 32.0,
-    is_dust: false,
-    original_reward_satoshi: 61280,
-    final_reward_satoshi: 61280,
-    distributable_rate: 32.0,
-    status: "completed",
+    winner_address: "bc1qdust2def789ghi012jkl345mno678pqr901stu",
+    holding_score: "0.00004",
+    score_share: "0.11%",
+    average_holding_satoshi: 4000,
+    join_block_height: 850701,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 80,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
   {
-    winner_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc",
-    holding_score: "0.0065",
-    win_probability_percent: 26.0,
-    is_dust: false,
-    original_reward_satoshi: 49790,
-    final_reward_satoshi: 49790,
-    distributable_rate: 26.0,
-    status: "completed",
+    winner_address: "bc1qdust3ghi012jkl345mno678pqr901stu234vwx",
+    holding_score: "0.00003",
+    score_share: "0.08%",
+    average_holding_satoshi: 3000,
+    join_block_height: 850712,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 60,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
   {
-    winner_address: "bc1qmno345pqr678stu901vwx234yz567abc890def",
-    holding_score: "0.0055",
-    win_probability_percent: 22.0,
-    is_dust: false,
-    original_reward_satoshi: 42130,
-    final_reward_satoshi: 42130,
-    distributable_rate: 22.0,
-    status: "completed",
+    winner_address: "bc1qdust4jkl345mno678pqr901stu234vwx567yza",
+    holding_score: "0.00002",
+    score_share: "0.06%",
+    average_holding_satoshi: 2000,
+    join_block_height: 850725,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 40,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
   {
-    winner_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi",
-    holding_score: "0.005",
-    win_probability_percent: 20.0,
-    is_dust: false,
-    original_reward_satoshi: 38300,
-    final_reward_satoshi: 38300,
-    distributable_rate: 20.0,
-    status: "completed",
+    winner_address: "bc1qdust5mno678pqr901stu234vwx567yza890bcd",
+    holding_score: "0.00001",
+    score_share: "0.03%",
+    average_holding_satoshi: 1000,
+    join_block_height: 850736,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 20,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
 ];
 
@@ -732,26 +771,11 @@ export const mockRewardDetails: RewardDetail[] = [
     platform_fee_satoshi: 7500,
     estimated_miner_fee_satoshi: 5000,
     distributable_satoshi: 287500,
-    winner_count: 12,
+    winner_count: 9,
     winners: mockPayoutWinners,
-    dust_winner_count: 3,
+    dust_winner_count: 5,
+    dust_threshold_satoshi: 2000,
     dust_redistribute_amount_satoshi: 1532,
-    payout_txid:
-      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
-    csv_sha256:
-      "d2f4a8c1b3e5f7890123456789abcdef0123456789abcdef0123456789abcef39",
-  },
-  {
-    reward_type: "additional",
-    plan_id: 457,
-    original_amount_satoshi: 200000,
-    platform_fee_satoshi: 5000,
-    estimated_miner_fee_satoshi: 3500,
-    distributable_satoshi: 191500,
-    winner_count: 4,
-    winners: mockAdditionalPayoutWinners,
-    dust_winner_count: 0,
-    dust_redistribute_amount_satoshi: 0,
     payout_txid:
       "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
     csv_sha256:
@@ -759,16 +783,67 @@ export const mockRewardDetails: RewardDetail[] = [
   },
 ];
 
+// A report from before the BTC-Time switchover, reachable at
+// /event/evt_legacy_mock/report. Its winners carry balance_at_snapshot_satoshi
+// and the report has no scoring_algorithm, so WinnerTable must keep rendering
+// the original Snapshot Balance / Distributable columns. Those payouts really
+// were weighted by a point-in-time balance; relabelling them as holding scores
+// would misstate what happened.
+export const mockLegacyPayoutWinners: PayoutWinner[] = [
+  {
+    winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    balance_at_snapshot_satoshi: 1280086,
+    win_probability_percent: 20.0,
+    is_dust: false,
+    original_reward_satoshi: 1668,
+    final_reward_satoshi: 1668,
+    distributable_rate: 19.0,
+    status: "completed",
+  },
+  {
+    winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    balance_at_snapshot_satoshi: 450000,
+    win_probability_percent: 18.0,
+    is_dust: false,
+    original_reward_satoshi: 51750,
+    final_reward_satoshi: 51750,
+    distributable_rate: 17.0,
+    status: "completed",
+  },
+];
+
+export const mockLegacyPayoutReport: PayoutReportRes = {
+  event_id: "evt_legacy_mock",
+  event_title: "Legacy event settled before BTC-Time scoring",
+  // No scoring_algorithm on purpose.
+  initial_reward_satoshi: 300000,
+  snapshot_block_height: 840000,
+  total_reward_pool_satoshi: 300000,
+  reward_details: [
+    {
+      ...mockRewardDetails[0],
+      winner_count: mockLegacyPayoutWinners.length,
+      winners: mockLegacyPayoutWinners,
+      dust_winner_count: 0,
+      dust_redistribute_amount_satoshi: 0,
+    },
+  ],
+};
+
 export const mockPayoutReport: PayoutReportRes = {
   event_id: "evt_001_mock",
   event_title: "What's the best Bitcoin scaling solution?",
+  // The winners below carry holding_score, which only a BTC-Time plan produces,
+  // so the report has to say so too. Without this the table falls back to the
+  // pre-BTC-Time columns and reads balance_at_snapshot_satoshi, which these
+  // winners do not have — every weight cell renders as "--". That combination
+  // cannot occur against the real backend: it sets both together.
+  scoring_algorithm: "btc_time_v1",
   initial_reward_satoshi: 300000,
   snapshot_block_height: 850000,
   total_reward_pool_satoshi: 500000,
   reward_details: mockRewardDetails,
   // TODO: 追加獎金 (下面key目前沒有)
-  additional_reward_1_satoshi: 200000,
-  additional_reward_2_satoshi: 0,
 };
 
 // Mock CSV data for verification
