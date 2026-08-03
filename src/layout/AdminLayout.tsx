@@ -6,24 +6,47 @@ import { Navigate, Outlet, useNavigate } from "react-router";
 
 import AdminMenu from "@/admin/AdminMenu";
 import { AdminAPI } from "@/api";
+import { isTokenExpired, subscribeSessionExpired } from "@/api/adminSession";
 import { getAdminToken, removeAdminToken } from "@/api/http";
 import Logo from "@/assets/logo/logo.svg?react";
 
 export default function AdminLayout() {
   const navigate = useNavigate();
-  const hasToken = !!getAdminToken();
+  const token = getAdminToken();
+  // A token whose own `exp` has passed is already worthless, so the probe
+  // request below is skipped entirely: no request, no 401, nothing flashing
+  // between the URL and the login form.
+  const staleToken = !!token && isTokenExpired(token);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
 
+  // A 401 from anywhere under this layout lands here, so the redirect stays a
+  // router transition instead of a full page reload.
+  useEffect(() => subscribeSessionExpired(() => setSessionExpired(true)), []);
+
   useEffect(() => {
-    if (!hasToken) return;
+    if (staleToken) removeAdminToken();
+  }, [staleToken]);
+
+  useEffect(() => {
+    if (!token || staleToken) return;
     AdminAPI.getSystemParameters()
       .then(() => setAuthChecked(true))
       .catch(() => {
-        // 401 handled by adminHttp interceptor (toast + redirect)
+        // A 401 arrives via subscribeSessionExpired above. Anything else (a
+        // network blip, a 500) leaves the layout unrendered rather than
+        // showing an admin shell we could not authenticate.
       });
-  }, [hasToken]);
+  }, [token, staleToken]);
 
-  if (!hasToken) return <Navigate to="/admin/login" replace />;
+  // Expiry is checked before the plain "no token" case on purpose: a 401 has
+  // already cleared the token by the time this re-renders, and the two would
+  // otherwise be indistinguishable — losing the reason the admin was sent back.
+  if (staleToken || sessionExpired)
+    return (
+      <Navigate to="/admin/login" replace state={{ sessionExpired: true }} />
+    );
+  if (!token) return <Navigate to="/admin/login" replace />;
   if (!authChecked) return null;
 
   const handleLogout = () => {

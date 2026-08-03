@@ -4,6 +4,8 @@ import CopyIcon from "@/assets/icons/copy.svg?react";
 import Logo from "@/assets/logo/logo.svg?react";
 
 interface AdminLoginProps {
+  /** Shown when the admin was bounced here by an expired session. */
+  sessionExpired?: boolean;
   adminAddress: string;
   plaintext: string;
   signature: string;
@@ -27,6 +29,7 @@ function formatCountdown(totalSeconds: number): string {
 }
 
 export default function AdminLogin({
+  sessionExpired = false,
   adminAddress,
   plaintext,
   signature,
@@ -67,6 +70,18 @@ export default function AdminLogin({
             </div>
           </div>
         </div>
+
+        {/* Stated plainly and in the card, so it reads as the reason the form
+            is here rather than as something that went wrong. Deliberately not
+            the word "expired": that already means the signing message below. */}
+        {sessionExpired && (
+          <div
+            role="status"
+            className="text-admin-text-sub mb-6 rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm"
+          >
+            Your previous session has ended. Please sign in again.
+          </div>
+        )}
 
         <div className="space-y-4">
           {passkeySupported && (
