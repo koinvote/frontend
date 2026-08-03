@@ -30,6 +30,25 @@ jobs:
             npm run build
             rm -f dist/mockServiceWorker.js
 
+      - name: Summarise the commit for the notification
+        if: always()
+        env:
+          # Read through the environment, never interpolated into the script.
+          # A commit message is attacker-controlled text and ${{ github }} inside
+          # a run block would substitute it before the shell ever sees it.
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          # Telegram rejects a message over 4096 characters. A squash merge puts
+          # the entire pull request body into the commit message, so the whole
+          # notification step fails and reports the deploy as failed - while the
+          # deploy itself succeeded. A red run that means "the deploy worked" is
+          # worse than no notification at all.
+          {
+            echo "COMMIT_SUBJECT<<COMMIT_SUBJECT_EOF"
+            printf '%s\n' "$COMMIT_MESSAGE" | head -n 1 | cut -c1-200
+            echo "COMMIT_SUBJECT_EOF"
+          } >> "$GITHUB_ENV"
+
       - name: Send Telegram notification
         uses: appleboy/telegram-action@master
         if: always() # 確保無論成功或失敗都會跑這步
@@ -40,7 +59,7 @@ jobs:
             🚀 **部署通知**
             專案: ${{ github.repository }} PROD
             狀態: ${{ job.status == 'success' && '✅ 成功' || '❌ 失敗' }}
-            提交訊息: ${{ github.event.head_commit.message }}
+            提交訊息: ${{ env.COMMIT_SUBJECT }}
             執行者: ${{ github.actor }}
 
             查看詳情: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
