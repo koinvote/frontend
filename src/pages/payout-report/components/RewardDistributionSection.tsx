@@ -8,7 +8,6 @@ import { WinnerTable } from "./WinnerTable";
 interface RewardDistributionSectionProps {
   detail: RewardDetail;
   eventId: string;
-  index: number;
   // Absent for events settled before the BTC-Time switchover; WinnerTable
   // uses it to decide which weight column set to render.
   scoringAlgorithm?: string;
@@ -17,23 +16,10 @@ interface RewardDistributionSectionProps {
 export function RewardDistributionSection({
   detail,
   eventId,
-  index,
   scoringAlgorithm,
 }: RewardDistributionSectionProps) {
   const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
-
-  const isOriginal = detail.reward_type === "initial";
-  const titleKey = isOriginal
-    ? "payoutReport.originalDistribution"
-    : "payoutReport.additionalDistribution";
-  const titleKeyDefaultText = isOriginal
-    ? "Original Reward Distribution"
-    : "Additional Reward Distribution";
-
-  const title = isOriginal
-    ? t(titleKey, titleKeyDefaultText)
-    : `${t(titleKey, titleKeyDefaultText)} #${index}`;
 
   const summaryItems = [
     {
@@ -86,11 +72,10 @@ export function RewardDistributionSection({
   return (
     <div className="mb-6">
       <div className="p-0 md:p-6 md:rounded-2xl md:border border-neutral-800 overflow-hidden">
-        {/* Header */}
-        <h3 className="mt-6 md:mt-0 mb-6 text-base text-primary">{title}</h3>
-
-        {/* Summary grid */}
-        <div className="px-4 pt-4 pb-6 bg-gray-100 dark:bg-transparent rounded-lg">
+        {/* No heading here: the section above already says "Reward
+            Distribution Detail", and with a single reward per event a second
+            heading repeating it adds a level without adding meaning. */}
+        <div className="px-4 pt-4 pb-6 mt-6 md:mt-0 bg-gray-100 dark:bg-transparent rounded-lg">
           <div className="flex flex-wrap -mx-2">
             {summaryItems.map((item, idx) => (
               <div
@@ -122,10 +107,8 @@ export function RewardDistributionSection({
         </h4>
         <WinnerTable
           winners={detail.winners}
-          winnerCount={detail.winner_count}
           redistributedAddressCount={detail.dust_winner_count}
           redistributedSatoshi={detail.dust_redistribute_amount_satoshi}
-          eventId={eventId}
           scoringAlgorithm={scoringAlgorithm}
         />
 

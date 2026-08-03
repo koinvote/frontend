@@ -11,10 +11,8 @@ import { useTranslation } from "react-i18next";
 
 interface WinnerTableProps {
   winners: PayoutWinner[];
-  winnerCount: number;
   redistributedAddressCount: number;
   redistributedSatoshi: number;
-  eventId: string;
   // Absent for events settled before BTC-Time. Those payouts were weighted by
   // a plain snapshot balance, so they keep the original Snapshot Balance /
   // Distributable columns rather than being relabelled as holding scores.
@@ -25,7 +23,6 @@ const DISPLAY_LIMIT = 10;
 
 export function WinnerTable({
   winners,
-  winnerCount,
   redistributedAddressCount,
   redistributedSatoshi,
   scoringAlgorithm,
@@ -35,15 +32,21 @@ export function WinnerTable({
   const { params } = useSystemParametersStore();
   const [, setCopiedAddress] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
     setIsScrolled(e.currentTarget.scrollLeft > 0);
   }, []);
 
   const isBtcTimeScored = !!scoringAlgorithm;
-  const displayedWinners = winners.slice(0, DISPLAY_LIMIT);
-  const shouldShowRemaining = winnerCount > DISPLAY_LIMIT;
-  const remainingCount = winnerCount - DISPLAY_LIMIT;
+  // The API returns every winner, dust included, so the hidden count is just
+  // what this table chose not to render. It used to be derived from
+  // winner_count, which excludes dust winners while these rows include them -
+  // the two disagreed whenever any reward fell under the threshold.
+  const displayedWinners = isExpanded
+    ? winners
+    : winners.slice(0, DISPLAY_LIMIT);
+  const isCollapsible = winners.length > DISPLAY_LIMIT;
 
   const dustThreshold = params?.dust_threshold_satoshi
     ? params.dust_threshold_satoshi.toLocaleString()
@@ -91,7 +94,7 @@ export function WinnerTable({
         className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-600 [&::-webkit-scrollbar-thumb:hover]:bg-neutral-500 [&::-webkit-scrollbar-track]:bg-transparent"
         onScroll={handleScroll}
       >
-        <table className="w-full min-w-[800px] text-sm">
+        <table className="w-full min-w-[800px] md:min-w-[1000px] text-sm">
           <thead>
             <tr className="border-b border-neutral-800">
               <th
@@ -103,21 +106,36 @@ export function WinnerTable({
               >
                 {t("payoutReport.address", "Address")}
               </th>
-              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
-                {isBtcTimeScored
-                  ? t("payoutReport.holdingScore", "Holding Score")
-                  : t("payoutReport.snapshotBalance", "Snapshot Balance")}
-              </th>
-              <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
-                {isBtcTimeScored
-                  ? t("payoutReport.scoreShare", "Score Share")
-                  : t("payoutReport.distributableRatio", "Distributable")}
-              </th>
+              {isBtcTimeScored ? (
+                <>
+                  <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
+                    {t("payoutReport.averageHolding", "Average Holding")}
+                  </th>
+                  <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
+                    {t("payoutReport.joinBlockHeight", "Join Height")}
+                  </th>
+                  <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
+                    {t("payoutReport.holdingScore", "Holding Score")}
+                  </th>
+                  <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
+                    {t("payoutReport.scoreShare", "Score Share")}
+                  </th>
+                </>
+              ) : (
+                <>
+                  <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
+                    {t("payoutReport.snapshotBalance", "Snapshot Balance")}
+                  </th>
+                  <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
+                    {t("payoutReport.distributableRatio", "Distributable")}
+                  </th>
+                </>
+              )}
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.estimatedReward", "Estimated reward")}
               </th>
               <th className="px-2 py-3 text-right text-xs font-medium whitespace-nowrap">
-                {t("payoutReport.paidSats", "Paid (Sats)")}
+                {t("payoutReport.paidSats", "Paid")}
               </th>
               <th className="px-2 py-3 text-center text-xs font-medium whitespace-nowrap">
                 {t("payoutReport.state", "State")}
@@ -125,9 +143,9 @@ export function WinnerTable({
             </tr>
           </thead>
           <tbody>
-            {displayedWinners.map((winner, index) => (
+            {displayedWinners.map((winner) => (
               <tr
-                key={index}
+                key={winner.winner_address}
                 className="group border-b border-neutral-800 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 <td
@@ -143,22 +161,40 @@ export function WinnerTable({
                     </span>
                     <button
                       onClick={() => handleCopyAddress(winner.winner_address)}
+                      aria-label={t("winnerTable.copyAddress", "Copy address")}
                       className="text-secondary hover:text-primary shrink-0 cursor-pointer transition-colors"
                     >
                       <CopyIcon className="h-4 w-4" />
                     </button>
                   </div>
                 </td>
-                <td className="dark:text-primary tabular-nums px-2 py-3 text-right font-mono text-xs whitespace-nowrap text-gray-500">
-                  {isBtcTimeScored
-                    ? winner.holding_score
-                    : satsToBtc(winner.balance_at_snapshot_satoshi ?? null)}
-                </td>
-                <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
-                  {isBtcTimeScored
-                    ? `${winner.win_probability_percent.toFixed(4)}%`
-                    : `${winner.distributable_rate.toFixed(4)}%`}
-                </td>
+                {isBtcTimeScored ? (
+                  <>
+                    <td className="dark:text-primary tabular-nums px-2 py-3 text-right font-mono text-xs whitespace-nowrap text-gray-500">
+                      {winner.average_holding_satoshi === undefined
+                        ? "--"
+                        : satsToBtc(winner.average_holding_satoshi)}
+                    </td>
+                    <td className="dark:text-primary tabular-nums px-2 py-3 text-right font-mono text-xs whitespace-nowrap text-gray-500">
+                      {winner.join_block_height?.toLocaleString() ?? "--"}
+                    </td>
+                    <td className="dark:text-primary tabular-nums px-2 py-3 text-right font-mono text-xs whitespace-nowrap text-gray-500">
+                      {winner.holding_score}
+                    </td>
+                    <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
+                      {winner.score_share ?? "--"}
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td className="dark:text-primary tabular-nums px-2 py-3 text-right font-mono text-xs whitespace-nowrap text-gray-500">
+                      {satsToBtc(winner.balance_at_snapshot_satoshi ?? null)}
+                    </td>
+                    <td className="dark:text-primary px-2 py-3 text-right text-xs whitespace-nowrap text-gray-500">
+                      {`${winner.distributable_rate.toFixed(4)}%`}
+                    </td>
+                  </>
+                )}
                 <td className="dark:text-primary px-2 py-3 text-right text-xs font-bold whitespace-nowrap text-gray-500">
                   {winner.original_reward_satoshi.toLocaleString()} sats
                 </td>
@@ -195,30 +231,26 @@ export function WinnerTable({
                 </td>
               </tr>
             ))}
-            {/* Remaining count message - only show when winners > 10 */}
-            {shouldShowRemaining && (
-              <tr className="my-4 text-center">
-                <td
-                  className="p-4 text-center text-sm text-gray-400"
-                  colSpan={7}
-                >
-                  {t(
-                    "payoutReport.moreAddresses",
-                    "There are {{count}} more addresses...",
-                    { count: remainingCount },
-                  )}
-                  (
-                  {t(
-                    "payoutReport.downloadVerification",
-                    "Please download the verification package to view the full list",
-                  )}
-                  )
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
+
+      {/* Outside the scrolling container on purpose. Inside the table it
+          spanned the full 1000px width, so on a phone it scrolled sideways
+          with the columns and its start was pushed off screen - it can only
+          stay centred in view out here. */}
+      {isCollapsible && (
+        <button
+          type="button"
+          onClick={() => setIsExpanded((expanded) => !expanded)}
+          className="w-full cursor-pointer border-t border-neutral-800 p-4 text-center text-sm text-gray-400 transition-colors hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+          aria-expanded={isExpanded}
+        >
+          {isExpanded
+            ? t("payoutReport.collapseWinners", "Show fewer")
+            : t("payoutReport.showFullList", "Click to show the full list")}
+        </button>
+      )}
     </div>
   );
 }

@@ -9,26 +9,42 @@ import { AdminFormSectionWithField } from "@/admin/component/AdminFormSection";
 import { AdminAPI } from "@/api";
 import { useToast } from "@/components/base/Toast/useToast";
 
-const FEE_MULTIPLIER_OPTIONS: SelectOption[] = [
+// Confirmation targets, in blocks, looked up against the self-hosted node's
+// own fee estimator. These replaced a set of multipliers applied to a constant
+// in the config file: "1.25x" multiplied a number the market had no say in,
+// and the label next to it claimed the base was a mempool recommendation,
+// which nothing in the system ever asked for. Worse, the product was truncated
+// to a whole number, so against a base of 2 the three options produced only
+// two distinct fees - 1.25x and 1x cost exactly the same.
+//
+// A target says what it does. The estimator is keyed by it.
+const FEE_TARGET_OPTIONS: SelectOption[] = [
   { value: "", label: "請選擇" },
-  { value: "0.75", label: "0.75X" },
-  { value: "1", label: "1X" },
-  { value: "1.25", label: "1.25X" },
+  { value: "1", label: "1 個區塊（最快，約 10 分鐘）" },
+  { value: "3", label: "3 個區塊（約 30 分鐘）" },
+  { value: "6", label: "6 個區塊（約 1 小時）" },
+  { value: "12", label: "12 個區塊（約 2 小時）" },
+  { value: "25", label: "25 個區塊（約 4 小時，最省）" },
 ];
 
 // Zod schema for form validation
 const feeSchema = z.object({
-  payoutFeeMultiplier: z.string().min(1, "必填欄位"),
-  refundFeeMultiplier: z.string().min(1, "必填欄位"),
-  withdrawalFeeMultiplier: z.string().min(1, "必填欄位"),
+  payoutFeeTargetBlocks: z.string().min(1, "必填欄位"),
+  refundFeeTargetBlocks: z.string().min(1, "必填欄位"),
+  withdrawalFeeTargetBlocks: z.string().min(1, "必填欄位"),
+  maxPayoutFeePercentage: z
+    .string()
+    .min(1, "必填欄位")
+    .refine((v) => Number(v) > 0 && Number(v) <= 50, "請輸入 0.1 到 50 之間"),
 });
 
 type FeeFormData = z.infer<typeof feeSchema>;
 
 const defaultValues: FeeFormData = {
-  payoutFeeMultiplier: "1",
-  refundFeeMultiplier: "1",
-  withdrawalFeeMultiplier: "1",
+  payoutFeeTargetBlocks: "6",
+  refundFeeTargetBlocks: "12",
+  withdrawalFeeTargetBlocks: "3",
+  maxPayoutFeePercentage: "5",
 };
 
 export default function AdminFeesPage() {
@@ -63,10 +79,14 @@ export default function AdminFeesPage() {
       if (envelope?.success && envelope?.data) {
         const data = envelope.data;
         const formData: FeeFormData = {
-          payoutFeeMultiplier: data.payout_fee_multiplier?.toString() || "1",
-          refundFeeMultiplier: data.refund_fee_multiplier?.toString() || "1",
-          withdrawalFeeMultiplier:
-            data.withdrawal_fee_multiplier?.toString() || "1",
+          payoutFeeTargetBlocks:
+            data.payout_fee_target_blocks?.toString() || "6",
+          refundFeeTargetBlocks:
+            data.refund_fee_target_blocks?.toString() || "12",
+          withdrawalFeeTargetBlocks:
+            data.withdrawal_fee_target_blocks?.toString() || "3",
+          maxPayoutFeePercentage:
+            data.max_payout_fee_percentage?.toString() || "5",
         };
         initialDataRef.current = formData;
         reset(formData);
@@ -111,9 +131,11 @@ export default function AdminFeesPage() {
       setIsLoading(true);
 
       const updateData = {
-        payout_fee_multiplier: Number(data.payoutFeeMultiplier) || 1,
-        refund_fee_multiplier: Number(data.refundFeeMultiplier) || 1,
-        withdrawal_fee_multiplier: Number(data.withdrawalFeeMultiplier) || 1,
+        payout_fee_target_blocks: Number(data.payoutFeeTargetBlocks) || 6,
+        refund_fee_target_blocks: Number(data.refundFeeTargetBlocks) || 12,
+        withdrawal_fee_target_blocks:
+          Number(data.withdrawalFeeTargetBlocks) || 3,
+        max_payout_fee_percentage: Number(data.maxPayoutFeePercentage) || 5,
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -148,9 +170,10 @@ export default function AdminFeesPage() {
   // Handle clear (clear all inputs)
   const handleClear = () => {
     reset({
-      payoutFeeMultiplier: "",
-      refundFeeMultiplier: "",
-      withdrawalFeeMultiplier: "",
+      payoutFeeTargetBlocks: "",
+      refundFeeTargetBlocks: "",
+      withdrawalFeeTargetBlocks: "",
+      maxPayoutFeePercentage: "",
     });
     showToast("success", "已清除所有輸入");
   };
@@ -173,60 +196,80 @@ export default function AdminFeesPage() {
 
         <form className="space-y-6">
           <Controller
-            name="payoutFeeMultiplier"
+            name="payoutFeeTargetBlocks"
             control={control}
             render={({ field }) => (
               <AdminFormSectionWithField
-                title="1. 派發獎金轉帳費倍率"
-                error={errors.payoutFeeMultiplier?.message}
+                title="1. 派發獎金目標確認區塊數"
+                error={errors.payoutFeeTargetBlocks?.message}
                 fieldProps={{
                   type: "select",
-                  label: "倍率",
-                  options: FEE_MULTIPLIER_OPTIONS,
+                  label: "目標確認區塊數",
+                  options: FEE_TARGET_OPTIONS,
                   value: field.value,
                   onChange: field.onChange,
                   disabled: isLoading || isLoadingRestore,
-                  suffix: "mempool 建議手續費",
+                  suffix: "費率由自架節點即時估算",
                 }}
               />
             )}
           />
 
           <Controller
-            name="refundFeeMultiplier"
+            name="refundFeeTargetBlocks"
             control={control}
             render={({ field }) => (
               <AdminFormSectionWithField
-                title="2. 退款轉帳費倍率"
-                error={errors.refundFeeMultiplier?.message}
+                title="2. 退款目標確認區塊數"
+                error={errors.refundFeeTargetBlocks?.message}
                 fieldProps={{
                   type: "select",
-                  label: "倍率",
-                  options: FEE_MULTIPLIER_OPTIONS,
+                  label: "目標確認區塊數",
+                  options: FEE_TARGET_OPTIONS,
                   value: field.value,
                   onChange: field.onChange,
                   disabled: isLoading || isLoadingRestore,
-                  suffix: "mempool 建議手續費",
+                  suffix: "費率由自架節點即時估算",
                 }}
               />
             )}
           />
 
           <Controller
-            name="withdrawalFeeMultiplier"
+            name="withdrawalFeeTargetBlocks"
             control={control}
             render={({ field }) => (
               <AdminFormSectionWithField
-                title="3. 提款轉帳費倍率"
-                error={errors.withdrawalFeeMultiplier?.message}
+                title="3. 提款目標確認區塊數"
+                error={errors.withdrawalFeeTargetBlocks?.message}
                 fieldProps={{
                   type: "select",
-                  label: "倍率",
-                  options: FEE_MULTIPLIER_OPTIONS,
+                  label: "目標確認區塊數",
+                  options: FEE_TARGET_OPTIONS,
                   value: field.value,
                   onChange: field.onChange,
                   disabled: isLoading || isLoadingRestore,
-                  suffix: "mempool 建議手續費",
+                  suffix: "費率由自架節點即時估算",
+                }}
+              />
+            )}
+          />
+          <Controller
+            name="maxPayoutFeePercentage"
+            control={control}
+            render={({ field }) => (
+              <AdminFormSectionWithField
+                title="4. 礦工費上限（佔獎池百分比）"
+                error={errors.maxPayoutFeePercentage?.message}
+                fieldProps={{
+                  type: "input",
+                  inputType: "number",
+                  step: "0.1",
+                  label: "上限百分比",
+                  value: field.value,
+                  onChange: field.onChange,
+                  disabled: isLoading || isLoadingRestore,
+                  suffix: "% ；超過則延後派獎，等費率下降後自動完成",
                 }}
               />
             )}
