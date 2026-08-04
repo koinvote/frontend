@@ -5,6 +5,17 @@ on:
     branches:
       - main
 
+# One server per environment, so one deploy at a time. Two overlapping runs
+# rsync into the same directory and rebuild in place; the backend had its redis
+# container torn down this way on 2026-07-30 when two pull requests merged
+# fifteen seconds apart.
+#
+# Queued rather than cancelled: a half-finished deploy is worse than a repeated
+# one.
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
