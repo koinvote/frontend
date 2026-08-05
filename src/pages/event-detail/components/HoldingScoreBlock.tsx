@@ -45,8 +45,8 @@ export function HoldingScoreBlock({
 
   const isFinal = scoreShare != null;
 
-  // A superseded reply keeps whichever label applies to the event's stage -
-  // both figures are the address's, so both are stated on its current card.
+  // The figure is the address's, not this card's, so a superseded reply
+  // points at the address's current card rather than restating it.
   const seeLatestLink = onSeeLatest && (
     <button
       type="button"
@@ -57,21 +57,6 @@ export function HoldingScoreBlock({
       <span aria-hidden="true">›</span>
     </button>
   );
-
-  if (isFinal) {
-    return (
-      <div className={cn("flex flex-col", className)}>
-        <div className="text-secondary text-xs font-medium">
-          {t("replyList.scoreShare", "Score Share")}
-        </div>
-        {seeLatestLink ?? (
-          <div className="text-primary mt-2 font-mono text-xs font-normal tabular-nums">
-            {scoreShare}
-          </div>
-        )}
-      </div>
-    );
-  }
 
   const isAccumulating = (currentBalanceSatoshi ?? 0) > 0;
 
@@ -105,25 +90,33 @@ export function HoldingScoreBlock({
             </span>
           </Tooltip>
         </span>
-        {/* Accumulating/Paused reports whether the address's balance is still
-            earning score. On a superseded reply it would be read as this
-            card's own state - and Paused in particular would claim the
-            re-vote stopped the scoring, which it does not. */}
-        {!onSeeLatest && (
-          <span
-            className={cn(
-              "ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal",
-              isAccumulating ? "text-success/70" : "text-secondary",
-            )}
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-current" />
-            <span>
-              {isAccumulating
-                ? t("replyList.accumulating", "Accumulating")
-                : t("replyList.paused", "Paused")}
+        {/* One slot, three states, so the block keeps its shape for the whole
+            life of an event: the figure never moves, only what qualifies it.
+            Accumulating/Paused reports whether the address's balance is still
+            earning score, so it is dropped once the event has settled - and on
+            a superseded reply, where Paused would claim the re-vote stopped
+            the scoring, which it does not. */}
+        {!onSeeLatest &&
+          (isFinal ? (
+            <span className="text-secondary ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal">
+              {t("replyList.scoreShare", "Score Share")}{" "}
+              <span className="tabular-nums">{scoreShare}</span>
             </span>
-          </span>
-        )}
+          ) : (
+            <span
+              className={cn(
+                "ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal",
+                isAccumulating ? "text-success/70" : "text-secondary",
+              )}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-current" />
+              <span>
+                {isAccumulating
+                  ? t("replyList.accumulating", "Accumulating")
+                  : t("replyList.paused", "Paused")}
+              </span>
+            </span>
+          ))}
       </div>
       {seeLatestLink ?? (
         <span className="text-primary mt-2 font-mono text-xs font-normal break-all tabular-nums transition-opacity duration-150">
