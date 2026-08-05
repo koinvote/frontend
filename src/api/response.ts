@@ -238,6 +238,21 @@ export interface PasskeyStepUpRes {
   expires_at: string;
 }
 
+/** The message to sign, for the wallet step-up path. */
+export interface StepUpWalletChallengeRes {
+  plaintext: string;
+  nonce_timestamp: string;
+  expires_at: string;
+}
+
+/** Assertion options for the passkey step-up path. */
+export interface StepUpPasskeyBeginRes {
+  challenge_id: string;
+  // PublicKeyCredentialRequestOptionsJSON, handed straight to
+  // @simplewebauthn/browser's startAuthentication.
+  publicKey: unknown;
+}
+
 export interface PasskeyRegisterBeginRes {
   challenge_id: string;
   // PublicKeyCredentialCreationOptionsJSON, handed straight to

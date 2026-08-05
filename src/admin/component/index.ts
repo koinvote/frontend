@@ -5,3 +5,4 @@ export {
   AdminFormSectionWithField,
 } from "./AdminFormSection";
 export { AdminToggle } from "./AdminToggle";
+export { StepUpDialog } from "./StepUpDialog";
