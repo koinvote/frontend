@@ -623,6 +623,8 @@
     "accumulating": "累積中",
     "paused": "暫停累積",
     "scoreShare": "積分占比",
+    "seeAddressLatestReply": "請見此地址的最新回覆",
+    "latestReplyNotInResults": "最新回覆不在目前的結果中。",
     "bitcoinAddress": "比特幣地址",
     "bitcoinSignature": "比特幣簽章",
     "plaintext": "明文",

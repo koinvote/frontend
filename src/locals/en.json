@@ -619,6 +619,8 @@
     "accumulating": "Accumulating",
     "paused": "Paused",
     "scoreShare": "Score Share",
+    "seeAddressLatestReply": "See this address's latest reply",
+    "latestReplyNotInResults": "The latest reply is not in the current results.",
     "bitcoinAddress": "Bitcoin Address",
     "bitcoinSignature": "Bitcoin Signature",
     "plaintext": "Plaintext",
