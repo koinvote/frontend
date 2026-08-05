@@ -53,8 +53,9 @@ export interface AdminLoginReq {
   /**
    * Identifies the challenge issued by POST /admin/login/challenge.
    *
-   * The server still accepts a login without it, but such a login is
-   * replayable forever and raises an operational alert, so we always send it.
+   * Required. The server refuses a login without it with
+   * LOGIN_NONCE_REQUIRED: a signature over a message the server never issued
+   * has nothing to expire it, and stays a working credential forever.
    */
   nonce_timestamp: string;
 }
@@ -89,6 +90,34 @@ export interface UpdateSystemParametersReq {
   platform_fee_percent: number;
   min_payout_sats: number;
   free_hours: number;
+}
+
+/**
+ * Proves the wallet or an enrolled passkey is present, right now.
+ *
+ * A session token says someone logged in within the last hour. Some actions
+ * need more than that, and carry this in their body rather than exchanging it
+ * for a token — so there is never an intermediate credential to steal, and the
+ * proof and the action it authorises arrive together.
+ *
+ * Exactly one of the two groups is filled in. Every proof is single-use.
+ */
+export interface StepUpProof {
+  // Wallet path.
+  plaintext?: string;
+  nonce_timestamp?: string;
+  signature?: string;
+
+  // Passkey path.
+  challenge_id?: string;
+  credential?: unknown;
+}
+
+/** Names the action a step-up authorises. Must match service.StepUpPurpose. */
+export type StepUpPurpose = "passkey_register" | "system_parameters";
+
+export interface StepUpChallengeReq {
+  purpose: StepUpPurpose;
 }
 
 export interface VerifySignatureReq {

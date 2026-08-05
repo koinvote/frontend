@@ -6,6 +6,8 @@ import { z } from "zod";
 import { AdminActionButtons } from "@/admin/component/AdminActionButtons";
 import type { SelectOption } from "@/admin/component/AdminFormField";
 import { AdminFormSectionWithField } from "@/admin/component/AdminFormSection";
+import { StepUpDialog } from "@/admin/component/StepUpDialog";
+import { useSystemParametersSave } from "@/admin/hooks/useSystemParametersSave";
 import { AdminAPI } from "@/api";
 import { useToast } from "@/components/base/Toast/useToast";
 
@@ -49,8 +51,24 @@ const defaultValues: FeeFormData = {
 
 export default function AdminFeesPage() {
   const { showToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
   const [isLoadingRestore, setIsLoadingRestore] = useState(false);
+
+  // The form values behind the staged payload, promoted to "saved" only once
+  // the write actually lands.
+  const pendingFormRef = useRef<FeeFormData | null>(null);
+
+  const { stepUpOpen, isSaving, requestSave, submitWithProof, cancel } =
+    useSystemParametersSave({
+      successMessage: "手續費設定已儲存",
+      onSaved: () => {
+        if (pendingFormRef.current) {
+          initialDataRef.current = pendingFormRef.current;
+        }
+      },
+    });
+
+  // The save button and the form fields both track the in-flight write.
+  const isLoading = isSaving;
 
   // Store initial API data for restore
   const initialDataRef = useRef<FeeFormData | null>(null);
@@ -126,45 +144,18 @@ export default function AdminFeesPage() {
   };
 
   // Handle save (update to API)
-  const onSubmit = async (data: FeeFormData) => {
-    try {
-      setIsLoading(true);
-
-      const updateData = {
-        payout_fee_target_blocks: Number(data.payoutFeeTargetBlocks) || 6,
-        refund_fee_target_blocks: Number(data.refundFeeTargetBlocks) || 12,
-        withdrawal_fee_target_blocks:
-          Number(data.withdrawalFeeTargetBlocks) || 3,
-        max_payout_fee_percentage: Number(data.maxPayoutFeePercentage) || 5,
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updateApiFunc = AdminAPI.updateSystemParameters as any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await updateApiFunc(updateData)) as any;
-
-      const envelope =
-        response?.success !== undefined ? response : response?.data;
-
-      if (envelope?.success) {
-        // Update initial data after successful save
-        initialDataRef.current = data;
-        showToast("success", "手續費設定已儲存");
-      } else {
-        const errorMessage = envelope?.message || "儲存失敗";
-        showToast("error", errorMessage);
-      }
-    } catch (error: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(error as any)?.isHandled) {
-        const errorMessage =
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (error as any)?.apiMessage || (error as any)?.message || "儲存失敗";
-        showToast("error", errorMessage);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  //
+  // Two steps now: the payload is staged, the step-up dialog collects a fresh
+  // wallet signature or passkey assertion, and both are sent together. The
+  // backend refuses this write without one.
+  const onSubmit = (data: FeeFormData) => {
+    pendingFormRef.current = data;
+    requestSave({
+      payout_fee_target_blocks: Number(data.payoutFeeTargetBlocks) || 6,
+      refund_fee_target_blocks: Number(data.refundFeeTargetBlocks) || 12,
+      withdrawal_fee_target_blocks: Number(data.withdrawalFeeTargetBlocks) || 3,
+      max_payout_fee_percentage: Number(data.maxPayoutFeePercentage) || 5,
+    });
   };
 
   // Handle clear (clear all inputs)
@@ -276,6 +267,16 @@ export default function AdminFeesPage() {
           />
         </form>
       </main>
+
+      <StepUpDialog
+        open={stepUpOpen}
+        purpose="system_parameters"
+        title="確認手續費設定"
+        description="手續費設定會決定每一筆派獎、退款與提領實際支付的礦工費，所以除了目前的登入狀態之外，還需要一次即時的驗證。"
+        confirmLoading={isSaving}
+        onProof={submitWithProof}
+        onCancel={cancel}
+      />
     </div>
   );
 }

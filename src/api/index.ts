@@ -23,6 +23,7 @@ import type {
   SubscribeReq,
   UnlockEventReq,
   UpdateResultVisibilityReq,
+  StepUpChallengeReq,
   UpdateSystemParametersReq,
   VerifyChangeVisibilityPlaintextReq,
   UpdateUnlockPriceReq,
@@ -35,6 +36,8 @@ import type {
   AdminLoginChallengeRes,
   AdminLoginRes,
   PasskeyStepUpRes,
+  StepUpPasskeyBeginRes,
+  StepUpWalletChallengeRes,
   PasskeyRegisterBeginRes,
   PasskeyLoginBeginRes,
   PasskeyListRes,
@@ -331,6 +334,16 @@ export const AdminAPI = {
   passkeyStepUp: adminPost<ApiResponse<PasskeyStepUpRes>, void>(
     "/admin/passkeys/step-up",
   ),
+  // Step-up, for actions a session token alone does not authorise. Both
+  // require an existing session: a step-up is a second proof, not a way in.
+  stepUpWalletChallenge: adminPost<
+    ApiResponse<StepUpWalletChallengeRes>,
+    StepUpChallengeReq
+  >("/admin/step-up/wallet/challenge"),
+  stepUpPasskeyBegin: adminPost<
+    ApiResponse<StepUpPasskeyBeginRes>,
+    StepUpChallengeReq
+  >("/admin/step-up/passkey/begin"),
   passkeyRegisterBegin: adminPost<
     ApiResponse<PasskeyRegisterBeginRes>,
     PasskeyRegisterBeginReq
