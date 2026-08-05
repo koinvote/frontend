@@ -36,6 +36,12 @@ npm run build
 # Lint code
 npm run lint
 
+# Run the Vitest suite once (what CI runs)
+npm run test
+
+# Run Vitest in watch mode
+npm run test:watch
+
 # Preview production build
 npm run preview
 ```

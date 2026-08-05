@@ -1,0 +1,47 @@
+name: CI
+
+# Runs on every pull request, and on the two branches that get deployed.
+# Deployment does not depend on this workflow yet, so a red run here does not
+# stop a merge - it only makes the breakage visible before someone hits deploy.
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+      - main
+
+# Superseded runs are wasted: a newer commit on the same ref is what anyone
+# will look at. Unlike the deploy, cancelling here breaks nothing.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The deploy runs `npm run build:dev` on the VM, so a build that only
+      # fails there fails after the old files are already gone.
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+
+      # `npm run lint` is deliberately not a step. It reports 32 pre-existing
+      # errors on dev today (unused variables, exhaustive-deps), so wiring it in
+      # would make this workflow red from its first run and train everyone to
+      # ignore it. Clear the backlog first, then add the step.
