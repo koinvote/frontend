@@ -31,6 +31,10 @@ if (!("IntersectionObserver" in globalThis)) {
     NoopIntersectionObserver as unknown as typeof IntersectionObserver;
 }
 
+// Pages scroll themselves to the top on mount. jsdom has no viewport to scroll
+// and logs "Not implemented" for every render, which buries real output.
+window.scrollTo = (() => {}) as typeof window.scrollTo;
+
 // Same reason: antd measures scrollbar width on first render.
 if (!("matchMedia" in window)) {
   window.matchMedia = ((query: string) => ({
