@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { API } from "@/api/index";
+import type { GetReceiptVerifyPubKeysRes } from "@/api/response";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import VerificationIcon from "@/assets/icons/verification.svg?react";
 import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
@@ -21,13 +22,7 @@ const VerificationTool = () => {
   const goBack = useBackIfInternal("/");
 
   const [receiptPubKeys, setReceiptPubKeys] = useState<
-    Array<{
-      kid: string;
-      public_key: string;
-      alg: string;
-      active: boolean;
-      created_at: string;
-    }>
+    GetReceiptVerifyPubKeysRes[]
   >([]);
 
   useEffect(() => {
@@ -249,7 +244,7 @@ const VerificationTool = () => {
                 <p className="text-secondary leading-relaxed">
                   {t(
                     "verificationTool.step2_2_text1",
-                    "To run the verifier, you need to install the Go programming language (version 1.20 or above).",
+                    "To run the verifier, you need to install the Go programming language (version 1.21 or above).",
                   )}
                 </p>
                 <p className="text-secondary leading-relaxed">
@@ -391,8 +386,24 @@ const VerificationTool = () => {
                   </p>
                   {receiptPubKeys.length > 0 &&
                     receiptPubKeys.map((item) => (
-                      <div className="my-4 text-sm md:text-base">
-                        kid ({item.kid})
+                      <div key={item.kid} className="my-4 text-sm md:text-base">
+                        <span className="mr-2">kid ({item.kid})</span>
+                        {/* Retired keys stay listed and stay valid: a receipt
+                            signed before a rotation is still verified with the
+                            key that signed it. Without the label the two are
+                            indistinguishable, and someone holding an older
+                            receipt has no way to know that is expected. */}
+                        <span
+                          className={`rounded px-2 py-0.5 text-xs ${
+                            item.active
+                              ? "bg-green-600/15 text-green-600"
+                              : "bg-neutral-500/15 text-neutral-500"
+                          }`}
+                        >
+                          {item.active
+                            ? t("verificationTool.pubKeyActive", "In use")
+                            : t("verificationTool.pubKeyRetired", "Retired")}
+                        </span>
                         <br />
                         {item.alg.toLocaleUpperCase()} {` `}
                         Public Key (Base64):
@@ -405,7 +416,7 @@ const VerificationTool = () => {
                   <p>
                     {t(
                       "verificationTool.receiptStep2Description2",
-                      "Note:\nThe kid field is a key identifier, not the public key itself.\nAlways use the public key mapped to the kid for verification.",
+                      "Note:\nThe kid field is a key identifier, not the public key itself.\nAlways use the public key mapped to the kid for verification.\nA retired key is still correct for receipts signed while it was in use.",
                     )}
                   </p>
                   <p className="mt-4">
@@ -433,7 +444,7 @@ const VerificationTool = () => {
           <div className="flex flex-col gap-4">
             <div className="flex gap-4">
               <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
-                <span className="text-black">2</span>
+                <span className="text-black">3</span>
               </div>
               <div className="w-full space-y-4">
                 <h3 className="fw-m">
