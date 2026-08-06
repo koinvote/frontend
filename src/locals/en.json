@@ -618,7 +618,6 @@
     "holdingScoreTooltip": "Holding Score determines the probability of winning and reward allocation. It is calculated by multiplying the address’s Bitcoin balance by the number of blocks elapsed since joining the event.",
     "accumulating": "Accumulating",
     "paused": "Paused",
-    "scoreShare": "Score Share",
     "seeAddressLatestReply": "See this address's latest reply",
     "latestReplyNotInResults": "The latest reply is not in the current results.",
     "bitcoinAddress": "Bitcoin Address",

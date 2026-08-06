@@ -98,9 +98,8 @@ export function HoldingScoreBlock({
             the scoring, which it does not. */}
         {!onSeeLatest &&
           (isFinal ? (
-            <span className="text-secondary ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal">
-              {t("replyList.scoreShare", "Score Share")}{" "}
-              <span className="tabular-nums">{scoreShare}</span>
+            <span className="text-secondary ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal tabular-nums">
+              {scoreShare}
             </span>
           ) : (
             <span

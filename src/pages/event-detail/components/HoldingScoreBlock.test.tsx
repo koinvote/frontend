@@ -55,8 +55,10 @@ describe("HoldingScoreBlock", () => {
 
     expect(screen.getByText("Holding Score")).toBeInTheDocument();
     expect(screen.getByText("2,423.4")).toBeInTheDocument();
-    expect(screen.getByText("Score Share")).toBeInTheDocument();
+    // The percentage stands on its own in the status slot - no second label
+    // competing with "Holding Score" on the same line.
     expect(screen.getByText("12.84%")).toBeInTheDocument();
+    expect(screen.queryByText("Score Share")).not.toBeInTheDocument();
   });
 
   it("drops the live status once settled, whatever the address now holds", () => {
