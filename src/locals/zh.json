@@ -215,9 +215,10 @@
 
     "receiptStep2Title": "辨識 kid 對應的公鑰",
     "receiptStep2Description1": "開啟收據檔案並找到 kid 欄位。\n將 kid 值對應到下方列出的相應公鑰。",
-    "receiptStep2Description2": "注意：\nkid 欄位是金鑰識別碼，並非公鑰本身。\n驗證時請務必使用對應 kid 的公鑰。\n已停用的金鑰，對於它還在使用時簽出的收據依然有效。",
+    "receiptStep2Description2": "注意：\nkid 欄位是金鑰識別碼，並非公鑰本身。\n驗證時請務必使用對應 kid 的公鑰。",
     "pubKeyActive": "使用中",
     "pubKeyRetired": "已停用",
+    "pubKeyRetiredNote": "已停用的金鑰，對於它還在使用時簽出的收據依然有效。",
     "receiptSampleImageTitle": "收據檔案範例：",
     "receiptSampleImageAlt": "顯示收據檔案中 kid 欄位的截圖。",
 

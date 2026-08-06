@@ -37,6 +37,13 @@ const VerificationTool = () => {
   // hands over, and once below as coloured JSX. They have to stay identical -
   // a reader who copies something other than what they were shown has no way
   // to notice - so a test compares the two, ignoring whitespace.
+  // Label the keys only once there is something to tell apart. The backend
+  // sets active to true when a key is first seen and has no path that ever
+  // clears it - there is no rotation mechanism yet - so today every key is
+  // active and a row of identical "In use" badges would say nothing. The
+  // moment a key really is retired the labels appear on their own.
+  const hasRetiredKey = receiptPubKeys.some((item) => !item.active);
+
   const eventCode = t(
     "verificationTool.codeBlockContentForCopy",
     "# Download the verifier, or update it if you already have it\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\ngit pull\n\n# Compile the verifier\ngo build -o verify-event main.go\n\n# Run the verifier\n# Replace <your-report-file.csv> with the actual report file you downloaded\n./verify-event --report <your-report-file.csv>",
@@ -418,23 +425,22 @@ const VerificationTool = () => {
                   {receiptPubKeys.length > 0 &&
                     receiptPubKeys.map((item) => (
                       <div key={item.kid} className="my-4 text-sm md:text-base">
-                        <span className="mr-2">kid ({item.kid})</span>
-                        {/* Retired keys stay listed and stay valid: a receipt
-                            signed before a rotation is still verified with the
-                            key that signed it. Without the label the two are
-                            indistinguishable, and someone holding an older
-                            receipt has no way to know that is expected. */}
-                        <span
-                          className={`rounded px-2 py-0.5 text-xs ${
-                            item.active
-                              ? "bg-green-600/15 text-green-600"
-                              : "bg-neutral-500/15 text-neutral-500"
-                          }`}
-                        >
-                          {item.active
-                            ? t("verificationTool.pubKeyActive", "In use")
-                            : t("verificationTool.pubKeyRetired", "Retired")}
+                        <span className={hasRetiredKey ? "mr-2" : undefined}>
+                          kid ({item.kid})
                         </span>
+                        {hasRetiredKey && (
+                          <span
+                            className={`rounded px-2 py-0.5 text-xs ${
+                              item.active
+                                ? "bg-green-600/15 text-green-600"
+                                : "bg-neutral-500/15 text-neutral-500"
+                            }`}
+                          >
+                            {item.active
+                              ? t("verificationTool.pubKeyActive", "In use")
+                              : t("verificationTool.pubKeyRetired", "Retired")}
+                          </span>
+                        )}
                         <br />
                         {item.alg.toLocaleUpperCase()} {` `}
                         Public Key (Base64):
@@ -444,10 +450,18 @@ const VerificationTool = () => {
                         </span>
                       </div>
                     ))}
+                  {hasRetiredKey && (
+                    <p>
+                      {t(
+                        "verificationTool.pubKeyRetiredNote",
+                        "A retired key is still correct for receipts signed while it was in use.",
+                      )}
+                    </p>
+                  )}
                   <p>
                     {t(
                       "verificationTool.receiptStep2Description2",
-                      "Note:\nThe kid field is a key identifier, not the public key itself.\nAlways use the public key mapped to the kid for verification.\nA retired key is still correct for receipts signed while it was in use.",
+                      "Note:\nThe kid field is a key identifier, not the public key itself.\nAlways use the public key mapped to the kid for verification.",
                     )}
                   </p>
                   <p className="mt-4">

@@ -162,6 +162,24 @@ describe("VerificationTool public key list", () => {
     consoleError.mockRestore();
   });
 
+  // This is the case in production today: the backend sets active on first
+  // sight and never clears it, so a badge on every row would be a column of
+  // identical decoration.
+  it("shows no status labels while every key is in use", async () => {
+    pubKeys.value = [key(), key({ kid: "kvpub_2", public_key: "MCowBQYDK2Vw" })];
+
+    render(<VerificationTool />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/kid \(kvpub_2\)/)).toBeInTheDocument();
+    });
+    expect(screen.queryByText("In use")).not.toBeInTheDocument();
+    expect(screen.queryByText("Retired")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/still correct for receipts signed/),
+    ).not.toBeInTheDocument();
+  });
+
   it("marks a retired key as retired and a current one as in use", async () => {
     pubKeys.value = [
       key({ kid: "kvpub_current", active: true }),
@@ -174,5 +192,8 @@ describe("VerificationTool public key list", () => {
       expect(screen.getByText("Retired")).toBeInTheDocument();
     });
     expect(screen.getByText("In use")).toBeInTheDocument();
+    expect(
+      screen.getByText(/still correct for receipts signed/),
+    ).toBeInTheDocument();
   });
 });
