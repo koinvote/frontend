@@ -33,24 +33,43 @@ const VerificationTool = () => {
     fetchPubKeys();
   }, []);
 
-  const eventCode = t("verificationTool.codeBlockContentForCopy");
+  // The commands exist twice: once here as the plain text the copy button
+  // hands over, and once below as coloured JSX. They have to stay identical -
+  // a reader who copies something other than what they were shown has no way
+  // to notice - so a test compares the two, ignoring whitespace.
+  const eventCode = t(
+    "verificationTool.codeBlockContentForCopy",
+    "# Download the verifier, or update it if you already have it\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\ngit pull\n\n# Compile the verifier\ngo build -o verify-event main.go\n\n# Run the verifier\n# Replace <your-report-file.csv> with the actual report file you downloaded\n./verify-event --report <your-report-file.csv>",
+  );
 
+  // Both failure paths reach the error toast, which the previous version
+  // never showed. The browser exposes no clipboard at all outside a secure
+  // context, and that took the early-return branch: nothing copied, nothing
+  // said, a button that looked broken. And writeText was not awaited, so a
+  // rejected copy still announced success - the one outcome worse than
+  // silence, because the reader walks away believing they have the commands.
   const handleCopy = useCallback(
-    (text: string) => {
-      try {
-        if (navigator && navigator.clipboard) {
-          navigator.clipboard.writeText(text);
-          showToast(
-            "success",
-            t("verificationTool.codeBlockCopied", "Code copied to clipboard"),
-          );
-        }
-      } catch (e) {
-        console.error("Failed to copy", e);
+    async (text: string) => {
+      const failed = () =>
         showToast(
           "error",
           t("verificationTool.codeBlockCopyFailed", "Failed to copy code"),
         );
+
+      if (!navigator?.clipboard) {
+        failed();
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(
+          "success",
+          t("verificationTool.codeBlockCopied", "Code copied to clipboard"),
+        );
+      } catch (e) {
+        console.error("Failed to copy", e);
+        failed();
       }
     },
     [t, showToast],
@@ -286,7 +305,10 @@ const VerificationTool = () => {
 
               <pre className="text-secondary tx-12 md:tx-14 m-0 p-4 font-mono wrap-break-word whitespace-pre-wrap">
                 {/* 有顏色的版本, 註釋拆出來 for i18n */}
-                {t("verificationTool.codeBlockAlt1", "# Download the verifier")}
+                {t(
+                  "verificationTool.codeBlockAlt1",
+                  "# Download the verifier, or update it if you already have it",
+                )}
                 <br />
                 <span className="text-primary">
                   git <span className="text-orange-500">clone</span>{" "}
@@ -295,6 +317,15 @@ const VerificationTool = () => {
                 <br />
                 <span className="text-primary">
                   <span className="text-orange-500">cd</span> event-verifier
+                </span>
+                <br />
+                {/* Harmless on a fresh clone, and the whole point on a stale
+                    one: the clone above fails when the directory is already
+                    there, but cd still succeeds into it, so without this the
+                    next line quietly builds whatever was downloaded months
+                    ago. */}
+                <span className="text-primary">
+                  git <span className="text-orange-500">pull</span>
                 </span>
                 <br />
                 <br />

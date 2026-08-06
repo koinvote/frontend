@@ -1,5 +1,6 @@
 import type { GetReceiptVerifyPubKeysRes } from "@/api/response";
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import VerificationTool from "./index";
@@ -21,14 +22,33 @@ vi.mock("@/api/index", () => ({
   },
 }));
 
-vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (_key: string, fallback: string) => fallback,
-  }),
-}));
+// Resolve against the real English file rather than returning the fallback,
+// so the command comparison below is checking the strings that actually ship.
+vi.mock("react-i18next", async () => {
+  const en = (await import("@/locals/en.json")).default as Record<
+    string,
+    Record<string, string>
+  >;
+  return {
+    useTranslation: () => ({
+      t: (key: string, fallback: string) => {
+        const [namespace, name] = key.split(".");
+        return en[namespace]?.[name] ?? fallback;
+      },
+    }),
+  };
+});
+
+const copyText = (
+  (await import("@/locals/en.json")).default as {
+    verificationTool: Record<string, string>;
+  }
+).verificationTool.codeBlockContentForCopy;
+
+const showToast = vi.hoisted(() => vi.fn());
 
 vi.mock("@/components/base/Toast/useToast", () => ({
-  useToast: () => ({ showToast: vi.fn() }),
+  useToast: () => ({ showToast }),
 }));
 
 vi.mock("@/hooks/useBack", () => ({
@@ -45,6 +65,75 @@ function key(overrides: Partial<GetReceiptVerifyPubKeysRes> = {}) {
     ...overrides,
   };
 }
+
+function setClipboard(value: { writeText: (t: string) => Promise<void> } | undefined) {
+  Object.defineProperty(navigator, "clipboard", {
+    value,
+    configurable: true,
+    writable: true,
+  });
+}
+
+describe("VerificationTool commands", () => {
+  beforeEach(() => {
+    pubKeys.value = [];
+    showToast.mockClear();
+  });
+
+  it("copies exactly the commands it displays", async () => {
+    // The two live in different places - plain text for the clipboard,
+    // coloured JSX for the screen - so they drift the moment one is edited
+    // alone. Whitespace is ignored because <br> carries no text content;
+    // what must match is the sequence of characters a reader would paste.
+    // Queried through the DOM rather than by text, because the commands are
+    // broken across nested spans for colouring and no text query spans them.
+    const { container } = render(<VerificationTool />);
+
+    const shown = container.querySelector("pre");
+    const strip = (s: string) => s.replace(/\s+/g, "");
+
+    expect(shown).not.toBeNull();
+    expect(strip(shown!.textContent ?? "")).toBe(strip(copyText));
+  });
+
+  // Announcing a copy that did not happen is the worst outcome here: the
+  // reader walks away believing they hold the commands. Both ways it can
+  // fail have to reach the error toast.
+  it("reports failure when the browser exposes no clipboard", async () => {
+    setClipboard(undefined);
+    render(<VerificationTool />);
+
+    await userEvent.click(screen.getByRole("button", { name: /copy code/i }));
+
+    expect(showToast).toHaveBeenCalledWith("error", expect.any(String));
+    expect(showToast).not.toHaveBeenCalledWith("success", expect.any(String));
+  });
+
+  it("reports failure when the copy is rejected", async () => {
+    setClipboard({ writeText: () => Promise.reject(new Error("denied")) });
+    render(<VerificationTool />);
+
+    await userEvent.click(screen.getByRole("button", { name: /copy code/i }));
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith("error", expect.any(String));
+    });
+    expect(showToast).not.toHaveBeenCalledWith("success", expect.any(String));
+  });
+
+  it("reports success when the copy goes through", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    setClipboard({ writeText });
+    render(<VerificationTool />);
+
+    await userEvent.click(screen.getByRole("button", { name: /copy code/i }));
+
+    await waitFor(() => {
+      expect(showToast).toHaveBeenCalledWith("success", expect.any(String));
+    });
+    expect(writeText).toHaveBeenCalledWith(copyText);
+  });
+});
 
 describe("VerificationTool public key list", () => {
   beforeEach(() => {
