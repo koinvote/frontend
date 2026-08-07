@@ -177,29 +177,23 @@
     "title": "驗證指南",
     "description": "如何使用開源工具獨立驗證活動和收據",
     "introductionTitle": "驗證工具介紹",
-    "introductionText1": "本頁面引導您使用提供的數據和開源工具獨立驗證活動結果的公平性和您回覆收據的真實性。",
-    "introductionText2": "無需信任平台，因為所有驗證輸入和源代碼都是公開可用的。",
+    "introductionText1": "本頁面說明如何使用平台提供的資料與開源工具，自行驗證活動結果是否公平，以及你的回覆收據是否真實。",
+    "introductionText2": "你不需要信任平台，因為所有驗證輸入與原始碼都是公開的。",
     "eventResultTitle": "活動結果驗證",
-
     "step1Title": "前往獎勵分配報告頁面下載驗證套件（CSV）。",
     "step1_1": "前往你想驗證的活動頁面。",
     "step1_2": "開啟該活動的獎勵分配報告。",
     "step1_3": "找到你想驗證的獎項並下載對應的驗證套件。",
-
     "step2Title": "設定並執行 Event Verifier",
-
     "step2_1_title": "1. 檢視開源程式碼",
     "step2_1_text_before": "前往我們的",
     "step2_1_linkLabel": "GitHub 儲存庫",
     "step2_1_text_after": "以檢視或下載驗證腳本。",
-
     "step2_2_title": "2. 安裝 Go",
     "step2_2_text1": "要執行驗證程式，你需要先安裝 Go 程式語言（版本 1.21 或以上）。",
     "step2_2_text2": "如果你已經安裝過 Go，可以跳過此步驟。",
-
     "step2_3_title": "3. 下載並執行驗證程式",
     "step2_3_text": "從 GitHub 下載開源驗證程式碼，並使用 Go 執行。",
-
     "codeBlockCopy": "複製指令",
     "codeBlockContentForCopy": "# 下載驗證程式；若你已經下載過，這段會更新成最新版\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\ngit pull\n\n# 編譯驗證程式\ngo build -o verify-event main.go\n\n# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案\n./verify-event --report <your-report-file.csv>",
     "codeBlockAlt1": "# 下載驗證程式；若你已經下載過，這段會更新成最新版",
@@ -207,34 +201,28 @@
     "codeBlockAlt3": "# 執行驗證程式\n# 將 <your-report-file.csv> 替換為你下載的實際報告檔案",
     "codeBlockCopied": "指令已複製到剪貼簿",
     "codeBlockCopyFailed": "指令複製失敗",
-
     "receiptSectionTitle": "收據驗證",
     "receiptStep1Title": "提交回覆後下載收據檔案",
     "receiptStep1Subtitle": "當你的回覆送出後，點擊「下載收據」下載並保存收據檔案。",
+    "receiptSampleImageTitle": "收據檔案範例：",
     "receiptImageAlt": "顯示「Submission Successful」畫面並標示 Download Receipt 按鈕的截圖。",
-
     "receiptStep2Title": "辨識 kid 對應的公鑰",
     "receiptStep2Description1": "開啟收據檔案並找到 kid 欄位。\n將 kid 值對應到下方列出的相應公鑰。",
     "receiptStep2Description2": "注意：\nkid 欄位是金鑰識別碼，並非公鑰本身。\n驗證時請務必使用對應 kid 的公鑰。",
     "pubKeyActive": "使用中",
     "pubKeyRetired": "已停用",
     "pubKeyRetiredNote": "已停用的金鑰，對於它還在使用時簽出的收據依然有效。",
-    "receiptSampleImageTitle": "收據檔案範例：",
     "receiptSampleImageAlt": "顯示收據檔案中 kid 欄位的截圖。",
-
     "receiptStep3Title": "驗證收據簽名",
     "receiptStep3Description1": "前往以下外部驗證工具：",
     "receiptStep3Description2": "點擊 Verify 完成驗證。",
-
     "faqTitle": "常見問題",
     "faq1_question": "「活動驗證」與「收據驗證」有什麼區別？",
-    "faq1_answer": "活動驗證旨在確保整個活動的獎勵發放流程公平、符合規則且可被重複驗證。收據驗證則是確認您的個人回覆已被平台妥善記錄，並經過加密簽署。這兩種機制使用不同的數據來源，服務於不同的目的。",
-
+    "faq1_answer": "活動驗證旨在確保整個活動的獎勵發放流程公平、符合規則且可被重複驗證。收據驗證則是確認您的個人回覆已被平台妥善記錄，並經過加密簽署。這兩種機制使用不同的資料來源，用途也不同。",
     "faq2_question": "如果我忘記下載收據會怎樣？",
     "faq2_answer": "如果您在提交回覆後沒有下載收據，日後將無法進行獨立驗證。為了保障您的驗證權利，建議您在提交後務必立即下載並妥善保存收據。",
-
     "faq3_question": "我如何確定用於驗證的公鑰（Public Key）是正確的？",
-    "faq3_answer": "驗證收據用的公鑰由平台發布，並直接列在本頁上——它們不在 GitHub 專案庫裡。你的收據裡的 kid 會告訴你該用哪一把；kid 是識別碼，不是公鑰本身。所有帶著同一個 kid 的收據，都必須用同一把已公開的公鑰才驗得過，所以驗證通過的收據事後無法被否認，平台也無法私下發給不同人不同的公鑰——那會讓其他用同一個 kid 簽出的收據全部驗不過。"
+    "faq3_answer": "驗證收據用的公鑰由平台發布，並直接列在本頁上。你的收據裡的 kid 會告訴你該用哪一把；kid 是識別碼，不是公鑰本身。所有帶著同一個 kid 的收據，都必須用同一把已公開的公鑰才驗得過，所以驗證通過的收據事後無法被否認，平台也無法私下發給不同人不同的公鑰——那會讓其他用同一個 kid 簽出的收據全部驗不過。"
   },
   "about": {
     "title": "關於 Koinvote",
