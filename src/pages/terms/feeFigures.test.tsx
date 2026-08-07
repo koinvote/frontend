@@ -59,12 +59,13 @@ describe("fee figures on the pages that state what the platform charges", () => 
   // satsToBtc appends " BTC" unless told not to, and the sentence ends in
   // " BTC per hour" of its own, so the hourly rate rendered as
   // "0.00050000 BTC BTC per hour".
-  it("names the currency once in the hourly rate", () => {
+  it("names the currency once in the hourly rate, and drops dead zeros", () => {
     useSystemParametersStore.setState({ params });
 
     const text = textOf(<ChargesnRefunds />);
 
     expect(text).not.toContain("BTC BTC");
-    expect(text).toContain("0.00050000 BTC per hour");
+    expect(text).not.toContain("0.00050000");
+    expect(text).toContain("0.0005 BTC per hour");
   });
 });

@@ -16,9 +16,12 @@ export default function ChargesnRefunds() {
   // already renders for an unknown amount.
   const freeHours = params?.free_hours ?? "--";
   const platformFeePercentage = params?.platform_fee_percentage ?? "--";
-  // suffix: false because the sentence supplies its own " BTC per hour".
+  // suffix: false because the sentence supplies its own " BTC per hour", and
+  // the trailing zeros of a fixed 8-decimal rate carry nothing - 0.0005 reads
+  // as a price, 0.00050000 reads as a machine field.
   const btcPerDurationHour = satsToBtc(params?.satoshi_per_duration_hour, {
     suffix: false,
+    trimTrailingZeros: true,
   });
   const bold = <span className="font-bold" />;
 
