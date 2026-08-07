@@ -8,7 +8,10 @@ import { setupAnchorFlash } from "@/utils/anchorFlash";
 export default function TermsOfRewardDistribution() {
   const { t } = useTranslation();
   const params = useSystemParametersStore((s) => s.params);
-  const dustThresholdSat = params?.dust_threshold_satoshi || 0;
+  // Unset until the system parameters arrive, and unset for good if that
+  // request fails. Falling back to 0 stated a minimum payout threshold of
+  // 0 sats, which is not a threshold this platform has ever applied.
+  const dustThresholdSat = params?.dust_threshold_satoshi ?? "--";
 
   const bold = <span className="font-bold" />;
 
