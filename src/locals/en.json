@@ -247,7 +247,7 @@
   },
   "privacy": {
     "title": "Privacy Policy",
-    "lastUpdated": "Last updated: 7 August 2026",
+    "lastUpdated": "Last updated: 8 August 2026",
     "scopeTitle": "Scope",
     "scope_p1": "This Privacy Policy describes how Koinvote collects, uses, discloses, and protects information when you access or use koinvote.com.",
     "scope_p2": "It does not apply to third-party websites or services that may be linked from the platform.",
@@ -309,7 +309,7 @@
   },
   "terms": {
     "title": "Terms of Service",
-    "lastUpdated": "Last updated: 7 August 2026",
+    "lastUpdated": "Last updated: 8 August 2026",
     "s1_title": "Introduction",
     "s1_text": "By using koinvote.com, you agree to comply with the following terms. If you do not agree, please stop using this platform.",
     "s2_title": "Platform Overview",
@@ -377,7 +377,7 @@
   },
   "charges": {
     "title": "Charges and Refunds",
-    "lastUpdated": "Last updated: 7 August 2026",
+    "lastUpdated": "Last updated: 8 August 2026",
     "section1Title": "Charges",
     "s1_1_title": "Platform Service Fee",
     "s1_1_1_title": "Reward event",
@@ -454,7 +454,7 @@
   },
   "rewardTerms": {
     "title": "Terms of Reward Distribution",
-    "lastUpdated": "Last updated: 7 August 2026",
+    "lastUpdated": "Last updated: 8 August 2026",
     "intro": "This document defines the rules and mechanisms of reward distribution, which are based on a weighted selection process using holding scores.",
     "s1_title": "Settlement Blocks",
     "s1_1": "An event is settled on two blocks. The <bold>seed block</bold> is the first block whose median time past is later than the event deadline. The <bold>scoring block</bold> is <bold>6 blocks below</bold> the seed block.",
