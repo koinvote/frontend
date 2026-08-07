@@ -9,10 +9,20 @@ export default function ChargesnRefunds() {
   const { t } = useTranslation();
   const params = useSystemParametersStore((s) => s.params);
 
-  const freeHours = params?.free_hours ?? 0;
-  const satoshiPerDurationHour = params?.satoshi_per_duration_hour ?? 0;
-  const platformFeePercentage = params?.platform_fee_percentage ?? 0;
-  const btcPerDurationHour = satsToBtc(satoshiPerDurationHour);
+  // The store starts empty and fills in from the API, so these are unset on the
+  // first render and stay unset if the request fails. Falling back to 0 printed
+  // "a platform service fee of 0%" and "a minimum payout threshold of 0 sats" —
+  // a fee page stating the platform charges nothing. "--" is what satsToBtc
+  // already renders for an unknown amount.
+  const freeHours = params?.free_hours ?? "--";
+  const platformFeePercentage = params?.platform_fee_percentage ?? "--";
+  // suffix: false because the sentence supplies its own " BTC per hour", and
+  // the trailing zeros of a fixed 8-decimal rate carry nothing - 0.0005 reads
+  // as a price, 0.00050000 reads as a machine field.
+  const btcPerDurationHour = satsToBtc(params?.satoshi_per_duration_hour, {
+    suffix: false,
+    trimTrailingZeros: true,
+  });
   const bold = <span className="font-bold" />;
 
   // Scroll to top on mount
@@ -31,9 +41,14 @@ export default function ChargesnRefunds() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27 text-primary px-2 md:px-0">
-      <h1 className="text-2xl md:text-3xl fw-m text-center text-primary">
-        {t("charges.title")}
-      </h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl md:text-3xl fw-m text-center text-primary">
+          {t("charges.title")}
+        </h1>
+        <p className="text-center text-secondary text-sm">
+          {t("charges.lastUpdated")}
+        </p>
+      </div>
 
       <section>
         <h2 className="text-xl fw-m mb-2">{t("charges.section1Title")}</h2>

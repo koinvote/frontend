@@ -15,9 +15,10 @@ export interface SystemConfigRes {
   free_hours: number; //免費時長
   platform_fee_percentage: number; //平台服務費比例
   refund_service_fee_percentage: number; //退款處理費比例
-  payout_fee_multiplier: number; //派獎手續費倍數
-  refund_fee_multiplier: number; //退款手續費倍數
-  withdrawal_fee_multiplier: number; //提款手續費倍數
+  payout_fee_target_blocks: number; //派獎目標確認區塊數
+  refund_fee_target_blocks: number; //退款目標確認區塊數
+  withdrawal_fee_target_blocks: number; //提款目標確認區塊數
+  max_payout_fee_percentage: number; //礦工費上限，佔獎池百分比
   maintenance_mode: boolean; //維護模式
   required_confirmations: number; //所需確認數
 }
@@ -118,10 +119,8 @@ export interface EventDetailDataRes {
     | typeof EventStatus.ENDED
     | typeof EventStatus.COMPLETED;
   initial_reward_satoshi: number; //事件建立時的初始獎金
-  additional_reward_satoshi: number; //額外獎金
   total_reward_satoshi: number; //total reward指的是總獎金
   winner_count: number;
-  additional_winner_count: number;
   duration_hours: number;
   creator_address: string;
   created_at: string;
@@ -239,6 +238,21 @@ export interface PasskeyStepUpRes {
   expires_at: string;
 }
 
+/** The message to sign, for the wallet step-up path. */
+export interface StepUpWalletChallengeRes {
+  plaintext: string;
+  nonce_timestamp: string;
+  expires_at: string;
+}
+
+/** Assertion options for the passkey step-up path. */
+export interface StepUpPasskeyBeginRes {
+  challenge_id: string;
+  // PublicKeyCredentialRequestOptionsJSON, handed straight to
+  // @simplewebauthn/browser's startAuthentication.
+  publicKey: unknown;
+}
+
 export interface PasskeyRegisterBeginRes {
   challenge_id: string;
   // PublicKeyCredentialCreationOptionsJSON, handed straight to
@@ -274,9 +288,10 @@ export interface AdminSystemParametersRes {
   free_hours: number; //免費時長
   platform_fee_percentage: number; // 平台手續費百分比
   refund_service_fee_percentage: number; //退款服務費百分比
-  payout_fee_multiplier: number; //派獎手續費倍數
-  refund_fee_multiplier: number; //退款手續費倍數
-  withdrawal_fee_multiplier: number; //提款手續費倍數
+  payout_fee_target_blocks: number; //派獎目標確認區塊數
+  refund_fee_target_blocks: number; //退款目標確認區塊數
+  withdrawal_fee_target_blocks: number; //提款目標確認區塊數
+  max_payout_fee_percentage: number; //礦工費上限，佔獎池百分比
   maintenance_mode: boolean; //維護模式
   required_confirmations: number; //所需確認數
 }
@@ -329,14 +344,21 @@ export type PayoutStatus =
   | "processing" // 派獎處理中
   | "redistribute"; // 低於 dust 門檻，獎金重分配給其他中獎者
 
-export type RewardType = "initial" | "additional";
+// Additional rewards were removed as a feature; an event has exactly one
+// reward. The field is kept because the API still sends it.
+export type RewardType = "initial";
 
 export interface PayoutWinner {
-  // Exactly one of these is present, decided by the plan's scoring algorithm:
-  // BTC-Time payouts carry holding_score (pre-formatted by the backend),
-  // payouts settled before the switchover carry the raw snapshot balance they
-  // were actually weighted by.
+  // BTC-Time payouts carry the four fields below (holding_score and
+  // score_share are pre-formatted by the backend). Payouts settled before the
+  // switchover carry balance_at_snapshot_satoshi instead, the raw balance they
+  // were actually weighted by, and none of the BTC-Time ones.
   holding_score?: string;
+  // This address's score over the total held by every participant, e.g.
+  // "12.84%". Same figure the reply card shows for the same address.
+  score_share?: string;
+  average_holding_satoshi?: number;
+  join_block_height?: number;
   balance_at_snapshot_satoshi?: number;
   distributable_rate: number;
   final_reward_satoshi: number;
@@ -344,6 +366,8 @@ export interface PayoutWinner {
   original_reward_satoshi: number;
   status: PayoutStatus;
   winner_address: string;
+  /** @deprecated Never held a win probability - use score_share. Kept only
+   * until the backend drops the field. */
   win_probability_percent: number;
 }
 
@@ -352,6 +376,8 @@ export interface RewardDetail {
   distributable_satoshi: number;
   dust_redistribute_amount_satoshi: number;
   dust_winner_count: number;
+  /** Threshold frozen at planning time, not the live system parameter. */
+  dust_threshold_satoshi?: number;
   estimated_miner_fee_satoshi: number;
   original_amount_satoshi: number;
   payout_txid: string;
@@ -365,11 +391,9 @@ export interface RewardDetail {
 export interface PayoutReportRes {
   event_id: string;
   event_title: string;
-  snapshot_block_height: number;
+  snapshot_block_height: number | null;
   scoring_algorithm?: string; // e.g. "btc_time_v1"; absent for reports settled before the BTC-Time switchover
   initial_reward_satoshi: number;
-  additional_reward_1_satoshi: number;
-  additional_reward_2_satoshi: number;
   total_reward_pool_satoshi: number;
   reward_details: RewardDetail[];
 }

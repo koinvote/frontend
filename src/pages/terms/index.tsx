@@ -13,9 +13,14 @@ export default function Terms() {
 
   return (
     <div className="lg:tx-16 lg:lh-27 text-primary mx-auto max-w-3xl space-y-6 px-2 md:px-0">
-      <h1 className="fw-m text-center text-2xl md:text-3xl">
-        {t("terms.title")}
-      </h1>
+      <div className="space-y-1">
+        <h1 className="fw-m text-center text-2xl md:text-3xl">
+          {t("terms.title")}
+        </h1>
+        <p className="text-center text-secondary text-sm">
+          {t("terms.lastUpdated")}
+        </p>
+      </div>
 
       <section>
         <ol className="list-decimal space-y-3 pl-6 marker:font-bold">
@@ -195,6 +200,23 @@ export default function Terms() {
             </ul>
           </li>
           <li className="space-y-1">
+            <h3 className="font-bold">{t("terms.s6_title")}</h3>
+            <ul className="text-secondary list-disc space-y-1 pl-6">
+              <li>
+                <Trans i18nKey="terms.s6_1" components={{ bold }} />
+              </li>
+              <li>
+                <Trans i18nKey="terms.s6_2" components={{ bold }} />
+              </li>
+              <li>
+                <Trans i18nKey="terms.s6_3" components={{ bold }} />
+              </li>
+              <li>
+                <Trans i18nKey="terms.s6_4" components={{ bold }} />
+              </li>
+            </ul>
+          </li>
+          <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s7_title")}</h3>
             <ul className="text-secondary list-disc space-y-1 pl-6">
               <li>
@@ -209,7 +231,59 @@ export default function Terms() {
               <li>
                 <Trans i18nKey="terms.s7_4" components={{ bold }} />
               </li>
+              <li>
+                <Trans i18nKey="terms.s7_5" components={{ bold }} />
+              </li>
+              <li>
+                <Trans i18nKey="terms.s7_6" components={{ bold }} />
+              </li>
             </ul>
+            <div className="text-secondary space-y-1 pt-2">
+              <p>
+                <Trans i18nKey="terms.s7_content_p1" components={{ bold }} />
+              </p>
+              <p>
+                <Trans i18nKey="terms.s7_content_p2" components={{ bold }} />
+              </p>
+              <p>
+                <Trans
+                  i18nKey="terms.s7_content_list_intro"
+                  components={{ bold }}
+                />
+              </p>
+              <ul className="list-disc space-y-1 pl-6">
+                <li>
+                  <Trans i18nKey="terms.s7_content_li1" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li2" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li3" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li4" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li5" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li6" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li7" components={{ bold }} />
+                </li>
+                <li>
+                  <Trans i18nKey="terms.s7_content_li8" components={{ bold }} />
+                </li>
+              </ul>
+              <p>
+                <Trans i18nKey="terms.s7_content_p3" components={{ bold }} />
+              </p>
+              <p>
+                <Trans i18nKey="terms.s7_content_p4" components={{ bold }} />
+              </p>
+            </div>
           </li>
           <li className="space-y-1">
             <h3 className="font-bold">{t("terms.s8_title")}</h3>
@@ -222,75 +296,6 @@ export default function Terms() {
               </li>
               <li>
                 <Trans i18nKey="terms.s8_3" components={{ bold }} />
-              </li>
-              <li>
-                <Trans i18nKey="terms.s8_4" components={{ bold }} />
-              </li>
-              <li>
-                <Trans i18nKey="terms.s8_5" components={{ bold }} />
-              </li>
-              <li>
-                <Trans i18nKey="terms.s8_6" components={{ bold }} />
-              </li>
-            </ul>
-            <div className="text-secondary space-y-1 pt-2">
-              <p>
-                <Trans i18nKey="terms.s8_content_p1" components={{ bold }} />
-              </p>
-              <p>
-                <Trans i18nKey="terms.s8_content_p2" components={{ bold }} />
-              </p>
-              <p>
-                <Trans
-                  i18nKey="terms.s8_content_list_intro"
-                  components={{ bold }}
-                />
-              </p>
-              <ul className="list-disc space-y-1 pl-6">
-                <li>
-                  <Trans i18nKey="terms.s8_content_li1" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li2" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li3" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li4" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li5" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li6" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li7" components={{ bold }} />
-                </li>
-                <li>
-                  <Trans i18nKey="terms.s8_content_li8" components={{ bold }} />
-                </li>
-              </ul>
-              <p>
-                <Trans i18nKey="terms.s8_content_p3" components={{ bold }} />
-              </p>
-              <p>
-                <Trans i18nKey="terms.s8_content_p4" components={{ bold }} />
-              </p>
-            </div>
-          </li>
-          <li className="space-y-1">
-            <h3 className="font-bold">{t("terms.s9_title")}</h3>
-            <ul className="text-secondary list-disc space-y-1 pl-6">
-              <li>
-                <Trans i18nKey="terms.s9_1" components={{ bold }} />
-              </li>
-              <li>
-                <Trans i18nKey="terms.s9_2" components={{ bold }} />
-              </li>
-              <li>
-                <Trans i18nKey="terms.s9_3" components={{ bold }} />
               </li>
             </ul>
           </li>

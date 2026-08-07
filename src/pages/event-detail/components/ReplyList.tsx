@@ -3,7 +3,7 @@ import { Tooltip } from "antd";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -32,6 +32,10 @@ import { HoldingScoreBlock } from "./HoldingScoreBlock";
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
+
+// How long a card stays ringed after being scrolled to: long enough to catch
+// the eye once the smooth scroll settles, short enough not to look like state.
+const HIGHLIGHT_MS = 2000;
 
 interface ReplyListProps {
   eventId: string;
@@ -246,6 +250,69 @@ export function ReplyList({
 
   const allReplies = repliesData?.pages.flatMap((p) => p?.replies ?? []) ?? [];
 
+  // Set once a "See latest reply" link has located its target, so the scroll
+  // happens after React has rendered the card (it may have just arrived in a
+  // freshly fetched page and not exist in the DOM yet).
+  const [scrollTargetId, setScrollTargetId] = useState<number | null>(null);
+  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+
+  const findLatestReplyId = (
+    pages: (GetListRepliesRes | null | undefined)[],
+    address: string,
+  ) =>
+    pages
+      .flatMap((p) => p?.replies ?? [])
+      .find((r) => r.btc_address === address && r.is_reply_valid)?.id ?? null;
+
+  // An invalidated card links to the address's current reply. That reply is
+  // always in the event, but not necessarily in the pages loaded so far, so
+  // keep paging until it turns up. It can also be genuinely absent - a search
+  // term that only matches the old content, or an admin-hidden reply - which
+  // is why this ends in a toast rather than an endless fetch.
+  const handleSeeLatest = useCallback(
+    async (address: string) => {
+      let targetId = findLatestReplyId(repliesData?.pages ?? [], address);
+      let canFetchMore = hasNextPage;
+
+      for (let i = 0; targetId == null && canFetchMore && i < 20; i++) {
+        const result = await fetchNextPage();
+        targetId = findLatestReplyId(result.data?.pages ?? [], address);
+        canFetchMore = !!result.hasNextPage;
+      }
+
+      if (targetId == null) {
+        showToast(
+          "warn",
+          t(
+            "replyList.latestReplyNotInResults",
+            "The latest reply is not in the current results.",
+          ),
+        );
+        return;
+      }
+      setScrollTargetId(targetId);
+    },
+    [repliesData, hasNextPage, fetchNextPage, showToast, t],
+  );
+
+  useEffect(() => {
+    if (scrollTargetId == null) return;
+    const el = document.getElementById(`reply-card-${scrollTargetId}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedId(scrollTargetId);
+    setScrollTargetId(null);
+  }, [scrollTargetId]);
+
+  // Dropping the highlight gets its own effect on purpose. Arming the timer
+  // in the effect above would cancel it a moment later: clearing
+  // scrollTargetId re-runs that effect, and its cleanup kills the timer.
+  useEffect(() => {
+    if (highlightedId == null) return;
+    const timer = setTimeout(() => setHighlightedId(null), HIGHLIGHT_MS);
+    return () => clearTimeout(timer);
+  }, [highlightedId]);
+
   useEffect(() => {
     const sentinel = sentinelRef.current;
     if (!sentinel) return;
@@ -435,6 +502,8 @@ export function ReplyList({
           eventType={eventType}
           eventStatus={eventStatus}
           balanceDisplayMode={balanceDisplayMode}
+          isHighlighted={reply.id === highlightedId}
+          onSeeLatest={handleSeeLatest}
         />
       ))}
       <div ref={sentinelRef} className="h-1" />
@@ -451,6 +520,8 @@ interface ReplyItemProps {
   eventType?: EventType;
   eventStatus?: number;
   balanceDisplayMode?: "snapshot" | "on_chain";
+  isHighlighted?: boolean;
+  onSeeLatest?: (address: string) => void;
 }
 
 function ReplyItem({
@@ -460,6 +531,8 @@ function ReplyItem({
   eventType,
   eventStatus,
   balanceDisplayMode,
+  isHighlighted,
+  onSeeLatest,
 }: ReplyItemProps) {
   const { t } = useTranslation();
   const { isDesktop } = useHomeStore();
@@ -551,7 +624,13 @@ function ReplyItem({
   const [showDetails, setShowDetails] = useState(!isCollapsible);
 
   return (
-    <div className="border-border bg-bg group relative flex h-full flex-col rounded-xl border p-4 md:p-6">
+    <div
+      id={`reply-card-${reply.id}`}
+      className={cn(
+        "border-border bg-bg group relative flex h-full flex-col rounded-xl border p-4 transition-shadow duration-300 md:p-6",
+        isHighlighted && "ring-accent ring-2",
+      )}
+    >
       <div
         className={cn(
           "flex flex-1 flex-col md:flex-row md:items-stretch md:justify-between md:gap-4",
@@ -690,6 +769,13 @@ function ReplyItem({
                 holdingScore={reply.holding_score}
                 scoreShare={reply.score_share}
                 currentBalanceSatoshi={reply.balance_at_current_satoshi}
+                // Superseded replies link to the address's current card rather
+                // than repeating its score.
+                onSeeLatest={
+                  reply.is_reply_valid
+                    ? undefined
+                    : () => onSeeLatest?.(reply.btc_address)
+                }
                 className="mt-9 md:mt-auto"
               />
             )}

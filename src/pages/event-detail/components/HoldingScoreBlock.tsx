@@ -14,6 +14,11 @@ interface HoldingScoreBlockProps {
   // is 0, so the score has stopped growing). Ignored once scoreShare is
   // present, since a settled event no longer accumulates either way.
   currentBalanceSatoshi?: number | null;
+  // Set on a reply that a later one from the same address has superseded.
+  // The score is the address's, not this card's, so repeating the figure here
+  // would show the same number twice and read as if it were counted twice.
+  // The label stays - only the figure and its status are replaced by a link.
+  onSeeLatest?: () => void;
   className?: string;
 }
 
@@ -26,6 +31,7 @@ export function HoldingScoreBlock({
   holdingScore,
   scoreShare,
   currentBalanceSatoshi,
+  onSeeLatest,
   className,
 }: HoldingScoreBlockProps) {
   const { t } = useTranslation();
@@ -39,18 +45,18 @@ export function HoldingScoreBlock({
 
   const isFinal = scoreShare != null;
 
-  if (isFinal) {
-    return (
-      <div className={cn("flex flex-col", className)}>
-        <div className="text-secondary text-xs font-medium">
-          {t("replyList.scoreShare", "Score Share")}
-        </div>
-        <div className="text-primary tabular-nums mt-2 font-mono text-xs font-normal">
-          {scoreShare}
-        </div>
-      </div>
-    );
-  }
+  // The figure is the address's, not this card's, so a superseded reply
+  // points at the address's current card rather than restating it.
+  const seeLatestLink = onSeeLatest && (
+    <button
+      type="button"
+      onClick={onSeeLatest}
+      className="text-accent mt-2 cursor-pointer self-start text-xs underline underline-offset-2"
+    >
+      {t("replyList.seeAddressLatestReply", "See this address's latest reply")}{" "}
+      <span aria-hidden="true">›</span>
+    </button>
+  );
 
   const isAccumulating = (currentBalanceSatoshi ?? 0) > 0;
 
@@ -84,23 +90,38 @@ export function HoldingScoreBlock({
             </span>
           </Tooltip>
         </span>
-        <span
-          className={cn(
-            "ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal",
-            isAccumulating ? "text-success/70" : "text-secondary",
-          )}
-        >
-          <span className="h-1.5 w-1.5 rounded-full bg-current" />
-          <span>
-            {isAccumulating
-              ? t("replyList.accumulating", "Accumulating")
-              : t("replyList.paused", "Paused")}
-          </span>
-        </span>
+        {/* One slot, three states, so the block keeps its shape for the whole
+            life of an event: the figure never moves, only what qualifies it.
+            Accumulating/Paused reports whether the address's balance is still
+            earning score, so it is dropped once the event has settled - and on
+            a superseded reply, where Paused would claim the re-vote stopped
+            the scoring, which it does not. */}
+        {!onSeeLatest &&
+          (isFinal ? (
+            <span className="text-secondary ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal tabular-nums">
+              {scoreShare}
+            </span>
+          ) : (
+            <span
+              className={cn(
+                "ml-3 flex shrink-0 items-center gap-1.5 text-xs font-normal",
+                isAccumulating ? "text-success/70" : "text-secondary",
+              )}
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-current" />
+              <span>
+                {isAccumulating
+                  ? t("replyList.accumulating", "Accumulating")
+                  : t("replyList.paused", "Paused")}
+              </span>
+            </span>
+          ))}
       </div>
-      <span className="text-primary tabular-nums mt-2 font-mono text-xs font-normal break-all transition-opacity duration-150">
-        {holdingScore}
-      </span>
+      {seeLatestLink ?? (
+        <span className="text-primary mt-2 font-mono text-xs font-normal break-all tabular-nums transition-opacity duration-150">
+          {holdingScore}
+        </span>
+      )}
     </div>
   );
 }

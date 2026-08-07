@@ -15,6 +15,7 @@ import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg
 import HashIcon from "@/assets/icons/hash.svg?react";
 import RewardBtcIcon from "@/assets/icons/reward-btc.svg?react";
 import TrophyIcon from "@/assets/icons/trophy.svg?react";
+import { AddressInput } from "@/components/base/AddressInput";
 import BackButton from "@/components/base/BackButton";
 import { Button } from "@/components/base/Button";
 import { EventInfoBox } from "@/components/base/EventInfoBox";
@@ -506,18 +507,13 @@ export default function ReplyPage() {
             {t("reply.btcAddressLabel", "BTC Address")}{" "}
             <span className="text-accent">*</span>
           </label>
-          <input
-            type="text"
+          <AddressInput
             value={btcAddress}
             onChange={(e) => setBtcAddress(e.target.value)}
             placeholder={t(
               "reply.enterBtcAddress",
               "Please enter your BTC address",
             )}
-            autoComplete="new-password"
-            autoCorrect="off"
-            autoCapitalize="off"
-            spellCheck="false"
             className={cn(
               "bg-form-bg text-primary tx-14 mt-2 w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:outline-none dark:placeholder:text-neutral-600",
               btcAddress && !isAddressValid

@@ -1,6 +1,6 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
-import { toast } from "@/components/base/Toast/toast";
+import { notifySessionExpired } from "@/api/adminSession";
 import i18n from "@/i18n";
 
 export type RequestConf = AxiosRequestConfig;
@@ -16,15 +16,23 @@ export function getApiMessage(error: unknown): string | undefined {
   return undefined;
 }
 
+/**
+ * @param lng Pin the message to one language instead of the site language.
+ *   The admin login screen passes "en": it is reachable by anyone who types
+ *   the URL, so it should not switch to Chinese just because the browser once
+ *   picked that on the public site.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getApiErrorMessage(error: any): string {
+export function getApiErrorMessage(error: any, lng?: string): string {
+  const translate = lng ? i18n.getFixedT(lng) : i18n.t.bind(i18n);
+
   // Axios response error
   if (error?.response) {
     const errorKey = error.response.data?.error_key;
     if (errorKey) {
       const i18nKey = errorKeyToI18nKey(errorKey);
-      if (i18n.exists(i18nKey)) {
-        return i18n.t(i18nKey);
+      if (i18n.exists(i18nKey, lng ? { lng } : undefined)) {
+        return translate(i18nKey);
       }
     }
     return (
@@ -130,9 +138,6 @@ adminHttp.interceptors.request.use(
   },
 );
 
-// Track whether a 401 redirect is already in progress to avoid duplicate toasts
-let isRedirectingToLogin = false;
-
 // Response interceptor: Handle token expiration and errors
 adminHttp.interceptors.response.use(
   (response) => response.data,
@@ -155,17 +160,13 @@ adminHttp.interceptors.response.use(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (error as any).isHandled = true;
 
-      // 防止「連線已過期」重複出現
-      if (!isRedirectingToLogin) {
-        isRedirectingToLogin = true;
-        toast("error", "連線已過期，請重新登入");
-        removeAdminToken();
-        if (typeof window !== "undefined") {
-          setTimeout(() => {
-            window.location.href = "/admin/login";
-          }, 1500);
-        }
-      }
+      // No toast here. An expired session is not an error the admin can act on
+      // from this screen, and a red banner in front of the login form reads as
+      // a broken site. The login page states it calmly instead — see
+      // notifySessionExpired, which lets AdminLayout redirect through the
+      // router rather than reloading the whole page behind a timer.
+      removeAdminToken();
+      notifySessionExpired();
     }
 
     return Promise.reject(error);

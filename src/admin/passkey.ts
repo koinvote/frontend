@@ -23,10 +23,10 @@ export function ceremonyErrorMessage(error: unknown, fallback: string): string {
   // when the ceremony times out. They are indistinguishable by design — the
   // spec deliberately refuses to tell the site which happened.
   if (e?.name === "NotAllowedError") {
-    return "已取消或逾時，請再試一次";
+    return "Cancelled or timed out. Please try again.";
   }
   if (e?.name === "InvalidStateError") {
-    return "這個裝置已經註冊過了";
+    return "This device is already registered.";
   }
   return e?.apiMessage || e?.message || fallback;
 }

@@ -25,9 +25,10 @@ export const mockSystemConfig: SystemConfigRes = {
   free_hours: 24,
   platform_fee_percentage: 2,
   refund_service_fee_percentage: 0,
-  payout_fee_multiplier: 1.0,
-  refund_fee_multiplier: 1.0,
-  withdrawal_fee_multiplier: 1.0,
+  payout_fee_target_blocks: 6,
+  refund_fee_target_blocks: 12,
+  withdrawal_fee_target_blocks: 3,
+  max_payout_fee_percentage: 5,
   maintenance_mode: false,
   required_confirmations: 3,
 };
@@ -118,6 +119,7 @@ export const mockEventList: EventListDataRes[] = [
       },
     ],
     options: [],
+    result_visibility: "public",
   },
   {
     id: 4,
@@ -169,6 +171,7 @@ export const mockEventList: EventListDataRes[] = [
         total_stake_satoshi: 22500,
       },
     ],
+    result_visibility: "public",
   },
   {
     id: 49,
@@ -239,6 +242,7 @@ export const mockEventList: EventListDataRes[] = [
         weight_percent: 0,
       },
     ],
+    result_visibility: "public",
   },
   {
     id: 5,
@@ -316,12 +320,15 @@ export const mockEventList: EventListDataRes[] = [
       },
     ],
     options: [],
+    result_visibility: "public",
   },
   {
     id: 4,
     event_type: "open",
     event_reward_type: "rewarded",
-    event_id: "evt_004_mock",
+    // Distinct from the active evt_004_mock above: sharing an event_id made
+    // this card open that one instead, since lookups take the first match.
+    event_id: "evt_005_mock",
     title: "Ended event awaiting payout (should NOT show PAID)",
     description:
       "This rewarded event has ended but the payout tx is not confirmed yet (status 4).",
@@ -345,6 +352,7 @@ export const mockEventList: EventListDataRes[] = [
       },
     ],
     options: [],
+    result_visibility: "public",
   },
 ];
 
@@ -365,10 +373,8 @@ export const mockEventDetail: EventDetailDataRes = {
   event_reward_type: "rewarded",
   status: EventStatus.ACTIVE,
   initial_reward_satoshi: 80000,
-  additional_reward_satoshi: 20000,
   total_reward_satoshi: 100000,
   winner_count: 5,
-  additional_winner_count: 2,
   duration_hours: 96,
   creator_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
   created_at: "2026-01-10T10:00:00Z",
@@ -569,9 +575,10 @@ export const mockAdminSystemParameters: AdminSystemParametersRes = {
   free_hours: 24,
   platform_fee_percentage: 2.5,
   refund_service_fee_percentage: 0.5,
-  payout_fee_multiplier: 1.0,
-  refund_fee_multiplier: 1.0,
-  withdrawal_fee_multiplier: 1.0,
+  payout_fee_target_blocks: 6,
+  refund_fee_target_blocks: 12,
+  withdrawal_fee_target_blocks: 3,
+  max_payout_fee_percentage: 5,
   maintenance_mode: false,
   required_confirmations: 3,
 };
@@ -581,6 +588,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
     holding_score: "0.01280086",
+    score_share: "35.71%",
+    average_holding_satoshi: 1280086,
+    join_block_height: 849501,
     win_probability_percent: 20.0,
     is_dust: false,
     original_reward_satoshi: 1668,
@@ -591,6 +601,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
     holding_score: "0.0045",
+    score_share: "12.55%",
+    average_holding_satoshi: 450000,
+    join_block_height: 849620,
     win_probability_percent: 18.0,
     is_dust: false,
     original_reward_satoshi: 51750,
@@ -601,6 +614,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qx9t2l3pyny2spqpqlye8svce70nppwtaxwdrp4",
     holding_score: "0.004",
+    score_share: "11.16%",
+    average_holding_satoshi: 400000,
+    join_block_height: 849745,
     win_probability_percent: 16.0,
     is_dust: false,
     original_reward_satoshi: 46000,
@@ -611,6 +627,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qabc123xyz456def789ghi012jkl345mno678pqr",
     holding_score: "0.0035",
+    score_share: "9.76%",
+    average_holding_satoshi: 350000,
+    join_block_height: 849880,
     win_probability_percent: 14.0,
     is_dust: false,
     original_reward_satoshi: 40250,
@@ -622,6 +641,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
     winner_address:
       "bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej",
     holding_score: "0.003",
+    score_share: "8.37%",
+    average_holding_satoshi: 300000,
+    join_block_height: 850010,
     win_probability_percent: 12.0,
     is_dust: false,
     original_reward_satoshi: 34500,
@@ -632,6 +654,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qdef456uvw789xyz012abc345ghi678jkl901mno",
     holding_score: "0.0025",
+    score_share: "6.97%",
+    average_holding_satoshi: 250000,
+    join_block_height: 850150,
     win_probability_percent: 10.0,
     is_dust: false,
     original_reward_satoshi: 28750,
@@ -642,6 +667,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qprocessing123xyz456def789ghi012jkl345mno",
     holding_score: "0.002",
+    score_share: "5.58%",
+    average_holding_satoshi: 200000,
+    join_block_height: 850290,
     win_probability_percent: 8.0,
     is_dust: false,
     original_reward_satoshi: 23000,
@@ -652,6 +680,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qwinner09abc123def456ghi789jkl012mno345pqr",
     holding_score: "0.0018",
+    score_share: "5.02%",
+    average_holding_satoshi: 180000,
+    join_block_height: 850430,
     win_probability_percent: 7.2,
     is_dust: false,
     original_reward_satoshi: 20700,
@@ -662,6 +693,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qwinner10xyz789abc012def345ghi678jkl901mno",
     holding_score: "0.0016",
+    score_share: "4.46%",
+    average_holding_satoshi: 160000,
+    join_block_height: 850560,
     win_probability_percent: 6.4,
     is_dust: false,
     original_reward_satoshi: 18400,
@@ -672,6 +706,9 @@ export const mockPayoutWinners: PayoutWinner[] = [
   {
     winner_address: "bc1qdust123abc456def789ghi012jkl345mno678pqr",
     holding_score: "0.00005",
+    score_share: "0.14%",
+    average_holding_satoshi: 5000,
+    join_block_height: 850690,
     win_probability_percent: 0.2,
     is_dust: true,
     original_reward_satoshi: 500,
@@ -679,48 +716,57 @@ export const mockPayoutWinners: PayoutWinner[] = [
     distributable_rate: 0.0,
     status: "redistribute",
   },
-];
-
-export const mockAdditionalPayoutWinners: PayoutWinner[] = [
   {
-    winner_address: "bc1qghi789rst012uvw345xyz678abc901def234ghi",
-    holding_score: "0.008",
-    win_probability_percent: 32.0,
-    is_dust: false,
-    original_reward_satoshi: 61280,
-    final_reward_satoshi: 61280,
-    distributable_rate: 32.0,
-    status: "completed",
+    winner_address: "bc1qdust2def789ghi012jkl345mno678pqr901stu",
+    holding_score: "0.00004",
+    score_share: "0.11%",
+    average_holding_satoshi: 4000,
+    join_block_height: 850701,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 80,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
   {
-    winner_address: "bc1qjkl012mno345pqr678stu901vwx234yz567abc",
-    holding_score: "0.0065",
-    win_probability_percent: 26.0,
-    is_dust: false,
-    original_reward_satoshi: 49790,
-    final_reward_satoshi: 49790,
-    distributable_rate: 26.0,
-    status: "completed",
+    winner_address: "bc1qdust3ghi012jkl345mno678pqr901stu234vwx",
+    holding_score: "0.00003",
+    score_share: "0.08%",
+    average_holding_satoshi: 3000,
+    join_block_height: 850712,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 60,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
   {
-    winner_address: "bc1qmno345pqr678stu901vwx234yz567abc890def",
-    holding_score: "0.0055",
-    win_probability_percent: 22.0,
-    is_dust: false,
-    original_reward_satoshi: 42130,
-    final_reward_satoshi: 42130,
-    distributable_rate: 22.0,
-    status: "completed",
+    winner_address: "bc1qdust4jkl345mno678pqr901stu234vwx567yza",
+    holding_score: "0.00002",
+    score_share: "0.06%",
+    average_holding_satoshi: 2000,
+    join_block_height: 850725,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 40,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
   {
-    winner_address: "bc1qpqr678stu901vwx234yz567abc890def123ghi",
-    holding_score: "0.005",
-    win_probability_percent: 20.0,
-    is_dust: false,
-    original_reward_satoshi: 38300,
-    final_reward_satoshi: 38300,
-    distributable_rate: 20.0,
-    status: "completed",
+    winner_address: "bc1qdust5mno678pqr901stu234vwx567yza890bcd",
+    holding_score: "0.00001",
+    score_share: "0.03%",
+    average_holding_satoshi: 1000,
+    join_block_height: 850736,
+    win_probability_percent: 0.1,
+    is_dust: true,
+    original_reward_satoshi: 20,
+    final_reward_satoshi: 0,
+    distributable_rate: 0.1,
+    status: "redistribute",
   },
 ];
 
@@ -732,26 +778,11 @@ export const mockRewardDetails: RewardDetail[] = [
     platform_fee_satoshi: 7500,
     estimated_miner_fee_satoshi: 5000,
     distributable_satoshi: 287500,
-    winner_count: 12,
+    winner_count: 9,
     winners: mockPayoutWinners,
-    dust_winner_count: 3,
+    dust_winner_count: 5,
+    dust_threshold_satoshi: 2000,
     dust_redistribute_amount_satoshi: 1532,
-    payout_txid:
-      "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
-    csv_sha256:
-      "d2f4a8c1b3e5f7890123456789abcdef0123456789abcdef0123456789abcef39",
-  },
-  {
-    reward_type: "additional",
-    plan_id: 457,
-    original_amount_satoshi: 200000,
-    platform_fee_satoshi: 5000,
-    estimated_miner_fee_satoshi: 3500,
-    distributable_satoshi: 191500,
-    winner_count: 4,
-    winners: mockAdditionalPayoutWinners,
-    dust_winner_count: 0,
-    dust_redistribute_amount_satoshi: 0,
     payout_txid:
       "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
     csv_sha256:
@@ -759,16 +790,67 @@ export const mockRewardDetails: RewardDetail[] = [
   },
 ];
 
+// A report from before the BTC-Time switchover, reachable at
+// /event/evt_legacy_mock/report. Its winners carry balance_at_snapshot_satoshi
+// and the report has no scoring_algorithm, so WinnerTable must keep rendering
+// the original Snapshot Balance / Distributable columns. Those payouts really
+// were weighted by a point-in-time balance; relabelling them as holding scores
+// would misstate what happened.
+export const mockLegacyPayoutWinners: PayoutWinner[] = [
+  {
+    winner_address: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+    balance_at_snapshot_satoshi: 1280086,
+    win_probability_percent: 20.0,
+    is_dust: false,
+    original_reward_satoshi: 1668,
+    final_reward_satoshi: 1668,
+    distributable_rate: 19.0,
+    status: "completed",
+  },
+  {
+    winner_address: "bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq",
+    balance_at_snapshot_satoshi: 450000,
+    win_probability_percent: 18.0,
+    is_dust: false,
+    original_reward_satoshi: 51750,
+    final_reward_satoshi: 51750,
+    distributable_rate: 17.0,
+    status: "completed",
+  },
+];
+
+export const mockLegacyPayoutReport: PayoutReportRes = {
+  event_id: "evt_legacy_mock",
+  event_title: "Legacy event settled before BTC-Time scoring",
+  // No scoring_algorithm on purpose.
+  initial_reward_satoshi: 300000,
+  snapshot_block_height: 840000,
+  total_reward_pool_satoshi: 300000,
+  reward_details: [
+    {
+      ...mockRewardDetails[0],
+      winner_count: mockLegacyPayoutWinners.length,
+      winners: mockLegacyPayoutWinners,
+      dust_winner_count: 0,
+      dust_redistribute_amount_satoshi: 0,
+    },
+  ],
+};
+
 export const mockPayoutReport: PayoutReportRes = {
   event_id: "evt_001_mock",
   event_title: "What's the best Bitcoin scaling solution?",
+  // The winners below carry holding_score, which only a BTC-Time plan produces,
+  // so the report has to say so too. Without this the table falls back to the
+  // pre-BTC-Time columns and reads balance_at_snapshot_satoshi, which these
+  // winners do not have — every weight cell renders as "--". That combination
+  // cannot occur against the real backend: it sets both together.
+  scoring_algorithm: "btc_time_v1",
   initial_reward_satoshi: 300000,
   snapshot_block_height: 850000,
   total_reward_pool_satoshi: 500000,
   reward_details: mockRewardDetails,
   // TODO: 追加獎金 (下面key目前沒有)
-  additional_reward_1_satoshi: 200000,
-  additional_reward_2_satoshi: 0,
 };
 
 // Mock CSV data for verification
@@ -1197,6 +1279,7 @@ export const mockScrollEventReplies: Reply[] = [
     signature:
       "H1aAbBcCdDeEfF0011223344556677889900aabbccddeeff0011223344556677",
     is_reply_valid: true,
+    holding_score: "77.85",
     balance_at_reply_satoshi: 5920000,
     balance_at_snapshot_satoshi: 5920000,
     balance_at_current_satoshi: 5920000,
@@ -1213,6 +1296,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900002 | bb02cc",
     signature: "H2bBcCdDeEfF0011223344556677889900aabbccddeeff0011223344556678",
     is_reply_valid: true,
+    holding_score: "74.85",
     balance_at_reply_satoshi: 5180000,
     balance_at_snapshot_satoshi: 5180000,
     balance_at_current_satoshi: 5180000,
@@ -1229,6 +1313,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900003 | cc03dd",
     signature: "H3cCdDeEfF0011223344556677889900aabbccddeeff0011223344556679",
     is_reply_valid: true,
+    holding_score: "31.27",
     balance_at_reply_satoshi: 3330000,
     balance_at_snapshot_satoshi: 3330000,
     balance_at_current_satoshi: 3330000,
@@ -1244,6 +1329,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900004 | dd04ee",
     signature: "H4dDeEfF0011223344556677889900aabbccddeeff0011223344556680",
     is_reply_valid: true,
+    holding_score: "23.88",
     balance_at_reply_satoshi: 2100000,
     balance_at_snapshot_satoshi: 2100000,
     balance_at_current_satoshi: 2100000,
@@ -1259,6 +1345,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900005 | ee05ff",
     signature: "H5eEfF0011223344556677889900aabbccddeeff0011223344556681",
     is_reply_valid: true,
+    holding_score: "19.17",
     balance_at_reply_satoshi: 1850000,
     balance_at_snapshot_satoshi: 1850000,
     balance_at_current_satoshi: 1850000,
@@ -1274,6 +1361,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900006 | ff06aa",
     signature: "H6fF0011223344556677889900aabbccddeeff0011223344556682",
     is_reply_valid: true,
+    holding_score: "19.46",
     balance_at_reply_satoshi: 1520000,
     balance_at_snapshot_satoshi: 1520000,
     balance_at_current_satoshi: 1520000,
@@ -1289,6 +1377,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900007 | aa07bb",
     signature: "H7aA0011223344556677889900aabbccddeeff0011223344556683",
     is_reply_valid: true,
+    holding_score: "14.98",
     balance_at_reply_satoshi: 1200000,
     balance_at_snapshot_satoshi: 1200000,
     balance_at_current_satoshi: 1200000,
@@ -1304,6 +1393,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900008 | bb08cc",
     signature: "H8bB0011223344556677889900aabbccddeeff0011223344556684",
     is_reply_valid: true,
+    holding_score: "10.8",
     balance_at_reply_satoshi: 980000,
     balance_at_snapshot_satoshi: 980000,
     balance_at_current_satoshi: 980000,
@@ -1319,6 +1409,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900009 | cc09dd",
     signature: "H9cC0011223344556677889900aabbccddeeff0011223344556685",
     is_reply_valid: true,
+    holding_score: "10.15",
     balance_at_reply_satoshi: 850000,
     balance_at_snapshot_satoshi: 850000,
     balance_at_current_satoshi: 850000,
@@ -1334,6 +1425,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900010 | dd10ee",
     signature: "H10dD011223344556677889900aabbccddeeff0011223344556686",
     is_reply_valid: true,
+    holding_score: "8.54",
     balance_at_reply_satoshi: 720000,
     balance_at_snapshot_satoshi: 720000,
     balance_at_current_satoshi: 720000,
@@ -1349,6 +1441,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900011 | ee11ff",
     signature: "H11eE011223344556677889900aabbccddeeff0011223344556687",
     is_reply_valid: false,
+    holding_score: "8.4",
     balance_at_reply_satoshi: 600000,
     balance_at_snapshot_satoshi: 600000,
     balance_at_current_satoshi: 600000,
@@ -1364,6 +1457,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900012 | ff12aa",
     signature: "H12fF011223344556677889900aabbccddeeff0011223344556688",
     is_reply_valid: true,
+    holding_score: "6.42",
     balance_at_reply_satoshi: 550000,
     balance_at_snapshot_satoshi: 550000,
     balance_at_current_satoshi: 550000,
@@ -1379,6 +1473,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900013 | aa13bb",
     signature: "H13aA011223344556677889900aabbccddeeff0011223344556689",
     is_reply_valid: true,
+    holding_score: "5.67",
     balance_at_reply_satoshi: 480000,
     balance_at_snapshot_satoshi: 480000,
     balance_at_current_satoshi: 480000,
@@ -1394,6 +1489,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900014 | bb14cc",
     signature: "H14bB011223344556677889900aabbccddeeff0011223344556690",
     is_reply_valid: true,
+    holding_score: "5.42",
     balance_at_reply_satoshi: 420000,
     balance_at_snapshot_satoshi: 420000,
     balance_at_current_satoshi: 420000,
@@ -1409,6 +1505,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900015 | cc15dd",
     signature: "H15cC011223344556677889900aabbccddeeff0011223344556691",
     is_reply_valid: true,
+    holding_score: "3.37",
     balance_at_reply_satoshi: 370000,
     balance_at_snapshot_satoshi: 370000,
     balance_at_current_satoshi: 370000,
@@ -1424,6 +1521,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900016 | dd16ee",
     signature: "H16dD011223344556677889900aabbccddeeff0011223344556692",
     is_reply_valid: true,
+    holding_score: "6.56",
     balance_at_reply_satoshi: 320000,
     balance_at_snapshot_satoshi: 320000,
     balance_at_current_satoshi: 320000,
@@ -1439,6 +1537,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900017 | ee17ff",
     signature: "H17eE011223344556677889900aabbccddeeff0011223344556693",
     is_reply_valid: true,
+    holding_score: "2.57",
     balance_at_reply_satoshi: 280000,
     balance_at_snapshot_satoshi: 280000,
     balance_at_current_satoshi: 280000,
@@ -1454,6 +1553,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900018 | ff18aa",
     signature: "H18fF011223344556677889900aabbccddeeff0011223344556694",
     is_reply_valid: true,
+    holding_score: "2.17",
     balance_at_reply_satoshi: 240000,
     balance_at_snapshot_satoshi: 240000,
     balance_at_current_satoshi: 240000,
@@ -1469,6 +1569,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900019 | aa19bb",
     signature: "H19aA011223344556677889900aabbccddeeff0011223344556695",
     is_reply_valid: true,
+    holding_score: "4.17",
     balance_at_reply_satoshi: 200000,
     balance_at_snapshot_satoshi: 200000,
     balance_at_current_satoshi: 200000,
@@ -1484,6 +1585,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900020 | bb20cc",
     signature: "H20bB011223344556677889900aabbccddeeff0011223344556696",
     is_reply_valid: true,
+    holding_score: "3.52",
     balance_at_reply_satoshi: 170000,
     balance_at_snapshot_satoshi: 170000,
     balance_at_current_satoshi: 170000,
@@ -1499,6 +1601,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900021 | cc21dd",
     signature: "H21cC011223344556677889900aabbccddeeff0011223344556697",
     is_reply_valid: true,
+    holding_score: "2.98",
     balance_at_reply_satoshi: 145000,
     balance_at_snapshot_satoshi: 145000,
     balance_at_current_satoshi: 145000,
@@ -1514,6 +1617,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900022 | dd22ee",
     signature: "H22dD011223344556677889900aabbccddeeff0011223344556698",
     is_reply_valid: false,
+    holding_score: "2.44",
     balance_at_reply_satoshi: 120000,
     balance_at_snapshot_satoshi: 120000,
     balance_at_current_satoshi: 120000,
@@ -1529,6 +1633,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900023 | ee23ff",
     signature: "H23eE011223344556677889900aabbccddeeff0011223344556699",
     is_reply_valid: true,
+    holding_score: "1.92",
     balance_at_reply_satoshi: 95000,
     balance_at_snapshot_satoshi: 95000,
     balance_at_current_satoshi: 95000,
@@ -1544,6 +1649,7 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900024 | ff24aa",
     signature: "H24fF011223344556677889900aabbccddeeff0011223344556700",
     is_reply_valid: true,
+    holding_score: "1.44",
     balance_at_reply_satoshi: 72000,
     balance_at_snapshot_satoshi: 72000,
     balance_at_current_satoshi: 72000,
@@ -1559,10 +1665,49 @@ export const mockScrollEventReplies: Reply[] = [
       "koinvote.com | type:open | evt_scroll_mock | 1772900025 | aa25bb",
     signature: "H25aA011223344556677889900aabbccddeeff0011223344556701",
     is_reply_valid: true,
+    holding_score: "1.02",
     balance_at_reply_satoshi: 50000,
     balance_at_snapshot_satoshi: 50000,
     balance_at_current_satoshi: 50000,
     created_at: "2026-03-03T01:00:00Z",
+  },
+  // Re-vote pair with reply 222. Every voided reply needs one: the backend
+  // only voids a reply when the same address posts a newer one, in the same
+  // transaction, so a voided reply with no live sibling cannot occur.
+  {
+    id: 227,
+    btc_address: "bc1qstu901vwx234yz567abc890def123ghi456jkl7",
+    content: "Charitable donations, with on-chain receipts for every grant",
+    content_hash:
+      "3b2901234567890123456789012301234567890abcdef1234567890123456789012346",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900027 | cc27dd",
+    signature: "H27cC011223344556677889900aabbccddeeff0011223344556703",
+    is_reply_valid: true,
+    holding_score: "2.44",
+    balance_at_reply_satoshi: 120000,
+    balance_at_snapshot_satoshi: 120000,
+    balance_at_current_satoshi: 120000,
+    created_at: "2026-03-03T03:00:00Z",
+  },
+  // Re-vote pair with reply 211: same address, so 211 is voided and links here.
+  // Deliberately last, past the first page, so the "See latest reply" link has
+  // to page in its target before it can scroll to it.
+  {
+    id: 226,
+    btc_address: "bc1qual0ccnxd8k40efvcrz4dhxguvl5zw9ledyejr",
+    content: "Machine-to-machine payments, settled on Lightning",
+    content_hash:
+      "2a1890123456789012345678901201234567890abcdef1234567890123456789012345",
+    plaintext:
+      "koinvote.com | type:open | evt_scroll_mock | 1772900026 | bb26cc",
+    signature: "H26bB011223344556677889900aabbccddeeff0011223344556702",
+    is_reply_valid: true,
+    holding_score: "8.4",
+    balance_at_reply_satoshi: 600000,
+    balance_at_snapshot_satoshi: 600000,
+    balance_at_current_satoshi: 600000,
+    created_at: "2026-03-03T02:00:00Z",
   },
 ];
 

@@ -12,9 +12,14 @@ export default function Privacy() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 lg:tx-16 lg:lh-27 text-primary px-2 md:px-0">
-      <h1 className="text-2xl md:text-3xl fw-m text-center">
-        {t('privacy.title')}
-      </h1>
+      <div className="space-y-1">
+        <h1 className="text-2xl md:text-3xl fw-m text-center">
+          {t('privacy.title')}
+        </h1>
+        <p className="text-center text-secondary text-sm">
+          {t('privacy.lastUpdated')}
+        </p>
+      </div>
 
       <section>
         <h2 className="text-xl fw-m mb-2">{t('privacy.scopeTitle')}</h2>

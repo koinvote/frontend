@@ -525,14 +525,12 @@ export const handlers = [
     // Active events - so don't fall back to an unrelated mock event's
     // replies just because this eventId isn't otherwise recognized.
     if (eventFromList?.status === 2 /* preheat */) {
-      return HttpResponse.json<ApiResponse<typeof mockGetListRepliesResponse>>(
-        {
-          code: "200",
-          success: true,
-          message: null,
-          data: { replies: [], is_creator: 0, page, limit },
-        },
-      );
+      return HttpResponse.json<ApiResponse<typeof mockGetListRepliesResponse>>({
+        code: "200",
+        success: true,
+        message: null,
+        data: { replies: [], is_creator: 0, page, limit },
+      });
     }
 
     let replies =
@@ -542,7 +540,18 @@ export const handlers = [
           ? [...mockScrollEventReplies]
           : eventId === "evt_003_mock"
             ? [...mockCompletedEventReplies]
-            : [...mockGetListRepliesResponse.replies];
+            : eventId === "evt_005_mock"
+              ? // Ended but not yet settled: the backend reads scores from the
+                // snapshot table, which the settlement job has not written
+                // yet, so it reports no score at all rather than presenting a
+                // live one as final. Without this the shared active-event set
+                // would show "Accumulating" on an event that is over.
+                mockGetListRepliesResponse.replies.map((r) => ({
+                  ...r,
+                  holding_score: undefined,
+                  score_share: undefined,
+                }))
+              : [...mockGetListRepliesResponse.replies];
 
     // Filter by search
     if (search) {
@@ -1104,7 +1113,9 @@ export const handlers = [
       } else {
         plaintext = `koinvote.com | ${eventId} | public | ${timestamp} | ${randomCode}`;
       }
-      return HttpResponse.json<ApiResponse<GenerateChangeVisibilityPlaintextRes>>({
+      return HttpResponse.json<
+        ApiResponse<GenerateChangeVisibilityPlaintextRes>
+      >({
         code: "000000",
         success: true,
         message: null,

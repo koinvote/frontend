@@ -5,6 +5,8 @@ import { z } from "zod";
 
 import { AdminActionButtons } from "@/admin/component/AdminActionButtons";
 import { AdminFormSectionWithField } from "@/admin/component/AdminFormSection";
+import { StepUpDialog } from "@/admin/component/StepUpDialog";
+import { useSystemParametersSave } from "@/admin/hooks/useSystemParametersSave";
 import { AdminAPI } from "@/api";
 import { useToast } from "@/components/base/Toast/useToast";
 
@@ -24,7 +26,22 @@ const defaultValues: RefundFormData = {
 
 export default function AdminRefundsPage() {
   const { showToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  // The form values behind the staged payload, promoted to "saved" only once
+  // the write actually lands.
+  const pendingFormRef = useRef<RefundFormData | null>(null);
+
+  const { stepUpOpen, isSaving, requestSave, submitWithProof, cancel } =
+    useSystemParametersSave({
+      successMessage: "退款設定已儲存",
+      onSaved: () => {
+        if (pendingFormRef.current) {
+          initialDataRef.current = pendingFormRef.current;
+        }
+      },
+    });
+
+  // The save button and the form fields both track the in-flight write.
+  const isLoading = isSaving;
   const [isLoadingRestore, setIsLoadingRestore] = useState(false);
 
   // Store initial API data for restore
@@ -95,42 +112,15 @@ export default function AdminRefundsPage() {
   };
 
   // Handle save (update to API)
-  const onSubmit = async (data: RefundFormData) => {
-    try {
-      setIsLoading(true);
-
-      const updateData = {
-        refund_service_fee_percentage:
-          Number(data.refundServiceFeePercent) || 0,
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updateApiFunc = AdminAPI.updateSystemParameters as any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await updateApiFunc(updateData)) as any;
-
-      const envelope =
-        response?.success !== undefined ? response : response?.data;
-
-      if (envelope?.success) {
-        // Update initial data after successful save
-        initialDataRef.current = data;
-        showToast("success", "退款設定已儲存");
-      } else {
-        const errorMessage = envelope?.message || "儲存失敗";
-        showToast("error", errorMessage);
-      }
-    } catch (error: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(error as any)?.isHandled) {
-        const errorMessage =
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (error as any)?.apiMessage || (error as any)?.message || "儲存失敗";
-        showToast("error", errorMessage);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  //
+  // Two steps now: the payload is staged, the step-up dialog collects a fresh
+  // wallet signature or passkey assertion, and both are sent together. The
+  // backend refuses this write without one.
+  const onSubmit = (data: RefundFormData) => {
+    pendingFormRef.current = data;
+    requestSave({
+      refund_service_fee_percentage: Number(data.refundServiceFeePercent) || 0,
+    });
   };
 
   // Handle clear (clear all inputs)
@@ -178,6 +168,16 @@ export default function AdminRefundsPage() {
           />
         </form>
       </main>
+
+      <StepUpDialog
+        open={stepUpOpen}
+        purpose="system_parameters"
+        title="確認退款設定"
+        description="退款服務費會從每一筆退款中扣除，所以除了目前的登入狀態之外，還需要一次即時的驗證。"
+        confirmLoading={isSaving}
+        onProof={submitWithProof}
+        onCancel={cancel}
+      />
     </div>
   );
 }

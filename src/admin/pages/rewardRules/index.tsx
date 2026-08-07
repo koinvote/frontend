@@ -5,6 +5,8 @@ import { z } from "zod";
 
 import { AdminActionButtons } from "@/admin/component/AdminActionButtons";
 import { AdminFormSectionWithField } from "@/admin/component/AdminFormSection";
+import { StepUpDialog } from "@/admin/component/StepUpDialog";
+import { useSystemParametersSave } from "@/admin/hooks/useSystemParametersSave";
 import { AdminAPI } from "@/api";
 import { useToast } from "@/components/base/Toast/useToast";
 
@@ -44,7 +46,22 @@ const defaultValues: RewardRulesFormData = {
 
 export default function AdminRewardRulesPage() {
   const { showToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
+  // The form values behind the staged payload, promoted to "saved" only once
+  // the write actually lands.
+  const pendingFormRef = useRef<RewardRulesFormData | null>(null);
+
+  const { stepUpOpen, isSaving, requestSave, submitWithProof, cancel } =
+    useSystemParametersSave({
+      successMessage: "系統參數已儲存",
+      onSaved: () => {
+        if (pendingFormRef.current) {
+          initialDataRef.current = pendingFormRef.current;
+        }
+      },
+    });
+
+  // The save button and the form fields both track the in-flight write.
+  const isLoading = isSaving;
   const [isLoadingRestore, setIsLoadingRestore] = useState(false);
 
   // Store initial API data for restore
@@ -130,45 +147,19 @@ export default function AdminRewardRulesPage() {
   };
 
   // Handle save (update to API)
-  const onSubmit = async (data: RewardRulesFormData) => {
-    try {
-      setIsLoading(true);
-
-      const updateData = {
-        satoshi_per_extra_winner: Number(data.satsPerExtraWinner) || 0,
-        satoshi_per_duration_hour: Number(data.satsPerDurationHour) || 0,
-        platform_fee_percentage: Number(data.platformFeePercent) || 0,
-        dust_threshold_satoshi: Number(data.minPayoutSats) || 0,
-        free_hours: Number(data.freeHours) || 0,
-      };
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updateApiFunc = AdminAPI.updateSystemParameters as any;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const response = (await updateApiFunc(updateData)) as any;
-
-      const envelope =
-        response?.success !== undefined ? response : response?.data;
-
-      if (envelope?.success) {
-        // Update initial data after successful save
-        initialDataRef.current = data;
-        showToast("success", "系統參數已儲存");
-      } else {
-        const errorMessage = envelope?.message || "儲存失敗";
-        showToast("error", errorMessage);
-      }
-    } catch (error: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      if (!(error as any)?.isHandled) {
-        const errorMessage =
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (error as any)?.apiMessage || (error as any)?.message || "儲存失敗";
-        showToast("error", errorMessage);
-      }
-    } finally {
-      setIsLoading(false);
-    }
+  //
+  // Two steps now: the payload is staged, the step-up dialog collects a fresh
+  // wallet signature or passkey assertion, and both are sent together. The
+  // backend refuses this write without one.
+  const onSubmit = (data: RewardRulesFormData) => {
+    pendingFormRef.current = data;
+    requestSave({
+      satoshi_per_extra_winner: Number(data.satsPerExtraWinner) || 0,
+      satoshi_per_duration_hour: Number(data.satsPerDurationHour) || 0,
+      platform_fee_percentage: Number(data.platformFeePercent) || 0,
+      dust_threshold_satoshi: Number(data.minPayoutSats) || 0,
+      free_hours: Number(data.freeHours) || 0,
+    });
   };
 
   // Handle clear (clear all inputs)
@@ -296,6 +287,16 @@ export default function AdminRewardRulesPage() {
           />
         </form>
       </main>
+
+      <StepUpDialog
+        open={stepUpOpen}
+        purpose="system_parameters"
+        title="確認獎金與派獎規則"
+        description="這些參數決定每一場活動的定價、平台費與派獎門檻，所以除了目前的登入狀態之外，還需要一次即時的驗證。"
+        confirmLoading={isSaving}
+        onProof={submitWithProof}
+        onCancel={cancel}
+      />
     </div>
   );
 }

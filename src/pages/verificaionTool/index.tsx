@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { API } from "@/api/index";
+import type { GetReceiptVerifyPubKeysRes } from "@/api/response";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import VerificationIcon from "@/assets/icons/verification.svg?react";
 import VerificationWhiteIcon from "@/assets/icons/verificationWhite.svg?react";
@@ -21,13 +22,7 @@ const VerificationTool = () => {
   const goBack = useBackIfInternal("/");
 
   const [receiptPubKeys, setReceiptPubKeys] = useState<
-    Array<{
-      kid: string;
-      public_key: string;
-      alg: string;
-      active: boolean;
-      created_at: string;
-    }>
+    GetReceiptVerifyPubKeysRes[]
   >([]);
 
   useEffect(() => {
@@ -38,24 +33,50 @@ const VerificationTool = () => {
     fetchPubKeys();
   }, []);
 
-  const eventCode = t("verificationTool.codeBlockContentForCopy");
+  // The commands exist twice: once here as the plain text the copy button
+  // hands over, and once below as coloured JSX. They have to stay identical -
+  // a reader who copies something other than what they were shown has no way
+  // to notice - so a test compares the two, ignoring whitespace.
+  // Label the keys only once there is something to tell apart. The backend
+  // sets active to true when a key is first seen and has no path that ever
+  // clears it - there is no rotation mechanism yet - so today every key is
+  // active and a row of identical "In use" badges would say nothing. The
+  // moment a key really is retired the labels appear on their own.
+  const hasRetiredKey = receiptPubKeys.some((item) => !item.active);
 
+  const eventCode = t(
+    "verificationTool.codeBlockContentForCopy",
+    "# Download the verifier, or update it if you already have it\ngit clone https://github.com/koinvote/event-verifier.git\ncd event-verifier\ngit pull\n\n# Compile the verifier\ngo build -o verify-event main.go\n\n# Run the verifier\n# Replace <your-report-file.csv> with the actual report file you downloaded\n./verify-event --report <your-report-file.csv>",
+  );
+
+  // Both failure paths reach the error toast, which the previous version
+  // never showed. The browser exposes no clipboard at all outside a secure
+  // context, and that took the early-return branch: nothing copied, nothing
+  // said, a button that looked broken. And writeText was not awaited, so a
+  // rejected copy still announced success - the one outcome worse than
+  // silence, because the reader walks away believing they have the commands.
   const handleCopy = useCallback(
-    (text: string) => {
-      try {
-        if (navigator && navigator.clipboard) {
-          navigator.clipboard.writeText(text);
-          showToast(
-            "success",
-            t("verificationTool.codeBlockCopied", "Code copied to clipboard"),
-          );
-        }
-      } catch (e) {
-        console.error("Failed to copy", e);
+    async (text: string) => {
+      const failed = () =>
         showToast(
           "error",
           t("verificationTool.codeBlockCopyFailed", "Failed to copy code"),
         );
+
+      if (!navigator?.clipboard) {
+        failed();
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast(
+          "success",
+          t("verificationTool.codeBlockCopied", "Code copied to clipboard"),
+        );
+      } catch (e) {
+        console.error("Failed to copy", e);
+        failed();
       }
     },
     [t, showToast],
@@ -249,7 +270,7 @@ const VerificationTool = () => {
                 <p className="text-secondary leading-relaxed">
                   {t(
                     "verificationTool.step2_2_text1",
-                    "To run the verifier, you need to install the Go programming language (version 1.20 or above).",
+                    "To run the verifier, you need to install the Go programming language (version 1.21 or above).",
                   )}
                 </p>
                 <p className="text-secondary leading-relaxed">
@@ -291,7 +312,10 @@ const VerificationTool = () => {
 
               <pre className="text-secondary tx-12 md:tx-14 m-0 p-4 font-mono wrap-break-word whitespace-pre-wrap">
                 {/* 有顏色的版本, 註釋拆出來 for i18n */}
-                {t("verificationTool.codeBlockAlt1", "# Download the verifier")}
+                {t(
+                  "verificationTool.codeBlockAlt1",
+                  "# Download the verifier, or update it if you already have it",
+                )}
                 <br />
                 <span className="text-primary">
                   git <span className="text-orange-500">clone</span>{" "}
@@ -300,6 +324,15 @@ const VerificationTool = () => {
                 <br />
                 <span className="text-primary">
                   <span className="text-orange-500">cd</span> event-verifier
+                </span>
+                <br />
+                {/* Harmless on a fresh clone, and the whole point on a stale
+                    one: the clone above fails when the directory is already
+                    there, but cd still succeeds into it, so without this the
+                    next line quietly builds whatever was downloaded months
+                    ago. */}
+                <span className="text-primary">
+                  git <span className="text-orange-500">pull</span>
                 </span>
                 <br />
                 <br />
@@ -391,8 +424,23 @@ const VerificationTool = () => {
                   </p>
                   {receiptPubKeys.length > 0 &&
                     receiptPubKeys.map((item) => (
-                      <div className="my-4 text-sm md:text-base">
-                        kid ({item.kid})
+                      <div key={item.kid} className="my-4 text-sm md:text-base">
+                        <span className={hasRetiredKey ? "mr-2" : undefined}>
+                          kid ({item.kid})
+                        </span>
+                        {hasRetiredKey && (
+                          <span
+                            className={`rounded px-2 py-0.5 text-xs ${
+                              item.active
+                                ? "bg-green-600/15 text-green-600"
+                                : "bg-neutral-500/15 text-neutral-500"
+                            }`}
+                          >
+                            {item.active
+                              ? t("verificationTool.pubKeyActive", "In use")
+                              : t("verificationTool.pubKeyRetired", "Retired")}
+                          </span>
+                        )}
                         <br />
                         {item.alg.toLocaleUpperCase()} {` `}
                         Public Key (Base64):
@@ -402,6 +450,14 @@ const VerificationTool = () => {
                         </span>
                       </div>
                     ))}
+                  {hasRetiredKey && (
+                    <p>
+                      {t(
+                        "verificationTool.pubKeyRetiredNote",
+                        "A retired key is still correct for receipts signed while it was in use.",
+                      )}
+                    </p>
+                  )}
                   <p>
                     {t(
                       "verificationTool.receiptStep2Description2",
@@ -433,7 +489,7 @@ const VerificationTool = () => {
           <div className="flex flex-col gap-4">
             <div className="flex gap-4">
               <div className="border-border fw-m bg-primary-lightModeGray flex h-7 w-7 shrink-0 items-center justify-center rounded-full border md:h-10 md:w-10">
-                <span className="text-black">2</span>
+                <span className="text-black">3</span>
               </div>
               <div className="w-full space-y-4">
                 <h3 className="fw-m">

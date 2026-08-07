@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 
 import AdminLogin from "@/admin/component/AdminLogin";
 import { usePasskeySupport } from "@/admin/hooks/usePasskeySupport";
@@ -9,12 +9,34 @@ import {
   unwrap,
 } from "@/admin/passkey";
 import { AdminAPI } from "@/api";
-import { setAdminToken } from "@/api/http";
+import { SESSION_EXPIRED_PARAM } from "@/api/adminSession";
+import { getApiErrorMessage, setAdminToken } from "@/api/http";
 import { useToast } from "@/components/base/Toast/useToast";
 import systemConsts from "@/consts";
 import { truncateAddress } from "@/utils/address";
 
 const adminAddress = truncateAddress(systemConsts.ADMIN_ADDRESS);
+
+/**
+ * Every message on this screen is English, whatever the site language is.
+ * The URL is public, and a login screen that answers in Chinese says more
+ * about who runs the site than it needs to.
+ */
+function loginErrorMessage(error: unknown, fallback: string): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const e = error as any;
+  return e?.response ? getApiErrorMessage(e, "en") : e?.message || fallback;
+}
+
+/** As above, but keeps the two WebAuthn cases the ceremony helper explains. */
+function passkeyErrorMessage(error: unknown): string {
+  const fallback = "Passkey sign-in failed";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const name = (error as any)?.name;
+  return name === "NotAllowedError" || name === "InvalidStateError"
+    ? ceremonyErrorMessage(error, fallback)
+    : loginErrorMessage(error, fallback);
+}
 
 /** Seconds remaining until an RFC3339 instant, floored at zero. */
 function secondsUntil(iso: string): number {
@@ -24,7 +46,16 @@ function secondsUntil(iso: string): number {
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { showToast } = useToast();
+
+  // Why the login form is on screen: bounced out of the admin area (router
+  // state), or bounced by the hard-redirect fallback (query param). Either way
+  // it belongs in the card, not in an error toast in front of it.
+  const sessionExpired =
+    Boolean((location.state as { sessionExpired?: boolean } | null)
+      ?.sessionExpired) || searchParams.get(SESSION_EXPIRED_PARAM) === "1";
 
   // The message to sign is now issued by the server instead of invented here.
   // The old client-side random string was never validated by the backend, so
@@ -73,13 +104,10 @@ export default function AdminLoginPage() {
         );
         return false;
       } catch (error: unknown) {
-        const message =
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (error as any)?.apiMessage ||
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (error as any)?.message ||
-          "Failed to get a message to sign";
-        showToast("error", message);
+        showToast(
+          "error",
+          loginErrorMessage(error, "Failed to get a message to sign"),
+        );
         return false;
       } finally {
         setIsFetchingChallenge(false);
@@ -170,10 +198,7 @@ export default function AdminLoginPage() {
       showToast("error", envelope?.message || "Login failed");
       await replaceBurntChallenge();
     } catch (error: unknown) {
-      const errorMessage =
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (error as any)?.apiMessage || (error as any)?.message || "Login failed";
-      showToast("error", errorMessage);
+      showToast("error", loginErrorMessage(error, "Login failed"));
       await replaceBurntChallenge();
     } finally {
       setIsLoading(false);
@@ -213,7 +238,7 @@ export default function AdminLoginPage() {
 
       showToast("error", finishRes?.message || "Passkey sign-in failed");
     } catch (error: unknown) {
-      showToast("error", ceremonyErrorMessage(error, "Passkey sign-in failed"));
+      showToast("error", passkeyErrorMessage(error));
     } finally {
       setIsPasskeyLoading(false);
     }
@@ -221,6 +246,7 @@ export default function AdminLoginPage() {
 
   return (
     <AdminLogin
+      sessionExpired={sessionExpired}
       adminAddress={adminAddress}
       plaintext={plaintext}
       signature={signature}
