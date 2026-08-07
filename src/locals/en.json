@@ -228,7 +228,7 @@
     "faq2_question": "What happens if I forget to download my receipt?",
     "faq2_answer": "If you do not download your receipt after submitting your reply, you will not be able to independently verify your submission later. To preserve your right to verification, you should always download and securely store your receipt immediately after submission.",
     "faq3_question": "How can I be sure the public key used for verification is the correct one?",
-    "faq3_answer": "The public keys are published by the platform and listed on this page — they are not in the GitHub repository. The kid in your receipt tells you which one to use; it is an identifier, not the key itself. Every receipt carrying the same kid must verify against that same published key, so a receipt that verifies cannot be repudiated later, and different people cannot quietly be given different keys without every other receipt signed with that kid failing to verify."
+    "faq3_answer": "The public keys are published by the platform and listed on this page. The kid in your receipt tells you which one to use; it is an identifier, not the key itself. Every receipt carrying the same kid must verify against that same published key, so a receipt that verifies cannot be repudiated later, and different people cannot quietly be given different keys without every other receipt signed with that kid failing to verify."
   },
   "about": {
     "title": "About Koinvote",
