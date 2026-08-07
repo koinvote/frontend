@@ -461,3 +461,18 @@
 .admin-tabstrip::-webkit-scrollbar {
   display: none;
 }
+
+/* Makes the <textarea> behind AddressInput look and behave like a one-line
+   text input: never wraps, never grows, and scrolls sideways without showing a
+   scrollbar that would eat the single line of height. */
+.address-input {
+  resize: none;
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.address-input::-webkit-scrollbar {
+  display: none;
+}
