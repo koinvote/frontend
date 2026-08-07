@@ -5,13 +5,13 @@ on:
     branches:
       - main
 
-# One server per environment, so one deploy at a time. Two overlapping runs
-# rsync into the same directory and rebuild in place; the backend had its redis
-# container torn down this way on 2026-07-30 when two pull requests merged
-# fifteen seconds apart.
+# One prod deploy at a time. This job SSHes in and rebuilds /var/www/koinvote
+# in place, so two overlapping runs would interleave `git pull`, `npm ci` and
+# `npm run build` in the same directory and could leave a half-written dist.
 #
-# Queued rather than cancelled: a half-finished deploy is worse than a repeated
-# one.
+# cancel-in-progress is deliberately false: killing a deploy mid-build is worse
+# than making the next one wait, because what it leaves behind is a partial
+# tree that is already being served.
 concurrency:
   group: deploy-prod
   cancel-in-progress: false
@@ -20,10 +20,47 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    # NOTE: this job intentionally has NO `environment:` gate.
+    #
+    # A manual-approval gate was added on 2026-07-29 (PR #50) and removed the
+    # same day, deliberately — not by accident. The project has a single
+    # operator who was also the only required reviewer, and self-review had to
+    # be permitted or the gate would have deadlocked. That makes it "press the
+    # button twice": it stops a silent deploy, but not an unauthorised one,
+    # since whoever holds that GitHub account can also approve.
+    #
+    # The observation behind it still stands and is worth keeping in mind: a
+    # push to main is by itself code execution on the production host, and this
+    # site displays Bitcoin deposit addresses, so a compromised GitHub account
+    # is enough to serve modified JavaScript to every visitor.
+    #
+    # The gate also had a footgun of its own: waiting runs queued up, and each
+    # run deploys its own commit, so approving an older one would overwrite a
+    # newer deploy with stale code.
+    #
+    # If detection is wanted back without the friction, add a notification
+    # rather than a gate — the Telegram step at the bottom of this file already
+    # runs on every deploy and carries the actor and commit message.
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # The account this logs into is named after an engineer who left on
+      # 2026-07-28, and it carries two production responsibilities:
+      #
+      #   1. It runs og-meta-server, via pm2-yichinweng.service. nginx sends
+      #      /sitemap.xml, /render-meta/* and crawler hits on /event/{id} to
+      #      it, so it is what produces the preview card when somebody shares
+      #      an event link. Remove the account and shared links lose their
+      #      preview and sitemap.xml starts 404ing.
+      #   2. /var/www/koinvote and its ~37,000 files are owned by that UID,
+      #      so this deploy writes as that user.
+      #
+      # Nothing about the account name says any of that, which is why the
+      # same warning sits at the top of its authorized_keys on the host.
+      #
+      # PROD_GCE_SSH_PRIVATE_KEY was rotated on 2026-07-28 so that the copy
+      # the departing engineer held no longer opens anything.
       - name: Deploy to GCE prod via SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
