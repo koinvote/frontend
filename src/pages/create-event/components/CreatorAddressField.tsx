@@ -4,6 +4,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 
 import InfoIcon from "@/assets/icons/info.svg?react";
+import { AddressInput } from "@/components/base/AddressInput";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { useHomeStore } from "@/stores/homeStore";
 
@@ -65,16 +66,11 @@ export function CreatorAddressField({
             t("createEvent.addressInvalid", "Invalid address."),
         }}
         render={({ field }) => (
-          <input
+          <AddressInput
             {...field}
             // Override DOM name/id to avoid browser autofill
             name="field_7x9abtca"
             id="field_7x9abtca"
-            type="text"
-            autoCorrect="off"
-            autoCapitalize="off"
-            autoComplete="one-time-code"
-            spellCheck="false"
             placeholder={t("createEvent.creatorAddressPlaceholder")}
             className={`border-border bg-form-bg tx-14 text-primary w-full rounded-xl border px-3 py-2 leading-5 placeholder:text-neutral-300 focus:ring-2 focus:ring-(--color-orange-500) focus:outline-none dark:placeholder:text-neutral-600 ${addrStatus === "invalid" ? "border-red-500 focus:ring-red-500" : ""} ${addrStatus === "valid" ? "border-green-500 focus:ring-green-500" : ""} `}
           />
