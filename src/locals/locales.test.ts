@@ -6,14 +6,10 @@ import zh from "@/locals/zh.json";
 import i18n, { SUPPORTED_LANGUAGES } from "@/i18n";
 
 // The switcher renders whatever SUPPORTED_LANGUAGES holds, so a language can
-// reach the menu with its file half-written and no test would fail. These
-// checks compare each file against English key by key.
-//
-// Japanese is deliberately partial: the four policy pages are legal text and
-// wait on a human translation. i18next falls back per key, so a *missing* key
-// renders the English sentence, while an empty string renders nothing at all.
-// That is the difference these tests pin down.
-const UNTRANSLATED_IN_JA = ["privacy", "terms", "charges", "rewardTerms"];
+// reach the menu with its file half-written and nothing would fail. i18next
+// does not throw on a missing key either - it falls back to English, or renders
+// the dotted key path when English has not got it either. These checks compare
+// each file against English key by key.
 
 type Tree = { [key: string]: unknown };
 
@@ -38,73 +34,104 @@ const leafAt = (node: unknown, path: string): unknown =>
       node,
     );
 
-const placeholdersOf = (value: unknown): string[] =>
+const placeholdersOf = (value: unknown): string =>
   typeof value === "string"
-    ? [...value.matchAll(/\{\{(\w+)\}\}/g)].map((m) => m[1]).sort()
-    : [];
+    ? [...value.matchAll(/\{\{(\w+)\}\}/g)]
+        .map((m) => m[1])
+        .sort()
+        .join(",")
+    : "";
+
+// The policy pages carry their own markup, which the page parses out of the
+// string: <bold> for emphasis and <a>/<a1>/<a2> for the links between
+// policies. The two are held to different standards below. Which phrase a
+// translator emphasises is theirs to decide - the Chinese pages bold more
+// than the English ones do, deliberately - but a link that goes missing in
+// one language leaves that page with no route to the policy it cites.
+const linksOf = (value: unknown): string =>
+  typeof value === "string" ? (value.match(/<\/?a\d*>/g) ?? []).join("") : "";
+
+const isUnbalanced = (value: unknown): boolean => {
+  if (typeof value !== "string") return false;
+  const open: string[] = [];
+  for (const tag of value.match(/<\/?[a-z0-9]+>/g) ?? []) {
+    if (tag.startsWith("</")) {
+      if (open.pop() !== tag.slice(2, -1)) return true;
+    } else {
+      open.push(tag.slice(1, -1));
+    }
+  }
+  return open.length > 0;
+};
 
 const enPaths = leafPaths(en);
-const translatablePaths = enPaths.filter(
-  (path) => !UNTRANSLATED_IN_JA.some((section) => path.startsWith(`${section}.`)),
-);
-
-const bundles: Record<string, { file: unknown; paths: string[] }> = {
-  en: { file: en, paths: enPaths },
-  zh: { file: zh, paths: translatablePaths.concat() },
-  ja: { file: ja, paths: translatablePaths },
-};
+const translations: Record<string, unknown> = { zh, ja };
 
 describe("the locale files", () => {
   it("ships one file per language the switcher offers", () => {
-    expect(Object.keys(bundles).sort()).toEqual(
+    expect(["en", ...Object.keys(translations)].sort()).toEqual(
       SUPPORTED_LANGUAGES.map((lang) => lang.code).sort(),
     );
   });
 
-  it("translates every English key into Chinese", () => {
-    expect(leafPaths(zh).sort()).toEqual(enPaths.sort());
-  });
+  it.each(Object.keys(translations))(
+    "translates every English key into %s",
+    (code) => {
+      expect(leafPaths(translations[code]).sort()).toEqual(enPaths.sort());
+    },
+  );
 
-  it("translates every English key into Japanese but the policy pages", () => {
-    expect(leafPaths(ja).sort()).toEqual(translatablePaths.sort());
-  });
+  it.each(Object.keys(translations))(
+    "keeps the %s placeholders identical to English",
+    (code) => {
+      const drifted = enPaths.filter(
+        (path) =>
+          placeholdersOf(leafAt(translations[code], path)) !==
+          placeholdersOf(leafAt(en, path)),
+      );
 
-  it("leaves the Japanese policy pages absent rather than blank", () => {
-    // Present-but-empty is the failure this guards: it would render a policy
-    // page of blank paragraphs instead of falling back to the English text.
-    for (const section of UNTRANSLATED_IN_JA) {
-      expect(ja).not.toHaveProperty(section);
-    }
-  });
+      // A renamed or dropped {{name}} interpolates to an empty string, so the
+      // sentence still renders - just with the number missing from it.
+      expect(drifted).toEqual([]);
+    },
+  );
 
-  it.each(["zh", "ja"])("keeps the %s placeholders identical to English", (code) => {
-    const { file, paths } = bundles[code];
-    const drifted = paths.filter(
-      (path) =>
-        placeholdersOf(leafAt(file, path)).join(",") !==
-        placeholdersOf(leafAt(en, path)).join(","),
-    );
+  it.each(Object.keys(translations))(
+    "keeps every %s cross-policy link that English has",
+    (code) => {
+      const drifted = enPaths.filter(
+        (path) =>
+          linksOf(leafAt(translations[code], path)) !==
+          linksOf(leafAt(en, path)),
+      );
 
-    // A renamed or dropped {{name}} interpolates to an empty string, so the
-    // sentence still renders - just with the number missing from it.
-    expect(drifted).toEqual([]);
-  });
+      expect(drifted).toEqual([]);
+    },
+  );
 
-  it.each(["zh", "ja"])("leaves no %s string empty", (code) => {
-    const { file, paths } = bundles[code];
-    const blank = paths.filter((path) => {
-      const value = leafAt(file, path);
-      return typeof value === "string" && value.trim() === "";
-    });
+  it.each(["en", ...Object.keys(translations)])(
+    "closes every %s markup tag it opens",
+    (code) => {
+      const file = code === "en" ? en : translations[code];
+
+      // An unclosed <bold> does not throw; the page renders the rest of the
+      // paragraph inside it, or prints the tag as text.
+      expect(enPaths.filter((path) => isUnbalanced(leafAt(file, path)))).toEqual(
+        [],
+      );
+    },
+  );
+
+  it.each(Object.keys(translations))("leaves no %s string empty", (code) => {
+    const blankIn = (file: unknown) =>
+      enPaths.filter((path) => {
+        const value = leafAt(file, path);
+        return typeof value === "string" && value.trim() === "";
+      });
 
     // en.json has a couple of deliberately empty placeholders; those paths are
     // the only ones allowed to be blank here too.
-    const blankInEnglish = paths.filter((path) => {
-      const value = leafAt(en, path);
-      return typeof value === "string" && value.trim() === "";
-    });
-
-    expect(blank).toEqual(blankInEnglish);
+    expect(blankIn(translations[code])).toEqual(blankIn(en));
   });
 });
 
@@ -117,15 +144,32 @@ describe("reading the site in Japanese", () => {
     await i18n.changeLanguage("ja");
 
     expect(i18n.t("menu.language")).toBe("言語");
-    expect(i18n.t("layout.createEventFull")).toBe("イベントを作成");
+    expect(i18n.t("layout.createEventFull")).toBe("イベント作成");
   });
 
-  it("falls back to the English policy text rather than showing nothing", async () => {
+  it("translates the policy pages rather than falling back to English", async () => {
     await i18n.changeLanguage("ja");
 
-    // This is what the missing sections buy: a reader gets the English terms,
-    // which is the state we can stand behind until a translator reviews them.
-    expect(i18n.t("terms.title")).toBe(en.terms.title);
-    expect(i18n.t("privacy.title")).toBe(en.privacy.title);
+    for (const key of [
+      "terms.title",
+      "privacy.title",
+      "charges.title",
+      "rewardTerms.title",
+    ]) {
+      expect(i18n.t(key)).not.toBe(i18n.getFixedT("en")(key));
+    }
+  });
+
+  it("states the worked examples with the same figures as the English terms", async () => {
+    await i18n.changeLanguage("ja");
+
+    // The examples have to add up in every language: these are the sums the
+    // English page is checked against in legalPages.test.tsx.
+    expect(i18n.t("rewardTerms.ex1_distribution_net")).toContain("8,987,999");
+    expect(i18n.t("rewardTerms.ex1_final_a")).toContain("5,992,000");
+    expect(i18n.t("rewardTerms.ex1_final_b")).toContain("2,995,999");
+    expect(i18n.t("rewardTerms.ex2_net_reward")).toContain("34,000");
+    expect(i18n.t("rewardTerms.ex2_final_a")).toContain("22,668");
+    expect(i18n.t("rewardTerms.ex2_final_b")).toContain("11,332");
   });
 });
