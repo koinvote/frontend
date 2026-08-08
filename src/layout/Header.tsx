@@ -22,7 +22,7 @@ export default function Header({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { isDesktop, setScrollY } = useHomeStore();
+  const { setScrollY } = useHomeStore();
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
@@ -68,22 +68,27 @@ export default function Header({
   return (
     <header
       className={cn(
-        "top-0 left-0 w-full z-50 bg-white dark:bg-black md:border-b border-border px-2 text-(--color-primary)",
-        "transition-transform duration-300 ease-out",
-        isDesktop && "fixed"
+        // Fixed rather than sticky: the overflow-x guards on #root and its
+        // children (global.css mobile section) turn every ancestor into a
+        // scroll container, which silently disables sticky. The layout below
+        // pads the page down by the header's height instead.
+        "fixed top-0 left-0 w-full z-50 bg-white dark:bg-black border-b border-border px-2 text-(--color-primary)",
+        "transition-transform duration-300 ease-out"
       )}
       style={{
         paddingTop: "env(safe-area-inset-top)",
       }}
     >
       <div className="flex h-14 w-full items-center md:h-16 md:px-4">
+        {/* -ml-2 keeps the icon on the same visual spot while the tap area
+            reaches the screen edge; 44px is the iOS minimum touch target. */}
         <button
           type="button"
           aria-label="Open menu"
-          className="inline-flex items-center justify-center rounded-md md:hidden"
+          className="-ml-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors active:bg-black/10 md:hidden dark:active:bg-white/15"
           onClick={() => setOpen(true)}
         >
-          <MenuIcon className="w-6 h-6" />
+          <MenuIcon className="h-7 w-7" />
         </button>
 
         <div className="flex flex-1 items-center justify-start ml-2 md:ml-0">

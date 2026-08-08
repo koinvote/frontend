@@ -94,7 +94,10 @@ export default function Layout() {
       />
 
       {/* 3. Main Content Container */}
-      <div className="relative flex w-full min-h-dvh-header md:pt-16">
+      {/* The header is fixed on every breakpoint, so the page pads itself
+          down by the header's height: 3.5rem (h-14) plus the notch inset on
+          mobile, 4rem (h-16, no inset) from md up. */}
+      <div className="relative flex w-full min-h-dvh-header pt-[calc(3.5rem+env(safe-area-inset-top))] md:pt-16">
         {/* Sidebar (Desktop Only - Fixed) */}
         {isDesktop && (
           <aside
@@ -177,21 +180,23 @@ export default function Layout() {
               <span className="text-base font-semibold">
                 {t("layout.menu", "Menu")}
               </span>
+              {/* Same 44px touch target as the hamburger that opened it; the
+                  negative margins let it overflow the row instead of growing it. */}
               <button
                 ref={closeBtnRef}
                 onClick={handleClose}
-                className="rounded-md p-2"
+                className="-my-1 -mr-2 inline-flex h-11 w-11 items-center justify-center rounded-full transition-colors active:bg-black/10 dark:active:bg-white/15"
                 aria-label="Close menu"
               >
                 <svg
-                  width="20"
-                  height="20"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
                   fill="none"
                   aria-hidden="true"
                 >
                   <path
-                    d="M6 6l12 12M18 6L6 18"
+                    d="M5 5l14 14M19 5L5 19"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
