@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 
 import en from "@/locals/en.json";
+import de from "@/locals/de.json";
 import es from "@/locals/es.json";
 import ja from "@/locals/ja.json";
 import ko from "@/locals/ko.json";
@@ -67,7 +68,7 @@ const isUnbalanced = (value: unknown): boolean => {
 };
 
 const enPaths = leafPaths(en);
-const translations: Record<string, unknown> = { zh, ja, ko, es };
+const translations: Record<string, unknown> = { zh, ja, ko, es, de };
 
 describe("the locale files", () => {
   it("ships one file per language the switcher offers", () => {
@@ -145,6 +146,7 @@ const fullLocales: [string, string, string][] = [
   ["ja", "言語", "イベント作成"],
   ["ko", "언어", "이벤트 생성"],
   ["es", "Idioma", "Crear evento"],
+  ["de", "Sprache", "Event erstellen"],
 ];
 
 describe.each(fullLocales)(
