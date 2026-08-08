@@ -3,6 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 import en from "@/locals/en.json";
 import ja from "@/locals/ja.json";
+import ko from "@/locals/ko.json";
 import zh from "@/locals/zh.json";
 
 /**
@@ -10,13 +11,14 @@ import zh from "@/locals/zh.json";
  *
  * `name` is written in the language itself and never translated: someone who
  * lands on a language they cannot read still recognises their own entry and
- * can get back out. Adding a fourth language means adding its JSON file, one
+ * can get back out. Adding a fifth language means adding its JSON file, one
  * entry here, and nothing else — the switcher renders whatever is in here.
  */
 export const SUPPORTED_LANGUAGES = [
   { code: "en", name: "English" },
   { code: "zh", name: "中文" },
   { code: "ja", name: "日本語" },
+  { code: "ko", name: "한국어" },
 ] as const;
 
 export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number]["code"];
@@ -44,7 +46,8 @@ i18n
     resources: {
       en: { translation: en },
       zh: { translation: zh },
-      ja: { translation: ja }
+      ja: { translation: ja },
+      ko: { translation: ko }
     },
     lng,
     fallbackLng: DEFAULT_LANGUAGE,

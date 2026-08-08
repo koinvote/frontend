@@ -2,6 +2,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 import en from "@/locals/en.json";
 import ja from "@/locals/ja.json";
+import ko from "@/locals/ko.json";
 import zh from "@/locals/zh.json";
 import i18n, { SUPPORTED_LANGUAGES } from "@/i18n";
 
@@ -65,7 +66,7 @@ const isUnbalanced = (value: unknown): boolean => {
 };
 
 const enPaths = leafPaths(en);
-const translations: Record<string, unknown> = { zh, ja };
+const translations: Record<string, unknown> = { zh, ja, ko };
 
 describe("the locale files", () => {
   it("ships one file per language the switcher offers", () => {
@@ -135,41 +136,52 @@ describe("the locale files", () => {
   });
 });
 
-describe("reading the site in Japanese", () => {
-  afterAll(async () => {
-    await i18n.changeLanguage("en");
-  });
+// Each full translation, with the strings the interface check pins: how the
+// language names the language menu, and its create-event button label (both
+// deliberately shortened to fit their boxes - see the PR descriptions).
+const fullLocales: [string, string, string][] = [
+  ["ja", "言語", "イベント作成"],
+  ["ko", "언어", "이벤트 생성"],
+];
 
-  it("translates the interface", async () => {
-    await i18n.changeLanguage("ja");
+describe.each(fullLocales)(
+  "reading the site in %s",
+  (lang, languageLabel, createEventLabel) => {
+    afterAll(async () => {
+      await i18n.changeLanguage("en");
+    });
 
-    expect(i18n.t("menu.language")).toBe("言語");
-    expect(i18n.t("layout.createEventFull")).toBe("イベント作成");
-  });
+    it("translates the interface", async () => {
+      await i18n.changeLanguage(lang);
 
-  it("translates the policy pages rather than falling back to English", async () => {
-    await i18n.changeLanguage("ja");
+      expect(i18n.t("menu.language")).toBe(languageLabel);
+      expect(i18n.t("layout.createEventFull")).toBe(createEventLabel);
+    });
 
-    for (const key of [
-      "terms.title",
-      "privacy.title",
-      "charges.title",
-      "rewardTerms.title",
-    ]) {
-      expect(i18n.t(key)).not.toBe(i18n.getFixedT("en")(key));
-    }
-  });
+    it("translates the policy pages rather than falling back to English", async () => {
+      await i18n.changeLanguage(lang);
 
-  it("states the worked examples with the same figures as the English terms", async () => {
-    await i18n.changeLanguage("ja");
+      for (const key of [
+        "terms.title",
+        "privacy.title",
+        "charges.title",
+        "rewardTerms.title",
+      ]) {
+        expect(i18n.t(key)).not.toBe(i18n.getFixedT("en")(key));
+      }
+    });
 
-    // The examples have to add up in every language: these are the sums the
-    // English page is checked against in legalPages.test.tsx.
-    expect(i18n.t("rewardTerms.ex1_distribution_net")).toContain("8,987,999");
-    expect(i18n.t("rewardTerms.ex1_final_a")).toContain("5,992,000");
-    expect(i18n.t("rewardTerms.ex1_final_b")).toContain("2,995,999");
-    expect(i18n.t("rewardTerms.ex2_net_reward")).toContain("34,000");
-    expect(i18n.t("rewardTerms.ex2_final_a")).toContain("22,668");
-    expect(i18n.t("rewardTerms.ex2_final_b")).toContain("11,332");
-  });
-});
+    it("states the worked examples with the same figures as the English terms", async () => {
+      await i18n.changeLanguage(lang);
+
+      // The examples have to add up in every language: these are the sums the
+      // English page is checked against in legalPages.test.tsx.
+      expect(i18n.t("rewardTerms.ex1_distribution_net")).toContain("8,987,999");
+      expect(i18n.t("rewardTerms.ex1_final_a")).toContain("5,992,000");
+      expect(i18n.t("rewardTerms.ex1_final_b")).toContain("2,995,999");
+      expect(i18n.t("rewardTerms.ex2_net_reward")).toContain("34,000");
+      expect(i18n.t("rewardTerms.ex2_final_a")).toContain("22,668");
+      expect(i18n.t("rewardTerms.ex2_final_b")).toContain("11,332");
+    });
+  },
+);
