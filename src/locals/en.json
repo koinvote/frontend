@@ -1005,5 +1005,19 @@
     "hoursAgo": "{{hours}}h ago",
     "daysAgo": "{{days}}d ago",
     "weeksAgo": "{{weeks}}w ago"
+  },
+  "contentTranslation": {
+    "showOriginal": "Show original",
+    "showTranslation": "Show translation",
+    "translatedFrom": "Translated from {{language}}",
+    "machineTranslated": "Machine translated",
+    "languageNames": {
+      "en": "English",
+      "zh": "Chinese",
+      "ja": "Japanese",
+      "ko": "Korean",
+      "es": "Spanish",
+      "de": "German"
+    }
   }
 }

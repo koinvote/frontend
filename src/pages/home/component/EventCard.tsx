@@ -7,6 +7,10 @@ import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
 import EventCardParticipantsIcon from "@/assets/icons/eventCard-participants.svg?react";
 import { useToast } from "@/components/base/Toast/useToast";
+import {
+  TranslationBar,
+  useTranslatedEvent,
+} from "@/components/TranslatedContent";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
 import { type EventSummary } from "@/pages/create-event/types/index";
 import { useHomeStore } from "@/stores/homeStore";
@@ -27,6 +31,17 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(() => formatCountdown(event, t));
+
+  // The card renders `view`: the event with title/description/options swapped
+  // to the reader's language while the translation is showing. `event` itself
+  // is never mutated — "Show original" is exactly the canonical text.
+  const {
+    viewEvent: view,
+    hasTranslation,
+    showingTranslation,
+    toggle: toggleTranslation,
+    sourceLocale,
+  } = useTranslatedEvent(event);
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -61,7 +76,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
   const { tooltipProps: amountTooltipProps, triggerProps: amountTriggerProps } =
     useTooltipWithClick({ keepOpenOnClick: !isDesktop });
 
-  const sortedReplies = [...event.top_replies].sort((a, b) => {
+  const sortedReplies = [...view.top_replies].sort((a, b) => {
     const amountA = parseFloat(a.amount_satoshi || "0");
     const amountB = parseFloat(b.amount_satoshi || "0");
     return amountB - amountA; // 降序排序
@@ -125,7 +140,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       clearTimeout(timer);
       window.removeEventListener("resize", checkDescriptionOverflow);
     };
-  }, [event.description, isDescriptionExpanded]);
+  }, [view.description, isDescriptionExpanded]);
 
   const handleDescriptionToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -165,7 +180,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
       {/* header row: title + reward + time */}
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <h2 className="text-primary w-full text-base font-semibold wrap-break-word md:min-w-0 md:flex-1 md:shrink md:text-lg">
-          {event.title}
+          {view.title}
         </h2>
         <div className="shrink-0">
           {event.status === EventStatus.PREHEAT && (
@@ -236,7 +251,7 @@ export function EventCard({ event, onClick }: EventCardProps) {
             isDescriptionExpanded ? "" : "line-clamp-2"
           }`}
         >
-          {event.description}
+          {view.description}
         </p>
 
         {showDescriptionToggle && (
@@ -252,12 +267,21 @@ export function EventCard({ event, onClick }: EventCardProps) {
         )}
       </div>
 
+      {hasTranslation && (
+        <TranslationBar
+          className="mt-1"
+          sourceLocale={sourceLocale}
+          showingTranslation={showingTranslation}
+          onToggle={toggleTranslation}
+        />
+      )}
+
       {/* top replies or options */}
-      {event.event_type === "single_choice" &&
-      event.options &&
-      event.options.length > 0 ? (
+      {view.event_type === "single_choice" &&
+      view.options &&
+      view.options.length > 0 ? (
         <SingleChoiceOptions
-          options={event.options}
+          options={view.options}
           eventId={event.event_id}
           t={t}
           resultVisibility={event.result_visibility}

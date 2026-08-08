@@ -52,11 +52,37 @@ export interface EventDataRes {
   total_cost_satoshi: number;
 }
 
+/**
+ * Machine translation of an event's text fields into the locale the request
+ * asked for. Attached by the backend only when a servable translation exists;
+ * absence of the object (or of one field inside it) means "show the canonical
+ * original, and offer no Show-original toggle for it". The canonical fields
+ * on the parent object are never altered.
+ */
+export interface EventTranslationRes {
+  target_locale: string;
+  /** Detected source language (BCP-47). Absent → show a generic "machine translated" label. */
+  source_locale?: string;
+  title?: string;
+  description?: string;
+  /** option id (decimal string) → translated option text */
+  options?: Record<string, string>;
+}
+
+/** Reply-content counterpart; each reply has its own author and source language. */
+export interface ReplyTranslationRes {
+  target_locale: string;
+  source_locale?: string;
+  content: string;
+}
+
 export interface TopReplyRes {
   id: number;
   body: string;
   weight_percent: number;
   amount_satoshi: number;
+  /** Viewer-locale translation of body, when one exists. */
+  body_translation?: string;
 }
 
 export interface EventListDataRes {
@@ -83,6 +109,7 @@ export interface EventListDataRes {
   unlock_price_satoshi?: number;
   unlock_count?: number;
   last_unlock_confirmed_at?: string | null;
+  translation?: EventTranslationRes;
 }
 
 export interface GetEventListRes {
@@ -136,6 +163,7 @@ export interface EventDetailDataRes {
   unlock_price_satoshi?: number;
   unlock_count?: number;
   last_unlock_confirmed_at?: string | null;
+  translation?: EventTranslationRes;
 }
 
 export interface GetSignaturePlainTextRes {
@@ -208,6 +236,8 @@ export interface Reply {
   updated_at: string;
   holding_score?: string; // BTC-Time holding score, pre-formatted by backend. Absent when not applicable.
   score_share?: string; // Only present once the event has settled.
+  /** Viewer-locale translation of content. Canonical content/plaintext/signature above stay exactly as signed. */
+  translation?: ReplyTranslationRes;
 }
 
 export interface GetReplyPlainTextRes {

@@ -36,6 +36,7 @@ export const mapApiTopReply = (r: TopReplyRes): TopReply => ({
   body: r.body,
   weight_percent: r.weight_percent,
   amount_satoshi: String(r.amount_satoshi),
+  body_translation: r.body_translation,
 });
 
 // Reward is considered paid only when the payout tx is confirmed on-chain
@@ -71,4 +72,5 @@ export const mapApiEventToEventSummary = (
   top_replies: ev.top_replies.map(mapApiTopReply),
   options: ev.options ?? [],
   result_visibility: ev.result_visibility ?? "public",
+  translation: ev.translation,
 });

@@ -25,7 +25,12 @@ import { useDebouncedClick } from "@/utils/helper";
 import { cn } from "@/utils/style";
 // import ReportIcon from "@/assets/icons/report.svg?react";
 import { useTooltipWithClick } from "@/hooks/useTooltipWithClick";
+import {
+  TranslationBar,
+  useContentTranslation,
+} from "@/components/TranslatedContent";
 import { useHomeStore } from "@/stores/homeStore";
+import { useLanguagesStore } from "@/stores/languagesStore";
 import { formatRelativeTime } from "@/utils/formatter";
 import { Divider } from "./Divider";
 import { HoldingScoreBlock } from "./HoldingScoreBlock";
@@ -100,6 +105,9 @@ export function ReplyList({
   const limit = 20;
   const sentinelRef = useRef<HTMLDivElement>(null);
 
+  // Reply translations ride on the list response in this language.
+  const locale = useLanguagesStore((state) => state.current);
+
   const [unlockEmail, setUnlockEmail] = useState(initialUnlockEmail ?? "");
   const [submittedEmail, setSubmittedEmail] = useState(
     initialUnlockEmail ?? "",
@@ -127,6 +135,7 @@ export function ReplyList({
       order,
       balanceDisplayMode,
       submittedEmail,
+      locale,
     ],
     queryFn: async ({ pageParam = 1 }) => {
       const balanceType =
@@ -141,6 +150,7 @@ export function ReplyList({
           limit,
           balance_type: balanceType,
           unlock_email: submittedEmail || undefined,
+          locale,
         })) as unknown as ApiResponse<GetListRepliesRes>;
         if (!response.success) {
           throw new Error(response.message || "Failed to fetch replies");
@@ -616,8 +626,20 @@ function ReplyItem({
     return t("replyList.option", "Option {{optionId}}", { optionId });
   };
 
+  // Open replies carry their own translation and their own toggle — each
+  // reply is one content unit. Option replies render option text, which
+  // follows the event-level unit via the `options` prop instead.
+  const replyTranslation = reply.content ? reply.translation : undefined;
+  const {
+    hasTranslation: hasReplyTranslation,
+    showingTranslation: showingReplyTranslation,
+    toggle: toggleReplyTranslation,
+  } = useContentTranslation(!!replyTranslation?.content);
+
   const displayText =
-    reply.content ||
+    (showingReplyTranslation && replyTranslation
+      ? replyTranslation.content
+      : reply.content) ||
     (reply.option_id !== undefined ? getOptionText(reply.option_id) : "");
 
   const isCollapsible = !reply.is_reply_valid || !getDisplayBalance();
@@ -759,6 +781,14 @@ function ReplyItem({
                     />
                   </Button>
                 </Tooltip>
+              )}
+              {hasReplyTranslation && (
+                <TranslationBar
+                  className="mt-1"
+                  sourceLocale={replyTranslation?.source_locale}
+                  showingTranslation={showingReplyTranslation}
+                  onToggle={toggleReplyTranslation}
+                />
               )}
             </div>
           )}

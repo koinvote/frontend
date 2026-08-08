@@ -28,6 +28,7 @@ export interface GetEventListReq {
   event_reward_type?: string[]; // e.g. ["rewarded", "non_reward"]
   event_type?: string[];         // e.g. ["single_choice", "open"]
   result_visibility?: string[];  // e.g. ["public", "paid_only", "creator_only"]
+  locale?: string; // viewer language; server attaches pre-stored translations for it
 }
 
 export interface GetListRepliesReq {
@@ -39,6 +40,7 @@ export interface GetListRepliesReq {
   limit?: number; // default: 20, max: 100
   balance_type?: "snapshot" | "current";
   unlock_email?: string;
+  locale?: string; // viewer language; server attaches pre-stored translations for it
 }
 
 // Admin API Request Types

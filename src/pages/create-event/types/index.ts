@@ -1,5 +1,5 @@
 // src/pages/home/types.ts
-import type { EventOption } from "@/api/response";
+import type { EventOption, EventTranslationRes } from "@/api/response";
 import type { EventRewardType, EventStatus } from "@/api/types";
 
 export interface TopReply {
@@ -7,6 +7,8 @@ export interface TopReply {
   body: string;
   weight_percent: number;
   amount_satoshi: string;
+  /** Viewer-locale translation of body, when one exists. */
+  body_translation?: string;
 }
 
 export interface EventSummary {
@@ -36,6 +38,8 @@ export interface EventSummary {
   event_type: "open" | "single_choice";
   event_reward_type: EventRewardType;
   options: EventOption[] | string[];
+  /** Viewer-locale machine translation of title/description/options, when present. */
+  translation?: EventTranslationRes;
 }
 
 // Home 狀態、排序（UI）

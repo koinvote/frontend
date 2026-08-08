@@ -7,6 +7,10 @@ import { useNavigate } from "react-router";
 import type { EventDetailDataRes, EventOption } from "@/api/response";
 import { EventStatus } from "@/api/types";
 import CopyIcon from "@/assets/icons/copy.svg?react";
+import {
+  TranslationBar,
+  useTranslatedEvent,
+} from "@/components/TranslatedContent";
 import type { TopReply } from "@/pages/create-event/types";
 import { useHomeStore } from "@/stores/homeStore";
 import {
@@ -45,6 +49,33 @@ export function EventInfo({
   const navigate = useNavigate();
   const { setActiveHashtag, setStatus, setSearch, setDebouncedSearch } =
     useHomeStore();
+
+  // `view` is the event with title/description/options swapped to the
+  // reader's language while the translation is showing; the raw `event`
+  // object stays canonical and "Show original" renders it verbatim.
+  const {
+    viewEvent: view,
+    hasTranslation,
+    showingTranslation,
+    toggle: toggleTranslation,
+    sourceLocale,
+  } = useTranslatedEvent(event);
+
+  // Top replies from the balance query are other authors' content. Open
+  // replies show their own translation regardless of the event's toggle;
+  // single-choice entries are option texts and follow the event unit.
+  const displayTopReplies = useMemo(() => {
+    if (!topReplies) return topReplies;
+    return topReplies.map((reply) => {
+      const translated =
+        event.event_type === "open"
+          ? reply.body_translation
+          : showingTranslation
+            ? (event.translation?.options?.[reply.id] ?? reply.body_translation)
+            : undefined;
+      return translated ? { ...reply, body: translated } : reply;
+    });
+  }, [topReplies, event.event_type, event.translation, showingTranslation]);
 
   // Debounced copy handler for creator address
   const handleCopyCreatorAddress = useDebouncedClick(async () => {
@@ -205,12 +236,12 @@ export function EventInfo({
 
     // PREHEAT + single_choice: Show Options
     if (isPreheat && isSingleChoice) {
-      if (!event.options || event.options.length === 0) {
+      if (!view.options || view.options.length === 0) {
         return { displayData: [], displayTitle: "", hasMore: false };
       }
 
       // Filter out string options, only use EventOption objects
-      const validOptions = (event.options as (EventOption | string)[]).filter(
+      const validOptions = (view.options as (EventOption | string)[]).filter(
         (opt): opt is EventOption => typeof opt === "object" && "id" in opt,
       );
 
@@ -237,11 +268,11 @@ export function EventInfo({
 
     // ACTIVE/COMPLETED + single_choice: Show Options or Top Reply
     if ((isOngoing || isCompleted) && isSingleChoice) {
-      if (!event.options || event.options.length === 0) {
+      if (!view.options || view.options.length === 0) {
         return { displayData: [], displayTitle: "", hasMore: false };
       }
 
-      const validOptions = (event.options as (EventOption | string)[]).filter(
+      const validOptions = (view.options as (EventOption | string)[]).filter(
         (opt): opt is EventOption => typeof opt === "object" && "id" in opt,
       );
 
@@ -270,8 +301,8 @@ export function EventInfo({
         : t("eventInfo.options", "Options");
       return {
         displayData:
-          topReplies && topReplies.length > 0
-            ? topReplies
+          displayTopReplies && displayTopReplies.length > 0
+            ? displayTopReplies
             : isTopRepliesLoading
               ? []
               : convertedData,
@@ -286,18 +317,18 @@ export function EventInfo({
 
     // ACTIVE/COMPLETED + open: Show Top Reply from top_replies
     if ((isOngoing || isCompleted) && isOpen) {
-      if (!event.top_replies || event.top_replies.length === 0) {
+      if (!view.top_replies || view.top_replies.length === 0) {
         return { displayData: [], displayTitle: "", hasMore: false };
       }
 
       // Sort by weight_percent descending, limit to 5
       // When loading, don't fall back to stale event.top_replies
       const replies =
-        topReplies && topReplies.length > 0
-          ? topReplies
+        displayTopReplies && displayTopReplies.length > 0
+          ? displayTopReplies
           : isTopRepliesLoading
             ? []
-            : event.top_replies;
+            : view.top_replies;
       const sortedReplies = [...replies]
         .sort((a, b) => {
           const weightA = a.weight_percent || 0;
@@ -316,12 +347,12 @@ export function EventInfo({
   }, [
     t,
     event.event_type,
-    event.options,
-    event.top_replies,
+    view.options,
+    view.top_replies,
     isPreheat,
     isOngoing,
     isCompleted,
-    topReplies,
+    displayTopReplies,
     isTopRepliesLoading,
   ]);
 
@@ -610,19 +641,19 @@ export function EventInfo({
       clearTimeout(timer);
       window.removeEventListener("resize", checkDescriptionOverflow);
     };
-  }, [event.description, isDescriptionExpanded]);
+  }, [view.description, isDescriptionExpanded]);
 
   return (
     <div className="flex flex-col gap-6">
       {/* Title and Copy Link */}
       <div className="flex items-start justify-between gap-4">
         <h1 className="text-primary min-w-0 flex-1 text-2xl font-semibold wrap-break-word md:text-3xl">
-          {event.title}
+          {view.title}
         </h1>
       </div>
 
       {/* Description */}
-      {event.description && (
+      {view.description && (
         <div>
           <p
             ref={descriptionRef}
@@ -630,7 +661,7 @@ export function EventInfo({
               isDescriptionExpanded ? "" : "line-clamp-2"
             }`}
           >
-            {event.description}
+            {view.description}
           </p>
           {showDescriptionToggle && (
             <button
@@ -644,6 +675,15 @@ export function EventInfo({
             </button>
           )}
         </div>
+      )}
+
+      {hasTranslation && (
+        <TranslationBar
+          className="-mt-4"
+          sourceLocale={sourceLocale}
+          showingTranslation={showingTranslation}
+          onToggle={toggleTranslation}
+        />
       )}
 
       {/* Top Reply / Options */}

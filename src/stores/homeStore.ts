@@ -28,6 +28,11 @@ interface HomeStoreState {
   limit: number;
   total: number;
   popularHashtags: string[];
+  // The UI language the cached `events` were fetched under. Translations ride
+  // on the list response, so a list fetched as "de" must not be shown to a
+  // reader who has since switched to "ja" — useHomeEvents refetches when this
+  // no longer matches the current language.
+  eventsLocale: string | null;
 
   // tab event counts（每次進首頁重新取得，不 persist）
   eventCounts: GetEventCountsRes | null;
@@ -55,6 +60,7 @@ interface HomeStoreState {
     hasMore: boolean,
     offset: number,
   ) => void;
+  setEventsLocale: (locale: string) => void;
   appendEvents: (
     events: EventSummary[],
     hasMore: boolean,
@@ -94,6 +100,7 @@ export const useHomeStore = create<HomeStoreState>()(
         limit: 20,
         total: 0,
         popularHashtags: [],
+        eventsLocale: null,
 
         eventCounts: null,
 
@@ -185,6 +192,9 @@ export const useHomeStore = create<HomeStoreState>()(
             false,
             "home/setEvents",
           ),
+
+        setEventsLocale: (locale) =>
+          set(() => ({ eventsLocale: locale }), false, "home/setEventsLocale"),
         appendEvents: (events, hasMore, offset) =>
           set(
             (state) => ({
@@ -267,7 +277,7 @@ export const useHomeStore = create<HomeStoreState>()(
         // bundle silently misses new fields — iOS Safari keeps a tab's
         // sessionStorage alive for weeks, so stale objects survive deploys.
         // A version mismatch makes zustand discard the stored state instead.
-        version: 1,
+        version: 2,
         storage: createJSONStorage(() => sessionStorage),
         partialize: (state) => ({
           status: state.status,
@@ -280,6 +290,7 @@ export const useHomeStore = create<HomeStoreState>()(
           scrollY: state.scrollY,
           // Persist data to restore scroll position
           events: state.events,
+          eventsLocale: state.eventsLocale,
           offset: state.offset,
           hasMore: state.hasMore,
           total: state.total,

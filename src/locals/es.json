@@ -1005,5 +1005,19 @@
     "hoursAgo": "hace {{hours}} h",
     "daysAgo": "hace {{days}} d",
     "weeksAgo": "hace {{weeks}} sem"
+  },
+  "contentTranslation": {
+    "showOriginal": "Mostrar original",
+    "showTranslation": "Mostrar traducción",
+    "translatedFrom": "Traducido del {{language}}",
+    "machineTranslated": "Traducción automática",
+    "languageNames": {
+      "en": "inglés",
+      "zh": "chino",
+      "ja": "japonés",
+      "ko": "coreano",
+      "es": "español",
+      "de": "alemán"
+    }
   }
 }

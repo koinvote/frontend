@@ -1005,5 +1005,19 @@
     "hoursAgo": "{{hours}}시간 전",
     "daysAgo": "{{days}}일 전",
     "weeksAgo": "{{weeks}}주 전"
+  },
+  "contentTranslation": {
+    "showOriginal": "원문 보기",
+    "showTranslation": "번역 보기",
+    "translatedFrom": "{{language}}에서 번역됨",
+    "machineTranslated": "기계 번역",
+    "languageNames": {
+      "en": "영어",
+      "zh": "중국어",
+      "ja": "일본어",
+      "ko": "한국어",
+      "es": "스페인어",
+      "de": "독일어"
+    }
   }
 }

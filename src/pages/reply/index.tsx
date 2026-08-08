@@ -8,6 +8,11 @@ import { API, type ApiResponse } from "@/api";
 import { getApiMessage } from "@/api/http";
 import type { EventDetailDataRes } from "@/api/response";
 import { EventStatus } from "@/api/types";
+import {
+  TranslationBar,
+  useTranslatedEvent,
+} from "@/components/TranslatedContent";
+import { useLanguagesStore } from "@/stores/languagesStore";
 import CheckCircleIcon from "@/assets/icons/check_circle.svg?react";
 import ClockIcon from "@/assets/icons/clock.svg?react";
 import CopyIcon from "@/assets/icons/copy.svg?react";
@@ -130,13 +135,15 @@ export default function ReplyPage() {
   };
 
   // --- Data Fetching ---
+  const locale = useLanguagesStore((state) => state.current);
+
   const { data: event, isLoading: isLoadingEvent } = useQuery({
-    queryKey: ["eventDetail", eventId],
+    queryKey: ["eventDetail", eventId, locale],
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
-      const response = (await API.getEventDetail(
-        eventId,
-      )()) as unknown as ApiResponse<EventDetailDataRes>;
+      const response = (await API.getEventDetail(eventId)({
+        locale,
+      })) as unknown as ApiResponse<EventDetailDataRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch event detail");
       }
@@ -144,6 +151,17 @@ export default function ReplyPage() {
     },
     enabled: !!eventId,
   });
+
+  // Voting happens by option id, and open answers are the voter's own words,
+  // so showing translated option labels never touches what gets signed —
+  // the backend hashes the canonical option text by id.
+  const {
+    viewEvent: eventView,
+    hasTranslation,
+    showingTranslation,
+    toggle: toggleTranslation,
+    sourceLocale,
+  } = useTranslatedEvent(event);
 
   const { data: referralCodeCount } = useQuery({
     queryKey: ["referralCodeCount"],
@@ -435,10 +453,21 @@ export default function ReplyPage() {
           </h2>
         </div>
 
-        <h3 className="tx-16 lh-24 fw-m text-primary mb-2">{event.title}</h3>
-        <p className="tx-14 lh-20 text-secondary mb-4 whitespace-pre-line">
-          {event.description}
+        <h3 className="tx-16 lh-24 fw-m text-primary mb-2">
+          {eventView?.title ?? event.title}
+        </h3>
+        <p className="tx-14 lh-20 text-secondary whitespace-pre-line">
+          {eventView?.description ?? event.description}
         </p>
+        {hasTranslation && (
+          <TranslationBar
+            className="mt-1"
+            sourceLocale={sourceLocale}
+            showingTranslation={showingTranslation}
+            onToggle={toggleTranslation}
+          />
+        )}
+        <div className="mb-4" />
 
         <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-4">
           <EventInfoBox
@@ -585,7 +614,7 @@ export default function ReplyPage() {
               <span className="text-accent">*</span>
             </label>
             <div className="mt-2 flex flex-col gap-3">
-              {event.options?.map((option, index) => {
+              {(eventView?.options ?? event.options)?.map((option, index) => {
                 const optionText =
                   typeof option === "string" ? option : option.option_text;
                 const optionId =

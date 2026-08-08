@@ -999,5 +999,19 @@
     "hoursAgo": "{{hours}} 小時前",
     "daysAgo": "{{days}} 天前",
     "weeksAgo": "{{weeks}} 週前"
+  },
+  "contentTranslation": {
+    "showOriginal": "顯示原文",
+    "showTranslation": "顯示翻譯",
+    "translatedFrom": "由{{language}}翻譯",
+    "machineTranslated": "機器翻譯",
+    "languageNames": {
+      "en": "英文",
+      "zh": "中文",
+      "ja": "日文",
+      "ko": "韓文",
+      "es": "西班牙文",
+      "de": "德文"
+    }
   }
 }
