@@ -1,6 +1,7 @@
 import { afterAll, describe, expect, it } from "vitest";
 
 import en from "@/locals/en.json";
+import es from "@/locals/es.json";
 import ja from "@/locals/ja.json";
 import ko from "@/locals/ko.json";
 import zh from "@/locals/zh.json";
@@ -66,7 +67,7 @@ const isUnbalanced = (value: unknown): boolean => {
 };
 
 const enPaths = leafPaths(en);
-const translations: Record<string, unknown> = { zh, ja, ko };
+const translations: Record<string, unknown> = { zh, ja, ko, es };
 
 describe("the locale files", () => {
   it("ships one file per language the switcher offers", () => {
@@ -137,11 +138,13 @@ describe("the locale files", () => {
 });
 
 // Each full translation, with the strings the interface check pins: how the
-// language names the language menu, and its create-event button label (both
-// deliberately shortened to fit their boxes - see the PR descriptions).
+// language names the language menu, and its create-event button label (the
+// CJK ones deliberately shortened to fit their boxes - see the PR
+// descriptions).
 const fullLocales: [string, string, string][] = [
   ["ja", "言語", "イベント作成"],
   ["ko", "언어", "이벤트 생성"],
+  ["es", "Idioma", "Crear evento"],
 ];
 
 describe.each(fullLocales)(
