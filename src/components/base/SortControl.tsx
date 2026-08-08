@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { CheckMark } from "@/components/base/CheckMark";
+
 export type SortOrder = "asc" | "desc";
 
 export interface SortOption<T extends string> {
@@ -52,27 +54,6 @@ function DirectionArrow({ order, className }: { order: SortOrder; className?: st
           strokeLinejoin="round"
         />
       )}
-    </svg>
-  );
-}
-
-function CheckMark() {
-  return (
-    <svg
-      width="12"
-      height="9"
-      viewBox="0 0 12 9"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="shrink-0"
-    >
-      <path
-        d="M1 4L4.5 7.5L11 1"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
     </svg>
   );
 }

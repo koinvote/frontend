@@ -99,7 +99,7 @@ export default function Layout() {
         {isDesktop && (
           <aside
             className={cn(
-              "fixed top-16 left-0 z-40",
+              "fixed top-16 left-0 z-40 flex flex-col",
               "h-dvh-header",
               "backdrop-blur",
               "transition-[width] duration-200 ease-out",
@@ -107,13 +107,20 @@ export default function Layout() {
               collapsed ? "w-[70px]" : "w-[280px]",
             )}
           >
+            {/* Same split as the mobile drawer: the links scroll, the footer
+                is a flex sibling below them. It used to be absolutely pinned
+                inside this scroll area, which clipped the language menu when
+                it opened past the sidebar edge. */}
             <div
               className={cn(
-                "h-full overflow-y-auto py-2 pb-20",
+                "min-h-0 flex-1 overflow-y-auto py-2",
                 collapsed ? "px-0" : "px-2",
               )}
             >
               <Menu collapsed={collapsed} onItemClick={handleClose} />
+            </div>
+            <div className="shrink-0">
+              <MenuFooter collapsed={collapsed} />
             </div>
 
             {/* Sidebar Toggle Button */}
@@ -197,7 +204,7 @@ export default function Layout() {
                 footer sits after the scroll area as a normal flex child (not
                 pinned over it) so it can never cover the last menu items. */}
             <div className="min-h-0 flex-1 overflow-y-auto">
-              <Menu onItemClick={handleClose} showFooter={false} />
+              <Menu onItemClick={handleClose} />
             </div>
             <div className="-mx-3 -mb-3 shrink-0">
               <MenuFooter />

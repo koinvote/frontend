@@ -1,8 +1,13 @@
 import { create } from "zustand";
-import i18n from "i18next";
 
-export type AppLanguage = "en" | "zh";
-const LANGUAGE_KEY = "PREFERRED_LANGUAGE";
+import i18n, {
+  LANGUAGE_KEY,
+  resolveLanguage,
+  syncDocumentLanguage,
+  type AppLanguage,
+} from "@/i18n";
+
+export type { AppLanguage };
 
 interface LanguageState {
   current: AppLanguage;
@@ -10,25 +15,20 @@ interface LanguageState {
   initLanguage: () => void;
 }
 
-const getInitialLanguage = (): AppLanguage => {
-  const saved = localStorage.getItem(LANGUAGE_KEY);
-  return saved === "zh" ? "zh" : "en";
-};
-
 export const useLanguagesStore = create<LanguageState>((set) => ({
-  current: getInitialLanguage(),
+  current: resolveLanguage(localStorage.getItem(LANGUAGE_KEY)),
 
   setLanguage: (lang) => {
     i18n.changeLanguage(lang);
     localStorage.setItem(LANGUAGE_KEY, lang);
+    syncDocumentLanguage(lang);
     set({ current: lang });
   },
 
   initLanguage: () => {
-    const saved = localStorage.getItem(LANGUAGE_KEY) as AppLanguage | null;
-    const fallback: AppLanguage = "en";
-    const selected = saved ?? fallback;
+    const selected = resolveLanguage(localStorage.getItem(LANGUAGE_KEY));
     i18n.changeLanguage(selected);
+    syncDocumentLanguage(selected);
     set({ current: selected });
   },
 }));

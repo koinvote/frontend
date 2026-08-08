@@ -55,7 +55,7 @@ npm run preview
 - **State Management**: Zustand (stores in `src/stores/`)
 - **Data Fetching**: TanStack Query (React Query)
 - **Styling**: Tailwind CSS 4 + Ant Design
-- **i18n**: react-i18next (English/Chinese translations in `src/locals/`)
+- **i18n**: react-i18next (English/Chinese/Japanese translations in `src/locals/`)
 
 ### Project Structure
 
@@ -73,7 +73,7 @@ src/
 │   └── base/         # Base components like Toast
 ├── hooks/            # Custom React hooks
 ├── layout/           # Layout components (Layout, AdminLayout)
-├── locals/           # i18n translation files (en.json, zh.json)
+├── locals/           # i18n translation files (en.json, zh.json, ja.json)
 ├── mocks/            # MSW mock API handlers and data (dev only)
 ├── pages/            # Public-facing pages
 ├── stores/           # Zustand stores
@@ -114,8 +114,10 @@ src/
 
 #### Internationalization
 - i18next configured in `src/i18n.ts`
-- Translation files: `src/locals/en.json` and `src/locals/zh.json`
+- Translation files: `src/locals/en.json`, `src/locals/zh.json`, `src/locals/ja.json`
 - Default language: English
+- **Adding a language**: add its JSON file and one entry to `SUPPORTED_LANGUAGES` in `src/i18n.ts`. The switcher in the menu footer renders that list, so nothing else needs touching. `src/locals/locales.test.ts` compares every file against English key by key.
+- Japanese deliberately omits the four policy sections (`privacy`, `terms`, `charges`, `rewardTerms`) — that legal text awaits a human translation, and i18next falls back per key, so those pages render in English. Leave the keys **absent**: an empty string renders a blank page instead of falling back.
 - Access translations via `useTranslation()` hook from react-i18next
 - **IMPORTANT**: Always provide a default fallback string when using `t()` function:
   ```typescript
