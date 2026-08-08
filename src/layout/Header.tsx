@@ -106,7 +106,7 @@ export default function Header({
             size="md"
             text="sm"
             block={false}
-            className="w-auto md:w-[140px] md:tx-14 lg:tx-16"
+            className="w-auto min-w-[88px] md:w-[140px] md:tx-14 lg:tx-16"
             onClick={() => {
               if (location.pathname === "/create-event") {
                 return;
