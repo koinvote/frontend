@@ -10,10 +10,18 @@ import Terms from "@/pages/terms";
 import TermsOfRewardDistribution from "@/pages/terms/TermsOfRewardDistribution";
 
 // The four public policy pages pull every sentence from the locale files. A key
-// that exists in one language and not the other, or a key the page asks for and
-// neither file defines, does not throw - i18next renders the key itself, so the
-// page quietly shows "rewardTerms.s3_4" to a user. Rendering each page in both
-// languages and looking for that shape is the only check that catches it.
+// that exists in one language and not another, or a key the page asks for and
+// no file defines, does not throw - i18next renders the key itself, so the page
+// quietly shows "rewardTerms.s3_4" to a user. Rendering each page in every
+// language and looking for that shape is the only check that catches it.
+
+// Each language paired with how its policy pages state the date they were last
+// changed - the one sentence every policy page is required to carry.
+const languages: [string, RegExp][] = [
+  ["en", /Last updated/],
+  ["zh", /最後更新/],
+  ["ja", /最終更新/],
+];
 
 const pages: [string, ReactElement][] = [
   ["Terms of Service", <Terms />],
@@ -29,7 +37,7 @@ afterAll(async () => {
   await i18n.changeLanguage("en");
 });
 
-describe.each(["en", "zh"])("the policy pages in %s", (lang) => {
+describe.each(languages)("the policy pages in %s", (lang, dateLine) => {
   it.each(pages)("renders %s with every key resolved", async (_name, ui) => {
     await i18n.changeLanguage(lang);
 
@@ -44,7 +52,7 @@ describe.each(["en", "zh"])("the policy pages in %s", (lang) => {
     await i18n.changeLanguage(lang);
 
     for (const [, ui] of pages) {
-      expect(textOf(ui)).toMatch(lang === "en" ? /Last updated/ : /最後更新/);
+      expect(textOf(ui)).toMatch(dateLine);
     }
   });
 });

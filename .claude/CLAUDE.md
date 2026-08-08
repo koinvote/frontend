@@ -55,7 +55,7 @@ npm run preview
 - **State Management**: Zustand (stores in `src/stores/`)
 - **Data Fetching**: TanStack Query (React Query)
 - **Styling**: Tailwind CSS 4 + Ant Design
-- **i18n**: react-i18next (English/Chinese translations in `src/locals/`)
+- **i18n**: react-i18next (English/Chinese/Japanese translations in `src/locals/`)
 
 ### Project Structure
 
@@ -73,7 +73,7 @@ src/
 │   └── base/         # Base components like Toast
 ├── hooks/            # Custom React hooks
 ├── layout/           # Layout components (Layout, AdminLayout)
-├── locals/           # i18n translation files (en.json, zh.json)
+├── locals/           # i18n translation files (en.json, zh.json, ja.json)
 ├── mocks/            # MSW mock API handlers and data (dev only)
 ├── pages/            # Public-facing pages
 ├── stores/           # Zustand stores
@@ -114,8 +114,11 @@ src/
 
 #### Internationalization
 - i18next configured in `src/i18n.ts`
-- Translation files: `src/locals/en.json` and `src/locals/zh.json`
+- Translation files: `src/locals/en.json`, `src/locals/zh.json`, `src/locals/ja.json`
 - Default language: English
+- **Adding a language**: add its JSON file and one entry to `SUPPORTED_LANGUAGES` in `src/i18n.ts`. The switcher in the menu footer renders that list, so nothing else needs touching.
+- `src/locals/locales.test.ts` holds every file to English key by key: same keys, same `{{placeholders}}`, same `<a>`/`<a1>`/`<a2>` cross-policy links, balanced markup tags, no empty strings. Which phrase a translation puts in `<bold>` is the translator's call and is not compared — the Chinese pages deliberately bold more than the English ones.
+- `src/pages/terms/legalPages.test.tsx` renders the four policy pages in **every** language; add new ones to its `languages` list along with the wording that page uses for "last updated".
 - Access translations via `useTranslation()` hook from react-i18next
 - **IMPORTANT**: Always provide a default fallback string when using `t()` function:
   ```typescript

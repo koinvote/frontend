@@ -1,5 +1,5 @@
 import { cn } from "@/utils/style";
-import { GlobalOutlined, MoonOutlined, SunOutlined } from "@ant-design/icons";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons";
 import { Button, Divider, Tooltip } from "antd";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
@@ -13,17 +13,12 @@ import SupportIcon from "@/assets/icons/menu-support.svg?react";
 import TermsIcon from "@/assets/icons/menu-terms.svg?react";
 import VerificationIcon from "@/assets/icons/menu-verificationTool.svg?react";
 import XIcon from "@/assets/logo/x.svg?react";
-import { useLanguagesStore } from "@/stores/languagesStore";
+import { LanguageSwitcher } from "@/components/base/LanguageSwitcher";
 import { useThemeStore } from "@/stores/themeStore";
 
 interface MenuProps {
   onItemClick?: () => void;
   collapsed?: boolean;
-  /** Render the language/theme footer pinned to the bottom of the nearest
-   *  positioned ancestor (desktop sidebar). The mobile drawer passes false
-   *  and lays out MenuFooter as a normal flex child instead, so it can
-   *  never overlap the menu items. */
-  showFooter?: boolean;
 }
 
 type Item = {
@@ -195,11 +190,7 @@ function MenuItem({
   );
 }
 
-const Menu = ({
-  onItemClick,
-  collapsed = false,
-  showFooter = true,
-}: MenuProps) => {
+const Menu = ({ onItemClick, collapsed = false }: MenuProps) => {
   const { t } = useTranslation();
 
   const theme = useThemeStore((state) => state.theme);
@@ -258,12 +249,6 @@ const Menu = ({
           </li>
         ))}
       </ul>
-
-      {showFooter && (
-        <div className="absolute bottom-0 left-0 w-full">
-          <MenuFooter collapsed={collapsed} />
-        </div>
-      )}
     </nav>
   );
 };
@@ -274,66 +259,35 @@ export function MenuFooter({ collapsed = false }: { collapsed?: boolean }) {
   const theme = useThemeStore((state) => state.theme);
   const toggle = useThemeStore((state) => state.toggle);
 
-  const { current, setLanguage } = useLanguagesStore();
-  const toggleLang = () => setLanguage(current === "en" ? "zh" : "en");
+  const themeButton = (
+    <Button
+      type="link"
+      size="middle"
+      onClick={toggle}
+      className="w-auto px-3"
+      icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
+      autoInsertSpace={false}
+    >
+      {!collapsed && (theme === "dark" ? t("menu.light") : t("menu.dark"))}
+    </Button>
+  );
 
   return (
     <div className="border-border border-t p-4">
-      {collapsed ? (
-            <div>
-              <Tooltip
-                placement="right"
-                title={current === "en" ? "中文" : "EN"}
-                color={theme === "dark" ? "#000" : "#fff"}
-              >
-                <Button
-                  type="link"
-                  size="middle"
-                  onClick={toggleLang}
-                  className="w-auto px-3"
-                  icon={<GlobalOutlined />}
-                  autoInsertSpace={false}
-                ></Button>
-              </Tooltip>
-              <Tooltip
-                placement="right"
-                title={theme === "dark" ? t("menu.light") : t("menu.dark")}
-                color={theme === "dark" ? "#000" : "#fff"}
-              >
-                <Button
-                  type="link"
-                  size="middle"
-                  onClick={toggle}
-                  className="w-auto px-3"
-                  icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
-                  autoInsertSpace={false}
-                ></Button>
-              </Tooltip>
-            </div>
-          ) : (
-            <div>
-              <Button
-                type="link"
-                size="middle"
-                onClick={toggleLang}
-                className="w-auto px-3"
-                icon={<GlobalOutlined />}
-                autoInsertSpace={false}
-              >
-                {current === "en" ? "中文" : "EN"}
-              </Button>
-              <Button
-                type="link"
-                size="middle"
-                onClick={toggle}
-                className="w-auto px-3"
-                icon={theme === "dark" ? <SunOutlined /> : <MoonOutlined />}
-                autoInsertSpace={false}
-              >
-                {theme === "dark" ? t("menu.light") : t("menu.dark")}
-              </Button>
-            </div>
-      )}
+      <div>
+        <LanguageSwitcher collapsed={collapsed} />
+        {collapsed ? (
+          <Tooltip
+            placement="right"
+            title={theme === "dark" ? t("menu.light") : t("menu.dark")}
+            color={theme === "dark" ? "#000" : "#fff"}
+          >
+            {themeButton}
+          </Tooltip>
+        ) : (
+          themeButton
+        )}
+      </div>
     </div>
   );
 }
