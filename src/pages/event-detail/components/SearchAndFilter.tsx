@@ -1,15 +1,13 @@
 import { useTranslation } from "react-i18next";
 
 import { EventStatus, ReplySortBy } from "@/api/types";
-import ArrowDownIcon from "@/assets/icons/arrowDown.svg?react";
 import ClearIcon from "@/assets/icons/clear.svg?react";
 import OnChainIcon from "@/assets/icons/onChain.svg?react";
 import SearchIcon from "@/assets/icons/search.svg?react";
-import SortAscIcon from "@/assets/icons/sort-asc.svg?react";
-import SortDescIcon from "@/assets/icons/sort-desc.svg?react";
 import { Button } from "@/components/base/Button";
+import { SortControl, type SortOrder } from "@/components/base/SortControl";
 import { useDebouncedClick } from "@/utils/helper";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./SearchAndFilter.module.css";
 
 interface SearchAndFilterProps {
@@ -37,27 +35,8 @@ export function SearchAndFilter({
     typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME
   >(ReplySortBy.TIME);
   const [order, setOrder] = useState<"desc" | "asc">("desc");
-  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
-  const sortDropdownRef = useRef<HTMLDivElement>(null);
   const [spinDeg, setSpinDeg] = useState(0);
   const { t } = useTranslation();
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        sortDropdownRef.current &&
-        !sortDropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsSortDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -71,18 +50,13 @@ export function SearchAndFilter({
     setSearch(value);
   };
 
-  const toggleOrder = () => {
-    const newOrder = order === "desc" ? "asc" : "desc";
-    setOrder(newOrder);
-    onSortChange?.(sortBy, newOrder);
-  };
-
-  const handleSortFieldChange = (
+  const handleSortChange = (
     newSortBy: typeof ReplySortBy.BALANCE | typeof ReplySortBy.TIME,
+    newOrder: SortOrder,
   ) => {
     setSortBy(newSortBy);
-    setIsSortDropdownOpen(false);
-    onSortChange?.(newSortBy, order);
+    setOrder(newOrder);
+    onSortChange?.(newSortBy, newOrder);
   };
 
   const handleRewardClick = useDebouncedClick(() => {
@@ -133,84 +107,32 @@ export function SearchAndFilter({
       {/* Filter and Sort */}
       <div className="flex items-center gap-2 w-full md:w-auto">
         {/* Sort Control */}
-        <div
-          className="flex-1 md:flex-none flex items-center h-9 bg-white 
-          dark:bg-surface rounded-lg border 
-          border-border"
-        >
-          {/* Order Toggle */}
-          <button
-            type="button"
-            onClick={toggleOrder}
-            className="flex items-center justify-center w-9 h-full border-r 
-            border-border hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors cursor-pointer"
-            aria-label={
-              order === "desc"
-                ? t("searchFilter.sortDesc", "Sort descending")
-                : t("searchFilter.sortAsc", "Sort ascending")
-            }
-          >
-            {order === "desc" ? (
-              <SortDescIcon className="w-4 h-4" />
-            ) : (
-              <SortAscIcon className="w-4 h-4" />
-            )}
-          </button>
-
-          {/* Sort Field Select */}
-          <div
-            className="relative h-full flex-1 md:text-center"
-            ref={sortDropdownRef}
-          >
-            <button
-              type="button"
-              onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-              className="w-full md:w-[90px] h-full flex items-center justify-center gap-2 px-3
-              hover:bg-black/[0.06] dark:hover:bg-white/10 transition-colors rounded-r-lg text-center cursor-pointer"
-            >
-              <span className="text-sm font-medium text-primary capitalize">
-                {sortBy === "balance"
-                  ? t("searchFilter.balance", "Balance")
-                  : t("searchFilter.time", "Time")}
-              </span>
-              <ArrowDownIcon
-                className={`w-2 h-2 text-secondary transition-transform duration-200 ${
-                  isSortDropdownOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {/* Dropdown Menu */}
-            {isSortDropdownOpen && (
-              <div className="absolute top-full right-0 mt-1 min-w-full w-28 bg-white dark:bg-surface border border-border rounded-lg shadow-lg z-10 overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => handleSortFieldChange(ReplySortBy.BALANCE)}
-                  className={`w-full text-center px-4 py-2 text-sm hover:bg-black/[0.06]
-                    dark:hover:bg-white/10 transition-colors ${
-                      sortBy === ReplySortBy.BALANCE
-                        ? "text-accent font-medium bg-accent/5"
-                        : "text-primary"
-                    }`}
-                >
-                  {t("searchFilter.balance", "Balance")}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleSortFieldChange(ReplySortBy.TIME)}
-                  className={`w-full text-center px-4 py-2 text-sm hover:bg-black/[0.06]
-                    dark:hover:bg-white/10 transition-colors ${
-                      sortBy === ReplySortBy.TIME
-                        ? "text-accent font-medium bg-accent/5"
-                        : "text-primary"
-                    }`}
-                >
-                  {t("searchFilter.time", "Time")}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        <SortControl
+          className="flex-1 md:flex-none md:w-[128px]"
+          options={[
+            {
+              value: ReplySortBy.BALANCE,
+              label: t("searchFilter.balance", "Balance"),
+              orderLabels: {
+                desc: t("searchFilter.orderHighFirst", "High to low"),
+                asc: t("searchFilter.orderLowFirst", "Low to high"),
+              },
+              defaultOrder: "desc",
+            },
+            {
+              value: ReplySortBy.TIME,
+              label: t("searchFilter.time", "Time"),
+              orderLabels: {
+                desc: t("searchFilter.orderNewestFirst", "Newest first"),
+                asc: t("searchFilter.orderOldestFirst", "Oldest first"),
+              },
+              defaultOrder: "desc",
+            },
+          ]}
+          field={sortBy}
+          order={order}
+          onChange={handleSortChange}
+        />
 
         {/* Reward Button (Active Only) OR On-chain Button (Completed Only) */}
 
