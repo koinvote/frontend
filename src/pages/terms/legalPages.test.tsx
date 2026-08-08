@@ -23,6 +23,7 @@ const languages: [string, RegExp][] = [
   ["ja", /最終更新/],
   ["ko", /마지막 업데이트/],
   ["es", /Última actualización/],
+  ["de", /Zuletzt aktualisiert/],
 ];
 
 const pages: [string, ReactElement][] = [
