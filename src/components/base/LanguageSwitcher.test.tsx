@@ -2,8 +2,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import i18n, { LANGUAGE_KEY } from "@/i18n";
+import i18n, { detectLanguage } from "@/i18n";
 import { useLanguagesStore } from "@/stores/languagesStore";
+import { LEGACY_LANGUAGE_KEY, LOCALE_COOKIE } from "@/utils/localePreference";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 // These run against the real i18n instance and the real store: what is worth
@@ -14,13 +15,28 @@ const openMenu = async (user: ReturnType<typeof userEvent.setup>) => {
   await user.click(screen.getByRole("button", { expanded: false }));
 };
 
-beforeEach(async () => {
+const forgetSavedLanguage = () => {
+  document.cookie = `${LOCALE_COOKIE}=; Path=/; Max-Age=0`;
   localStorage.clear();
+};
+
+/** Stands in for whatever languages the reader has set in their browser. */
+const setBrowserLanguages = (languages: string[]) => {
+  Object.defineProperty(window.navigator, "languages", {
+    value: languages,
+    configurable: true,
+  });
+};
+
+beforeEach(async () => {
+  forgetSavedLanguage();
   await i18n.changeLanguage("en");
   useLanguagesStore.setState({ current: "en" });
 });
 
 afterEach(async () => {
+  forgetSavedLanguage();
+  Reflect.deleteProperty(window.navigator, "languages");
   await i18n.changeLanguage("en");
 });
 
@@ -70,9 +86,25 @@ describe("the language switcher", () => {
     await user.click(screen.getByRole("menuitemradio", { name: "日本語" }));
 
     expect(i18n.language).toBe("ja");
-    expect(localStorage.getItem(LANGUAGE_KEY)).toBe("ja");
+    expect(document.cookie).toContain(`${LOCALE_COOKIE}=ja`);
+    expect(localStorage.getItem(LEGACY_LANGUAGE_KEY)).toBe("ja");
     expect(document.documentElement.lang).toBe("ja");
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+  });
+
+  it("holds the choice against a browser that asks for something else", async () => {
+    const user = userEvent.setup();
+    // A German browser, which is what the reader would get on a fresh visit.
+    setBrowserLanguages(["de-DE", "de"]);
+    expect(detectLanguage()).toBe("de");
+
+    render(<LanguageSwitcher />);
+    await openMenu(user);
+    await user.click(screen.getByRole("menuitemradio", { name: "한국어" }));
+
+    // What the next page load would open in. Having been asked for Korean
+    // once, the site does not quietly go back to German.
+    expect(detectLanguage()).toBe("ko");
   });
 
   it("closes without changing anything when the language in use is picked", async () => {

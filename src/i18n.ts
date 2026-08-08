@@ -1,6 +1,13 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
+import { resolveLocale } from "@/utils/locale";
+import {
+  readBrowserLanguages,
+  readGeoCountry,
+  readSavedLocale,
+} from "@/utils/localePreference";
+
 import en from "@/locals/en.json";
 import ja from "@/locals/ja.json";
 import de from "@/locals/de.json";
@@ -29,10 +36,10 @@ export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number]["code"];
 
 export const DEFAULT_LANGUAGE: AppLanguage = "en";
 
-export const LANGUAGE_KEY = "PREFERRED_LANGUAGE";
+const SUPPORTED_CODES = SUPPORTED_LANGUAGES.map((lang) => lang.code);
 
 /**
- * localStorage holds whatever an older build — or a hand-edited value — left
+ * A stored value is whatever an older build — or a hand-edited cookie — left
  * behind, so every read goes through here rather than being trusted as a code.
  */
 export const resolveLanguage = (
@@ -42,7 +49,36 @@ export const resolveLanguage = (
     ? (value as AppLanguage)
     : DEFAULT_LANGUAGE;
 
-const lng = resolveLanguage(localStorage.getItem(LANGUAGE_KEY));
+/**
+ * Works out the language to open the site in: the one the reader chose on an
+ * earlier visit, else the best match for their browser's languages, else the
+ * country they are in, else English. `@/utils/locale` holds the rules; this
+ * hands it the registry above and the browser's answers.
+ *
+ * Called once at import, before React renders, so the first paint is already
+ * in the right language rather than switching out from under the reader.
+ */
+export const detectLanguage = (): AppLanguage => {
+  try {
+    return resolveLocale({
+      savedPreference: readSavedLocale(),
+      browserLanguages: readBrowserLanguages(),
+      geoCountry: readGeoCountry(),
+      supportedLocales: SUPPORTED_CODES,
+      defaultLocale: DEFAULT_LANGUAGE,
+    });
+  } catch {
+    // Whatever went wrong reading a preference, an unreadable one is not a
+    // reason for the site not to load.
+    return DEFAULT_LANGUAGE;
+  }
+};
+
+/**
+ * The language the app started in. The store reads this rather than detecting
+ * again, so there is one answer per page load and one path that produced it.
+ */
+export const INITIAL_LANGUAGE = detectLanguage();
 
 i18n
   .use(initReactI18next)
@@ -55,7 +91,7 @@ i18n
       es: { translation: es },
       de: { translation: de }
     },
-    lng,
+    lng: INITIAL_LANGUAGE,
     fallbackLng: DEFAULT_LANGUAGE,
     interpolation: {
       escapeValue: false,
@@ -72,6 +108,6 @@ export const syncDocumentLanguage = (lang: AppLanguage) => {
   document.documentElement.lang = lang;
 };
 
-syncDocumentLanguage(lng);
+syncDocumentLanguage(INITIAL_LANGUAGE);
 
 export default i18n;

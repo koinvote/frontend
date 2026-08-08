@@ -33,6 +33,16 @@
   <meta name="twitter:image:alt" content="Koinvote - A forum for Bitcoiners" />
   <meta property="og:image:type" content="image/png" />
 
+  <!--
+    The site picks its language from the reader's saved choice, then their
+    browser's languages, then the country the request came from. Nothing knows
+    a country today. When something does, it publishes it into this head as
+    <meta name="koinvote-geo-country" content="TW"> — nginx can add it on the
+    way out — and the resolver picks it up with no change to the app. Only
+    infrastructure may write that tag; a country a client can set is a country
+    a client can lie about.
+  -->
+
   <script type="application/ld+json">
   [
     {
