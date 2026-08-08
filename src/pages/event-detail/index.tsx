@@ -1,5 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useLanguagesStore } from "@/stores/languagesStore";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, useParams } from "react-router";
 
@@ -47,16 +48,21 @@ const EventDetail = () => {
   const [creatorEmail, setCreatorEmail] = useState(initialUnlockEmail ?? "");
   const [unlockedEmail, setUnlockedEmail] = useState(initialUnlockEmail ?? "");
 
+  // Translations ride on the responses in this language, so it is part of
+  // both query keys: switching language refetches with the right locale.
+  const locale = useLanguagesStore((state) => state.current);
+
   const {
     data: eventDetail,
     isLoading: isLoadingEvent,
     error: eventError,
   } = useQuery({
-    queryKey: ["eventDetail", eventId, unlockedEmail],
+    queryKey: ["eventDetail", eventId, unlockedEmail, locale],
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
       const response = (await API.getEventDetail(eventId)({
         unlock_email: unlockedEmail || undefined,
+        locale,
       })) as unknown as ApiResponse<EventDetailDataRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch event detail");
@@ -99,6 +105,7 @@ const EventDetail = () => {
       eventId,
       effectiveBalanceDisplayMode === "on_chain" ? "current" : "snapshot",
       unlockedEmail,
+      locale,
     ],
     queryFn: async () => {
       if (!eventId) throw new Error("Event ID is required");
@@ -107,6 +114,7 @@ const EventDetail = () => {
       const response = (await API.getCompletedTopReplies(eventId)({
         balance_type: balanceType,
         unlock_email: unlockedEmail || undefined,
+        locale,
       })) as unknown as ApiResponse<GetCompletedTopRepliesRes>;
       if (!response.success) {
         throw new Error(response.message || "Failed to fetch top replies");
@@ -123,6 +131,21 @@ const EventDetail = () => {
     : isTopRepliesEnabled
       ? []
       : (eventDetail?.top_replies ?? []);
+
+  // Option texts handed to the reply list, in the reader's language when a
+  // translation exists. The reply list sits far from the event block's
+  // Show-original toggle, so it stays on the translated view; the exact
+  // canonical option text is one toggle away in the event block above.
+  const replyListOptions = useMemo(() => {
+    const options = eventDetail?.options;
+    const translated = eventDetail?.translation?.options;
+    if (!options || !translated) return options ?? [];
+    return options.map((opt) =>
+      typeof opt === "string"
+        ? opt
+        : { ...opt, option_text: translated[String(opt.id)] ?? opt.option_text },
+    ) as typeof options;
+  }, [eventDetail?.options, eventDetail?.translation?.options]);
 
   // Save scroll position on scroll
   useEffect(() => {
@@ -333,7 +356,7 @@ const EventDetail = () => {
           search={search}
           sortBy={sortBy}
           order={order}
-          options={eventDetail.options}
+          options={replyListOptions}
           eventType={eventDetail.event_type}
           unlockPriceSatoshi={eventDetail.unlock_price_satoshi}
           unlockCount={eventDetail.unlock_count}

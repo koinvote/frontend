@@ -1005,5 +1005,19 @@
     "hoursAgo": "{{hours}} 時間前",
     "daysAgo": "{{days}} 日前",
     "weeksAgo": "{{weeks}} 週間前"
+  },
+  "contentTranslation": {
+    "showOriginal": "原文を表示",
+    "showTranslation": "翻訳を表示",
+    "translatedFrom": "{{language}}から翻訳",
+    "machineTranslated": "機械翻訳",
+    "languageNames": {
+      "en": "英語",
+      "zh": "中国語",
+      "ja": "日本語",
+      "ko": "韓国語",
+      "es": "スペイン語",
+      "de": "ドイツ語"
+    }
   }
 }

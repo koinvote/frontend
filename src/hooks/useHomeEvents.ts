@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { API, type ApiResponse } from "@/api/index";
 import type { GetEventListRes } from "@/api/response";
 import { useHomeStore } from "@/stores/homeStore";
+import { useLanguagesStore } from "@/stores/languagesStore";
 import { mapApiEventToEventSummary } from "@/utils/eventTransform";
 
 // Map frontend status filter to backend tab parameter
@@ -38,11 +39,17 @@ export function useHomeEvents() {
     limit,
     isLoading,
     isError,
+    eventsLocale,
     setEvents,
+    setEventsLocale,
     appendEvents,
     setLoading,
     setError,
   } = useHomeStore();
+
+  // Translations arrive with the list, in this language; it is part of what
+  // the request asks for and part of what the cached list "is".
+  const locale = useLanguagesStore((s) => s.current);
 
   // Track the status when request was made to prevent race conditions
   const requestStatusRef = useRef(status);
@@ -77,6 +84,7 @@ export function useHomeEvents() {
         tab: mapStatusToTab(requestStatus),
         q,
         tag: hashtagForTag,
+        locale,
         page: String(currentPage),
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
@@ -106,6 +114,7 @@ export function useHomeEvents() {
         const newOffset = transformedEvents.length;
 
         setEvents(transformedEvents, total, hasMoreData, newOffset);
+        setEventsLocale(locale);
       } else {
         setError(true);
       }
@@ -130,8 +139,10 @@ export function useHomeEvents() {
     filterRewardType,
     filterEventType,
     filterVisibility,
+    locale,
     limit,
     setEvents,
+    setEventsLocale,
     setLoading,
     setError,
   ]);
@@ -163,6 +174,7 @@ export function useHomeEvents() {
         tab: mapStatusToTab(requestStatus),
         q,
         tag: hashtagForTag,
+        locale,
         page: String(currentPage),
         limit: String(limit),
         sortBy: mapSortFieldToSortBy(sortField),
@@ -217,6 +229,7 @@ export function useHomeEvents() {
     filterVisibility,
     offset,
     limit,
+    locale,
     isLoading,
     hasMore,
     appendEvents,
@@ -230,10 +243,15 @@ export function useHomeEvents() {
     // 說明是頁面刷新或導航返回，此時不應該重新加載第一頁，以免丟失滾動位置和數據
     // 只有當 offset 為 0 (表示 filter 改變或被手動重置) 時才加載
     if (events.length > 0 && offset > 0) {
+      // 例外：清單是用另一個語言抓的（換過語言、或從 persist 恢復到換語言後的
+      // session）。清單身上帶著那個語言的翻譯，必須用現在的語言重抓。
+      if (eventsLocale !== locale) {
+        loadFirstPage();
+      }
       return;
     }
     loadFirstPage();
-  }, [loadFirstPage, events.length, offset]);
+  }, [loadFirstPage, events.length, offset, eventsLocale, locale]);
 
   return {
     events,

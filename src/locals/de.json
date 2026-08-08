@@ -1005,5 +1005,19 @@
     "hoursAgo": "vor {{hours}} Std.",
     "daysAgo": "vor {{days}} Tg.",
     "weeksAgo": "vor {{weeks}} Wo."
+  },
+  "contentTranslation": {
+    "showOriginal": "Original anzeigen",
+    "showTranslation": "Übersetzung anzeigen",
+    "translatedFrom": "Übersetzt aus {{language}}",
+    "machineTranslated": "Maschinell übersetzt",
+    "languageNames": {
+      "en": "Englisch",
+      "zh": "Chinesisch",
+      "ja": "Japanisch",
+      "ko": "Koreanisch",
+      "es": "Spanisch",
+      "de": "Deutsch"
+    }
   }
 }

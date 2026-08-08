@@ -159,7 +159,7 @@ export const API = {
   getEventCounts: get<ApiResponse<GetEventCountsRes>, void>("/events/counts"),
 
   getEventDetail: (eventId: string) =>
-    get<ApiResponse<EventDetailDataRes>, { unlock_email?: string }>(
+    get<ApiResponse<EventDetailDataRes>, { unlock_email?: string; locale?: string }>(
       `/events/${eventId}`,
     ),
 
@@ -213,7 +213,11 @@ export const API = {
   getCompletedTopReplies: (eventId: string) =>
     get<
       ApiResponse<GetCompletedTopRepliesRes>,
-      { balance_type?: "snapshot" | "current"; unlock_email?: string }
+      {
+        balance_type?: "snapshot" | "current";
+        unlock_email?: string;
+        locale?: string;
+      }
     >(`/events/${eventId}/completed/top-replies`),
 
   // Verification CSV API - Returns CSV file as blob
