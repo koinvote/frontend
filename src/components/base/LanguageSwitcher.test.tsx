@@ -43,6 +43,7 @@ describe("the language switcher", () => {
       "English",
       "中文",
       "日本語",
+      "한국어",
     ]);
   });
 
@@ -129,6 +130,6 @@ describe("the language switcher", () => {
     expect(trigger).toHaveAccessibleName("Language: English");
 
     await user.click(trigger);
-    expect(screen.getAllByRole("menuitemradio")).toHaveLength(3);
+    expect(screen.getAllByRole("menuitemradio")).toHaveLength(4);
   });
 });
