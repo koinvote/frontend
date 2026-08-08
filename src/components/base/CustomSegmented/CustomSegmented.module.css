@@ -7,7 +7,12 @@
   --segmented-selected-color: #0a0a0a;
 
   position: relative;
-  display: inline-flex;
+  /* Equal-width columns: every segment gets the width of the widest label,
+     so the selected thumb is the same size on every option regardless of
+     label length (e.g. ja "終了" vs "開始前"). Supported since Safari 10.1. */
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   align-items: stretch;
   padding: 4px;
   background: var(--color-surface);
@@ -25,7 +30,7 @@
 }
 
 .block {
-  display: flex;
+  display: grid;
   width: 100%;
 }
 
@@ -74,9 +79,6 @@
   user-select: none;
   overflow: hidden;
   text-overflow: ellipsis;
-  @media (max-width: 768px) {
-    flex: 1;
-  }
 }
 
 .item:focus {
