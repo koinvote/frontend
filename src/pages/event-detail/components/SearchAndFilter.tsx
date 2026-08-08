@@ -106,34 +106,6 @@ export function SearchAndFilter({
 
       {/* Filter and Sort */}
       <div className="flex items-center gap-2 w-full md:w-auto">
-        {/* Sort Control */}
-        <SortControl
-          className="flex-1 md:flex-none md:w-[128px]"
-          options={[
-            {
-              value: ReplySortBy.BALANCE,
-              label: t("searchFilter.balance", "Balance"),
-              orderLabels: {
-                desc: t("searchFilter.orderHighFirst", "High to low"),
-                asc: t("searchFilter.orderLowFirst", "Low to high"),
-              },
-              defaultOrder: "desc",
-            },
-            {
-              value: ReplySortBy.TIME,
-              label: t("searchFilter.time", "Time"),
-              orderLabels: {
-                desc: t("searchFilter.orderNewestFirst", "Newest first"),
-                asc: t("searchFilter.orderOldestFirst", "Oldest first"),
-              },
-              defaultOrder: "desc",
-            },
-          ]}
-          field={sortBy}
-          order={order}
-          onChange={handleSortChange}
-        />
-
         {/* Reward Button (Active Only) OR On-chain Button (Completed Only) */}
 
         {/* {(isActive || isPreheat) && (
@@ -186,6 +158,36 @@ export function SearchAndFilter({
             </Button>
           </div>
         )}
+
+        {/* Sort Control — keep last: its menu is anchored to the control's
+            right edge, so the control must sit at the group's right for the
+            menu to stay inside the viewport on mobile. */}
+        <SortControl
+          className="flex-1 md:flex-none md:w-[128px]"
+          options={[
+            {
+              value: ReplySortBy.BALANCE,
+              label: t("searchFilter.balance", "Balance"),
+              orderLabels: {
+                desc: t("searchFilter.orderHighFirst", "High to low"),
+                asc: t("searchFilter.orderLowFirst", "Low to high"),
+              },
+              defaultOrder: "desc",
+            },
+            {
+              value: ReplySortBy.TIME,
+              label: t("searchFilter.time", "Time"),
+              orderLabels: {
+                desc: t("searchFilter.orderNewestFirst", "Newest first"),
+                asc: t("searchFilter.orderOldestFirst", "Oldest first"),
+              },
+              defaultOrder: "desc",
+            },
+          ]}
+          field={sortBy}
+          order={order}
+          onChange={handleSortChange}
+        />
       </div>
     </div>
   );
